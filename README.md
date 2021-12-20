@@ -6,3 +6,4 @@ These changes where made on the 20th of december 2021 and if Easylist changes, t
 
 The original Filters:
 https://easylist.to/
+https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm
