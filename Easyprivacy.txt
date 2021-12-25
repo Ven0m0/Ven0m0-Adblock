@@ -1,14 +1,6 @@
-[Adblock Plus 1.1]
-! Version: 202112192004
-! Title: EasyPrivacy
-! Last modified: 19 Dec 2021 20:04 UTC
-! Expires: 4 days (update frequency)
-! Homepage: https://easylist.to/
-! Licence: https://easylist.to/pages/licence.html
-! 
-! Please report any unblocked tracking or problems
-! in the forums (https://forums.lanik.us/)
-! or via e-mail (easylist@protonmail.com).
+! Title: EasyPrivacy without Network Filters
+! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+
 ! -----------------General tracking systems-----------------!
 ! *** easylist:easyprivacy/easyprivacy_general.txt ***
 &action=confection_send_data&
