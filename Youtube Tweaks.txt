@@ -131,3 +131,10 @@ youtube.com##.yt-uix-button[data-trigger-for=action-panel-share]
 
 ! "Subscribe to see more videos from this channel" on home page after watching some video of a channel
 youtube.com###channel-subscription-promo-in-feed
+
+! Remove Voice Search BUtton
+www.youtube.com###voice-search-button > .size-default.style-default.ytd-masthead.style-scope > .ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-default.ytd-button-renderer.style-scope
+www.youtube.com###voice-search-button
+
+! Remove Share Button
+www.youtube.com##ytd-button-renderer.size-default.style-default.force-icon-button.ytd-menu-renderer.style-scope:nth-of-type(1) > .ytd-button-renderer.style-scope.yt-simple-endpoint
