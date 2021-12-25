@@ -1,3 +1,7 @@
+! Title: Youtube Tweaks
+! Description: This list makes Youtube much more enjoyable
+! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+
 ! Google consent, "before you continue"
 www.google.*##^script:has-text(consentCookiePayload)
 www.google.*##+js(acis, document.cookie, YES+)
