@@ -1,17 +1,6 @@
-[Adblock Plus 1.1]
-! Version: 202112221928
 ! Title: EasyList Germany without Network Filters
-! Last modified: 22 Dec 2021 19:28 UTC
-! Expires: 1 days (update frequency)
-! Homepage: https://easylist.to/
-! Licence: https://easylist.to/pages/licence.html
-! 
-! Bitte melde ungeblockte Werbung und fälschlicherweise geblockte Dinge:
-! Forum: https://forums.lanik.us/viewforum.php?f=90
-! E-Mail: easylist.germany@gmail.com
-! GitHub issues: https://github.com/easylist/easylistgermany/issues
-! GitHub pull requests: https://github.com/easylist/easylistgermany/pulls
-! 
+! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+
 ! ----------------Allgemeine Regeln zum Blockieren von Werbung-----------------!
 ! *** easylistgermany:easylistgermany/easylistgermany_general_block.txt ***
 &werbemittel=
