@@ -1,6 +1,6 @@
 [Adblock Plus 1.1]
 ! Version: 202112221928
-! Title: EasyList Germany
+! Title: EasyList Germany without Network Filters
 ! Last modified: 22 Dec 2021 19:28 UTC
 ! Expires: 1 days (update frequency)
 ! Homepage: https://easylist.to/
