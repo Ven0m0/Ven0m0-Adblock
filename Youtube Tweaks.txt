@@ -6,7 +6,6 @@
 www.google.*##^script:has-text(consentCookiePayload)
 www.google.*##+js(acis, document.cookie, YES+)
 google.*##+js(aeld, DOMContentLoaded, CONSENT)
-||consent.google.com^
 
 ! Hide Reddit 'Top Broadcast Now' & 'Top livestream'
 reddit.com##a[href^="/rpan/"] > h3:has-text(/Top (livestream|broadcast)/):upward(7)
