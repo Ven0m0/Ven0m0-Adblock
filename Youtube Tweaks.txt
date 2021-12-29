@@ -139,3 +139,9 @@ www.youtube.com###voice-search-button
 ! Remove Join Channel Buttons
 www.youtube.com##.size-default.style-suggestive.ytd-video-owner-renderer.style-scope > .ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-suggestive.ytd-button-renderer.style-scope
 www.youtube.com##.ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-suggestive.ytd-button-renderer.style-scope
+
+! Clip
+www.youtube.com##ytd-button-renderer.size-default.style-default.force-icon-button.ytd-menu-renderer.style-scope:nth-of-type(3) > .ytd-button-renderer.style-scope.yt-simple-endpoint
+
+! Share
+www.youtube.com##ytd-button-renderer.size-default.style-default.force-icon-button.ytd-menu-renderer.style-scope:nth-of-type(1) > .ytd-button-renderer.style-scope.yt-simple-endpoint
