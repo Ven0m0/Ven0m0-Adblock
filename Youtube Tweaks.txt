@@ -141,3 +141,9 @@ www.youtube.com###header-section
 www.youtube.com###collapse-controls-section
 www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
 www.youtube.com###CjEKL0NPTU1VTklUWV9HVUlERUxJTkVTX1ZFTTIwMjIvMDEvMDEtMjA6MTg6NTUuNjgz > .yt-live-chat-viewer-engagement-message-renderer.style-scope
+
+Unknown
+www.youtube.com###content > .ytd-tvfilm-offer-module-renderer.style-scope
+www.youtube.com##.ytd-watch-next-secondary-results-renderer.style-scope > .ytd-tvfilm-offer-module-renderer.style-scope
+www.youtube.com###offer-module
+www.youtube.com##.ytp-paid-content-overlay-link
