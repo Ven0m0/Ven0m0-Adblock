@@ -1,4 +1,4 @@
-[Adblock Plus 3.4]
+[Adblock Plus 3.6]
 ! Title: Combination
 ! Description: Combination List
 ! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
