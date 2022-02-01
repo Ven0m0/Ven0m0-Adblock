@@ -4,3 +4,8 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 !#include YoutubeTweaks.txt
 !#include RedditTweaks.txt
+!#include TwitchTweaks.txt
+!#includeTwitterTweaks
+!#include Other.txt
+!#include Easylist.txt
+!#include Easyprivacy.txt
