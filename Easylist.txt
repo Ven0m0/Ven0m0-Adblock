@@ -1,5 +1,5 @@
 ! Title: EasyList without Network Filters
-! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! -----------------------General advert blocking filters-----------------------!
 ! *** easylist:easylist/easylist_general_block.txt ***
