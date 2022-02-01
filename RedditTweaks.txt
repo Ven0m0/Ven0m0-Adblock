@@ -1,7 +1,7 @@
 [Adblock Plus 3.6]
 ! Title: Reddit Tweaks
 ! Description: This list makes Reddit much more enjoyable
-! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! Coins
 www.reddit.com##._1dJtiWITrnvIbQdXgYgdym.jEUbSHJJx8vISKpWirlfx
