@@ -1,5 +1,5 @@
 ! Title: EasyPrivacy without Network Filters
-! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! -----------------General tracking systems-----------------!
 ! *** easylist:easyprivacy/easyprivacy_general.txt ***
