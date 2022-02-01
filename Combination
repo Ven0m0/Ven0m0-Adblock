@@ -1,9 +1,8 @@
 [Adblock Plus 3.4]
 ! Title: Combination
+! Version: 06October2020v1-Beta
+! Expires: 3 days
 ! Description: Combination List
 ! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
-! /\/\ Supercompilations: /\/\
 !#include YoutubeTweaks.txt
 !#include RedditTweaks.txt
-
-! ——/——/——/——/——/——/——/——/——/——/——/——/——/——/——/——
