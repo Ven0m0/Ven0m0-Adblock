@@ -1,0 +1,19 @@
+! Title: 
+! Description: 
+! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+
+! Spotify
+open.spotify.com##.Upqw01TOXETOmR5Td7Dj.X7lQWw2Ly_RZVPEFj2QY.Qt5xfSWikz6CLU8Vobxs
+open.spotify.com##.WvLkmOVB2R2vzI2ibR_r.eNs6P3JYpf2LScgTDHc6 > .ATUzFKub89lzvkmvhpyE.link-subtle
+
+! Twitch
+www.twitch.tv##.jyFZFI.jGqsfG.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
+
+! Movie2k
+2kmovie.cc##.text-home
+
+! Nexusmods
+www.nexusmods.com##.background-2.premium-block--upgrade.premium-block
+www.nexusmods.com##.css-u1qlwc.qc-cmp-cleanslate
+www.nexusmods.com###mainContent > div.clearfix.agroup > .ads > .ad-unit.demo-billboard.ad
+www.nexusmods.com##div.clearfix.agroup:nth-of-type(1)
