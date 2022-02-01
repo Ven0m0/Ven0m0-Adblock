@@ -1,6 +1,5 @@
 ! Title: EasyList Germany without Network Filters
-! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
-
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! ----------------Allgemeine Regeln zum Blockieren von Werbung-----------------!
 ! *** easylistgermany:easylistgermany/easylistgermany_general_block.txt ***
 &werbemittel=
