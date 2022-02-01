@@ -1,7 +1,7 @@
 [Adblock Plus 3.6]
 ! Title: Other Blocklist
 ! Description: Block uncategorized Stuff
-! Homepage: https://github.com/Ven0m0/Adblock-Filters-without-Networkfilters
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! Spotify
 open.spotify.com##.Upqw01TOXETOmR5Td7Dj.X7lQWw2Ly_RZVPEFj2QY.Qt5xfSWikz6CLU8Vobxs
