@@ -5,7 +5,7 @@
 !#include YoutubeTweaks.txt
 !#include RedditTweaks.txt
 !#include TwitchTweaks.txt
-!#includeTwitterTweaks
+!#include TwitterTweaks
 !#include Other.txt
 !#include Easylist.txt
 !#include Easyprivacy.txt
