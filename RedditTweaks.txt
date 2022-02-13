@@ -39,7 +39,7 @@ reddit.com#?#.Post,.Comment:-abp-has(a[href^="/user"]:-abp-contains(/j[eou][owi]
 reddit.com#?#.Post,.Comment:-abp-has(a[href^="/user"]:-abp-contains(/g[o0]y/i):-abp-contains(/wh[i1]te/i))
 !#endif
 
-! Removes the "n new posts for you" banner
+! Removes the "new posts for you" banner
 reddit.com#?#div:-abp-has(> svg[viewbox="0 0 34 16"])
 reddit.com#?#div[class^=SubredditVars-r-] > div:-abp-has(> svg)
 
