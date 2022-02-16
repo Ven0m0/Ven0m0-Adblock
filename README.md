@@ -1,6 +1,6 @@
 # Ven0m0´s Filterlists
 
-I removed the Network Filters from Easylist for people who dont need it due to their hostfilex pihole or some other service already blocking network requests. THis should speed up adblocking because it has a lot less rules. 
+I removed the Network Filters from Easylist for people who dont need it due to their hostfile, pihole or some other service already blocking network requests. This should speed up adblocking because it has a lot less rules. 
 This is for private use only.
 
 The original Filters:
