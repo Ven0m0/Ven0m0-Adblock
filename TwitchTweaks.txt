@@ -46,3 +46,13 @@ clips.twitch.tv#?#.clips-watch.tw-lg-pd-b-5.tw-pd-b-2.tw-sm-pd-b-3:style(max-wid
 
 ! Makes avatars square again without having to use FrankerFaceZ
 twitch.tv#?#.tw-avatar > img.tw-border-radius-rounded:style(border-radius: unset !important)
+
+! Removes login nags
+twitter.com#?##layers > div[class*=" "]:first-of-type:-abp-has(a[href="/i/flow/signup"])
+!#if !adguard
+! https://mobile.twitter.com/nasuno_Posi
+twitter.com##div[data-testid=sidebarColumn] section[aria-label][role=region]
+!#endif
+
+! Removes the cookie sticky on bottom
+twitter.com###layers > div > div:nth-of-type(2):last-of-type
