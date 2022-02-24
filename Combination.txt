@@ -7,5 +7,3 @@
 !#include TwitchTweaks.txt
 !#include TwitterTweaks
 !#include Other.txt
-!#include Easylist.txt
-!#include Easyprivacy.txt
