@@ -70,9 +70,6 @@ youtube.com,youtube-nocookie.com##button[class*=share-button]
 youtube.com##.ytp-scroll-min
 youtube.com##.ytp-pause-overlay
 
-! Removes video epilogue suggestion overlays
-youtube.com##.ytp-ce-element-show
-
 ! Removes a banner that promotes YouTube Premium
 youtube.com###masthead-ad
 
