@@ -3,6 +3,6 @@
 ! Description: Combination List
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 !#include YoutubeTweaks.txt
-!#include RedditTweaks.txt
+!#include Reddit Annoyances.txt
 !#include TwitchTweaks.txt
 !#include Other.txt
