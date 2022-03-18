@@ -1,0 +1,17 @@
+[Adblock Plus 3.6]
+! Title: Reddit Tweaks
+! Description: This list makes Reddit much more enjoyable
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+
+! Coins
+www.reddit.com##._1dJtiWITrnvIbQdXgYgdym.jEUbSHJJx8vISKpWirlfx
+
+! Removes hard-to-close cookie banners on Imgur embeds
+||quantcast.mgr.consensu.org$domain=reddit.com|imgur.com
+
+! Removes the "new posts for you" banner
+reddit.com#?#div:-abp-has(> svg[viewbox="0 0 34 16"])
+reddit.com#?#div[class^=SubredditVars-r-] > div:-abp-has(> svg)
+
+! Aims to prevent Imgur embeds from cutting off half the preview
+imgur.com#?#img[id=image-element][src*=imgur]:style(margin-top: 0 !important)
