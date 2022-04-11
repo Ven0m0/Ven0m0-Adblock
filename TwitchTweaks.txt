@@ -59,3 +59,6 @@ twitter.com###layers > div > div:nth-of-type(2):last-of-type
 
 ! Remove Bits button
 www.twitch.tv##.dWAnXP.Layout-sc-nxg1ff-0 > div > .kJZgbi.boGviw.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
+
+! Adblock
+twitch.tv##+js(twitch-videoad)
