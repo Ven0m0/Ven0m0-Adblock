@@ -15,3 +15,6 @@ reddit.com#?#div[class^=SubredditVars-r-] > div:-abp-has(> svg)
 
 ! Aims to prevent Imgur embeds from cutting off half the preview
 imgur.com#?#img[id=image-element][src*=imgur]:style(margin-top: 0 !important)
+
+! Advertise button
+www.reddit.com##._24UNt1hkbrZxLzs5vkvuDh
