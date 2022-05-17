@@ -6,6 +6,9 @@
 ! Coins
 www.reddit.com##._1dJtiWITrnvIbQdXgYgdym.jEUbSHJJx8vISKpWirlfx
 
+! Premium
+www.reddit.com##.premium-banner
+
 ! Removes hard-to-close cookie banners on Imgur embeds
 ||quantcast.mgr.consensu.org$domain=reddit.com|imgur.com
 
