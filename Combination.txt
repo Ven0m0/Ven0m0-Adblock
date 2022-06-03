@@ -7,3 +7,4 @@
 !#include RedditAnnoyances.txt
 !#include TwitchTweaks.txt
 !#include Other.txt
+!#include FacebookAnnoyances.txt
