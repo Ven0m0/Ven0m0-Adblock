@@ -27,6 +27,11 @@ youtube.com##ytd-rich-item-renderer #video-title-link[title*="Mix"][href$="start
 ! Removes Mixes from the right side panel
 youtube.com##ytd-compact-radio-renderer
 
+! Hide Mixes and radios
+www.youtube.com##ytd-browse ytd-rich-item-renderer:has(#video-title-link[href*="&start_radio=1"])
+www.youtube.com##ytd-watch-next-secondary-results-renderer ytd-compact-radio-renderer
+www.youtube.com##ytd-player div.videowall-endscreen a[data-is-list=true]
+
 ! Removes Mixes from search results
 youtube.com##ytd-radio-renderer
 
@@ -146,7 +151,11 @@ www.youtube.com###CjEKL0NPTU1VTklUWV9HVUlERUxJTkVTX1ZFTTIwMjIvMDEvMDEtMjA6MTg6NT
 ! Block Brand image in the corner
 youtube.com##.ytp-button.branding-img-container
 
-Unknown
+! Hide the copyright notice in video description
+www.youtube.com##[class*="video-secondary-info-renderer"] #always-shown + #collapsible
+www.youtube.com###description-and-actions #always-shown + #collapsible
+
+! Unknown
 www.youtube.com###content > .ytd-tvfilm-offer-module-renderer.style-scope
 www.youtube.com##.ytd-watch-next-secondary-results-renderer.style-scope > .ytd-tvfilm-offer-module-renderer.style-scope
 www.youtube.com###offer-module
