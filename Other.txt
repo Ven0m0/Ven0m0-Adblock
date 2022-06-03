@@ -18,3 +18,16 @@ www.nexusmods.com##.background-2.premium-block--upgrade.premium-block
 www.nexusmods.com##.css-u1qlwc.qc-cmp-cleanslate
 www.nexusmods.com###mainContent > div.clearfix.agroup > .ads > .ad-unit.demo-billboard.ad
 www.nexusmods.com##div.clearfix.agroup:nth-of-type(1)
+www.nexusmods.com###rj-vortex
+www.nexusmods.com##.rj-standard-button
+www.nexusmods.com##.rj-supporter-wrapper > h3
+
+! Playstation
+www.playstation.com##.evidon-banner-message
+www.playstation.com###_evidon_banner
+
+! Sony
+my.account.sony.com###js-SIEWS1lib-header-Base
+
+! Pixlr
+pixlr.com###try-premium
