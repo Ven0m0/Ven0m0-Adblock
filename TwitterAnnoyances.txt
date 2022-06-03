@@ -1,0 +1,10 @@
+64 lines (47 sloc)  2.97 KB
+   
+[Adblock Plus 3.6]
+! Title: Twitter Tweaks
+! Description: This list makes Twitter much more enjoyable
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+
+! Login popup
+twitter.com##div#layers div[data-testid="sheetDialog"]:upward(div[role="group"][tabindex="0"])
+twitter.com##html:style(overflow: auto !important;)
