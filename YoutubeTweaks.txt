@@ -126,7 +126,7 @@ www.youtube.com###voice-search-button
 www.youtube.com##.size-default.style-suggestive.ytd-video-owner-renderer.style-scope > .ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-suggestive.ytd-button-renderer.style-scope
 www.youtube.com##.ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-suggestive.ytd-button-renderer.style-scope
 
-! Livestream donation
+! Block Livestream donations
 www.youtube.com###nonprofit-section
 www.youtube.com###creator-messages-section
 www.youtube.com###donate-section
@@ -134,6 +134,9 @@ www.youtube.com###header-section
 www.youtube.com###collapse-controls-section
 www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
 www.youtube.com###CjEKL0NPTU1VTklUWV9HVUlERUxJTkVTX1ZFTTIwMjIvMDEvMDEtMjA6MTg6NTUuNjgz > .yt-live-chat-viewer-engagement-message-renderer.style-scope
+
+! Block Brand image in the corner
+youtube.com##.ytp-button.branding-img-container
 
 Unknown
 www.youtube.com###content > .ytd-tvfilm-offer-module-renderer.style-scope
