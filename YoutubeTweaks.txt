@@ -155,6 +155,10 @@ youtube.com##.ytp-button.branding-img-container
 www.youtube.com##[class*="video-secondary-info-renderer"] #always-shown + #collapsible
 www.youtube.com###description-and-actions #always-shown + #collapsible
 
+! Add exception to EasyList rule to let YouTube track video progress
+@@||s.youtube.com/api/stats/watchtime*
+@@||www.youtube.com/generate_204$xhr,domain=www.youtube.com
+
 ! Unknown
 www.youtube.com###content > .ytd-tvfilm-offer-module-renderer.style-scope
 www.youtube.com##.ytd-watch-next-secondary-results-renderer.style-scope > .ytd-tvfilm-offer-module-renderer.style-scope
