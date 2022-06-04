@@ -58,3 +58,7 @@ web.archive.org###donate_banner
 
 ! DuckDuckGo "shopping" ads
 duckduckgo.com##.ia-modules
+
+! Remove Teams download app notification
+teams.microsoft.com##.app-notification-container
+teams.microsoft.com##.engagement-surface.button-banner.accent-banner.promo-banner.banner-show.app-notification-banner
