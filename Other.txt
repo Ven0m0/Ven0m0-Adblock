@@ -22,6 +22,10 @@ www.nexusmods.com###rj-vortex
 www.nexusmods.com##.rj-standard-button
 www.nexusmods.com##.rj-supporter-wrapper > h3
 
+! Removes "Downloads for non-premium members are capped at 2MB/s" banner
+www.nexusmods.com##.container.premium-banner
+www.nexusmods.com##.areplacer
+
 ! Playstation
 www.playstation.com##.evidon-banner-message
 www.playstation.com###_evidon_banner
@@ -31,3 +35,26 @@ my.account.sony.com###js-SIEWS1lib-header-Base
 
 ! Pixlr
 pixlr.com###try-premium
+
+! Removes the "upgrade to office 365" box
+outlook.live.com##._4EQjiwXF4KIhqby_Qqf8J
+outlook.live.com##._2_1jS9rVrPuzoS0TkWEtIk
+outlook.live.com##.tTgHI
+
+! Removes side bar asking to sign up for "Ad-Free Outlook"
+outlook.live.com##._1TpU2KF6f_EeQiytBaYj8I > ._3_hHr3kfEhbNYRFM5YJxH9
+outlook.live.com##._1xCBLVKl1qp6BB2jT7GN5b > ._3_hHr3kfEhbNYRFM5YJxH9
+outlook.live.com##._1dBL6mV6xRANqjh_Z8BjN6 > ._1fti_QgAzqGWPGlqh_FSvI
+outlook.live.com##.AK_my > .pBKjV
+
+! Removes the video player from the side panel
+gbatemp.net##.with_undefined.sidebar > div:nth-of-type(2)
+
+! Aims to remove unavailable emotes from the Discord emote selector
+discordapp.com#?#div[class^=row-]:-abp-has(> div[class^=emojiItem-][class*=disabled])
+
+! Removes donate banner
+web.archive.org###donate_banner
+
+! DuckDuckGo "shopping" ads
+duckduckgo.com##.ia-modules
