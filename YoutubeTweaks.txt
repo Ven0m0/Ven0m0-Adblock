@@ -158,6 +158,7 @@ www.youtube.com###description-and-actions #always-shown + #collapsible
 ! Add exception to EasyList rule to let YouTube track video progress
 @@||s.youtube.com/api/stats/watchtime*
 @@||www.youtube.com/generate_204$xhr,domain=www.youtube.com
+@@||www.youtube.com/youtubei/v1/log_event$xhr,domain=www.youtube.com
 
 ! Unknown
 www.youtube.com###content > .ytd-tvfilm-offer-module-renderer.style-scope
