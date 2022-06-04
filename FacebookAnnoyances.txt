@@ -42,3 +42,12 @@ www.facebook.com###jsc_c_39d > .l9j0dhe7 > div > .j83agx80.cbu4d94t.ni8dbmo4.stj
 www.facebook.com##div.kr520xx4.j9ispegn.pmk7jnqg.n7fi1qx3.rq0escxv.i09qtzwb:nth-of-type(4)
 www.facebook.com###jsc_c_10f > .l9j0dhe7 > div > .j83agx80.cbu4d94t.ni8dbmo4.stjgntxs.l9j0dhe7 > .ni8dbmo4.stjgntxs.l9j0dhe7 > div.l9j0dhe7 > .k4urcfbm.kr520xx4.j9ispegn.pmk7jnqg.datstx6m.n7fi1qx3.i09qtzwb > .du4w35lb.a8c37x1j.datstx6m.l9j0dhe7.k4urcfbm > div > .datstx6m.pmk7jnqg.kr520xx4.k4urcfbm > .nhd2j8a9.kr520xx4.j9ispegn.pmk7jnqg.n7fi1qx3.rq0escxv.i09qtzwb
 www.facebook.com###jsc_c_10f > .l9j0dhe7 > div > .j83agx80.cbu4d94t.ni8dbmo4.stjgntxs.l9j0dhe7 > .ni8dbmo4.stjgntxs.l9j0dhe7 > div.l9j0dhe7 > .k4urcfbm.kr520xx4.j9ispegn.pmk7jnqg.datstx6m.n7fi1qx3.i09qtzwb > .du4w35lb.a8c37x1j.datstx6m.l9j0dhe7.k4urcfbm > div > .datstx6m.pmk7jnqg.kr520xx4.k4urcfbm
+
+! Remove "Join VIP" and twitch stream
+theouterworlds.wiki.fextralife.com###sidebar-wrapper > .row
+theouterworlds.wiki.fextralife.com##.hidden-sm.fixme > h3.simulation-hero-heading.section-heading-light.section-heading
+
+! Removes Facebook sponsored posts
+facebook.com##div[data-pagelet*="FeedUnit"]:has(span[dir="auto"]:has-text(Suggested for You))
+facebook.com##div[data-pagelet*="FeedUnit"]:has(span[class]:first-child + [role*="n"] > span:only-child > span:first-child + span:last-child)
+facebook.com##div[data-pagelet^="FeedUnit"] div[data-pagelet^="FeedUnit"]:has(span:has-text(/Sponsored/))
