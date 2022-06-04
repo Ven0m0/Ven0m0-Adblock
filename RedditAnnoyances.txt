@@ -21,3 +21,7 @@ www.reddit.com##._24UNt1hkbrZxLzs5vkvuDh
 
 ! Hide Reddit 'Top Broadcast Now' & 'Top livestream'
 reddit.com##a[href^="/rpan/"] > h3:has-text(/Top (livestream|broadcast)/):upward(7)
+
+! Remove premium banner
+www.reddit.com##.premium-banner
+old.reddit.com##.premium-banner
