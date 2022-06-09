@@ -165,3 +165,7 @@ www.youtube.com###content > .ytd-tvfilm-offer-module-renderer.style-scope
 www.youtube.com##.ytd-watch-next-secondary-results-renderer.style-scope > .ytd-tvfilm-offer-module-renderer.style-scope
 www.youtube.com###offer-module
 www.youtube.com##.ytp-paid-content-overlay-link
+
+! Help box
+www.youtube.com##.watch > .ytd-emergency-onebox-renderer.style-scope
+www.youtube.com##.watch
