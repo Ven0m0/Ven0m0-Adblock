@@ -62,3 +62,6 @@ duckduckgo.com##.ia-modules
 ! Remove Teams download app notification
 teams.microsoft.com##.app-notification-container
 teams.microsoft.com##.engagement-surface.button-banner.accent-banner.promo-banner.banner-show.app-notification-banner
+
+! Help us improve Google notification
+www.google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
