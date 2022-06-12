@@ -65,3 +65,7 @@ teams.microsoft.com##.engagement-surface.button-banner.accent-banner.promo-banne
 
 ! Help us improve Google notification
 www.google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
+
+! Push notifications
+gbatemp.net##.notice-content
+gbatemp.net##.uix_noticeInner
