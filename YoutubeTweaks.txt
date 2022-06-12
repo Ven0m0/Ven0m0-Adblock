@@ -159,3 +159,9 @@ www.youtube.com###description-and-actions #always-shown + #collapsible
 @@||s.youtube.com/api/stats/watchtime*
 @@||www.youtube.com/generate_204$xhr,domain=www.youtube.com
 @@||www.youtube.com/youtubei/v1/log_event$xhr,domain=www.youtube.com
+
+! Paid promotion overlay
+www.youtube.com##.ytp-paid-content-overlay-link
+
+! Get help banner
+www.youtube.com##.watch
