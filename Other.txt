@@ -69,3 +69,9 @@ www.google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
 ! Push notifications
 gbatemp.net##.notice-content
 gbatemp.net##.uix_noticeInner
+
+! Paywall Press Plus
+||s.ppjol.net/lightbox/pp*.js
+
+! Google chrome ad
+||ogs.google.com/u/0/widget/callout/sid?prid=19016403&pgid=19010599&puid=1b10da64bfa91688&dc=1&origin=https%3A%2F%2Fdrive.google.com&cn=callout&pid=49&spid=49&hl=en-GB$subdocument
