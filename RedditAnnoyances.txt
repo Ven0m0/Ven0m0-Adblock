@@ -39,3 +39,7 @@ reddit.com###change-username-tooltip-id > span > a[href^="https://ads.reddit.com
 
 ! Reddit Sidebar links
 www.reddit.com##._1oRQu-aolgpPPJDblUGTw5
+
+! Reddit create new posts sidebar
+www.reddit.com##.TmgZY6tDcdErbE5d7E0HJ
+www.reddit.com##div._2vEf-C2keJaBMY9qk_BxVn > ._2QeqBqfT5UbHBoViZUt-wX._1G4yU68P50vRZ4USXfaceV
