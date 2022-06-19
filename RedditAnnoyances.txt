@@ -36,3 +36,6 @@ reddit.com##[data-testid="subreddit-sidebar"] [src="https://www.redditstatic.com
 
 ! Reddit premium
 www.reddit.com##[data-testid="frontpage-sidebar"] > div:nth-child(2)
+
+! Reddit Advertise button
+reddit.com###change-username-tooltip-id > span > a[href^="https://ads.reddit.com?utm_source="]
