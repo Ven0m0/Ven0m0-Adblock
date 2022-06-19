@@ -29,3 +29,7 @@ old.reddit.com##.premium-banner
 ! https://www.reddit.com/r/uBlockOrigin/comments/v8m8t1/where_i_can_find_an_explanation_of_a_rule_cant/
 /\/[0-9a-z]{8,10}\?key=[0-9a-f]{32}/$doc,domain=~duckduckgo.com,badfilter
 !/\/[0-9a-z]{8,10}\?key=[0-9a-f]{32}/$doc,domain=~duckduckgo.com|~paypal.com
+
+! Remove reddit powerup
+reddit.com##[data-testid="powerups-icon-rangers"]:upward(3)
+reddit.com##[data-testid="subreddit-sidebar"] [src="https://www.redditstatic.com/desktop2x/img/powerups/powerups-rangers.png"]:upward([data-testid="subreddit-sidebar"]>div)
