@@ -33,3 +33,6 @@ old.reddit.com##.premium-banner
 ! Remove reddit powerup
 reddit.com##[data-testid="powerups-icon-rangers"]:upward(3)
 reddit.com##[data-testid="subreddit-sidebar"] [src="https://www.redditstatic.com/desktop2x/img/powerups/powerups-rangers.png"]:upward([data-testid="subreddit-sidebar"]>div)
+
+! Reddit premium
+www.reddit.com##[data-testid="frontpage-sidebar"] > div:nth-child(2)
