@@ -88,3 +88,6 @@ appuals.com##.wp-timed-p-content
 
 ! Imgur Go ad free button
 imgur.com##.Button.EmeraldButton
+
+! Imgur donation button
+imgur.com##[href="https://donate.coreresponse.org/give/393950"] > .ProfileNavbar-item.uScaleTransition > svg
