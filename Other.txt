@@ -95,3 +95,6 @@ imgur.com##[href="https://donate.coreresponse.org/give/393950"] > .ProfileNavbar
 ! Github sponsor buttons
 github.com###funding-links-modal-JosefNemec-Playnite > .btn.btn-sm
 github.com##.mr-1.btn-sm.btn
+
+! Main Press Plus Paywall
+||s.ppjol.net/lightbox/pp*.js
