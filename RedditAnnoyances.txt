@@ -43,3 +43,11 @@ www.reddit.com##._1oRQu-aolgpPPJDblUGTw5
 ! Reddit create new posts sidebar
 www.reddit.com##.TmgZY6tDcdErbE5d7E0HJ
 www.reddit.com##div._2vEf-C2keJaBMY9qk_BxVn > ._2QeqBqfT5UbHBoViZUt-wX._1G4yU68P50vRZ4USXfaceV
+
+! Old Design
+reddit.com##div[data-subreddit="FUTMobile"]:has(a[class~="title"]:has-text(/Squad Building/i))
+reddit.com##div[data-subreddit="FUTMobile"]:has(a[class~="title"]:has-text(/League Application/i))
+
+! New Design
+reddit.com##div:has(> div > div[class~="scrollerItem"]:has-text(/Squad Building/i))
+reddit.com##div:has(> div > div[class~="scrollerItem"]:has-text(/League Application/i))

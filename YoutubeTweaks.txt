@@ -165,3 +165,6 @@ www.youtube.com##.ytp-paid-content-overlay-link
 
 ! Get help banner
 www.youtube.com##.watch
+
+! Suggested overlay at end of the clip.
+youtube.com##.ytp-ce-element

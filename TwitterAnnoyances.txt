@@ -11,3 +11,9 @@ twitter.com##html:style(overflow: auto !important;)
 
 ! Twitter cookie banner
 twitter.com##.r-13qz1uu.r-1f1sjgu.r-ymttw5.r-1d7fvdj.r-18u37iz.r-15ce4ve.r-1sw30gj.r-1awozwy.css-1dbjc4n
+
+! Footer
+twitter.com##div:has(> nav[role="navigation"][aria-label="Footer"])
+
+! Filter Words
+twitter.com##main section article[role=article]:has(span:has-text(Terms of Service))
