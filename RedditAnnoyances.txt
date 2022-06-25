@@ -37,3 +37,5 @@ reddit.com##[data-testid="subreddit-sidebar"] [src="https://www.redditstatic.com
 ! Reddit Advertise button
 reddit.com###change-username-tooltip-id > span > a[href^="https://ads.reddit.com?utm_source="]
 
+! Reddit Sidebar links
+www.reddit.com##._1oRQu-aolgpPPJDblUGTw5
