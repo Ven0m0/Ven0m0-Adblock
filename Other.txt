@@ -85,3 +85,6 @@ appuals.com##.wp-timed-p-content
 
 ! Google drive
 ||ogs.google.com/u/0/widget/callout/sid?prid=19016403&pgid=19010599&puid=1b10da64bfa91688&dc=1&origin=https%3A%2F%2Fdrive.google.com&cn=callout&pid=25&spid=25&hl=en-GB$subdocument
+
+! Imgur Go ad free button
+imgur.com##.Button.EmeraldButton
