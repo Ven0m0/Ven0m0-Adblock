@@ -91,3 +91,6 @@ imgur.com##.Button.EmeraldButton
 
 ! Imgur donation button
 imgur.com##[href="https://donate.coreresponse.org/give/393950"] > .ProfileNavbar-item.uScaleTransition > svg
+
+! Github sponsor button
+github.com###funding-links-modal-JosefNemec-Playnite > .btn.btn-sm
