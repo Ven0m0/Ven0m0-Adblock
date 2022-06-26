@@ -98,3 +98,6 @@ github.com##.mr-1.btn-sm.btn
 
 ! Main Press Plus Paywall
 ||s.ppjol.net/lightbox/pp*.js
+
+! Google search rating
+www.google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
