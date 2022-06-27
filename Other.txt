@@ -101,7 +101,3 @@ github.com##.mr-1.btn-sm.btn
 
 ! Google search rating
 www.google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
-
-! Help translate
-my.nextdns.io##.text-center.px-3 > span
-||my.nextdns.io/static/media/translations.2f419bf65f2a8b8057a648b4f6350f82.svg$image
