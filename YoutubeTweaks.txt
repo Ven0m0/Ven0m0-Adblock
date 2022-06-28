@@ -168,3 +168,6 @@ www.youtube.com##.watch
 
 ! Suggested overlay at end of the clip.
 youtube.com##.ytp-ce-element
+
+! Sponsor button
+www.youtube.com##ytd-button-renderer.size-default.style-default.force-icon-button.ytd-menu-renderer.style-scope:nth-of-type(2) > .ytd-button-renderer.style-scope.yt-simple-endpoint
