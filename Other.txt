@@ -101,3 +101,7 @@ github.com##.mr-1.btn-sm.btn
 
 ! Google search rating
 www.google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
+
+! Microsoft 365 ad
+support.microsoft.com###rail-banner-button
+support.microsoft.com##.ghcMtE.sc-bYoBSM
