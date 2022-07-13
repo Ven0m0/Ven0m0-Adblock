@@ -39,3 +39,9 @@ reddit.com###change-username-tooltip-id > span > a[href^="https://ads.reddit.com
 
 ! Reddit Sidebar links
 www.reddit.com##._1oRQu-aolgpPPJDblUGTw5
+
+! Unknown
+www.reddit.com##._2N9ShiilNyzdd0B_i9geBj
+
+! Moderation button
+www.reddit.com###Header--Moderation > .FOioVk_DUTmZIKKa82Mm1
