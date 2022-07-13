@@ -176,3 +176,6 @@ community.spiceworks.com###gsidebar
 
 ! Ad
 www.carlcare.com##.native-dark-inline-style-6309942.native-dark-inline-style-2022746.tpl
+
+! Help tranlate NextDNS banner
+my.nextdns.io##.text-center.px-3
