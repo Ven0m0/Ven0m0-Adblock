@@ -106,37 +106,24 @@ www.google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
 support.microsoft.com###rail-banner-button
 support.microsoft.com##.ghcMtE.sc-bYoBSM
 
-! 2021-12-21 https://www.schulministerium.nrw
 www.schulministerium.nrw##.eu-cookie-compliance-banner--categories.eu-cookie-compliance-banner-info.eu-cookie-compliance-banner
 
-! 2022-04-13 https://christitus.com
 christitus.com##div.widget:nth-of-type(3)
 
-! 2022-05-17 https://yuzu-emu.org
 yuzu-emu.org##.is-centered.columns > div.column:nth-of-type(2)
 
-! 2022-05-27 https://www.techradar.com
 www.techradar.com##.region_redirect_banner
 
-! 2022-06-09 https://www.lifewire.com
 www.lifewire.com##.ot-sdk-row
 
-! 2022-06-09 https://medium.com
 medium.com##.tr.tq.tp.ht.to.tn.tm.tl.tk.tj.ti.th.tg.tf.te.td.tc.aq.ap
 
-! 2022-06-17 https://www.vidmore.com
 www.vidmore.com##.usernotice_pop
 
-! 2022-06-22 https://www.reddit.com
-www.reddit.com##._2N9ShiilNyzdd0B_i9geBj
-
-! 2022-06-25 https://www.google.com
 ||ogs.google.com/u/0/widget/callout/sid?prid=19018054&pgid=19008535&puid=a87840e5a60f1228&dc=1&origin=https%3A%2F%2Fwww.google.com&cn=callout&pid=1&spid=113&hl=en$subdocument
 
-! 2022-06-25 https://towardsdatascience.com
 towardsdatascience.com##.ws.wr.ot.iw.wq.wp.wo.wn.wm.wl.wk.wj.wi.wh.wg.wf.we.aq.ap
 
-! 2022-07-12 https://www.chip.de
 ! Chip sponsor message
 www.chip.de##.Affiliate-Notice
 
@@ -148,11 +135,6 @@ www.deviantart.com##._1VuFx
 ! Devianart upgrade to core button
 www.deviantart.com##._3I-fJ.bf6hc._16RrG._1jkTN.-n4aD._2pFrH._1FMli
 
-! 2022-07-12 https://www.reddit.com
-! Moderation button
-www.reddit.com###Header--Moderation > .FOioVk_DUTmZIKKa82Mm1
-
-! 2022-07-12 https://tech-latest.com
 ! Tech-latest emtpy space
 tech-latest.com###lates-1263607438 > div
 tech-latest.com###lates-1561389064
@@ -165,43 +147,32 @@ tech-latest.com###lates-1443932345 > div
 tech-latest.com###lates-1979837024
 tech-latest.com##.td-container > .td-pb-row
 
-! 2022-07-12 https://www.makeuseof.com
 ! Shopping banner
 www.makeuseof.com##.w-pencil-banner
 
-! 2022-07-12 https://browserhow.com
 ! Empty ad banner
 ||cdn.browserhow.com/wp-content/uploads/sites/3/Ad-Removed-in-Edge-browser-after-enabling-flag*.png$image
 
-! 2022-07-12 https://blocklistproject.github.io
 ! Patreon banner
 blocklistproject.github.io##p:nth-of-type(4)
 
-
-! 2022-07-12 https://medium.com
 ! Medium cookie banner
 medium.com##.xh.xg.oe.il.xf.xe.xd.xc.xb.xa.wz.wy.wx.ww.wv.wu.wt.aq.ap
 
-! 2022-07-12 https://medium.com
 ! Medium unnecessary button
 medium.com##.c.ao.o.pm.pl.pk.eb.pj
 
-! 2022-07-12 https://answers.microsoft.com
 ! Microsoft 365 ad
 answers.microsoft.com##.ucsRailContainer
 
-! 2022-07-12 https://www.minitool.com
 ! Black bar at bottom
 www.minitool.com##.page-bottom-fixed-ads
 
-! 2022-07-12 https://community.spiceworks.com
 ! Blank space
 community.spiceworks.com###gsidebar
 
-! 2022-07-12 https://www.google.de
 ! Google Chrome recommendation
 ||ogs.google.de/u/0/widget/callout/sid?prid=19026802&pgid=19026797&puid=63a1a1689acd7948&dc=1&origin=https%3A%2F%2Fwww.google.de&cn=callout&pid=1&spid=538&hl=en$subdocument
 
-! 2022-07-12 https://www.carlcare.com
 ! Ad
 www.carlcare.com##.native-dark-inline-style-6309942.native-dark-inline-style-2022746.tpl
