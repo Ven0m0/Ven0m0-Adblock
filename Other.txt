@@ -179,3 +179,6 @@ www.carlcare.com##.native-dark-inline-style-6309942.native-dark-inline-style-202
 
 ! Help tranlate NextDNS banner
 my.nextdns.io##.text-center.px-3
+
+! AHKScript Footer
+p.ahkscript.org##footer
