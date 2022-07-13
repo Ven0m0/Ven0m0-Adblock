@@ -1,5 +1,3 @@
-64 lines (47 sloc)  2.97 KB
-   
 [Adblock Plus 3.6]
 ! Title: Twitter Tweaks
 ! Description: This list makes Twitter much more enjoyable
@@ -17,3 +15,6 @@ twitter.com##div:has(> nav[role="navigation"][aria-label="Footer"])
 
 ! Filter Words
 twitter.com##main section article[role=article]:has(span:has-text(Terms of Service))
+
+! Unnecessary downvote banner
+mobile.twitter.com##.r-iyfy8q.r-1f1sjgu.r-ymttw5.r-hwh8t1.r-18u37iz.r-6koalj.r-1xfd6ze.r-rgqbpe.css-1dbjc4n
