@@ -174,3 +174,6 @@ www.youtube.com##ytd-button-renderer.size-default.style-default.force-icon-butto
 
 ! Watch movie
 www.youtube.com###offer-module > .ytd-watch-next-secondary-results-renderer.style-scope
+
+! Unknown
+www.youtube.com##.ytd-mealbar-promo-renderer
