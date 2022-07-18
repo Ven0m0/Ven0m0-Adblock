@@ -3,11 +3,6 @@
 ! Description: This list makes Youtube much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
-! Google consent, "before you continue"
-www.google.*##^script:has-text(consentCookiePayload)
-www.google.*##+js(acis, document.cookie, YES+)
-google.*##+js(aeld, DOMContentLoaded, CONSENT)
-
 ! Fix Youtube Ads showing
 ||music.youtube.com^$csp=worker-src 'none'
 ||www.youtube.com^$csp=worker-src 'none'
