@@ -179,3 +179,6 @@ www.youtube.com###offer-module > .ytd-watch-next-secondary-results-renderer.styl
 
 ! Unknown
 www.youtube.com##.ytd-mealbar-promo-renderer
+
+! Channel banner subscribe button
+www.youtube.com##.ytd-c4-tabbed-header-renderer.style-scope.container.yt-simple-endpoint
