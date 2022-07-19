@@ -3,63 +3,6 @@
 ! Description: This list makes Twitch much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
-! Aims to remove the spacing between Twitch emotes, for the sake of multi-part emotes
-twitch.tv#?#.message > span:-abp-contains(/^ $/)
-clips.twitch.tv#?#span.text-fragment:not(:-abp-contains(/\S/))
-
-! Removes the ungodly awful Hype Train chat banner
-www.twitch.tv##.community-highlight-stack__card
-
-! Aims to remove mass spamming of "!play" on streams of 'Marbles on Stream'
-twitch.tv#?#div[class$=message]:not(.tw-inline):-abp-has(.message:-abp-contains(/^!play$/))
-
-! Aims to remove that one RPG-loot-game embed window that is on some Twitch channels
-twitch.tv#?#.channel-panels-container div[style^=position]:-abp-has(a[href^="/ext/ro13roxp88918kulntih9uzm7vs9jr"])
-
-! Removed a seemingly blank community message floaty on top of chat
-www.twitch.tv##.community-highlight-stack__backlog-card
-
-! ——— ↓ Not supported by ABP or AdBlock ↓ ———
-
-! Reduces the size of the chat header
-www.twitch.tv#?#.video-chat__header:style(height: 20px !important)
-www.twitch.tv#?#.tw-pd-r-1.tw-pd-l-2.tw-justify-content-between.tw-full-width:style(height: 2rem)
-
-! Broadens the chat textbox
-www.twitch.tv#?#.tw-flex-shrink-0.tw-full-width.tw-pd-b-2.tw-pd-t-1.tw-pd-x-2.video-chat__input:style(padding: 4px 1px 1px !important)
-www.twitch.tv#?#.tw-textarea.tw-textarea--no-resize:style(padding: 1px 35px !important; height: 55px !important)
-www.twitch.tv#?#.chat-input.tw-block:style(padding: 0 3px 2px !important)
-
-! Reduces the size of the "Hosting [channel]" header
-twitch.tv#?#.tw-align-items-center.tw-flex.tw-flex-nowrap.tw-justify-content-between.tw-pd-1:style(padding-top: 0 !important; padding-bottom: 0 !important)
-
-! Narrows the spacing between the chat comments
-twitch.tv#?#.chat-line__message:style(padding: 2px 4px !important)
-twitch.tv#?#.tw-full-width.tw-pd-l-05.tw-pd-y-05.vod-message:style(padding: 2px 4px !important)
-clips.twitch.tv#?#.clips-chat-replay > .tw-mg-b-1:style(margin-bottom: 2px !important)
-
-! Narrows the spacing between the chat comments in mobile browser mode
-m.twitch.tv#?#li.chat-message:style(padding: 2px !important)
-
-! Maximises the size of the clip viewer pages
-clips.twitch.tv#?#.clips-watch.tw-lg-pd-b-5.tw-pd-b-2.tw-sm-pd-b-3:style(max-width: none)
-
-! Makes avatars square again without having to use FrankerFaceZ
-twitch.tv#?#.tw-avatar > img.tw-border-radius-rounded:style(border-radius: unset !important)
-
-! Removes login nags
-twitter.com#?##layers > div[class*=" "]:first-of-type:-abp-has(a[href="/i/flow/signup"])
-!#if !adguard
-! https://mobile.twitter.com/nasuno_Posi
-twitter.com##div[data-testid=sidebarColumn] section[aria-label][role=region]
-!#endif
-
-! Removes the cookie sticky on bottom
-twitter.com###layers > div > div:nth-of-type(2):last-of-type
-
-! Get bits button
-www.twitch.tv##.kgzEiA.ffyxRu.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
-
 ! Adblock
 twitch.tv##+js(twitch-videoad)
 
