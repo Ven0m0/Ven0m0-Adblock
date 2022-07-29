@@ -119,17 +119,6 @@ www.youtube.com##li.guide-section:nth-of-type(4)
 ! Removes the Trending button in the left-hand menu when using "Disable polymer"
 www.youtube.com###trending-guide-item
 
-! Removes all annotations in videos
-||youtube.com/annotations_invideo?$object-subrequest
-
-! HTML5 version
-youtube.com,youtube-nocookie.com##.video-annotations
-
-! Removes sharing tab below videos
-||youtube.com/share_ajax?action_get_share_box=1&video_id=$xmlhttprequest
-youtube.com##.action-panel-trigger[role=button][data-trigger-for=action-panel-share]
-youtube.com##.yt-uix-button[data-trigger-for=action-panel-share]
-
 ! "Subscribe to see more videos from this channel" on home page after watching some video of a channel
 youtube.com###channel-subscription-promo-in-feed
 
