@@ -119,7 +119,7 @@ www.youtube.com###trending-guide-item
 ! "Subscribe to see more videos from this channel" on home page after watching some video of a channel
 youtube.com###channel-subscription-promo-in-feed
 
-! Remove Voice Search BUtton
+! Remove Voice Search Button
 www.youtube.com###voice-search-button > .size-default.style-default.ytd-masthead.style-scope > .ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-default.ytd-button-renderer.style-scope
 www.youtube.com###voice-search-button
 
@@ -163,5 +163,8 @@ www.youtube.com###offer-module > .ytd-watch-next-secondary-results-renderer.styl
 ! Channel banner subscribe button
 www.youtube.com##.ytd-c4-tabbed-header-renderer.style-scope.container.yt-simple-endpoint
 
-! Suggested overlay at end of the clip.
-youtube.com##.ytp-ce-element
+! Unknown
+www.youtube.com##.ytd-mealbar-promo-renderer
+
+! Unnecessary Overlay
+www.youtube.com##.opened
