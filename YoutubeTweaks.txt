@@ -62,9 +62,6 @@ www.youtube.com##.ytp-button.ytp-miniplayer-button
 www.youtube.com##.ytp-button.ytp-size-button
 www.youtube.com##.ytp-button.ytp-remote-button
 
-! Unnecessary Overlay
-www.youtube.com##.opened
-
 ! Removes the video store button in the left-hand menu
 www.youtube.com#?#ytd-guide-entry-renderer:-abp-has(a[href*=UClgRkhTL3_hImCAmdLfDE4g])
 
@@ -157,15 +154,11 @@ www.youtube.com##.ytp-paid-content-overlay-link
 ! Get help banner
 www.youtube.com##.watch
 
-
 ! Sponsor button
 www.youtube.com##ytd-button-renderer.size-default.style-default.force-icon-button.ytd-menu-renderer.style-scope:nth-of-type(2) > .ytd-button-renderer.style-scope.yt-simple-endpoint
 
 ! Watch movie
 www.youtube.com###offer-module > .ytd-watch-next-secondary-results-renderer.style-scope
-
-! Unknown
-www.youtube.com##.ytd-mealbar-promo-renderer
 
 ! Channel banner subscribe button
 www.youtube.com##.ytd-c4-tabbed-header-renderer.style-scope.container.yt-simple-endpoint
