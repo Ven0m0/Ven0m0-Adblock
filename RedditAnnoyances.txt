@@ -58,4 +58,4 @@ reddit.com##a[href^="/rpan/"] > h3:has-text(/Top (livestream|broadcast)/):upward
 ||strapi.reddit.com^$xhr,domain=reddit.com
 
 ! Reddit Gold
-www.reddit.com##.jEUbSHJJx8vISKpWirlfx
+www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
