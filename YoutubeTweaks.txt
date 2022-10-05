@@ -82,6 +82,7 @@ youtube.com##.ytp-pause-overlay
 
 ! Removes a banner that promotes YouTube Premium
 youtube.com###masthead-ad
+www.youtube.com##.ytd-banner-promo-renderer.style-scope.ytd-banner-promo-renderer-background
 
 ! Believed to remove sponsored description links inserted by rights holders
 www.youtube.com##ytd-metadata-row-renderer
