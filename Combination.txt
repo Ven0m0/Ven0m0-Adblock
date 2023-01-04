@@ -1,6 +1,6 @@
 [Adblock Plus 3.6]
-! Title: Combination
-! Description: Combination List
+! Title: Ven0m0's Adblocking Filter
+! Description: Combination List of multiple filters to make the internet comfortable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/Combination.txt
 !#include YoutubeTweaks.txt
