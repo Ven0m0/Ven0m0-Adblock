@@ -63,3 +63,4 @@ www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
 !Playback issue fix
 ||redditstatic.com/desktop2x/img/renderTimingPixel.png
 ||https://www.redditstatic.com/desktop2x/img/renderTimingPixel.png
+||v.redd.it
