@@ -191,3 +191,6 @@ www.google.*##^script:has-text(consentCookiePayload)
 www.google.*##+js(acis, document.cookie, YES+)
 google.*##+js(aeld, DOMContentLoaded, CONSENT)
 ||consent.google.com^
+
+! Editpad
+editpad.org##.top_ad_box
