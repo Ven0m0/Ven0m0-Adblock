@@ -40,9 +40,6 @@ reddit.com###change-username-tooltip-id > span > a[href^="https://ads.reddit.com
 ! Reddit Sidebar links
 www.reddit.com##._1oRQu-aolgpPPJDblUGTw5
 
-! Unknown
-www.reddit.com##._2N9ShiilNyzdd0B_i9geBj
-
 ! Moderation button
 www.reddit.com###Header--Moderation > .FOioVk_DUTmZIKKa82Mm1
 
@@ -52,10 +49,6 @@ www.reddit.com##div._29lagmmeH1Fb03mLJEq0Dt:nth-of-type(1)
 
 ! Hide Reddit 'Top Broadcast Now' & 'Top livestream'
 reddit.com##a[href^="/rpan/"] > h3:has-text(/Top (livestream|broadcast)/):upward(7)
-
-! Block downloading. Please report back if does not work or causes issues
-||redd.it/*.m3u8^$xhr,domain=reddit.com
-||strapi.reddit.com^$xhr,domain=reddit.com
 
 ! Reddit Gold
 www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
