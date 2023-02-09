@@ -52,8 +52,3 @@ reddit.com##a[href^="/rpan/"] > h3:has-text(/Top (livestream|broadcast)/):upward
 
 ! Reddit Gold
 www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
-
-!Playback issue fix
-||redditstatic.com/desktop2x/img/renderTimingPixel.png
-||https://www.redditstatic.com/desktop2x/img/renderTimingPixel.png
-||v.redd.it
