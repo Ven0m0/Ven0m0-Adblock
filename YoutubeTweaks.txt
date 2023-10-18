@@ -3,15 +3,6 @@
 ! Description: This list makes Youtube much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
-! Fix Youtube Ads showing
-||music.youtube.com^$csp=worker-src 'none'
-||www.youtube.com^$csp=worker-src 'none'
-youtube.com##+js(json-prune, 2.playerResponse.adPlacements playerResponse.adPlacements playerResponse.playerAds adPlacements playerAds)
-youtube.com##+js(json-prune, 2.playerResponse.adPlacements)
-youtube.com##+js(json-prune, playerResponse.adPlacements)
-youtube.com##+js(json-prune, playerResponse.playerAds)
-youtube.com##+js(set, ytInitialPlayerResponse.adPlacements, null)
-
 ! YT consent v2
 youtube.com##+js(set, ytInitialData.topbar.desktopTopbarRenderer.interstitial.consentBumpV2Renderer, undefined)
 youtube.com##+js(json-prune, [].response.overlay.consentBumpV2Renderer topbar.desktopTopbarRenderer.interstitial.consentBumpV2Renderer overlay.consentBumpV2Renderer response.overlay.consentBumpV2Renderer)
