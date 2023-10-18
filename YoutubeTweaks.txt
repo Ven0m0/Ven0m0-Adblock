@@ -48,7 +48,6 @@ www.youtube.com#?#a.ytp-suggestion-set.ytp-videowall-still:has(.ytp-videowall-st
 youtube.com##ytd-compact-playlist-renderer .ytd-channel-name:has-text(/^YouTube/):upward(ytd-compact-playlist-renderer)
 
 ! YT Home Ad placeholder
-youtube.com##ytd-rich-grid-row:style(--ytd-rich-grid-items-per-row: 1 !important;)
 youtube.com##ytd-rich-grid-row>#contents, ytd-rich-grid-row ytd-rich-grid-media:style(max-width: unset !important;)
 
 ! Removes the YouTube Gaming button in the left-hand menu
