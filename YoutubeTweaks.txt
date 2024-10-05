@@ -89,8 +89,7 @@ www.youtube.com###voice-search-button > .size-default.style-default.ytd-masthead
 www.youtube.com###voice-search-button
 
 ! Remove Join Channel Buttons
-www.youtube.com##.size-default.style-suggestive.ytd-video-owner-renderer.style-scope > .ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-suggestive.ytd-button-renderer.style-scope
-www.youtube.com##.ytd-button-renderer.style-scope.yt-simple-endpoint > .size-default.style-suggestive.ytd-button-renderer.style-scope
+www.youtube.com##.ytd-video-owner-renderer.style-scope.YtwTimedAnimationButtonRendererHost
 
 ! Block Livestream donations
 www.youtube.com###nonprofit-section
