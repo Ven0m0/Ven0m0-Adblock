@@ -142,10 +142,3 @@ youtube.com##ytd-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-
 youtube.com##ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-playlist-thumbnail.ytd-radio-renderer:style(max-width: 360px !important)
 youtube.com##ytd-movie-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] .thumbnail-container.ytd-movie-renderer, ytd-movie-renderer[use-bigger-thumbs] .thumbnail-container.ytd-movie-renderer:style(max-width: 360px !important)
 youtube.com##ytd-promoted-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-promoted-video-renderer, ytd-promoted-sparkles-web-renderer[web-search-layout][use-bigger-thumbs][bigger-thumbs-style=BIG] #thumbnail-container.ytd-promoted-sparkles-web-renderer, ytd-text-image-no-button-layout-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #text-image-container.ytd-text-image-no-button-layout-renderer:style(max-width: 360px !important)
-
-! YT - Remove more unwanted elements (Live chat, commments, etc...)
-www.youtube.com###comments.style-scope.ytd-watch-flexy
-www.youtube.com##ytd-download-button-renderer
-www.youtube.com###flexible-item-buttons [aria-label="Promote"]
-||youtube.com/youtubei/v1/browse?key=$xhr,1p
-||youtube.com/complete/search
