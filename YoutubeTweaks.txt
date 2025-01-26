@@ -6,3 +6,4 @@
 www.youtube.com##.ytp-paid-content-overlay-link
 www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
 www.youtube.com###sponsor-button
+www.youtube.com###clarify-box > .ytd-watch-flexy.style-scope
