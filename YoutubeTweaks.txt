@@ -7,3 +7,9 @@ www.youtube.com##.ytp-paid-content-overlay-link
 www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
 www.youtube.com###sponsor-button
 www.youtube.com###clarify-box > .ytd-watch-flexy.style-scope
+
+! YT - Remove unwanted popups and annoyances
+youtube.com##ytd-popup-container > tp-yt-paper-dialog > ytd-mealbar-promo-renderer, ytd-popup-container > tp-yt-paper-dialog > yt-mealbar-promo-renderer:has-text(/Claim Offer|Join now|Not Now|No thanks|YouTube TV|live TV|Live TV|movies|sports|Try it free|unlimited DVR|watch NFL/)
+youtube.com##ytd-video-quality-promo-renderer
+youtube.com###cinematics.ytd-watch-flexy:remove()
+youtube.com##ytd-clarification-renderer.style-scope.ytd-watch-flexy
