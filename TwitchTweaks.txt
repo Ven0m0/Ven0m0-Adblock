@@ -57,5 +57,8 @@ twitter.com###layers > div > div:nth-of-type(2):last-of-type
 ! Get bits button
 www.twitch.tv##.kgzEiA.ffyxRu.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
 
+! Misc
+www.twitch.tv##.jyFZFI.jGqsfG.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
+
 ! Adblock
 twitch.tv##+js(twitch-videoad)
