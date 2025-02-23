@@ -1,0 +1,7 @@
+[Adblock Plus 3.6]
+! Title: Spotify Blocklist
+! Description: Block spotify stuff
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+
+open.spotify.com##.Upqw01TOXETOmR5Td7Dj.X7lQWw2Ly_RZVPEFj2QY.Qt5xfSWikz6CLU8Vobxs
+open.spotify.com##.WvLkmOVB2R2vzI2ibR_r.eNs6P3JYpf2LScgTDHc6 > .ATUzFKub89lzvkmvhpyE.link-subtle
