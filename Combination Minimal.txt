@@ -5,4 +5,5 @@
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Combination%20Minimal.txt
 !#include YoutubeTweaks.txt
 !#include RedditAnnoyances.txt
+!#include SpotifyTweaks.txt
 !#include Other.txt
