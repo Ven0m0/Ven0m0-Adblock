@@ -7,4 +7,5 @@
 !#include RedditAnnoyances.txt
 !#include TwitchTweaks.txt
 !#include TwitterAnnoyances.txt
+!#include SpotifyTweaks.txt
 !#include Other.txt
