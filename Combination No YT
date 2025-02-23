@@ -4,6 +4,7 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/Combination.txt
 !#include RedditAnnoyances.txt
+!#include SpotifyTweaks.txt
 !#include TwitchTweaks.txt
 !#include TwitterAnnoyances.txt
 !#include Other.txt
