@@ -7,12 +7,10 @@ This is my collection of filterlist and rules for adblocking and making the web 
 - [Click here to add the main list without Youtube](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Combination%20No%20YT)
 
 ### Individual Filterlists
-- [Click here to add the Youtube list](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/YoutubeTweaks.txt)
+- [Click here to add the Youtube list](https://subscribe.adblockplus.org/?location=[https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/YoutubeTweaks.txt])
 - [Click here to add the Reddit list](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/RedditAnnoyances.txt)
 - [Click here to add the Spotify list](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/SpotifyTweaks.txt)
 - [Click here to add the Twitter list](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/TwitterAnnoyances.txt)
 - [Click here to add the Twitch list](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/TwitchTweaks.txt)
 - [Click here to add the Misc list](https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Other.txt)
 
-
-[test](https://subscribe.adblockplus.org/?location=[https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/SpotifyTweaks.txt]&title=[filter list title])
