@@ -3,13 +3,6 @@
 ! Description: Block uncategorized Stuff
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
-! Spotify
-open.spotify.com##.Upqw01TOXETOmR5Td7Dj.X7lQWw2Ly_RZVPEFj2QY.Qt5xfSWikz6CLU8Vobxs
-open.spotify.com##.WvLkmOVB2R2vzI2ibR_r.eNs6P3JYpf2LScgTDHc6 > .ATUzFKub89lzvkmvhpyE.link-subtle
-
-! Twitch
-www.twitch.tv##.jyFZFI.jGqsfG.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
-
 ! Movie2k
 2kmovie.cc##.text-home
 
@@ -123,9 +116,6 @@ www.vidmore.com##.usernotice_pop
 ||ogs.google.com/u/0/widget/callout/sid?prid=19018054&pgid=19008535&puid=a87840e5a60f1228&dc=1&origin=https%3A%2F%2Fwww.google.com&cn=callout&pid=1&spid=113&hl=en$subdocument
 
 towardsdatascience.com##.ws.wr.ot.iw.wq.wp.wo.wn.wm.wl.wk.wj.wi.wh.wg.wf.we.aq.ap
-
-! Chip sponsor message
-www.chip.de##.Affiliate-Notice
 
 ! 2022-07-12 https://www.deviantart.com
 ! Devianart cookie banner
