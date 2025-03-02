@@ -18,3 +18,5 @@ youtube.com##ytd-clarification-renderer.style-scope.ytd-watch-flexy
 www.youtube.com###flexible-item-buttons > yt-button-view-model.ytd-menu-renderer:nth-of-type(1)
 ! Clip button
 www.youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
+! Voice search button
+www.youtube.com###voice-search-button
