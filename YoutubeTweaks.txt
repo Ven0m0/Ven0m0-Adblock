@@ -21,7 +21,6 @@ www.youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
 ! Voice search button
 www.youtube.com###voice-search-button
 
-
 ! Inspected ad content
 youtube.com##ytd-ad-slot-renderer
 youtube.com##ytd-ad-hover-text-button-renderer
