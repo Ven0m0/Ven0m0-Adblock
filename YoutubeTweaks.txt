@@ -28,3 +28,9 @@ youtube.com##ytd-ad-inline-playback-meta-block
 youtube.com##ytd-ad-engagement-panel-banner-renderer
 youtube.com##ytd-ad-feedback-renderer
 youtube.com##ytd-ad-info-dialog-renderer
+youtube.com##ytp-ad-image-overlay
+youtube.com##video-ads
+youtube.com##ad-interrupting
+youtube.com##ytp-ad-text
+youtube.com##ytp-ad-module
+youtube.com##ytp-ad-player-overlay
