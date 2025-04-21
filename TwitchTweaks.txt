@@ -3,6 +3,9 @@
 ! Description: This list makes Twitch much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
+! Twitch adblock: https://github.com/pixeltris/TwitchAdSolutions
+twitch.tv##+js(twitch-videoad)
+
 ! Aims to remove the spacing between Twitch emotes, for the sake of multi-part emotes
 twitch.tv#?#.message > span:-abp-contains(/^ $/)
 clips.twitch.tv#?#span.text-fragment:not(:-abp-contains(/\S/))
