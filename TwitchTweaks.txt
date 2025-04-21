@@ -19,8 +19,6 @@ twitch.tv#?#.channel-panels-container div[style^=position]:-abp-has(a[href^="/ex
 ! Removed a seemingly blank community message floaty on top of chat
 www.twitch.tv##.community-highlight-stack__backlog-card
 
-! ——— ↓ Not supported by ABP or AdBlock ↓ ———
-
 ! Reduces the size of the chat header
 www.twitch.tv#?#.video-chat__header:style(height: 20px !important)
 www.twitch.tv#?#.tw-pd-r-1.tw-pd-l-2.tw-justify-content-between.tw-full-width:style(height: 2rem)
@@ -62,6 +60,3 @@ www.twitch.tv##.kgzEiA.ffyxRu.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc
 
 ! Misc
 www.twitch.tv##.jyFZFI.jGqsfG.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
-
-! Adblock
-twitch.tv##+js(twitch-videoad)
