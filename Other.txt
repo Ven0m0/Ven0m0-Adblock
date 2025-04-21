@@ -3,8 +3,9 @@
 ! Description: Block uncategorized Stuff
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
-! Movie2k
-2kmovie.cc##.text-home
+! Duckduckgo
+# Share feedback
+duckduckgo.com##.WktWJWUFfihMbuzAEqk2.hUUdRtuaOUx7mcSwc56s.ffON2NH02oMAcqyoh2UU
 
 ! Nexusmods
 www.nexusmods.com##.background-2.premium-block--upgrade.premium-block
