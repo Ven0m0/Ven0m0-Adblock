@@ -34,3 +34,36 @@ youtube.com##ad-interrupting
 youtube.com##ytp-ad-text
 youtube.com##ytp-ad-module
 youtube.com##ytp-ad-player-overlay
+
+! https://pastebin.com/5L2wahXV
+youtube.com##.YtdTalkToRecsFlowRendererHost:has-text(What hobbies are you interested in developing?)
+youtube.com##tp-yt-paper-dialog.ytd-popup-container:has-text(/following Premium|Choose all that apply|Become a member|Free trial|How are your|How interested|Live TV|Wish videos|background play|better TV|cable box|cable reimagined|hidden fees|of YouTube TV|on YouTube TV|unlimited DVR|with YouTube TV|without the ads|try this feature|Terms apply/)
+youtube.com##ytd-action-companion-ad-renderer, ytd-display-ad-renderer, ytd-video-masthead-ad-advertiser-info-renderer, ytd-video-masthead-ad-primary-video-renderer, ytd-in-feed-ad-layout-renderer, ytd-ad-slot-renderer, yt-about-this-ad-renderer, yt-mealbar-promo-renderer, ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, .ytd-video-masthead-ad-v3-renderer, div#root.style-scope.ytd-display-ad-renderer.yt-simple-endpoint, div#sparkles-container.style-scope.ytd-promoted-sparkles-web-renderer, div#main-container.style-scope.ytd-promoted-video-renderer, div#player-ads.style-scope.ytd-watch-flexy, ad-slot-renderer, ytm-promoted-sparkles-web-renderer, masthead-ad, #masthead-ad, ytd-video-quality-promo-renderer, #yt-lang-alert-container, .YtmPaidContentOverlayHost, .ytd-primetime-promo-renderer, ytd-brand-video-singleton-renderer, #yt-feedback, #yt-hitchhiker-feedback
+youtube.com###upsell-dialog-text > a[href*="sign"]:upward(body > * > *)
+youtube.com##.opened:not(.ytcp-bulk-actions):remove()
+youtube.com###cinematics.ytd-watch-flexy:remove()
+youtube.com##.ytp-inline-preview-mode
+youtube.com##.ytp-inline-preview-mode .ytp-paid-content-overlay, #endorsement.ytd-video-preview
+youtube.com###hover-overlays
+
+! save more bandwidth
+||i.ytimg.com/vi_webp/*/maxresdefault.webp
+||i.ytimg.com/vi/*/maxresdefault.jpg
+||i.ytimg.com/sb/*
+www.youtube.com##div.ytp-tooltip-bg
+www.youtube.com##div.ytp-tooltip-image
+www.youtube.com##div.ytp-tooltip:style(border-radius:0px;!important)
+
+! https://pastebin.com/0Qtubr5M
+youtube.com###related ytd-compact-radio-renderer
+youtube.com###related ytd-compact-movie-renderer
+youtube.com##ytd-download-button-renderer
+
+! YT - Revert giant search thumbnails to normal https://pastebin.com/keJAfsv9
+youtube.com##ytd-two-column-search-results-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #primary.ytd-two-column-search-results-renderer, ytd-search[has-search-header][has-bigger-thumbs] #header.ytd-search:style(max-width: 1096px !important)
+youtube.com##ytd-channel-renderer[use-bigger-thumbs][bigger-thumb-style=BIG] #avatar-section.ytd-channel-renderer, ytd-channel-renderer[use-bigger-thumbs] #avatar-section.ytd-channel-renderer:style(max-width: 360px !important)
+youtube.com##ytd-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-video-renderer, ytd-video-renderer[use-search-ui] ytd-thumbnail.ytd-video-rendererytd-playlist-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-playlist-thumbnail.ytd-playlist-renderer, ytd-playlist-renderer[use-bigger-thumbs] ytd-playlist-thumbnail.ytd-playlist-renderer:style(max-width: 360px !important)
+youtube.com##ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-playlist-thumbnail.ytd-radio-renderer:style(max-width: 360px !important)
+youtube.com##ytd-movie-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] .thumbnail-container.ytd-movie-renderer, ytd-movie-renderer[use-bigger-thumbs] .thumbnail-container.ytd-movie-renderer:style(max-width: 360px !important)
+youtube.com##ytd-promoted-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-promoted-video-renderer, ytd-promoted-sparkles-web-renderer[web-search-layout][use-bigger-thumbs][bigger-thumbs-style=BIG] #thumbnail-container.ytd-promoted-sparkles-web-renderer, ytd-text-image-no-button-layout-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #text-image-container.ytd-text-image-no-button-layout-renderer:style(max-width: 360px !important)
+.yt-lockup-view-model-wiz--horizontal .yt-lockup-view-model-wiz__content-image:style(max-width: 360px !important)
