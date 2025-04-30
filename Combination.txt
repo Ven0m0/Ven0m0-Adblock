@@ -9,3 +9,4 @@
 !#include TwitterAnnoyances.txt
 !#include SpotifyTweaks.txt
 !#include Other.txt
+!#include Google.txt
