@@ -1,0 +1,21 @@
+{
+  "name": "Simplified Domain Names filter",
+  "sources": [
+    {
+      "name": "Ads",
+      "source": "Ads.txt",
+      "type": "hosts",
+    },
+    {
+      "name": "Native",
+      "source": "Native.txt",
+      "type": "hosts",
+    },
+    {
+      "name": "Social Media",
+      "source": "Social Media.txt",
+      "type": "hosts",
+    },
+  ],
+  "transformations": ["Deduplicate", "TrimLines", "RemoveComments", "RemoveModifiers", "RemoveEmptyLines"]
+}

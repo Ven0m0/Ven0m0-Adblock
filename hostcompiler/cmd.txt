@@ -1,0 +1,6 @@
+hostlist-compiler -i hosts.txt -i hosts2.txt -o output.txt
+hostlist-compiler -c config.json -o output.txt
+
+hostlist-compiler -i Ads.txt -i Native.txt -t hosts -o output.txt
+
+hostlist-compiler -i Ads.txt -i Native.txt -i "Smart TV.txt" -i "Social Media.txt" -i Spotify.txt -i Games.txt -i Other.txt -t hosts -o output.txt
