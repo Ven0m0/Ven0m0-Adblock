@@ -185,3 +185,6 @@ google.*##+js(aeld, DOMContentLoaded, CONSENT)
 
 ! Editpad
 editpad.org##.top_ad_box
+
+! Cloudflare subscription popup
+www.cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-row-ns.flex-column.flex.z-5.bottom-0.fixed
