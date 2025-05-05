@@ -42,7 +42,24 @@ google.*##.mnr-c.rl-qs-crs-t._Db > ._gt:has(._mB)
 *###ads_1:style(height: 1px !important)
 *##.adsbygoogle:style(height: 1px !important)
 
-# Collecting Youtube Banner Ads #1353
-youtube.com#@#.sparkles-light-cta
-youtube.com#@#ytd-promoted-sparkles-web-renderer
-youtube.com##ytd-promoted-sparkles-web-renderer #sparkles-container:style(height: 0px !important; opacity: 0 !important;) 
+! Brave search browser ad
+search.brave.com##.svelte-1avqjm8.download-cta
+
+! Example searches
+search.brave.com##.svelte-1avqjm8.noscript-hide.noscrollbar.example-searches
+
+! AI buttons
+search.brave.com##.svelte-1tjerau.subutton
+search.brave.com##.svelte-rany9i.llm.t-secondary.desktop-large-regular.suggestion
+
+! Settings feedback
+search.brave.com##.headerless.svelte-9ouv38.card > .layout-row.svelte-5r82hb
+
+! Feedback button
+search.brave.com##.svelte-1yt5tdo.primary-right
+
+! Rerank button
+search.brave.com###quick-goggles-button
+
+! Bottom bloat
+search.brave.com###main > .svelte-6sdecn
