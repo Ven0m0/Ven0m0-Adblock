@@ -17,3 +17,11 @@ This is my collection of filterlist and rules for adblocking and making the web 
 - [Twitch list](https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/TwitchTweaks.txt)
 - [Misc list](https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Other.txt)
 
+
+### Other resources
+
+- https://github.com/AdguardTeam/PopupBlocker
+
+- https://adsbypasser.github.io
+
+- https://greasyfork.org/en/scripts/31088-morecaptcha
