@@ -191,3 +191,15 @@ www.cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-
 
 ! Chatgpt
 chatgpt.com##.md\:px-\[60px\].text-xs.text-center.p-2.justify-center.items-center.w-full.min-h-8.flex.mt-auto.relative.text-token-text-secondary
+
+
+! Proton lumo
+lumo.proton.me##.md\:block.hidden.my-2.text-xs.color-weak.relative.text-center
+lumo.proton.me##.lumo-plus-button-shadow.p-4.rounded-lg.bg-white.px-3.w-full.navigation-link
+##.lumo-upgrade-trigger.mb-0\.5.px-3.w-full.navigation-item
+lumo.proton.me##.text-hint.text-sm.rounded-sm.p-3
+##.mx-auto.mb-0.mr-2.ml-2.mt-4.rounded-sm.chat-history-upsell
+lumo.proton.me##.text-no-decoration.color-weak.p-3.inline-flex
+
+
+askubuntu.com###credential_picker_container
