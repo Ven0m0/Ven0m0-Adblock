@@ -25,3 +25,5 @@ This is my collection of filterlist and rules for adblocking and making the web 
 - https://adsbypasser.github.io
 
 - https://greasyfork.org/en/scripts/31088-morecaptcha
+
+- https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js
