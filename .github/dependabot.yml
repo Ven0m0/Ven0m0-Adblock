@@ -1,10 +1,8 @@
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      # No need to check for updates more often than once a month
       interval: monthly
 
   # Maintain dependencies for NPM - typically AGLint updates
