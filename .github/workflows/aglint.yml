@@ -2,6 +2,7 @@ name: AGLint
 env:
   NODE_VERSION: 20
 on:
+  workflow_dispatch:
   push:
     paths:
       - "**/*.txt"
