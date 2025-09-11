@@ -1,7 +1,6 @@
-# https://github.com/AdguardTeam/AGLint
 name: AGLint
 env:
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 on:
   push:
     paths:
@@ -22,19 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out to repository
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v5
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          # It is recommended to use cache to speed up the process,
-          # especially if your repository receives a lot of pushes
-          # and/or pull requests
           cache: npm
       - name: Install dependencies
         run: npm ci
-      # If the linter found any errors, it will exit with a non-zero
-      # code, which will cause the job to fail
+      # If the linter found any errors, it will exit with a non-zero code, which will cause the job to fail
       - name: Run AGLint
-        run: npm run lint
+        run: npm run aglint
