@@ -2,6 +2,11 @@
 
 ![Commit activity](https://img.shields.io/github/last-commit/Ven0m0/Ven0m0-Adblock?logo=github)
 
+### Tools
+
+- [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler)
+
+
 
 This is my collection of filterlist and rules for adblocking and making the web more pleasant.
 ### Combined Filterlists
@@ -20,10 +25,11 @@ This is my collection of filterlist and rules for adblocking and making the web 
 
 ### Other resources
 
-- https://github.com/AdguardTeam/PopupBlocker
+- [Adguard PopupBlocker](https://github.com/AdguardTeam/PopupBlocker)
+- [Adguard scriptlets](https://github.com/AdguardTeam/Scriptlets)
+- [Adguard userscript](https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js)
 
 - https://adsbypasser.github.io
-
 - https://greasyfork.org/en/scripts/31088-morecaptcha
 
-- https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js
+
