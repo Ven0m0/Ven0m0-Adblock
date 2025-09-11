@@ -1,0 +1,40 @@
+name: markdownlint
+env:
+  NODE_VERSION: 20
+
+on:
+  push:
+    paths:
+      - "**/*.md"
+      - ".markdownlint.json"
+      - ".markdownlintignore"
+      - "package.json"
+      - "package-lock.json"
+  pull_request:
+    paths:
+      - "**/*.md"
+      - ".markdownlint.json"
+      - ".markdownlintignore"
+      - "package.json"
+      - "package-lock.json"
+
+jobs:
+  lint:
+    name: Run markdownlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out to repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # If the linter found any errors, it will exit with a non-zero code, which will cause the job to fail
+      - name: Run markdownlint
+        run: npm run markdownlint
