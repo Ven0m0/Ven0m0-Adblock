@@ -25,11 +25,12 @@ This is my collection of filterlist and rules for adblocking and making the web 
 
 ### Other resources
 
+- [Adguard Filters](https://github.com/AdguardTeam/AdguardFilters)
 - [Adguard PopupBlocker](https://github.com/AdguardTeam/PopupBlocker)
 - [Adguard scriptlets](https://github.com/AdguardTeam/Scriptlets)
 - [Adguard userscript](https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js)
 
 - https://adsbypasser.github.io
 - https://greasyfork.org/en/scripts/31088-morecaptcha
-
+- https://github.com/yokoffing/filterlists
 
