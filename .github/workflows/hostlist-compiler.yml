@@ -1,0 +1,43 @@
+name: Hostlist Compiler
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+    paths:
+      - '**.txt' # Only run when lists change
+      - 'hostlist-config.json'
+      - 'configuration_popup_filter.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-hostlists:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install -g @adguard/hostlist-compiler
+
+      - name: Compile AdGuard DNS filter
+        run: |
+          mkdir -p Filters
+          hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5.0.1
+        with:
+          commit_message: "chore(filters): Update hostlists"
+          branch: main # Or your default branch
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
