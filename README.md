@@ -6,7 +6,7 @@
 
 - [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler)
 
-
+- [Userscript compile](https://github.com/FiorenMas/Userscripts/)
 
 This is my collection of filterlist and rules for adblocking and making the web more pleasant.
 ### Combined Filterlists
