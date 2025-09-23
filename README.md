@@ -5,8 +5,8 @@
 ### Tools
 
 - [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler)
-
-- [Userscript compile](https://github.com/FiorenMas/Userscripts/)
+- [Userscript compile](https://github.com/FiorenMas/Userscripts)
+- - https://github.com/m0zgen/kompressor
 
 This is my collection of filterlist and rules for adblocking and making the web more pleasant.
 ### Combined Filterlists
