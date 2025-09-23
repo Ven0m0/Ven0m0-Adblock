@@ -8,3 +8,8 @@ npm install -D @adguard/aglint
 npx aglint init
 npm pkg set scripts.lint="aglint"
 npm run lint
+
+# Precommit
+npm install -D husky
+npx husky init
+echo npx aglint > .husky/pre-commit
