@@ -1,0 +1,24 @@
+{
+  // Enable minification
+  "minify": true,
+  // Optional, configure minification options
+  "jsc": {
+    "minify": {
+      "compress": {
+        "unused": true
+        "collapse_vars": true
+        "dead_code": truee
+        "drop_console": true
+        "drop_debugger": true
+        "inline": true
+        "reduce_funcs": true
+        "reduce_vars": true
+        "unused": true
+      },
+      "mangle": true
+      "format": {
+        comments: false
+      },
+    }
+  }
+}
