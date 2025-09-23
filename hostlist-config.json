@@ -1,0 +1,14 @@
+{
+  "name": "Compile list",
+  "description": "List description",
+  "sources": [
+    {
+      "name": "HOSTS rules",
+      "source": "hosts.txt",
+      "type": "hosts",
+      "transformations": ["Compress", "RemoveComments", "RemoveModifiers", "TrimLines", "RemoveEmptyLines", "InsertFinalNewLine"]
+    }
+  ],
+  "transformations": ["Deduplicate", "Compress", "RemoveComments", "TrimLines", "RemoveEmptyLines", "InsertFinalNewLine", "Validate", "RemoveModifiers" ],
+  "inclusions": ["*"],
+}
