@@ -79,7 +79,7 @@ jobs:
     name: Build with Ragibkl Compiler
     runs-on: ubuntu-latest
     # Only run this job if the specific config file for it exists.
-    if: success() && hashFiles('ragibkl-config.json') != ''
+    if: success() # && hashFiles('ragibkl-config.json') != ''
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
