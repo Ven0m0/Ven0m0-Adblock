@@ -1,0 +1,40 @@
+# .github/workflows/build-adblocklists.yml
+# Automatically compiles adblock source lists into a single filter.
+name: "📝 TXT: Build Adblock Lists"
+
+on:
+  push:
+    branches: ["main"]
+    paths: # Trigger only when source .txt files change
+      - "**.txt"
+      - "Combination-No-YT"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Compile Adblock list"
+        run: |
+          chmod +x Scripts/build-adblocklists.sh
+          ./Scripts/build-adblocklists.sh
+        shell: bash
+
+      - name: "Commit and push changes"
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet Filters/filter.txt; then
+            git add Filters/filter.txt
+            git commit -m "ci(filters): build combined adblock list"
+            git push
+          else
+            echo "No changes to Adblock lists."
+          fi
+        shell: bash
