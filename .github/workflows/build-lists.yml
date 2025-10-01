@@ -1,0 +1,42 @@
+# .github/workflows/build-lists.yml
+# A unified CI/CD pipeline for building and validating Adblock and Host lists.
+name: "📦 Build: Compile Lists"
+
+on:
+  push:
+    branches: ["main"]
+    paths: ["lists/sources/**", "hostlist-config.json"] # Trigger on source changes
+  workflow_dispatch: # Allow manual runs
+
+permissions:
+  contents: write # Required to push commits back to the repo
+
+jobs:
+  build-and-commit:
+    name: "Build & Commit Lists"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Build all lists"
+        run: |
+          chmod +x Scripts/build-lists.sh
+          ./Scripts/build-lists.sh
+        shell: bash
+
+      - name: "Commit and push changes"
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if there are any changes in the releases directory
+          if ! git diff --quiet lists/releases/; then
+            git add lists/releases/*.txt
+            git commit -m "ci(lists): build and optimize filter lists" -m "Built on $(date -u)"
+            git push
+          else
+            echo "No changes to commit. Compiled lists are up-to-date."
+          fi
+        shell: bash
