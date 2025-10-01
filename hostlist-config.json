@@ -1,14 +1,19 @@
 {
-  "name": "Compile list",
-  "description": "List description",
+  "name": "Ven0m0's Combined Hostlist",
+  "homepage": "https://github.com/ven0m0/ven0m0-adblock",
   "sources": [
-    {
-      "name": "HOSTS rules",
-      "source": "hosts.txt",
-      "type": "hosts",
-      "transformations": ["Compress", "RemoveComments", "RemoveModifiers", "TrimLines", "RemoveEmptyLines", "InsertFinalNewLine"]
-    }
+    { "source": "lists/sources/3rd-party.txt", "type": "adblock" },
+    { "source": "lists/sources/Other.txt", "type": "adblock" },
+    { "source": "lists/sources/Search-Engines.txt", "type": "adblock" },
+    { "source": "lists/sources/TwitterAnnoyances.txt", "type": "adblock" }
   ],
-  "transformations": ["Deduplicate", "Compress", "RemoveComments", "TrimLines", "RemoveEmptyLines", "InsertFinalNewLine", "Validate", "RemoveModifiers" ],
-  "inclusions": ["*"],
+  "output": "lists/releases/hosts.txt",
+  "transformations": [
+    "RemoveComments",
+    "Validate",
+    "Sort",
+    "Unique",
+    "Compress"
+  ]
 }
+
