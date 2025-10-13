@@ -7,34 +7,91 @@ out="dist"
 repo="Ven0m0/Ven0m0-Adblock"
 jobs=$(nproc 2>/dev/null || echo 4)
 
-# Colors for terse output
-RED="\e[31m" GRN="\e[32m" RST="\e[0m"
+# Colors
+readonly red=$'\e[31m' grn=$'\e[32m' rst=$'\e[0m'
 
-# Process a single JS file
+# Process file (optimized for bash-native)
 process_file() {
   local f=$1 fname base meta code js
-  fname=$(basename "$f")
-  base="${fname%.*}"
+  fname=${f##*/}
+  base=${fname%.*}
   
-  # Extract metadata+code in one pass (bash-native)
-  meta=$(grep -A 999999 "// ==UserScript==" "$f" | grep -B 999999 "// ==/UserScript==" | head -n -1)
-  [[ -n "$meta" ]] || meta=""
-  code=$(grep -A 999999 "// ==/UserScript==" "$f" | tail -n +2)
+  # Extract with one grep pass (bash-native)
+  meta=$(sed -n '/^\/\/ ==UserScript==/,/^\/\/ ==\/UserScript==/p' "$f" | head -n -1)
+  code=$(sed -n '/^\/\/ ==\/UserScript==/,$p' "$f" | tail -n +2)
   
-  # Update metadata URLs if present
+  # Update metadata URLs (if exists)
   [[ -n "$meta" ]] && {
-    meta=$(echo "$meta" | sed -E \
+    meta=$(sed -E \
       -e "s|// @downloadURL .*|// @downloadURL https://raw.githubusercontent.com/$repo/main/$out/$fname|" \
-      -e "s|// @updateURL .*|// @updateURL https://raw.githubusercontent.com/$repo/main/$out/${base}.meta.js|")
+      -e "s|// @updateURL .*|// @updateURL https://raw.githubusercontent.com/$repo/main/$out/${base}.meta.js|" \
+      <<< "$meta")
   }
   
-  # Minify with esbuild (using here-string)
-  js=$(esbuild --minify --bundle --target=es2022 \
-       --platform=browser --log-level=error --format=iife \
-       --outfile=/dev/stdout <<< "$code")
+  # Minify (here-string for input)
+  js=$(esbuild --minify --bundle --target=es2022 --format=iife \
+       --platform=browser --log-level=error --outfile=/dev/stdout <<< "$code")
   
-  # Output files with direct redirection (no echo)
+  # Output (direct redirection)
   if [[ -n "$meta" ]]; then
+    printf "%s\n" "$meta" > "$out/${base}.meta.js"
+    printf "%s\n%s\n" "$meta" "$js" > "$out/$fname"
+    printf "%s✓%s %s\n" "$grn" "$rst" "$fname"
+  else
+    printf "%s\n" "$js" > "$out/$fname"
+    printf "%s✓%s %s\n" "$grn" "$rst" "$fname"
+  fi
+}
+export -f process_file
+
+# Main
+main() {
+  mkdir -p "$src" "$out"
+  
+  # Process local files
+  [[ -d "$src" ]] && {
+    # Prefer fd, fall back to find (bash array)
+    local -a files
+    if command -v fd >/dev/null 2>&1; then
+      mapfile -t files < <(fd -e js . "$src")
+    else
+      mapfile -t files < <(find "$src" -name "*.js" -type f 2>/dev/null)
+    fi
+    
+    # Process (parallel if available)
+    if [[ ${#files[@]} -gt 0 ]]; then
+      if [[ ${#files[@]} -gt 1 ]] && command -v parallel >/dev/null 2>&1; then
+        printf "%s\n" "${files[@]}" | parallel -j "$jobs" process_file
+      else
+        local f
+        for f in "${files[@]}"; do
+          process_file "$f"
+        done
+      fi
+    fi
+  }
+  
+  # Process List file
+  [[ -f "List" ]] && {
+    while read -r line; do
+      url=$(grep -o 'https\?://[^ "]*\.user\.js' <<< "$line" 2>/dev/null || true)
+      [[ -n "$url" ]] && {
+        fname=${url##*/}
+        fname=$(tr -cd '[:alnum:]._-' <<< "$fname")
+        printf "↓ %s\n" "$fname"
+        curl -sL -A "Mozilla/5.0 Firefox/124.0" -o "$src/$fname" "$url"
+        process_file "$src/$fname"
+        sed -i "s|$url|https://raw.githubusercontent.com/$repo/main/$out/$fname|g" List
+      }
+    done < List
+    
+    cp List "$out/README.md"
+  }
+  
+  printf "\n%s✓ Done!%s\n" "$grn" "$rst"
+}
+
+main  if [[ -n "$meta" ]]; then
     printf "%s\n" "$meta" > "$out/${base}.meta.js"
     printf "%s\n%s\n" "$meta" "$js" > "$out/$fname"
     printf "${GRN}✓${RST} %s (with meta)\n" "$fname"
