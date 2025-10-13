@@ -1,0 +1,117 @@
+name: Optimize Userscripts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'userscripts/src/**'
+  pull_request:
+    branches: [main]
+  schedule:
+    # Check for updates every Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild all scripts'
+        required: false
+        default: 'false'
+      fetch_updates:
+        description: 'Fetch updates from sources'
+        required: false
+        default: 'false'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm install -g esbuild
+        sudo apt-get update
+        sudo apt-get install -y parallel curl
+        curl -LO https://github.com/sharkdp/fd/releases/download/v9.0.0/fd-musl_9.0.0_amd64.deb
+        sudo dpkg -i fd-musl_9.0.0_amd64.deb
+
+    - name: Detect unoptimized scripts
+      id: detect
+      run: |
+        mkdir -p userscripts/src dist
+        
+        # Compare src to dist if both files exist
+        unoptimized=false
+        for f in userscripts/src/*.js; do
+          if [[ -f "$f" ]]; then
+            fname=$(basename "$f")
+            if [[ ! -f "dist/$fname" ]]; then
+              echo "Detected new file: $fname"
+              unoptimized=true
+            else
+              # Check if source is newer than build
+              if [[ "$f" -nt "dist/$fname" ]]; then
+                echo "Detected modified file: $fname"
+                unoptimized=true
+              fi
+            fi
+          fi
+        done
+        
+        # Also check if List file exists
+        if [[ -f "List" && (! -f "dist/README.md" || "List" -nt "dist/README.md") ]]; then
+          echo "Detected changes in List file"
+          unoptimized=true
+        fi
+        
+        if [[ "${{ github.event.inputs.force_rebuild }}" == "true" ]]; then
+          echo "Forced rebuild requested"
+          unoptimized=true
+        fi
+        
+        echo "unoptimized=$unoptimized" >> $GITHUB_OUTPUT
+
+    - name: Fetch script updates
+      if: github.event_name == 'schedule' || github.event.inputs.fetch_updates == 'true'
+      run: |
+        if [[ -f "List" ]]; then
+          echo "Fetching updates from List file"
+          mkdir -p userscripts/src
+          
+          # Extract URLs and download latest versions
+          grep -o 'https\?://[^ "]*\.user\.js' List | while read -r url; do
+            echo "Updating from $url"
+            filename=$(basename "$url" | tr -cd '[:alnum:]._-')
+            curl -sL -A "Mozilla/5.0 Firefox/124.0" "$url" > "userscripts/src/$filename"
+          done
+          
+          # Force rebuilding
+          echo "unoptimized=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build scripts
+      if: steps.detect.outputs.unoptimized == 'true'
+      run: |
+        chmod +x build-userscripts.sh
+        ./build-userscripts.sh
+
+    - name: Commit and push changes
+      if: steps.detect.outputs.unoptimized == 'true' && github.event_name != 'pull_request'
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add dist/
+        git commit -m "Auto-optimize userscripts [skip ci]" || echo "No changes to commit"
+        git push
