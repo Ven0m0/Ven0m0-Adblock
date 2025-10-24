@@ -44,7 +44,7 @@ process_file() {
 
   # Minify the script with esbuild. The result is stored in memory.
   local minified_body
-  minified_body=$(esbuild "$input_file" --minify --log-level=warning)
+  minified_body=$(esbuild "$input_file" --minify --bundle --log-level=warning --drop:debugger --platform=browser --charset=utf8)
 
   # Write the final file using a here-string for efficiency.
   # This is faster than creating multiple temporary files.
