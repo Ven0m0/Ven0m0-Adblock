@@ -50,7 +50,7 @@ for file in meta/*.meta.js; do
 done
 
 # Parallel compile js files
-function compile_js() {
+compile_js(){
   local file=$1
   base=$(basename "$file" .js)
   npx esbuild $file --minify --outfile="js/$base.js"
