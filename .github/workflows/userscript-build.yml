@@ -50,11 +50,9 @@ jobs:
       id: detect
       run: |
         mkdir -p userscripts dist
-        
         unoptimized=false
         # Use bash arrays for file collection
         mapfile -t scripts < <(find userscripts -name "*.js" -type f 2>/dev/null || true)
-        
         for f in "${scripts[@]}"; do
           [[ -f "$f" ]] || continue
           fname=$(basename "$f")
@@ -66,19 +64,16 @@ jobs:
             unoptimized=true
           fi
         done
-        
         # List file check (bash-native test)
         if [[ -f "List" ]] && { [[ ! -f "dist/README.md" ]] || [[ "List" -nt "dist/README.md" ]]; }; then
           echo "::notice::List file changed"
           unoptimized=true
         fi
-        
         # Input handling
         [[ "${{ github.event.inputs.force_rebuild }}" == "true" ]] && {
           echo "::notice::Force rebuild requested"
           unoptimized=true
         }
-        
         echo "unoptimized=$unoptimized" >> $GITHUB_OUTPUT
 
     - name: Fetch script updates
@@ -86,14 +81,12 @@ jobs:
       run: |
         [[ -f "List" ]] || exit 0
         mkdir -p userscripts
-        
         # Use while read for efficient iteration
         grep -o 'https\?://[^ "]*\.user\.js' List | while read -r url; do
           filename=$(basename "$url" | tr -cd '[:alnum:]._-')
           echo "::notice::Updating $filename"
           curl -sL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/$filename" "$url"
         done
-        
         echo "unoptimized=true" >> $GITHUB_OUTPUT
 
     - name: Build scripts
