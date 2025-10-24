@@ -12,7 +12,6 @@ module.exports = {
 	extends: [
 		"eslint:recommended",
 		"plugin:@cspell/recommended",
-		"plugin:security/recommended-legacy",
 
 		// Display Prettier errors as ESLint errors.
 		// Enables eslint-plugin-prettier and eslint-config-prettier.
@@ -57,7 +56,6 @@ module.exports = {
 				//! Prettier should always be the last configuration in the extends array.
 			],
 		},
-
 		/*
 		 * `package.json` file.
 		 * This needs it's own configuration, because it doesn't work together with `plugin:json`.
