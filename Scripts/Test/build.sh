@@ -25,6 +25,10 @@ if ! command -v fd &>/dev/null; then
   exit 1
 fi
 
+run_eslint(){
+  eslint --fix --quiet --prune-suppressions --no-warn-ignored --no-error-on-unmatched-pattern --exit-on-fatal-error --concurrency auto "${1:-$PWD/*.js}"   
+}
+
 # 2. Ensure Directories Exist
 mkdir -p "$SRC_DIR" "$OUT_DIR"
 
@@ -36,7 +40,10 @@ process_file() {
   local -r output_file="${OUT_DIR}/${filename}"
 
   echo "  -> Processing: ${filename}"
-
+  
+  # Run eslint with autofix
+  command -v eslint &>/dev/null && run_eslint "$input_file"
+  
   # esbuild does not preserve top-level comments. We must extract the
   # UserScript header manually and prepend it to the minified output.
   local header
