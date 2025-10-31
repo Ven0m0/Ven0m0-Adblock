@@ -7,6 +7,8 @@
 // @run-at      document-end
 // ==/UserScript==
 "use strict";
+//Reduce logging overhead
+console.log = console.warn = console.error = function() {};
 const KEY="ven0m0.webperf.v2",defaults={log:!1,images:!0,iframes:!0,videos:!0,deferScripts:!0,observe:!0,prefetch:!0,preconnect:!0,linkPrefetch:!0,linkLimit:15,linkDelay:2e3};
 const cfg=(()=>{try{const r=localStorage.getItem(KEY);return r?{...defaults,...JSON.parse(r)}:{...defaults}}catch(e){return{...defaults}}})();
 const saveCfg=()=>localStorage.setItem(KEY,JSON.stringify(cfg)),L=(...a)=>cfg.log&&console.debug("webperf:",...a);
