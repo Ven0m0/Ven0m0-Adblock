@@ -3,10 +3,10 @@
 ! Description: Combination List of multiple filters to make the internet comfortable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Combination.txt
-!#include YoutubeTweaks.txt
-!#include RedditAnnoyances.txt
-!#include TwitchTweaks.txt
-!#include TwitterAnnoyances.txt
-!#include SpotifyTweaks.txt
+!#include Youtube.txt
+!#include Reddit.txt
+!#include Twitch.txt
+!#include Twitter.txt
+!#include Spotify.txt
 !#include Other.txt
 !#include Search-Engines.txt
