@@ -66,7 +66,7 @@ jobs:
 
       - name: Commit AdGuard List Changes
         if: steps.compile.outputs.changes_detected == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v6.0.1
+        uses: stefanzweifel/git-auto-commit-action@v7.0.0
         with:
           commit_message: "chore(filters): Update and clean AdGuard compiled list"
           file_pattern: Filters/Venom-Combined.txt
@@ -106,7 +106,7 @@ jobs:
 
       - name: Commit Ragibkl List Changes
         if: steps.compile.outputs.changes_detected == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v6.0.1
+        uses: stefanzweifel/git-auto-commit-action@v7.0.0
         with:
           commit_message: "chore(filters): Update ragibkl compiled list"
           file_pattern: Filters/Ragibkl-Combined.txt
