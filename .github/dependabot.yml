@@ -3,10 +3,8 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
-
-  # Maintain dependencies for NPM - typically AGLint updates
+      interval: weekly
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: daily
+      interval: weekly
