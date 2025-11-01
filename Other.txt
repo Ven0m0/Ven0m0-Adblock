@@ -189,9 +189,7 @@ editpad.org##.top_ad_box
 ! Cloudflare subscription popup
 www.cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-row-ns.flex-column.flex.z-5.bottom-0.fixed
 
-! Chatgpt
-chatgpt.com##.md\:px-\[60px\].text-xs.text-center.p-2.justify-center.items-center.w-full.min-h-8.flex.mt-auto.relative.text-token-text-secondary
-
+askubuntu.com###credential_picker_container
 
 ! Proton lumo
 lumo.proton.me##.md\:block.hidden.my-2.text-xs.color-weak.relative.text-center
@@ -201,5 +199,27 @@ lumo.proton.me##.text-hint.text-sm.rounded-sm.p-3
 ##.mx-auto.mb-0.mr-2.ml-2.mt-4.rounded-sm.chat-history-upsell
 lumo.proton.me##.text-no-decoration.color-weak.p-3.inline-flex
 
+! Github copilot
+github.com##.LegalDisclaimer-module__container--lNe5E
+github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner--L3kg0
+github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u7T1C
+github.com##.NewConversationDownloadActions-module__desktopActions--SOL35
 
-askubuntu.com###credential_picker_container
+! Claude
+claude.ai##a.\[\&\[data-highlighted\]\]\:text-text-000.\[\&\[data-highlighted\]\]\:bg-bg-200.select-none.outline-none.items-center.gap-2.grid-cols-\[minmax\(0\,_1fr\)_auto\].grid.text-ellipsis.overflow-hidden.whitespace-nowrap.cursor-pointer.rounded-lg.px-2.py-1\.5.font-base:nth-of-type(2)
+claude.ai##div.w-fit:nth-of-type(2)
+
+! Chatgpt
+chatgpt.com##.md\:px-\[60px\].text-xs.text-center.p-2.justify-center.items-center.w-full.min-h-8.flex.mt-auto.relative.text-token-text-secondary
+chatgpt.com##.rtl\:translate-x-1\/2.ltr\:-translate-x-1\/2.lg\:start-1\/2.gap-2.items-center.flex-col.flex.start-0.absolute.pointer-events-none
+chatgpt.com##.hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary
+chatgpt.com##.dark\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\:items-center.shadow-xxs.dark\:border-transparent.lg\:mx-auto.\[text-wrap\:pretty\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex
+
+! Gemini
+gemini.google.com##.ng-star-inserted.adv-upsell.buttons-container > .ng-star-inserted.ng-tns-c1774853282-9
+gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c3313845457-6.gds-upsell-button.mat-mdc-button-base.mdc-button
+gemini.google.com##button.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(2)
+gemini.google.com##button.ng-star-inserted.mat-mdc-menu-item-submenu-trigger.mat-mdc-menu-trigger.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(3)
+gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c283640854-5.gds-upsell-button.mat-mdc-button-base.mdc-button
+gemini.google.com##.cdk-mouse-focused.cdk-focused.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
+
