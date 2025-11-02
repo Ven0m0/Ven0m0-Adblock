@@ -204,6 +204,8 @@ github.com##.LegalDisclaimer-module__container--lNe5E
 github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner--L3kg0
 github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u7T1C
 github.com##.NewConversationDownloadActions-module__desktopActions--SOL35
+github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner__visual--dHdzB
+github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner--L3kg0
 
 ! Claude
 claude.ai##a.\[\&\[data-highlighted\]\]\:text-text-000.\[\&\[data-highlighted\]\]\:bg-bg-200.select-none.outline-none.items-center.gap-2.grid-cols-\[minmax\(0\,_1fr\)_auto\].grid.text-ellipsis.overflow-hidden.whitespace-nowrap.cursor-pointer.rounded-lg.px-2.py-1\.5.font-base:nth-of-type(2)
@@ -222,4 +224,3 @@ gemini.google.com##button.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
 gemini.google.com##button.ng-star-inserted.mat-mdc-menu-item-submenu-trigger.mat-mdc-menu-trigger.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(3)
 gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c283640854-5.gds-upsell-button.mat-mdc-button-base.mdc-button
 gemini.google.com##.cdk-mouse-focused.cdk-focused.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
-
