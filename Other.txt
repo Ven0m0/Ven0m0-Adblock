@@ -191,6 +191,8 @@ www.cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-
 
 askubuntu.com###credential_picker_container
 
+gitlab.freedesktop.org##.light-red.js-broadcast-notification-10.banner.gl-broadcast-message
+
 ! Proton lumo
 lumo.proton.me##.md\:block.hidden.my-2.text-xs.color-weak.relative.text-center
 lumo.proton.me##.lumo-plus-button-shadow.p-4.rounded-lg.bg-white.px-3.w-full.navigation-link
@@ -224,3 +226,4 @@ gemini.google.com##button.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
 gemini.google.com##button.ng-star-inserted.mat-mdc-menu-item-submenu-trigger.mat-mdc-menu-trigger.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(3)
 gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c283640854-5.gds-upsell-button.mat-mdc-button-base.mdc-button
 gemini.google.com##.cdk-mouse-focused.cdk-focused.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
+
