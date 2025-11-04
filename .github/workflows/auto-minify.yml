@@ -1,10 +1,11 @@
-
-
-on: [push]
+name: Auto minify CSS & JS
+on: 
+  workflow_dispatch:
 
 jobs:
   minify:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: check out the repository
         uses: actions/checkout@v4
@@ -13,7 +14,8 @@ jobs:
         uses: nizarmah/auto-minify@v3
         with:
           js_engine: 'uglify-js'
-          css_engine: 'clean-css'
+          css_engine: 'lightning'
+          overwrite: true
 
       - name: auto commit the minified files
         uses: stefanzweifel/git-auto-commit-action@v5
