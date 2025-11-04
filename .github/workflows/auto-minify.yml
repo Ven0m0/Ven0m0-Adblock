@@ -1,0 +1,21 @@
+
+
+on: [push]
+
+jobs:
+  minify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check out the repository
+        uses: actions/checkout@v4
+
+      - name: auto minify files with different engines
+        uses: nizarmah/auto-minify@v3
+        with:
+          js_engine: 'uglify-js'
+          css_engine: 'clean-css'
+
+      - name: auto commit the minified files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "bot: Add auto minified files"
