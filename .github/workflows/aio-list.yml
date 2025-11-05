@@ -22,16 +22,9 @@ jobs:
     name: Build with AdGuard Toolchain
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-          check-latest: true
-          cache: 'npm'
-          package-manager-cache: true
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v6
+        with: {node-version: 22, cache: npm, package-manager-cache: true}
 
       - name: Install AdGuard Tools
         run: npm i -g @adguard/hostlist-compiler @adguard/aglint @adguard/dead-domains-linter
