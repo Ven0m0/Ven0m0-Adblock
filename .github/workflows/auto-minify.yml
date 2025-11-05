@@ -7,9 +7,26 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-      - name: check out the repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v6
+        with: {node-version: 22, cache: npm, package-manager-cache: true}
 
+      - name: JS
+        run: |
+          npx esbuild **/*.js --minify --outdir=dist --bundle
+          # OR: npx @swc/cli src -d dist --minify
+
+      # - name: CSS
+        # run: |
+          # npx lightningcss --minify --bundle src/*.css -o dist/bundle.min.css
+
+      - name: HTML: minify-html
+        run: |
+          npx @minify-html/node-cli/ **/*.html
+      - name: JSON: jq
+        run: |
+          fd -e json -x sh -c 'jq -c . {} > {.}.min.json'
+      
       - name: auto minify files with different engines
         uses: nizarmah/auto-minify@v3
         with:
