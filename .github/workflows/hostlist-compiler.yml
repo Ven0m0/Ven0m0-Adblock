@@ -20,11 +20,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
+          check-latest: true
           cache: 'npm'
+          package-manager-cache: true
 
       - name: Install dependencies
         run: npm install -g @adguard/hostlist-compiler
