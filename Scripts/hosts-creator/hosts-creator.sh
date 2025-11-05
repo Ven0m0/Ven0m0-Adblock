@@ -40,35 +40,68 @@ downloadhosts() {
     n=0
     printf '%b\n' "${BLUE}Downloading host lists${NC}"
     for i in $HOSTS; do
-        n=$(awk "BEGIN {print $n+1}")
+        n=$((n + 1))
         printf '%b\n' "${CYAN}$n) ${YELLOW}downloading $i${NC}"
         $downloader $i >>$current_dir/$newhostsfn
     done
 }
 
 edithostsfile() {
-    # comments
+    # Build awk script based on enabled options
+    awk_script=""
+    print_newline=""
+    
+    # Build actions and pattern into single awk script
+    actions=""
+    pattern=""
+    
+    # comments - this is a filter pattern
     if [ $RM_COMMENTS = 1 ]; then
         printf '%b' "${BLUE}removing comments${NC}"
-        awk '!/^#/' $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b' "${BLUE}: ${GREEN}done${NC}")
+        pattern="!/^#/"
+        print_newline="1"
     fi
-    # trailing spaces
+    
+    # trailing spaces - this is an action
     if [ $RM_TRAILING_SPACES = 1 ]; then
         if [ $RM_COMMENTS = 1 ]; then
             printf '\n%b' "${BLUE}removing trailing spaces${NC}"
         else
             printf '%b' "${BLUE}removing trailing spaces${NC}"
         fi
-        awk '{gsub(/^ +| +$/,"")}1' $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b' "${BLUE}: ${GREEN}done${NC}")
+        actions="gsub(/^ +| +$/,\"\");"
+        print_newline="1"
     fi
-    # duplicate lines
+    
+    # duplicate lines - this is another filter
     if [ $RM_DUPLICATE_LINES = 1 ]; then
-        if [ $RM_TRAILING_SPACES = 1 ]; then
+        if [ $RM_TRAILING_SPACES = 1 ] || [ $RM_COMMENTS = 1 ]; then
             printf '\n%b' "${BLUE}removing duplicate lines${NC}"
-        elif [ $RM_COMMENTS = 0 ] && [ $RM_TRAILING_SPACES = 0 ]; then
+        else
             printf '%b' "${BLUE}removing duplicate lines${NC}"
         fi
-        awk '!seen[$0]++' $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b\n' "${BLUE}: ${GREEN}done${NC}")
+        if [ -n "$pattern" ]; then
+            pattern="$pattern && !seen[$0]++"
+        else
+            pattern="!seen[$0]++"
+        fi
+        print_newline="1"
+    fi
+    
+    # Construct final awk script
+    if [ -n "$pattern" ]; then
+        if [ -n "$actions" ]; then
+            awk_script="$pattern {${actions}print}"
+        else
+            awk_script="$pattern {print}"
+        fi
+    elif [ -n "$actions" ]; then
+        awk_script="{${actions}print}"
+    fi
+    
+    # Run combined awk command once if any processing is needed
+    if [ -n "$awk_script" ]; then
+        awk "$awk_script" $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b\n' "${BLUE}: ${GREEN}done${NC}")
     fi
 }
 

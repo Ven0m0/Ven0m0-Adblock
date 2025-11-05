@@ -3,7 +3,10 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-npm i -g @adguard/hostlist-compiler
+# Only install if not already available
+if ! command -v hostlist-compiler >/dev/null 2>&1; then
+  npm i -g @adguard/hostlist-compiler
+fi
 
 # Compiling AdGuard DNS filter
 mkdir -p Filters
