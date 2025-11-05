@@ -20,6 +20,14 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          check-latest: true
+          cache: 'npm'
+          package-manager-cache: true
+
       - name: "Build all lists"
         run: |
           chmod +x Scripts/build-lists.sh
