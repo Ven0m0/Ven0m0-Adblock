@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
+set -euo pipefail; shopt -s nullglob globstar
+LC_ALL=C LANG=C
 # Config
 readonly repo="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
 readonly src="${1:-userscripts}"
