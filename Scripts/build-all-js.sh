@@ -8,6 +8,8 @@ readonly out="${2:-dist}"
 readonly list="${3:-List}"
 readonly jobs=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 readonly red=$'\e[31m' grn=$'\e[32m' ylw=$'\e[33m' rst=$'\e[0m'
+# Flag to control esbuild command
+ESBUILD_CMD="node_modules/.bin/esbuild"
 
 # Process single userscript
 process() {
@@ -30,7 +32,7 @@ process() {
   fi
   
   # Minify (here-string stdin) - use local esbuild to avoid repeated npm lookups
-  if ! js=$(node_modules/.bin/esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1); then
+  if ! js=$($ESBUILD_CMD --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1); then
     printf "%s✗%s %s (esbuild failed)\n" "$red" "$rst" "$fname" >&2
     return 1
   fi
@@ -52,7 +54,7 @@ process() {
   printf "%s✓%s %s (%d → %d bytes)\n" "$grn" "$rst" "$fname" "$(wc -c < "$f")" "$len"
 }
 export -f process
-export repo out red grn ylw rst
+export repo out red grn ylw rst ESBUILD_CMD
 
 # Download userscript
 download() {
@@ -117,11 +119,12 @@ main() {
   # Ensure esbuild is installed locally for better performance
   if [[ ! -f node_modules/.bin/esbuild ]]; then
     printf "%s→%s Installing esbuild locally for better performance...\n" "$ylw" "$rst"
-    npm install --no-save esbuild >/dev/null 2>&1 || {
+    if npm install --no-save esbuild >/dev/null 2>&1; then
+      export ESBUILD_CMD="node_modules/.bin/esbuild"
+    else
       printf "%s✗%s Failed to install esbuild, falling back to npx\n" "$red" "$rst" >&2
-      # Update the process function to fall back to npx if local install fails
-      sed -i 's|node_modules/.bin/esbuild|npx -y esbuild|g' <<< "$(declare -f process)"
-    }
+      export ESBUILD_CMD="npx -y esbuild"
+    fi
   fi
   
   # Find local files
