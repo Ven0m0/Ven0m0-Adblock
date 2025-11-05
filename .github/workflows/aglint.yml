@@ -23,11 +23,13 @@ jobs:
     steps:
       - name: Check out to repository
         uses: actions/checkout@v5
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+          node-version: '22'
+          check-latest: true
+          cache: 'npm'
+          package-manager-cache: true
       - name: Install dependencies
         run: npm ci
       # If the linter found any errors, it will exit with a non-zero code, which will cause the job to fail
