@@ -1,6 +1,15 @@
-name: Userscript Builder
-
+name: Build & minify
 on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'userscripts/**'
+      - '**.css'
+      - '**.html'
+      - '**.json'
+      - '**.yml'
+      - 'List'
+      - 'Scripts/**'
   workflow_dispatch:
 
 jobs:
@@ -8,18 +17,32 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: '22'
-        check-latest: true
-        cache: 'npm'
-        package-manager-cache: true
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      
+      - name: yamlfmt
+        uses: yk-lab/yamlfmt-action@v1
+      
+      - name: Minify userscripts
+        run: bash Scripts/minifyl-js.sh .
+      
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'bot: build & minify'
+          file_pattern: |
+            dist/*.js
+            dist/README.md
+            *.css
+            *.html
+            *.json
+            *.yml
+            *.yaml
