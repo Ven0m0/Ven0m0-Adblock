@@ -30,9 +30,9 @@ jobs:
       
       - name: yamlfmt
         uses: yk-lab/yamlfmt-action@v1
-      
+        
       - name: Minify userscripts
-        run: bash Scripts/minifyl-js.sh .
+        run: bash Scripts/minifyl-js.sh
       
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
