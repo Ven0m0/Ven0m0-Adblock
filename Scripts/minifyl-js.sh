@@ -112,16 +112,6 @@ process_list(){
 main(){
   mkdir -p "$src" "$out"
 
-  # Ensure esbuild is installed locally for better performance (npx only)
-  # This optimization doesn't apply to bun which handles packages differently
-  if [[ "${runner[0]}" == "npx" ]] && [[ ! -f node_modules/.bin/esbuild ]]; then
-    printf "%s→%s Installing esbuild locally for better performance...\n" "$ylw" "$rst"
-    if npm install --no-save esbuild >/dev/null 2>&1; then
-      # Update runner to use local esbuild
-      runner=(node_modules/.bin/esbuild)
-    fi
-  fi
-
   local -a files=()
   if [[ -d $src ]]; then
     if command -v fd &>/dev/null; then
