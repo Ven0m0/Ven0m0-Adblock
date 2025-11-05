@@ -29,8 +29,8 @@ process() {
       <<< "$meta")
   fi
   
-  # Minify (here-string stdin)
-  if ! js=$(npx -y esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1); then
+  # Minify (here-string stdin) - use local esbuild to avoid repeated npm lookups
+  if ! js=$(node_modules/.bin/esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1); then
     printf "%s✗%s %s (esbuild failed)\n" "$red" "$rst" "$fname" >&2
     return 1
   fi
@@ -113,6 +113,16 @@ main() {
   # Setup
   mkdir -p "$src" "$out"
   command -v npx &>/dev/null || { printf "%s✗%s npx not found (install Node.js)\n" "$red" "$rst" >&2; exit 1; }
+  
+  # Ensure esbuild is installed locally for better performance
+  if [[ ! -f node_modules/.bin/esbuild ]]; then
+    printf "%s→%s Installing esbuild locally for better performance...\n" "$ylw" "$rst"
+    npm install --no-save esbuild >/dev/null 2>&1 || {
+      printf "%s✗%s Failed to install esbuild, falling back to npx\n" "$red" "$rst" >&2
+      # Update the process function to fall back to npx if local install fails
+      sed -i 's|node_modules/.bin/esbuild|npx -y esbuild|g' <<< "$(declare -f process)"
+    }
+  fi
   
   # Find local files
   local -a files=()

@@ -40,18 +40,24 @@ downloadhosts() {
     n=0
     printf '%b\n' "${BLUE}Downloading host lists${NC}"
     for i in $HOSTS; do
-        n=$(awk "BEGIN {print $n+1}")
+        n=$((n + 1))
         printf '%b\n' "${CYAN}$n) ${YELLOW}downloading $i${NC}"
         $downloader $i >>$current_dir/$newhostsfn
     done
 }
 
 edithostsfile() {
+    # Build awk script based on enabled options
+    awk_script=""
+    print_newline=""
+    
     # comments
     if [ $RM_COMMENTS = 1 ]; then
         printf '%b' "${BLUE}removing comments${NC}"
-        awk '!/^#/' $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b' "${BLUE}: ${GREEN}done${NC}")
+        awk_script="!/^#/"
+        print_newline="1"
     fi
+    
     # trailing spaces
     if [ $RM_TRAILING_SPACES = 1 ]; then
         if [ $RM_COMMENTS = 1 ]; then
@@ -59,16 +65,32 @@ edithostsfile() {
         else
             printf '%b' "${BLUE}removing trailing spaces${NC}"
         fi
-        awk '{gsub(/^ +| +$/,"")}1' $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b' "${BLUE}: ${GREEN}done${NC}")
+        if [ -n "$awk_script" ]; then
+            awk_script="$awk_script {gsub(/^ +| +$/,\"\")}1"
+        else
+            awk_script="{gsub(/^ +| +$/,\"\")}1"
+        fi
+        print_newline="1"
     fi
+    
     # duplicate lines
     if [ $RM_DUPLICATE_LINES = 1 ]; then
-        if [ $RM_TRAILING_SPACES = 1 ]; then
+        if [ $RM_TRAILING_SPACES = 1 ] || [ $RM_COMMENTS = 1 ]; then
             printf '\n%b' "${BLUE}removing duplicate lines${NC}"
-        elif [ $RM_COMMENTS = 0 ] && [ $RM_TRAILING_SPACES = 0 ]; then
+        else
             printf '%b' "${BLUE}removing duplicate lines${NC}"
         fi
-        awk '!seen[$0]++' $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b\n' "${BLUE}: ${GREEN}done${NC}")
+        if [ -n "$awk_script" ]; then
+            awk_script="$awk_script !seen[\$0]++"
+        else
+            awk_script="!seen[\$0]++"
+        fi
+        print_newline="1"
+    fi
+    
+    # Run combined awk command once if any processing is needed
+    if [ -n "$awk_script" ]; then
+        awk "$awk_script" $current_dir/$newhostsfn >tmp && (mv -f tmp $current_dir/$newhostsfn && printf '%b\n' "${BLUE}: ${GREEN}done${NC}")
     fi
 }
 

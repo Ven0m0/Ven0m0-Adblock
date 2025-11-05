@@ -3,13 +3,33 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-npm init -y
-npm install -D @adguard/aglint
-npx aglint init
-npm pkg set scripts.lint="aglint"
+# Only initialize if package.json doesn't exist
+if [ ! -f package.json ]; then
+  npm init -y
+fi
+
+# Only install if not already present
+if ! npm list @adguard/aglint >/dev/null 2>&1; then
+  npm install -D @adguard/aglint
+fi
+
+# Only initialize aglint if config doesn't exist
+if [ ! -f .aglintrc.yaml ]; then
+  npx aglint init
+fi
+
+# Set lint script if not already set
+if ! grep -q '"lint".*"aglint"' package.json 2>/dev/null; then
+  npm pkg set scripts.lint="aglint"
+fi
+
 npm run lint
 
-# Precommit
-npm install -D husky
-npx husky init
-echo npx aglint > .husky/pre-commit
+# Precommit - only if not already configured
+if [ ! -d .husky ]; then
+  if ! npm list husky >/dev/null 2>&1; then
+    npm install -D husky
+  fi
+  npx husky init
+  echo npx aglint > .husky/pre-commit
+fi
