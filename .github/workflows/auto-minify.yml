@@ -1,12 +1,12 @@
-name: Auto minify CSS & JS
+name: Build userscripts
 on:
   push:
     branches: [main, master]
-    paths: ['**.js', '**.css', '**.html', '**.json']
+    paths: ['userscripts/**', 'List', 'Scripts/build.sh']
   workflow_dispatch:
 
 jobs:
-  minify:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,33 +18,11 @@ jobs:
           node-version: 22
           cache: npm
       
-      - name: Install minifiers
-        run: npm i -D esbuild lightningcss @minify-html/node-cli
+      - name: Build userscripts
+        run: bash Scripts/build.sh userscripts dist List
       
-      - name: Minify JS in-place
-        run: |
-          find . -type f -name '*.js' ! -name '*.min.js' ! -path '*/node_modules/*' ! -path '*/dist/*' -print0 | while IFS= read -r -d '' f; do
-            npx esbuild "$f" --minify --allow-overwrite --outfile="$f" --log-level=warning || :
-          done
-      
-      - name: Minify CSS in-place
-        run: |
-          find . -type f -name '*.css' ! -name '*.min.css' ! -path '*/node_modules/*' ! -path '*/dist/*' -print0 | while IFS= read -r -d '' f; do
-            npx lightningcss --minify "$f" -o "$f" &>/dev/null || :
-          done
-      
-      - name: Minify HTML in-place
-        run: |
-          find . -type f -name '*.html' ! -path '*/node_modules/*' ! -path '*/dist/*' -exec npx @minify-html/node-cli --output . {} + || :
-      
-      - name: Minify JSON in-place
-        run: |
-          find . -type f -name '*.json' ! -name '*.min.json' ! -path '*/node_modules/*' ! -path '*/dist/*' ! -path '*/.git/*' -print0 | while IFS= read -r -d '' f; do
-            jq -c . "$f" > "$f.tmp" && mv "$f.tmp" "$f" || :
-          done
-      
-      - name: Commit minified files
+      - name: Commit built files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'bot: minify files'
-          file_pattern: '*.js *.css *.html *.json'
+          commit_message: 'bot: build userscripts'
+          file_pattern: 'dist/*.js dist/README.md'
