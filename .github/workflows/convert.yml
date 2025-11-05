@@ -11,10 +11,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "lts/*"
+          node-version: '22'
+          check-latest: true
+          cache: 'npm'
+          package-manager-cache: true
       - name: Convert
         run: bash convert.sh
         env:
