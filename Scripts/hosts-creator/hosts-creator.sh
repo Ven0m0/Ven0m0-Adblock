@@ -51,41 +51,52 @@ edithostsfile() {
     awk_script=""
     print_newline=""
     
-    # comments
+    # Build actions and pattern into single awk script
+    actions=""
+    pattern=""
+    
+    # comments - this is a filter pattern
     if [ $RM_COMMENTS = 1 ]; then
         printf '%b' "${BLUE}removing comments${NC}"
-        awk_script="!/^#/"
+        pattern="!/^#/"
         print_newline="1"
     fi
     
-    # trailing spaces
+    # trailing spaces - this is an action
     if [ $RM_TRAILING_SPACES = 1 ]; then
         if [ $RM_COMMENTS = 1 ]; then
             printf '\n%b' "${BLUE}removing trailing spaces${NC}"
         else
             printf '%b' "${BLUE}removing trailing spaces${NC}"
         fi
-        if [ -n "$awk_script" ]; then
-            awk_script="$awk_script; {gsub(/^ +| +$/,\"\")}1"
-        else
-            awk_script="{gsub(/^ +| +$/,\"\")}1"
-        fi
+        actions="gsub(/^ +| +$/,\"\");"
         print_newline="1"
     fi
     
-    # duplicate lines
+    # duplicate lines - this is another filter
     if [ $RM_DUPLICATE_LINES = 1 ]; then
         if [ $RM_TRAILING_SPACES = 1 ] || [ $RM_COMMENTS = 1 ]; then
             printf '\n%b' "${BLUE}removing duplicate lines${NC}"
         else
             printf '%b' "${BLUE}removing duplicate lines${NC}"
         fi
-        if [ -n "$awk_script" ]; then
-            awk_script="$awk_script; !seen[$0]++"
+        if [ -n "$pattern" ]; then
+            pattern="$pattern && !seen[$0]++"
         else
-            awk_script="!seen[$0]++"
+            pattern="!seen[$0]++"
         fi
         print_newline="1"
+    fi
+    
+    # Construct final awk script
+    if [ -n "$pattern" ]; then
+        if [ -n "$actions" ]; then
+            awk_script="$pattern {${actions}print}"
+        else
+            awk_script="$pattern {print}"
+        fi
+    elif [ -n "$actions" ]; then
+        awk_script="{${actions}print}"
     fi
     
     # Run combined awk command once if any processing is needed

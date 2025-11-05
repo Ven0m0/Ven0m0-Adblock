@@ -19,8 +19,8 @@ if [ ! -f .aglintrc.yaml ]; then
 fi
 
 # Set lint script if not already set
-lint_script=$(npm pkg get scripts.lint 2>/dev/null || echo '""')
-if [ "$lint_script" = '""' ] || [ "$lint_script" = "undefined" ]; then
+lint_script=$(npm pkg get scripts.lint 2>/dev/null)
+if [ -z "$lint_script" ] || [ "$lint_script" = '""' ] || [ "$lint_script" = "undefined" ]; then
   npm pkg set scripts.lint="aglint"
 fi
 
