@@ -119,9 +119,7 @@ main() {
   # Ensure esbuild is installed locally for better performance
   if [[ ! -f node_modules/.bin/esbuild ]]; then
     printf "%s→%s Installing esbuild locally for better performance...\n" "$ylw" "$rst"
-    if npm install --no-save esbuild >/dev/null 2>&1; then
-      export ESBUILD_CMD="node_modules/.bin/esbuild"
-    else
+    if ! npm install --no-save esbuild >/dev/null 2>&1; then
       printf "%s✗%s Failed to install esbuild, falling back to npx\n" "$red" "$rst" >&2
       export ESBUILD_CMD="npx -y esbuild"
     fi

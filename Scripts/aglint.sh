@@ -19,7 +19,8 @@ if [ ! -f .aglintrc.yaml ]; then
 fi
 
 # Set lint script if not already set
-if ! grep -q '"lint".*"aglint"' package.json 2>/dev/null; then
+lint_script=$(npm pkg get scripts.lint 2>/dev/null || echo '""')
+if [ "$lint_script" = '""' ] || [ "$lint_script" = "undefined" ]; then
   npm pkg set scripts.lint="aglint"
 fi
 

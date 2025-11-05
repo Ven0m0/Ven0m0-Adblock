@@ -66,7 +66,7 @@ edithostsfile() {
             printf '%b' "${BLUE}removing trailing spaces${NC}"
         fi
         if [ -n "$awk_script" ]; then
-            awk_script="$awk_script {gsub(/^ +| +$/,\"\")}1"
+            awk_script="$awk_script; {gsub(/^ +| +$/,\"\")}1"
         else
             awk_script="{gsub(/^ +| +$/,\"\")}1"
         fi
@@ -81,7 +81,7 @@ edithostsfile() {
             printf '%b' "${BLUE}removing duplicate lines${NC}"
         fi
         if [ -n "$awk_script" ]; then
-            awk_script="$awk_script !seen[$0]++"
+            awk_script="$awk_script; !seen[$0]++"
         else
             awk_script="!seen[$0]++"
         fi
