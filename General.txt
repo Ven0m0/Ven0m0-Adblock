@@ -4,6 +4,16 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
 
+* * 3p-frame block
+! * * 3p-script block
+! * * 3p block
+
+* challenges.cloudflare.com * noop
+* www.google.com * noop
+* www.gstatic.com * noop
+x.com twitter.com * noop
+twitter.com x.com * noop
+
 ! Disable telemetry/analytics/error reporting domains
 ||telemetry.*^$all
 ||analytics.*^$all
