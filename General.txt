@@ -37,26 +37,47 @@ $removeparam=utm_campaign
 $removeparam=utm_content
 $removeparam=utm_term
 
+
+||disqus.com^$3p
+||disquscdn.com^$3p
+||api.github.com/_private/browser/errors^
+
+||facebook.com^$important,$3p
+||facebook.net^$important,$3p
+||linkedin.com^$important,$3p
+||instagram.com^$important,$3p
+||tiktok.com^$important,$3p
+||twitter.com^$3p
+||x.com^$3p
+
 # https://github.com/celenityy/ublock-origin-settings
 ||doubleclick.net^$important
 ||google-analytics.com^$important
+||google-analytics.com^$3p,important
+||firebase.com^$3p
+||google.com/cse/cse.js^
 
-||facebook.com^$important,third-party
-||facebook.net^$important,third-party
-||linkedin.com^$important,third-party
-||instagram.com^$important,third-party
-||tiktok.com^$important,third-party
-||twitter.com^$third-party
-||x.com^$third-party
-
-||accounts.google.com^$third-party
+||accounts.google.com^$3p
+||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
 @@||accounts.google.com^$domain=youtube.com|chromium.org|gstatic.com|googleusercontent.com
+@@||accounts.google.*/ServiceLogin$subdocument
+@@||apis.google.com^
+@@||consent.google.com^$subdocument
+@@||google.com/recaptcha
+@@||google.com^$script,domain=youtube.com
+@@||google*.^$domain=youtube.com|youtube-nocookie.com
+@@||google.com/uds/*visualization$script,stylesheet
 
+! Fix sites that use built-in Google search
+! https://github.com/yokoffing/filterlists/issues/170
+@@||google.com/cse/static^
+@@||cse.google.com/cse^
+!@@||clients1.google.com^
 
-||challenges.cloudflare.com^$third-party
-@@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$third-party,script,frame
-||www.google.com^$third-party,subdocument
-@@||www.google.com/recaptcha/$third-party,subdocument
-||www.gstatic.com^$third-party,script
-@@||www.gstatic.com/recaptcha/$third-party,script
+||challenges.cloudflare.com^$3p
+@@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
+||www.google.com^$3p,subdocument
+@@||www.google.com/recaptcha/$3p,subdocument
+||www.gstatic.com^$3p,script
+@@||www.gstatic.com/recaptcha/$3p,script
 
