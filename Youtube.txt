@@ -72,3 +72,6 @@ youtube.com##ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-
 youtube.com##ytd-movie-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] .thumbnail-container.ytd-movie-renderer, ytd-movie-renderer[use-bigger-thumbs] .thumbnail-container.ytd-movie-renderer:style(max-width: 360px !important)
 youtube.com##ytd-promoted-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-promoted-video-renderer, ytd-promoted-sparkles-web-renderer[web-search-layout][use-bigger-thumbs][bigger-thumbs-style=BIG] #thumbnail-container.ytd-promoted-sparkles-web-renderer, ytd-text-image-no-button-layout-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #text-image-container.ytd-text-image-no-button-layout-renderer:style(max-width: 360px !important)
 .yt-lockup-view-model-wiz--horizontal .yt-lockup-view-model-wiz__content-image:style(max-width: 360px !important)
+
+! Empty ad space
+youtube.com##ytd-rich-grid-renderer > #contents.ytd-rich-grid-renderer > :not(ytd-rich-item-renderer):not(ytd-rich-grid-row):not(ytd-continuation-item-renderer)
