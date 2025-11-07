@@ -52,3 +52,7 @@ reddit.com##a[href^="/rpan/"] > h3:has-text(/Top (livestream|broadcast)/):upward
 
 ! Reddit Gold
 www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
+
+! Banner
+www.reddit.com###redesign-beta-optin-btn
+old.reddit.com###redesign-beta-optin-btn
