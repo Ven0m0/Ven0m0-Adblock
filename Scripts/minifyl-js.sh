@@ -6,7 +6,9 @@ readonly repo="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
 readonly src="${1:-userscripts}"
 readonly out="${2:-dist}"
 readonly list="${3:-List}"
-readonly jobs=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+# Separate declaration from assignment to avoid masking return values
+jobs=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+readonly jobs
 readonly red=$'\e[31m' grn=$'\e[32m' ylw=$'\e[33m' rst=$'\e[0m'
 
 # Detect runtime
@@ -97,7 +99,8 @@ process_list(){
   done < "$list"
 
   if (( ${#updated[@]} > 0 )); then
-    local tmp=$(mktemp)
+    local tmp
+    tmp=$(mktemp)
     cp "$list" "$tmp"
     for pair in "${updated[@]}"; do
       IFS='|' read -r old new <<< "$pair"
@@ -133,7 +136,8 @@ main(){
 
   process_list
 
-  local total=$(find "$out" -name "*.user.js" -type f 2>/dev/null | wc -l)
+  local total
+  total=$(find "$out" -name "*.user.js" -type f 2>/dev/null | wc -l)
   printf "\n%s✓%s %d scripts → %s/\n" "$grn" "$rst" "$total" "$out"
 }
 

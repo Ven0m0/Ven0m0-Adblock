@@ -60,7 +60,6 @@ process_file() {
 
 # 4. Main Execution Block
 echo "Optimizing UserScripts..."
-local file
 # Use fd to find all source files and pipe them to the processing function.
 # --print0 and read -d '' handle filenames with spaces or special characters.
 while IFS= read -r -d '' file; do
