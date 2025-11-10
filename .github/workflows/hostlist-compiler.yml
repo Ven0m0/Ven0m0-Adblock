@@ -37,7 +37,7 @@ jobs:
           hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
 
       - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@v7.0.0
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(filters): Update hostlists"
           branch: main # Or your default branch

@@ -23,7 +23,7 @@ jobs:
         env:
           repository: ${{ github.repository }}
       - name: Release
-        uses: stefanzweifel/git-auto-commit-action@v7.0.0
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           branch: release
           skip_checkout: true

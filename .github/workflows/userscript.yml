@@ -32,7 +32,7 @@ jobs:
         run: bash Scripts/minifyl-js.sh
       
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 'bot: build & minify'
           file_pattern: |
