@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        Web Pro
+// @name        Web Pro Enhanced
 // @namespace   Ven0m0
-// @version     3.0
+// @version     4.0
 // @match       *://*/*
 // @grant       GM_setValue
 // @grant       GM_getValue
@@ -10,37 +10,209 @@
 // @run-at      document-start
 // ==/UserScript==
 "use strict";
-// Config
-const K='ven0m0.webpro.v3';
+
+// ============================================================================
+// CONFIG & STORAGE
+// ============================================================================
+const K='ven0m0.webpro.v4';
 const defs={
-  log:0,lazy:1,iframes:1,videos:1,defer:1,observe:1,prefetch:1,preconnect:1,linkPrefetch:1,linkLimit:15,linkDelay:2e3,gpu:1,mem:1,preload:0,
-  cleanURL:1,bypass:1,rightClick:0,copy:1,select:1,adBlock:1,cookie:1,tabSave:1
+  log:0,lazy:1,iframes:1,videos:1,defer:1,observe:1,prefetch:1,preconnect:1,linkPrefetch:1,linkLimit:15,linkDelay:2e3,
+  gpu:1,mem:1,preload:0,cleanURL:1,bypass:1,rightClick:0,copy:1,select:1,adBlock:1,cookie:1,tabSave:1,
+  cpuTamer:1,rafTamer:1,blockTrackers:1,caching:1,minTimeout:10,minInterval:16
 };
 const cfg=(()=>{try{const s=localStorage.getItem(K);return s?{...defs,...JSON.parse(s)}:{...defs};}catch(e){return{...defs};}})();
 const save=()=>localStorage.setItem(K,JSON.stringify(cfg));
 const L=(...a)=>cfg.log&&console.debug('webpro:',...a);
-// Utils
+
+// ============================================================================
+// UTILITIES
+// ============================================================================
 const isHttp=u=>/^\s*https?:/i.test(u);
 const mark=(e,k='data-wp')=>e.setAttribute(k,'1');
 const marked=(e,k='data-wp')=>e.getAttribute(k)==='1';
 const idle=fn=>window.requestIdleCallback?requestIdleCallback(fn,{timeout:1e3}):setTimeout(fn,200);
-// Timer clamping
-const origSetInterval=window.setInterval;
-const origSetTimeout=window.setTimeout;
-window.setInterval=(cb,d)=>origSetInterval(cb,Math.max(d,16));
-window.setTimeout=(cb,d)=>origSetTimeout(cb,Math.max(d,10));
+const debounce=(fn,ms)=>{let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);};};
+const throttle=(fn,ms)=>{let p=!1;return function(...a){if(!p){fn.apply(this,a);p=!0;setTimeout(()=>p=!1,ms);}};};
+
+// ============================================================================
+// CPU TAMING - ADVANCED TIMER & RAF PATCHING
+// ============================================================================
+if(cfg.cpuTamer||cfg.rafTamer){
+  const AsyncFn=(async()=>{})().constructor;
+  const nativeTimers=[setTimeout,setInterval,requestAnimationFrame,clearTimeout,clearInterval,cancelAnimationFrame];
+  const[nTO,nSI,nRAF,nCTO,nCI,nCAF]=nativeTimers;
+  const microtask=queueMicrotask;
+  let resolveFn=()=>{};
+  let promise;
+  const newPromise=()=>promise=new AsyncFn(r=>resolveFn=r);
+  newPromise();
+  const marker=document.createComment("--CPUTamer--");
+  let counter=0,lastPromise=null;
+  const trigger=()=>{
+    if(lastPromise!==promise){
+      lastPromise=promise;
+      counter=(counter&7)+1;
+      marker.data=counter&1?"++":"--";
+    }
+  };
+  const obs=new MutationObserver(()=>{resolveFn();newPromise();});
+  obs.observe(marker,{characterData:!0});
+  const timeoutSet=new Set;
+  const rafSet=new Set;
+  const awaitTimeout=async id=>{
+    timeoutSet.add(id);
+    lastPromise!==promise&&microtask(trigger);
+    await promise;
+    lastPromise!==promise&&microtask(trigger);
+    await promise;
+    timeoutSet.delete(id);
+  };
+  const awaitRAF=async(id,p)=>{rafSet.add(id);await p;rafSet.delete(id);};
+  const throwErr=e=>microtask(()=>{throw e});
+  
+  if(cfg.cpuTamer){
+    window.setTimeout=function(fn,delay=0,...args){
+      let id;
+      const wrapped=typeof fn=="function"?(...a)=>{
+        awaitTimeout(id).then(v=>v&&fn(...a)).catch(throwErr);
+      }:fn;
+      delay>=1&&(delay-=2**-26);
+      delay=Math.max(delay,cfg.minTimeout);
+      id=nTO(wrapped,delay,...args);
+      return id;
+    };
+    window.setInterval=function(fn,delay=0,...args){
+      let id;
+      const wrapped=typeof fn=="function"?(...a)=>{
+        awaitTimeout(id).then(v=>v&&fn(...a)).catch(throwErr);
+      }:fn;
+      delay>=1&&(delay-=2**-26);
+      delay=Math.max(delay,cfg.minInterval);
+      id=nSI(wrapped,delay,...args);
+      return id;
+    };
+    window.clearTimeout=id=>{timeoutSet.delete(id);return nCTO(id);};
+    window.clearInterval=id=>{timeoutSet.delete(id);return nCI(id);};
+    L('CPU tamer enabled');
+  }
+  
+  if(cfg.rafTamer){
+    class Timeline{
+      constructor(){this.startTime=performance.timeOrigin||performance.now();}
+      get currentTime(){return performance.now()-this.startTime;}
+    }
+    let timeline;
+    if(typeof DocumentTimeline=="function"){
+      timeline=new DocumentTimeline;
+    }else if(typeof Animation=="function"){
+      const anim=document.documentElement?.animate?.(null);
+      timeline=anim?.timeline||new Timeline;
+    }else{
+      timeline=new Timeline;
+    }
+    window.requestAnimationFrame=function(fn){
+      let id;
+      const p=promise;
+      const wrapped=ts=>{
+        const start=timeline.currentTime;
+        awaitRAF(id,p).then(v=>v&&fn(ts+(timeline.currentTime-start))).catch(throwErr);
+      };
+      lastPromise!==promise&&microtask(trigger);
+      id=nRAF(wrapped);
+      return id;
+    };
+    window.cancelAnimationFrame=id=>{rafSet.delete(id);return nCAF(id);};
+    L('RAF tamer enabled');
+  }
+}
+
 // Suppress logs
 if(!cfg.log){console.log=console.warn=console.error=()=>{};}
-// Enhanced RAF
-const origRAF=window.requestAnimationFrame;
-window.requestAnimationFrame=cb=>origRAF(()=>cb(performance.now()));
+
 // Tab visibility save
 if(cfg.tabSave){
   document.addEventListener('visibilitychange',()=>{
     document.documentElement.style.display=document.visibilityState==='hidden'?'none':'block';
   });
 }
-// URL cleaning
+
+// ============================================================================
+// TRACKER BLOCKING
+// ============================================================================
+if(cfg.blockTrackers){
+  const blockedPatterns=[
+    /google-analytics\.com/i,/googletagmanager\.com/i,/doubleclick\.net/i,/googlesyndication\.com/i,
+    /adsbygoogle\.js/i,/facebook\.com\/tr/i,/pixel\.facebook\.com/i,/criteo\.com/i,
+    /analytics\.js/i,/gtag\/js/i,/scorecardresearch/i,/matomo/i
+  ];
+  const origXHR=XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open=function(method,url,...args){
+    if(blockedPatterns.some(p=>p.test(url))){L('Blocked XHR:',url);return;}
+    return origXHR.call(this,method,url,...args);
+  };
+  const origFetch=window.fetch;
+  window.fetch=function(url,...args){
+    if(typeof url=="string"&&blockedPatterns.some(p=>p.test(url))){
+      L('Blocked fetch:',url);
+      return Promise.reject(new Error("Blocked"));
+    }
+    return origFetch.call(this,url,...args);
+  };
+  L('Tracker blocking enabled');
+}
+
+// ============================================================================
+// CACHING
+// ============================================================================
+let cache=new Map;
+let cacheSize=0;
+const maxCacheSize=48*1024*1024;
+const cacheTTL=5*60*1e3;
+
+if(cfg.caching){
+  const isCacheable=url=>/\.(css|woff2?|ttf|eot|js)$/i.test(url);
+  const getCached=url=>{
+    if(cache.has(url)){
+      const{data,ts}=cache.get(url);
+      if(Date.now()-ts<cacheTTL){
+        cache.set(url,{data,ts:Date.now()});
+        return Promise.resolve(data);
+      }
+      cache.delete(url);
+      cacheSize-=data.length;
+    }
+    return null;
+  };
+  const setCache=(url,data)=>{
+    if(cacheSize+data.length<=maxCacheSize){
+      cache.set(url,{data,ts:Date.now()});
+      cacheSize+=data.length;
+    }
+  };
+  const origFetch=window.fetch;
+  window.fetch=function(url,...args){
+    if(typeof url=="string"&&isCacheable(url)){
+      const cached=getCached(url);
+      if(cached)return cached;
+      return origFetch.call(this,url,...args).then(res=>{
+        const size=res.headers.get("Content-Length");
+        if(!size||parseInt(size)<=1048576){
+          return res.clone().text().then(text=>{
+            setCache(url,text);
+            return new Response(text,{status:res.status,statusText:res.statusText,headers:res.headers});
+          });
+        }
+        return res;
+      });
+    }
+    return origFetch.call(this,url,...args);
+  };
+  L('Caching enabled');
+}
+
+// ============================================================================
+// URL CLEANING
+// ============================================================================
 const trackParams=[
   'fbclid','gclid','utm_source','utm_medium','utm_campaign','utm_content','utm_term','utm_id',
   'mc_cid','mc_eid','_ga','pk_campaign','scid','src','ref','aff','affiliate','campaign',
@@ -48,6 +220,7 @@ const trackParams=[
   'smid','pvid','qid','traffic_source','sprefix','rowan_id1','rowan_msg_id'
 ];
 const cleanHashes=['intcid','back-url','back_url','src'];
+
 function cleanURL(){
   if(!cfg.cleanURL)return;
   const url=new URL(location.href.replace('/ref=','?ref='));
@@ -55,11 +228,11 @@ function cleanURL(){
   trackParams.forEach(p=>{if(url.searchParams.has(p)){url.searchParams.delete(p);clean=1;}});
   cleanHashes.forEach(h=>{if(url.hash.startsWith('#'+h))clean=1;});
   if(clean){
-    const nu=url.origin+url.pathname+url.search;
-    window.history.replaceState(null,'',nu);
+    window.history.replaceState(null,'',url.origin+url.pathname+url.search);
     L('URL cleaned');
   }
 }
+
 function cleanLinks(){
   if(!cfg.cleanURL)return;
   document.querySelectorAll('a[href]:not([data-wp-cl])').forEach(a=>{
@@ -73,7 +246,10 @@ function cleanLinks(){
     }catch(e){}
   });
 }
-// Bypass restrictions
+
+// ============================================================================
+// BYPASS RESTRICTIONS
+// ============================================================================
 function applyBypass(){
   if(!cfg.bypass)return;
   if(cfg.rightClick){
@@ -94,11 +270,15 @@ function applyBypass(){
     document.head.appendChild(s);
   }
 }
-// Ad blocking
+
+// ============================================================================
+// AD BLOCKING
+// ============================================================================
 const adSels=[
   '[data-component-type="sp-sponsored-result"]','.ad-banner','.player-ad-overlay',
   '.ytp-ad-overlay-close-button','[class*="sponsor"]','[class*="advertisement"]'
 ];
+
 function blockAds(){
   if(!cfg.adBlock)return;
   const h=location.hostname;
@@ -126,7 +306,10 @@ function blockAds(){
     });
   });
 }
-// Cookie acceptance
+
+// ============================================================================
+// COOKIE ACCEPTANCE
+// ============================================================================
 function acceptCookies(){
   if(!cfg.cookie)return;
   document.querySelectorAll('button,input[type=button]').forEach(b=>{
@@ -134,7 +317,10 @@ function acceptCookies(){
     if(/accept|agree|allow/i.test(t))b.click();
   });
 }
-// GPU acceleration
+
+// ============================================================================
+// GPU ACCELERATION
+// ============================================================================
 function forceGPU(){
   if(!cfg.gpu)return;
   document.querySelectorAll('*:not([data-wp-gpu])').forEach(el=>{
@@ -144,7 +330,10 @@ function forceGPU(){
     mark(el,'data-wp-gpu');
   });
 }
-// Memory optimization
+
+// ============================================================================
+// MEMORY OPTIMIZATION
+// ============================================================================
 function optimizeMem(){
   if(!cfg.mem)return;
   if(window.performance?.memory){
@@ -153,7 +342,10 @@ function optimizeMem(){
   if(window.gc)window.gc();
   L('mem optimized');
 }
-// Preload resources
+
+// ============================================================================
+// PRELOAD RESOURCES
+// ============================================================================
 function preloadRes(){
   if(!cfg.preload)return;
   document.querySelectorAll('img:not([data-wp-pre]),video:not([data-wp-pre]),audio:not([data-wp-pre])').forEach(r=>{
@@ -162,7 +354,12 @@ function preloadRes(){
     mark(r,'data-wp-pre');
   });
 }
-// Lazy load iframes
+
+// ============================================================================
+// LAZY LOADING
+// ============================================================================
+const loaded=new WeakSet;
+
 function lazyIframes(){
   if(!cfg.iframes)return;
   document.querySelectorAll('iframe:not([data-wp])').forEach(i=>{
@@ -173,7 +370,7 @@ function lazyIframes(){
     mark(i);
   });
 }
-// Lazy load images
+
 function lazyImages(){
   if(!cfg.lazy)return;
   document.querySelectorAll('img:not([data-wp])').forEach(i=>{
@@ -183,7 +380,37 @@ function lazyImages(){
     mark(i);
   });
 }
-// Video optimization
+
+function lazyVideos(){
+  if(!cfg.videos)return;
+  if("IntersectionObserver"in window){
+    const obs=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          const v=e.target;
+          if(!loaded.has(v)){
+            const sources=v.querySelectorAll("source[data-src]");
+            sources.forEach(s=>{
+              if(s.dataset.src){
+                s.src=s.dataset.src;
+                delete s.dataset.src;
+              }
+            });
+            if(v.dataset.src){
+              v.src=v.dataset.src;
+              delete v.dataset.src;
+            }
+            v.load();
+            loaded.add(v);
+          }
+          obs.unobserve(v);
+        }
+      });
+    },{rootMargin:'200px'});
+    document.querySelectorAll('video[data-src],video:has(source[data-src])').forEach(v=>obs.observe(v));
+  }
+}
+
 function optimizeVids(){
   if(!cfg.videos)return;
   document.querySelectorAll('video:not([data-wp])').forEach(v=>{
@@ -198,8 +425,12 @@ function optimizeVids(){
     mark(v);
   });
 }
-// Block tracking scripts
+
+// ============================================================================
+// SCRIPT DEFERRAL
+// ============================================================================
 const scriptDeny=/ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo/i;
+
 function deferScripts(){
   if(!cfg.defer)return;
   document.querySelectorAll('script[src]:not([data-wp-s])').forEach(s=>{
@@ -214,6 +445,7 @@ function deferScripts(){
     mark(s,'data-wp-s');
   });
 }
+
 function restoreScripts(){
   document.querySelectorAll('script[type="text/wp-blocked"][data-wp-src]').forEach(s=>{
     const src=s.getAttribute('data-wp-src');
@@ -225,8 +457,10 @@ function restoreScripts(){
     L('restored:',src);
   });
 }
+
 const userEvents=['click','keydown','touchstart','pointerdown'];
 let interactionBound=0;
+
 function bindRestore(){
   if(interactionBound)return;
   const cb=()=>{
@@ -238,7 +472,10 @@ function bindRestore(){
   userEvents.forEach(e=>window.addEventListener(e,cb,{passive:!0,once:!0}));
   interactionBound=1;
 }
-// Resource hints
+
+// ============================================================================
+// RESOURCE HINTS
+// ============================================================================
 function addHint(rel,href,as,cors){
   if(!href||!isHttp(href))return;
   if(document.querySelector(`link[rel="${rel}"][href="${href}"]`))return;
@@ -249,7 +486,9 @@ function addHint(rel,href,as,cors){
   if(cors)lnk.crossOrigin='anonymous';
   document.head.appendChild(lnk);
 }
+
 const origins=new Set();
+
 function extractOrigins(){
   if(!cfg.preconnect)return;
   document.querySelectorAll('img[src],script[src],link[href],iframe[src],video[src],source[src]').forEach(e=>{
@@ -262,6 +501,7 @@ function extractOrigins(){
   });
   origins.forEach(o=>addHint('preconnect',o));
 }
+
 function preloadCritical(){
   if(!cfg.preconnect)return;
   document.querySelectorAll('script[src]:not([async]):not([defer])').forEach((s,i)=>{
@@ -271,7 +511,10 @@ function preloadCritical(){
     }
   });
 }
-// Link prefetching
+
+// ============================================================================
+// LINK PREFETCHING
+// ============================================================================
 let prefetched=new Set();
 let prefetchQ=[];
 let prefetchT;
@@ -281,6 +524,7 @@ const linkIgnore=[
   u=>['youtube.com','youtu.be','youtube-nocookie.com','youtubeeducation.com'].some(d=>u.includes(d))
 ];
 const shouldIgnore=(u,e)=>linkIgnore.some(i=>typeof i==='function'?i(u,e):i.test?i.test(u):0);
+
 function shouldPrefetch(a){
   const h=a.href;
   if(!h||!isHttp(h)||prefetched.has(h))return 0;
@@ -291,6 +535,7 @@ function shouldPrefetch(a){
   }catch(e){return 0;}
   return 1;
 }
+
 function prefetchLink(url){
   if(prefetched.has(url))return;
   const lnk=document.createElement('link');
@@ -301,16 +546,19 @@ function prefetchLink(url){
   prefetched.add(url);
   L('prefetch:',url);
 }
+
 function processPrefetchQ(){
   if(!prefetchQ.length)return;
   const batch=prefetchQ.splice(0,cfg.linkLimit);
   batch.forEach(u=>prefetchLink(u));
 }
+
 function queuePrefetch(url){
   if(!prefetchQ.includes(url))prefetchQ.push(url);
   clearTimeout(prefetchT);
   prefetchT=setTimeout(processPrefetchQ,cfg.linkDelay);
 }
+
 function setupLinkPrefetch(){
   if(!cfg.linkPrefetch||!cfg.prefetch)return;
   const obs=new IntersectionObserver(entries=>{
@@ -326,12 +574,16 @@ function setupLinkPrefetch(){
   },{rootMargin:'50px'});
   document.querySelectorAll('a[href]').forEach(a=>obs.observe(a));
 }
-// Apply all optimizations
+
+// ============================================================================
+// APPLY ALL OPTIMIZATIONS
+// ============================================================================
 function applyAll(){
   idle(()=>{
     cleanLinks();
     lazyIframes();
     lazyImages();
+    lazyVideos();
     optimizeVids();
     deferScripts();
     if(cfg.defer)bindRestore();
@@ -346,30 +598,38 @@ function applyAll(){
     acceptCookies();
   });
 }
-// DOM observer
+
+// ============================================================================
+// DOM OBSERVER
+// ============================================================================
 let observer=null;
+
 function startObs(){
   if(!cfg.observe||observer)return;
   observer=new MutationObserver(m=>applyAll());
   observer.observe(document.documentElement||document,{childList:!0,subtree:!0});
   L('observer started');
 }
+
 function stopObs(){
   if(!observer)return;
   observer.disconnect();
   observer=null;
   L('observer stopped');
 }
+
+// ============================================================================
 // UI
+// ============================================================================
 function buildUI(){
   if(document.getElementById('wp-ui'))return;
-  const css=`#wp-ui{position:fixed;right:8px;bottom:8px;z-index:2147483647;background:rgba(0,0,0,.85);color:#fff;font:12px monospace;padding:10px;border-radius:6px;user-select:none;max-width:300px;box-shadow:0 0 20px rgba(0,255,0,.3)}.hdr{font-weight:bold;margin-bottom:8px;border-bottom:1px solid #0f0;padding-bottom:6px;color:#0f0;text-align:center}label{display:block;margin:4px 0;cursor:pointer;transition:color .2s}label:hover{color:#0f0}input[type=checkbox]{margin-right:6px}button{width:100%;margin:4px 0;padding:6px;font:11px monospace;background:#111;color:#0f0;border:1px solid #0f0;border-radius:4px;cursor:pointer;transition:all .2s}button:hover{background:#0f0;color:#000}.stats{margin-top:8px;padding-top:8px;border-top:1px solid #333;font-size:10px;color:#0f0;text-align:center}`;
+  const css=`#wp-ui{position:fixed;right:8px;bottom:8px;z-index:2147483647;background:rgba(0,0,0,.85);color:#fff;font:12px monospace;padding:10px;border-radius:6px;user-select:none;max-width:320px;box-shadow:0 0 20px rgba(0,255,0,.3)}.hdr{font-weight:bold;margin-bottom:8px;border-bottom:1px solid #0f0;padding-bottom:6px;color:#0f0;text-align:center}label{display:block;margin:4px 0;cursor:pointer;transition:color .2s}label:hover{color:#0f0}input[type=checkbox]{margin-right:6px}button{width:100%;margin:4px 0;padding:6px;font:11px monospace;background:#111;color:#0f0;border:1px solid #0f0;border-radius:4px;cursor:pointer;transition:all .2s}button:hover{background:#0f0;color:#000}.stats{margin-top:8px;padding-top:8px;border-top:1px solid #333;font-size:10px;color:#0f0;text-align:center}`;
   const style=document.createElement('style');
   style.textContent=css;
   document.head.appendChild(style);
   const div=document.createElement('div');
   div.id='wp-ui';
-  div.innerHTML='<div class=hdr>⚡ WebPro v3.0 ⚡</div>';
+  div.innerHTML='<div class=hdr>⚡ Web Pro v4.0 Enhanced ⚡</div>';
   const items=[
     ['log','Verbose logging'],
     ['lazy','Lazy load images'],
@@ -390,7 +650,11 @@ function buildUI(){
     ['select','Enable text selection'],
     ['adBlock','Block ads'],
     ['cookie','Auto-accept cookies'],
-    ['tabSave','Tab CPU saving']
+    ['tabSave','Tab CPU saving'],
+    ['cpuTamer','CPU Tamer (advanced)'],
+    ['rafTamer','RAF Tamer (advanced)'],
+    ['blockTrackers','Block trackers (XHR/Fetch)'],
+    ['caching','Resource caching']
   ];
   items.forEach(([k,label])=>{
     const lab=document.createElement('label');
@@ -414,7 +678,13 @@ function buildUI(){
   btnRestore.addEventListener('click',()=>restoreScripts());
   const btnClear=document.createElement('button');
   btnClear.textContent='🗑️ Clear Cache';
-  btnClear.addEventListener('click',()=>{prefetched.clear();prefetchQ=[];L('cache cleared');});
+  btnClear.addEventListener('click',()=>{
+    prefetched.clear();
+    prefetchQ=[];
+    cache.clear();
+    cacheSize=0;
+    L('cache cleared');
+  });
   const btnMemGC=document.createElement('button');
   btnMemGC.textContent='♻️ Force GC';
   btnMemGC.addEventListener('click',()=>{optimizeMem();L('GC triggered');});
@@ -428,16 +698,20 @@ function buildUI(){
   div.appendChild(stats);
   setInterval(()=>{
     const mem=performance.memory?(performance.memory.usedJSHeapSize/1048576).toFixed(2)+'MB':'N/A';
-    stats.innerHTML=`MEM: ${mem} | FPS: OPT | GPU: ${cfg.gpu?'ON':'OFF'}`;
+    const cacheInfo=cfg.caching?` | CACHE: ${(cacheSize/1024).toFixed(0)}KB`:'';
+    stats.innerHTML=`MEM: ${mem}${cacheInfo} | GPU: ${cfg.gpu?'ON':'OFF'}`;
   },2e3);
   document.documentElement.appendChild(div);
 }
-// Init
+
+// ============================================================================
+// INIT
+// ============================================================================
 (function init(){
   cleanURL();
   buildUI();
   applyAll();
   if(cfg.observe)startObs();
   setInterval(()=>applyAll(),3e4);
-  L('WebPro v3.0 initialized',cfg);
+  L('Web Pro v4.0 Enhanced initialized',cfg);
 })();
