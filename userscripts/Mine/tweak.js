@@ -12,20 +12,18 @@
 // @run-at      document-start
 // ==/UserScript==
 "use strict";
-
 // ============================================================================
 // CONFIG & STORAGE
 // ============================================================================
 const K='ven0m0.webpro.v4';
 const defs={
   log:0,lazy:1,iframes:1,videos:1,defer:1,observe:1,prefetch:1,preconnect:1,linkPrefetch:1,linkLimit:15,linkDelay:2e3,
-  gpu:1,mem:1,preload:0,cleanURL:1,bypass:1,rightClick:0,copy:1,select:1,adBlock:1,cookie:1,tabSave:1,
-  cpuTamer:1,rafTamer:1,blockTrackers:1,caching:1,minTimeout:10,minInterval:16
+  gpu:1,mem:1,preload:1,cleanURL:1,bypass:1,rightClick:0,copy:1,select:1,cookie:1,tabSave:1,
+  cpuTamer:1,rafTamer:1,caching:1,minTimeout:10,minInterval:16
 };
 const cfg=(()=>{try{const s=localStorage.getItem(K);return s?{...defs,...JSON.parse(s)}:{...defs};}catch(e){return{...defs};}})();
 const save=()=>localStorage.setItem(K,JSON.stringify(cfg));
 const L=(...a)=>cfg.log&&console.debug('webpro:',...a);
-
 // ============================================================================
 // UTILITIES
 // ============================================================================
@@ -35,7 +33,6 @@ const marked=(e,k='data-wp')=>e.getAttribute(k)==='1';
 const idle=fn=>window.requestIdleCallback?requestIdleCallback(fn,{timeout:1e3}):setTimeout(fn,200);
 const debounce=(fn,ms)=>{let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);};};
 const throttle=(fn,ms)=>{let p=!1;return function(...a){if(!p){fn.apply(this,a);p=!0;setTimeout(()=>p=!1,ms);}};};
-
 // ============================================================================
 // CPU TAMING - ADVANCED TIMER & RAF PATCHING
 // ============================================================================
@@ -71,7 +68,6 @@ if(cfg.cpuTamer||cfg.rafTamer){
   };
   const awaitRAF=async(id,p)=>{rafSet.add(id);await p;rafSet.delete(id);};
   const throwErr=e=>microtask(()=>{throw e});
-  
   if(cfg.cpuTamer){
     window.setTimeout=function(fn,delay=0,...args){
       let id;
@@ -97,7 +93,6 @@ if(cfg.cpuTamer||cfg.rafTamer){
     window.clearInterval=id=>{timeoutSet.delete(id);return nCI(id);};
     L('CPU tamer enabled');
   }
-  
   if(cfg.rafTamer){
     class Timeline{
       constructor(){this.startTime=performance.timeOrigin||performance.now();}
@@ -127,42 +122,14 @@ if(cfg.cpuTamer||cfg.rafTamer){
     L('RAF tamer enabled');
   }
 }
-
 // Suppress logs
 if(!cfg.log){console.log=console.warn=console.error=()=>{};}
-
 // Tab visibility save
 if(cfg.tabSave){
   document.addEventListener('visibilitychange',()=>{
     document.documentElement.style.display=document.visibilityState==='hidden'?'none':'block';
   });
 }
-
-// ============================================================================
-// TRACKER BLOCKING
-// ============================================================================
-if(cfg.blockTrackers){
-  const blockedPatterns=[
-    /google-analytics\.com/i,/googletagmanager\.com/i,/doubleclick\.net/i,/googlesyndication\.com/i,
-    /adsbygoogle\.js/i,/facebook\.com\/tr/i,/pixel\.facebook\.com/i,/criteo\.com/i,
-    /analytics\.js/i,/gtag\/js/i,/scorecardresearch/i,/matomo/i
-  ];
-  const origXHR=XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open=function(method,url,...args){
-    if(blockedPatterns.some(p=>p.test(url))){L('Blocked XHR:',url);return;}
-    return origXHR.call(this,method,url,...args);
-  };
-  const origFetch=window.fetch;
-  window.fetch=function(url,...args){
-    if(typeof url=="string"&&blockedPatterns.some(p=>p.test(url))){
-      L('Blocked fetch:',url);
-      return Promise.reject(new Error("Blocked"));
-    }
-    return origFetch.call(this,url,...args);
-  };
-  L('Tracker blocking enabled');
-}
-
 // ============================================================================
 // CACHING
 // ============================================================================
@@ -170,7 +137,6 @@ let cache=new Map;
 let cacheSize=0;
 const maxCacheSize=48*1024*1024;
 const cacheTTL=5*60*1e3;
-
 if(cfg.caching){
   const isCacheable=url=>/\.(css|woff2?|ttf|eot|js)$/i.test(url);
   const getCached=url=>{
@@ -211,7 +177,6 @@ if(cfg.caching){
   };
   L('Caching enabled');
 }
-
 // ============================================================================
 // URL CLEANING
 // ============================================================================
@@ -222,7 +187,6 @@ const trackParams=[
   'smid','pvid','qid','traffic_source','sprefix','rowan_id1','rowan_msg_id'
 ];
 const cleanHashes=['intcid','back-url','back_url','src'];
-
 function cleanURL(){
   if(!cfg.cleanURL)return;
   const url=new URL(location.href.replace('/ref=','?ref='));
@@ -234,7 +198,6 @@ function cleanURL(){
     L('URL cleaned');
   }
 }
-
 function cleanLinks(){
   if(!cfg.cleanURL)return;
   document.querySelectorAll('a[href]:not([data-wp-cl])').forEach(a=>{
@@ -248,7 +211,6 @@ function cleanLinks(){
     }catch(e){}
   });
 }
-
 // ============================================================================
 // BYPASS RESTRICTIONS
 // ============================================================================
@@ -272,43 +234,6 @@ function applyBypass(){
     document.head.appendChild(s);
   }
 }
-
-// ============================================================================
-// AD BLOCKING
-// ============================================================================
-const adSels=[
-  '[data-component-type="sp-sponsored-result"]','.ad-banner','.player-ad-overlay',
-  '.ytp-ad-overlay-close-button','[class*="sponsor"]','[class*="advertisement"]'
-];
-
-function blockAds(){
-  if(!cfg.adBlock)return;
-  const h=location.hostname;
-  if(/youtube/.test(h)){
-    const skip=document.querySelector('.ytp-ad-skip-button');
-    if(skip)skip.click();
-    const ov=document.querySelector('.ytp-ad-overlay-close-button');
-    if(ov)ov.click();
-    const v=document.querySelector('video');
-    const ad=document.querySelector('.ad-showing');
-    if(v&&ad&&!v.muted)v.muted=!0;
-  }
-  if(/twitch/.test(h)){
-    const v=document.querySelector('video');
-    if(v&&v.duration<60)v.muted=!0;
-  }
-  if(/netflix/.test(h)){
-    const skip=document.querySelector('[data-uia="player-skip-intro"]');
-    if(skip)skip.click();
-  }
-  adSels.forEach(sel=>{
-    document.querySelectorAll(sel+':not([data-wp-ad])').forEach(e=>{
-      e.style.display='none';
-      mark(e,'data-wp-ad');
-    });
-  });
-}
-
 // ============================================================================
 // COOKIE ACCEPTANCE
 // ============================================================================
@@ -319,7 +244,6 @@ function acceptCookies(){
     if(/accept|agree|allow/i.test(t))b.click();
   });
 }
-
 // ============================================================================
 // GPU ACCELERATION
 // ============================================================================
@@ -332,7 +256,6 @@ function forceGPU(){
     mark(el,'data-wp-gpu');
   });
 }
-
 // ============================================================================
 // MEMORY OPTIMIZATION
 // ============================================================================
@@ -344,7 +267,6 @@ function optimizeMem(){
   if(window.gc)window.gc();
   L('mem optimized');
 }
-
 // ============================================================================
 // PRELOAD RESOURCES
 // ============================================================================
@@ -356,12 +278,10 @@ function preloadRes(){
     mark(r,'data-wp-pre');
   });
 }
-
 // ============================================================================
 // LAZY LOADING
 // ============================================================================
 const loaded=new WeakSet;
-
 function lazyIframes(){
   if(!cfg.iframes)return;
   document.querySelectorAll('iframe:not([data-wp])').forEach(i=>{
@@ -372,7 +292,6 @@ function lazyIframes(){
     mark(i);
   });
 }
-
 function lazyImages(){
   if(!cfg.lazy)return;
   document.querySelectorAll('img:not([data-wp])').forEach(i=>{
@@ -382,7 +301,6 @@ function lazyImages(){
     mark(i);
   });
 }
-
 function lazyVideos(){
   if(!cfg.videos)return;
   if("IntersectionObserver"in window){
@@ -412,7 +330,6 @@ function lazyVideos(){
     document.querySelectorAll('video[data-src],video:has(source[data-src])').forEach(v=>obs.observe(v));
   }
 }
-
 function optimizeVids(){
   if(!cfg.videos)return;
   document.querySelectorAll('video:not([data-wp])').forEach(v=>{
@@ -427,12 +344,10 @@ function optimizeVids(){
     mark(v);
   });
 }
-
 // ============================================================================
 // SCRIPT DEFERRAL
 // ============================================================================
 const scriptDeny=/ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo/i;
-
 function deferScripts(){
   if(!cfg.defer)return;
   document.querySelectorAll('script[src]:not([data-wp-s])').forEach(s=>{
@@ -447,7 +362,6 @@ function deferScripts(){
     mark(s,'data-wp-s');
   });
 }
-
 function restoreScripts(){
   document.querySelectorAll('script[type="text/wp-blocked"][data-wp-src]').forEach(s=>{
     const src=s.getAttribute('data-wp-src');
@@ -459,10 +373,8 @@ function restoreScripts(){
     L('restored:',src);
   });
 }
-
 const userEvents=['click','keydown','touchstart','pointerdown'];
 let interactionBound=0;
-
 function bindRestore(){
   if(interactionBound)return;
   const cb=()=>{
@@ -474,7 +386,6 @@ function bindRestore(){
   userEvents.forEach(e=>window.addEventListener(e,cb,{passive:!0,once:!0}));
   interactionBound=1;
 }
-
 // ============================================================================
 // RESOURCE HINTS
 // ============================================================================
@@ -488,9 +399,7 @@ function addHint(rel,href,as,cors){
   if(cors)lnk.crossOrigin='anonymous';
   document.head.appendChild(lnk);
 }
-
 const origins=new Set();
-
 function extractOrigins(){
   if(!cfg.preconnect)return;
   document.querySelectorAll('img[src],script[src],link[href],iframe[src],video[src],source[src]').forEach(e=>{
@@ -503,7 +412,6 @@ function extractOrigins(){
   });
   origins.forEach(o=>addHint('preconnect',o));
 }
-
 function preloadCritical(){
   if(!cfg.preconnect)return;
   document.querySelectorAll('script[src]:not([async]):not([defer])').forEach((s,i)=>{
@@ -513,7 +421,6 @@ function preloadCritical(){
     }
   });
 }
-
 // ============================================================================
 // LINK PREFETCHING
 // ============================================================================
@@ -526,7 +433,6 @@ const linkIgnore=[
   u=>['youtube.com','youtu.be','youtube-nocookie.com','youtubeeducation.com'].some(d=>u.includes(d))
 ];
 const shouldIgnore=(u,e)=>linkIgnore.some(i=>typeof i==='function'?i(u,e):i.test?i.test(u):0);
-
 function shouldPrefetch(a){
   const h=a.href;
   if(!h||!isHttp(h)||prefetched.has(h))return 0;
@@ -537,7 +443,6 @@ function shouldPrefetch(a){
   }catch(e){return 0;}
   return 1;
 }
-
 function prefetchLink(url){
   if(prefetched.has(url))return;
   const lnk=document.createElement('link');
@@ -548,19 +453,16 @@ function prefetchLink(url){
   prefetched.add(url);
   L('prefetch:',url);
 }
-
 function processPrefetchQ(){
   if(!prefetchQ.length)return;
   const batch=prefetchQ.splice(0,cfg.linkLimit);
   batch.forEach(u=>prefetchLink(u));
 }
-
 function queuePrefetch(url){
   if(!prefetchQ.includes(url))prefetchQ.push(url);
   clearTimeout(prefetchT);
   prefetchT=setTimeout(processPrefetchQ,cfg.linkDelay);
 }
-
 function setupLinkPrefetch(){
   if(!cfg.linkPrefetch||!cfg.prefetch)return;
   const obs=new IntersectionObserver(entries=>{
@@ -576,7 +478,6 @@ function setupLinkPrefetch(){
   },{rootMargin:'50px'});
   document.querySelectorAll('a[href]').forEach(a=>obs.observe(a));
 }
-
 // ============================================================================
 // APPLY ALL OPTIMIZATIONS
 // ============================================================================
@@ -596,30 +497,25 @@ function applyAll(){
     optimizeMem();
     preloadRes();
     applyBypass();
-    blockAds();
     acceptCookies();
   });
 }
-
 // ============================================================================
 // DOM OBSERVER
 // ============================================================================
 let observer=null;
-
 function startObs(){
   if(!cfg.observe||observer)return;
   observer=new MutationObserver(m=>applyAll());
   observer.observe(document.documentElement||document,{childList:!0,subtree:!0});
   L('observer started');
 }
-
 function stopObs(){
   if(!observer)return;
   observer.disconnect();
   observer=null;
   L('observer stopped');
 }
-
 // ============================================================================
 // UI
 // ============================================================================
@@ -650,12 +546,10 @@ function buildUI(){
     ['rightClick','Enable right-click'],
     ['copy','Enable copy/paste'],
     ['select','Enable text selection'],
-    ['adBlock','Block ads'],
     ['cookie','Auto-accept cookies'],
     ['tabSave','Tab CPU saving'],
     ['cpuTamer','CPU Tamer (advanced)'],
     ['rafTamer','RAF Tamer (advanced)'],
-    ['blockTrackers','Block trackers (XHR/Fetch)'],
     ['caching','Resource caching']
   ];
   items.forEach(([k,label])=>{
@@ -705,7 +599,6 @@ function buildUI(){
   },2e3);
   document.documentElement.appendChild(div);
 }
-
 // ============================================================================
 // INIT
 // ============================================================================
@@ -715,5 +608,5 @@ function buildUI(){
   applyAll();
   if(cfg.observe)startObs();
   setInterval(()=>applyAll(),3e4);
-  L('Web Pro v4.0 Enhanced initialized',cfg);
+  L('Web Pro initialized',cfg);
 })();
