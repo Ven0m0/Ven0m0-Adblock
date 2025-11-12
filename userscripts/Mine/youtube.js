@@ -20,7 +20,7 @@ window[GUARD]=!0;
 // CONFIG
 // ============================================================================
 const CFG={
-  debug:!1,
+  debug:!0,
   cpu:{
     eventThrottle:!0,
     rafDecimation:!0,
