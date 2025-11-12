@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name        Web Pro Enhanced
+// @description General web performance optimizer
 // @namespace   Ven0m0
+// @author      Ven0m0
 // @version     4.0
 // @match       *://*/*
 // @grant       GM_setValue
