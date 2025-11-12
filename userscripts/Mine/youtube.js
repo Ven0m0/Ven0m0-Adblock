@@ -9,16 +9,13 @@
 // @grant        GM_addStyle
 // @run-at       document-start
 // ==/UserScript==
-
-(()=>{"use strict";
-
+"use strict";
 // ============================================================================
 // GUARD: Prevent duplicate execution
 // ============================================================================
 const GUARD="__yt_ultimate_optimizer__";
 if(window[GUARD])return;
 window[GUARD]=!0;
-
 // ============================================================================
 // CONFIG
 // ============================================================================
@@ -28,7 +25,7 @@ const CFG={
     eventThrottle:!0,
     rafDecimation:!0,
     timerPatch:!0,
-    idleBoost:!0,
+    idleBoost:!1,
     idleDelayNormal:6e3,
     idleDelayShorts:12e3,
     rafFpsVisible:24,
@@ -38,14 +35,14 @@ const CFG={
   },
   gpu:{
     blockAV1:!0,
-    disableAmbient:!0,
-    lazyThumbs:!0
+    disableAmbient:!1,
+    lazyThumbs:!1
   },
   ui:{
-    hideSpinner:!0,
+    hideSpinner:!1,
     hideShorts:!0,
-    hideAds:!0,
-    disableAnimations:!0,
+    hideAds:!1,
+    disableAnimations:!1,
     contentVisibility:!0,
     instantNav:!0
   },
