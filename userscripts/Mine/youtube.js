@@ -41,7 +41,6 @@ const CFG={
   ui:{
     hideSpinner:!1,
     hideShorts:!0,
-    hideAds:!1,
     disableAnimations:!1,
     contentVisibility:!0,
     instantNav:!0
@@ -115,7 +114,6 @@ const CV_OFF_ATTR="data-yt-cv-off";
           scheduleClose(db,name);
         }
       };
-      
       const origAdd=req.addEventListener;
       req.addEventListener=function(type,fn,...a){
         if(type=="success"||type=="error"){
@@ -123,7 +121,6 @@ const CV_OFF_ATTR="data-yt-cv-off";
         }
         return origAdd.call(this,type,fn,...a);
       };
-      
       openDBs.add(req);
       clearTimeout(cleanTimer);
       cleanTimer=setTimeout(cleanup,18e3);
@@ -132,7 +129,6 @@ const CV_OFF_ATTR="data-yt-cv-off";
     log("IndexedDB auto-close enabled");
   }
 })();
-
 // ============================================================================
 // 2. GPU OPTIMIZATION
 // ============================================================================
@@ -150,39 +146,28 @@ if(CFG.gpu.blockAV1){
   }
   log("AV1 codec blocked");
 }
-
 // ============================================================================
 // 3. CSS INJECTION
 // ============================================================================
 (()=>{
   let css="";
-  
   if(CFG.ui.disableAnimations){
     css+=`[no-anim] *{transition:none!important;animation:none!important}html{scroll-behavior:auto!important}`;
     css+=`.ytd-ghost-grid-renderer *,.ytd-continuation-item-renderer *{animation:none!important}`;
   }
-  
   if(CFG.ui.contentVisibility){
     css+=`html:not([${CV_OFF_ATTR}]) #comments,html:not([${CV_OFF_ATTR}]) #related,html:not([${CV_OFF_ATTR}]) ytd-watch-next-secondary-results-renderer{content-visibility:auto!important;contain-intrinsic-size:800px 600px!important}`;
   }
-  
   if(CFG.ui.hideSpinner){
     css+=`.ytp-spinner,.ytp-spinner *{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}`;
   }
-  
   if(CFG.gpu.disableAmbient){
     css+=`.ytp-ambient-light,ytd-watch-flexy[ambient-mode-enabled] .ytp-ambient-light{display:none!important}`;
     css+=`ytd-app,ytd-watch-flexy,#content,#page-manager{backdrop-filter:none!important;filter:none!important;animation:none!important;will-change:auto!important}`;
   }
-  
-  if(CFG.ui.hideAds){
-    css+=`ytd-shelf-renderer:has(ytd-ad-slot-renderer),ytd-reel-shelf-renderer,ytd-rich-section-renderer,ytd-display-ad-renderer,ytd-ad-slot-renderer,ytd-statement-banner-renderer,ytd-banner-promo-renderer-background,ytd-in-feed-ad-layout-renderer,ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-ads"],ytd-rich-item-renderer:has(> #content > ytd-ad-slot-renderer),#player-ads,masthead-ad,tp-yt-iron-overlay-backdrop{display:none!important}`;
-  }
-  
   if(CFG.ui.hideShorts){
     css+=`[hide-shorts] ytd-rich-section-renderer,ytd-reel-shelf-renderer,#endpoint[title="Shorts"],a[title="Shorts"]{display:none!important}`;
   }
-  
   if(css){
     const style=document.createElement("style");
     style.textContent=css;
@@ -190,7 +175,6 @@ if(CFG.gpu.blockAV1){
     log("CSS injected");
   }
 })();
-
 // ============================================================================
 // 4. EVENT THROTTLING
 // ============================================================================
@@ -217,7 +201,6 @@ if(CFG.cpu.eventThrottle){
       }
     };
   };
-  
   const debounce=(fn,ctx,ms)=>{
     let timer=0,args=null;
     return function(...a){
@@ -226,31 +209,25 @@ if(CFG.cpu.eventThrottle){
       timer=setTimeout(()=>fn.apply(ctx,args),ms);
     };
   };
-  
   EventTarget.prototype.addEventListener=function(type,fn,opts){
     if(isShorts()||!CFG.cpu.eventThrottle||typeof fn!="function"||isPlayer(this)||(isGlobal(this)&&(type=="wheel"||type=="scroll"||type=="resize"))){
       return origAdd.call(this,type,fn,opts);
     }
-    
     let wrapped=fn;
     if(throttleEvents.has(type)){
       wrapped=raf(fn,this);
     }else if(debounceEvents.has(type)){
       wrapped=debounce(fn,this,debounceEvents.get(type));
     }
-    
     if(wrapped!==fn)wrapMap.set(fn,wrapped);
     return origAdd.call(this,type,wrapped,opts);
   };
-  
   EventTarget.prototype.removeEventListener=function(type,fn,opts){
     const wrapped=wrapMap.get(fn)||fn;
     return origRem.call(this,type,wrapped,opts);
   };
-  
   log("Event throttling enabled");
 }
-
 // ============================================================================
 // 5. RAF DECIMATION
 // ============================================================================
@@ -262,9 +239,7 @@ if(CFG.cpu.rafDecimation){
   const rafQueue=new Map;
   let rafScheduled=!1;
   let nextFrame=performance.now();
-  
   const getInterval=()=>document.visibilityState=="visible"?1e3/CFG.cpu.rafFpsVisible:1e3/CFG.cpu.rafFpsHidden;
-  
   const processQueue=()=>{
     if(!CFG.cpu.rafDecimation){
       rafScheduled=!1;
@@ -293,15 +268,12 @@ if(CFG.cpu.rafDecimation){
     }
     return id;
   };
-  
   window.cancelAnimationFrame=id=>{
     typeof id=="number"&&id>=BASE_ID?rafQueue.delete(id):origCAF(id);
   };
-  
   document.addEventListener("visibilitychange",()=>{
     nextFrame=performance.now();
   });
-  
   log("RAF decimation enabled");
 }
 
@@ -310,45 +282,37 @@ if(CFG.cpu.rafDecimation){
 // ============================================================================
 (async()=>{
   if(!CFG.cpu.timerPatch)return;
-  
   const nativeTimers={
     setTimeout:window.setTimeout.bind(window),
     clearTimeout:window.clearTimeout.bind(window),
     setInterval:window.setInterval.bind(window),
     clearInterval:window.clearInterval.bind(window)
   };
-  
   const waitDOM=async()=>{
     while(!document.documentElement)await new Promise(requestAnimationFrame);
   };
   await waitDOM();
-  
   const iframe=document.createElement("iframe");
   iframe.id="yt-timer-provider";
   iframe.style.display="none";
   iframe.sandbox="allow-same-origin allow-scripts";
   iframe.srcdoc="<!doctype html><title>timer</title>";
   document.documentElement.appendChild(iframe);
-  
   while(!iframe.contentWindow?.setTimeout)await new Promise(requestAnimationFrame);
-  
   const iframeTimers={
     setTimeout:iframe.contentWindow.setTimeout.bind(iframe.contentWindow),
     clearTimeout:iframe.contentWindow.clearTimeout.bind(iframe.contentWindow),
     setInterval:iframe.contentWindow.setInterval.bind(iframe.contentWindow),
     clearInterval:iframe.contentWindow.clearInterval.bind(iframe.contentWindow)
   };
-  
   const trigger=document.createElement("div");
   trigger.id="yt-trigger-node";
   trigger.style.display="none";
   document.documentElement.appendChild(trigger);
-  
   let throttleTimers=!0;
   let minDelay=CFG.cpu.minDelayBase;
   let lastActivity=performance.now();
   const timerSet=new WeakSet;
-  
   const scheduleCallback=cb=>{
     if(document.visibilityState=="visible"){
       return new Promise(r=>{
@@ -362,7 +326,6 @@ if(CFG.cpu.rafDecimation){
     }
     return new Promise(requestAnimationFrame).then(cb);
   };
-  
   const wrapTimeout=(impl,tracked)=>function(fn,delay=0,...args){
     const exec=typeof fn=="function"?()=>fn.apply(window,args):()=>(0,eval)(String(fn));
     if(isShorts()||!throttleTimers||delay<minDelay){
@@ -372,18 +335,15 @@ if(CFG.cpu.rafDecimation){
     tracked.add(id);
     return id;
   };
-  
   const wrapClear=tracked=>id=>{
     tracked.has(id)?(tracked.delete(id),iframeTimers.clearTimeout(id)):nativeTimers.clearTimeout(id);
   };
-  
   const wrapInterval=impl=>function(fn,delay=0,...args){
     if(isShorts()||typeof fn!="function"||delay<minDelay||!throttleTimers){
       return nativeTimers.setInterval(()=>fn.apply(window,args),delay);
     }
     return impl(()=>scheduleCallback(()=>fn.apply(window,args)),delay);
   };
-  
   const patchTimers=()=>{
     const tracked=new Set;
     window.setTimeout=wrapTimeout(iframeTimers.setTimeout,tracked);
@@ -392,14 +352,11 @@ if(CFG.cpu.rafDecimation){
     window.clearInterval=iframeTimers.clearInterval;
     log("Timer patches installed");
   };
-  
   const unpatchTimers=()=>{
     Object.assign(window,nativeTimers);
     log("Timer patches removed");
   };
-  
   patchTimers();
-  
   if(CFG.cpu.idleBoost){
     const activityEvents=["mousemove","mousedown","keydown","wheel","touchstart","pointerdown","focusin"];
     const onActivity=()=>{
@@ -411,11 +368,9 @@ if(CFG.cpu.rafDecimation){
         log("Idle mode OFF");
       }
     };
-    
     activityEvents.forEach(evt=>{
       window.addEventListener(evt,onActivity,{capture:!0,passive:!0});
     });
-    
     setInterval(()=>{
       const now=performance.now();
       const idleThreshold=isShorts()?CFG.cpu.idleDelayShorts:CFG.cpu.idleDelayNormal;
@@ -429,10 +384,8 @@ if(CFG.cpu.rafDecimation){
         }
       }
     },1e3);
-    
     log("Idle boost enabled");
   }
-  
   window.addEventListener("yt-navigate-finish",()=>{
     unpatchTimers();
     setTimeout(patchTimers,500);
@@ -484,7 +437,6 @@ if(CFG.gpu.lazyThumbs){
       }
     });
   };
-  
   const lazyObs=new MutationObserver(lazyLoad);
   if(document.body)lazyObs.observe(document.body,{childList:!0,subtree:!0});
   document.addEventListener("DOMContentLoaded",()=>{
