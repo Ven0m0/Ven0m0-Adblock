@@ -2,8 +2,8 @@
 // @name         YouTube Ultimate Optimizer
 // @namespace    http://tampermonkey.net/
 // @version      1.0.0
-// @description  Merged YouTube performance optimization: CPU taming, GPU optimization, resource lock removal, ad blocking
-// @author       Lucy
+// @description  YouTube performance optimization: CPU taming, GPU optimization, resource lock removal, ad blocking
+// @author       Ven0m0
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
 // @grant        GM_addStyle
