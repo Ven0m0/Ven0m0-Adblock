@@ -4,8 +4,6 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
 
-* * 3p-frame block
-
 ! Disable telemetry/analytics/error reporting domains
 ||telemetry.*^$all
 ||analytics.*^$all
