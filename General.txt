@@ -66,7 +66,6 @@ $removeparam=utm_term
 
 * challenges.cloudflare.com * noop
 * www.google.com * noop
-* www.gstatic.com * noop
 x.com twitter.com * noop
 twitter.com x.com * noop
 
@@ -74,6 +73,3 @@ twitter.com x.com * noop
 @@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
 ||www.google.com^$3p,subdocument
 @@||www.google.com/recaptcha/$3p,subdocument
-||www.gstatic.com^$3p,script
-@@||www.gstatic.com/recaptcha/$3p,script
-
