@@ -3,7 +3,10 @@ set -euo pipefail; shopt -s nullglob globstar extglob
 IFS=$'\n\t'; export LC_ALL=C LANG=C
 #── Config ──
 readonly REPO="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
-readonly SRC="${1:-userscripts}" OUT="${2:-dist}" FILT="Filters" LIST="${3:-List}"
+readonly FILTER_SRC="lists/sources"
+readonly FILTER_OUT="lists/releases"
+readonly SCRIPT_SRC="userscripts/src"
+readonly SCRIPT_OUT="userscripts/dist"
 #── Load lib ──
 D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 [[ -f $D/lib-common.sh ]] && . "$D/lib-common.sh" || {
@@ -27,10 +30,10 @@ runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RU
 
 #── Adblock filter ──
 build_adblock(){
-  local -a src=(3rd-party.txt Combination*.txt Other.txt *Annoyances.txt *Tweaks.txt)
-  local out=$FILT/filter.txt v ts
+  local -a src=(3rd-party.txt Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
+  local out=$FILTER_OUT/adblock.txt v ts
   log adblock "Building..."
-  mkdir -p "$FILT"
+  mkdir -p "$FILTER_OUT"
   v=$(ts_short); ts=$(ts_read)
   cat > "$out" <<EOF
 [Adblock Plus 2.0]
@@ -40,24 +43,37 @@ build_adblock(){
 ! Homepage: https://github.com/$REPO
 ! Syntax: Adblock Plus 2.0
 EOF
+  cd "$FILTER_SRC" || { err "Cannot access $FILTER_SRC"; return 1; }
   local -a ex=(); for f in "${src[@]}"; do [[ -f $f ]] && ex+=("$f"); done
-  (( ${#ex[@]} > 0 )) && cat "${ex[@]}" | $(rg) -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$out"
+  if (( ${#ex[@]} > 0 )); then
+    cat "${ex[@]}" | $(rg) -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out"
+  else
+    err "No filter files found"; return 1
+  fi
+  cd "$OLDPWD"
   ok "$out ($(wc -l < "$out") rules)"
 }
 
 #── Hosts ──
 build_hosts(){
   local -a src=(3rd-party.txt Other.txt)
-  local out=hosts.txt ts
+  local out=$FILTER_OUT/hosts.txt ts
   log hosts "Building..."
+  mkdir -p "$FILTER_OUT"
   ts=$(ts_read)
   cat > "$out" <<EOF
 # Hostlist by $REPO
 # Updated: $ts
 EOF
+  cd "$FILTER_SRC" || { err "Cannot access $FILTER_SRC"; return 1; }
   local -a ex=(); for f in "${src[@]}"; do [[ -f $f ]] && ex+=("$f"); done
-  (( ${#ex[@]} > 0 )) && cat "${ex[@]}" | $(rg) -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
-    awk '{print "0.0.0.0",tolower($1)}' | LC_ALL=C sort -u >> "$out"
+  if (( ${#ex[@]} > 0 )); then
+    cat "${ex[@]}" | $(rg) -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
+      awk '{print "0.0.0.0",tolower($1)}' | LC_ALL=C sort -u >> "$OLDPWD/$out"
+  else
+    err "No host source files found"; return 1
+  fi
+  cd "$OLDPWD"
   ok "$out ($(wc -l < "$out") hosts)"
 }
 
@@ -82,11 +98,11 @@ setup_aglint(){
 build_hostlist(){
   has hostlist-compiler || npm i -g @adguard/hostlist-compiler
   log hostlist "Compiling..."
-  mkdir -p "$FILT"
-  [[ -f hostlist-config.json ]] && hostlist-compiler -c hostlist-config.json -o "$FILT/filter.txt" --verbose
+  mkdir -p "$FILTER_OUT"
+  [[ -f hostlist-config.json ]] && hostlist-compiler -c hostlist-config.json -o "$FILTER_OUT/hostlist.txt" --verbose
   [[ -f configuration_popup_filter.json ]] && {
-    hostlist-compiler -c configuration_popup_filter.json -o "$FILT/adguard_popup_filter.txt" --verbose
-    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILT/adguard_popup_filter.txt"
+    hostlist-compiler -c configuration_popup_filter.json -o "$FILTER_OUT/adguard_popup_filter.txt" --verbose
+    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILTER_OUT/adguard_popup_filter.txt"
   }
 }
 
@@ -100,52 +116,37 @@ _process_js(){
   code=$(sed -n '/^$/,$p' "$tmp")
   rm "$tmp"
   [[ -n $meta ]] && meta=$(sed -E '/^\/\/ @(name|description):/!b;/en/!d' <<< "$meta" | \
-    sed -E "s|(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$OUT/$base.user.js|;\
-s|(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$OUT/$base.meta.js|")
+    sed -E "s|(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.user.js|;\
+s|(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.meta.js|")
   js=$($(runner) esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || { err "$fn (esbuild)"; return 1; }
   len=${#js}; (( len < 50 )) && { err "$fn ($len bytes)"; return 1; }
-  [[ -n $meta ]] && { printf '%s\n' "$meta" > "$OUT/$base.meta.js"; printf '%s\n%s\n' "$meta" "$js" > "$OUT/$base.user.js"; } || \
-    printf '%s\n' "$js" > "$OUT/$base.user.js"
+  [[ -n $meta ]] && { printf '%s\n' "$meta" > "$SCRIPT_OUT/$base.meta.js"; printf '%s\n%s\n' "$meta" "$js" > "$SCRIPT_OUT/$base.user.js"; } || \
+    printf '%s\n' "$js" > "$SCRIPT_OUT/$base.user.js"
   ok "$fn ($(wc -c < "$f") → $len)"
 }
 
 _dl_js(){
   local url=$1 fn base ts
   fn=$(tr -cd '[:alnum:]._-' <<< "${url##*/}"); [[ $fn != *.user.js ]] && fn+=.user.js
-  [[ -f $SRC/$fn ]] && { ts=$(date +%s); base=${fn%.user.js}; fn="${base}_${ts}.user.js"; }
+  [[ -f $SCRIPT_SRC/$fn ]] && { ts=$(date +%s); base=${fn%.user.js}; fn="${base}_${ts}.user.js"; }
   log dl "$fn"
-  curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -m 30 "$url" -o "$SRC/$fn" 2>/dev/null && echo "$SRC/$fn" || return 1
+  curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -m 30 "$url" -o "$SCRIPT_SRC/$fn" 2>/dev/null && echo "$SCRIPT_SRC/$fn" || return 1
 }
 
 build_userscripts(){
   [[ -z $(runner) ]] && { err "No JS runtime (bun/node)"; return 1; }
-  mkdir -p "$SRC" "$OUT"
-  [[ -f $LIST ]] && {
-    local -a upd=()
-    while IFS= read -r line; do
-      if [[ $line =~ https?://[^\ \"]+\.user\.js ]]; then
-        local url=${BASH_REMATCH[0]} file fn
-        file=$(_dl_js "$url") && { _process_js "$file" || continue; fn=${file##*/}; fn=${fn%.user.js}.user.js
-          upd+=("$url|https://raw.githubusercontent.com/$REPO/main/$OUT/$fn"); } || :
-      fi
-    done < "$LIST"
-    if (( ${#upd[@]} > 0 )); then
-      local tmp; tmp=$(mktemp); cp "$LIST" "$tmp"
-      for p in "${upd[@]}"; do IFS='|' read -r old new <<< "$p"; sed -i "s|$old|$new|g" "$tmp"; done
-      mv "$tmp" "$OUT/README.md"
-    else cp "$LIST" "$OUT/README.md"; fi
-  }
+  mkdir -p "$SCRIPT_SRC" "$SCRIPT_OUT"
   local -a files=()
-  [[ $(fd) == *fd* ]] && mapfile -t files < <($(fd) -e js -t f . "$SRC" 2>/dev/null) || \
-    mapfile -t files < <(find "$SRC" -type f -name "*.js" 2>/dev/null)
-  (( ${#files[@]} == 0 )) && return 0
+  [[ $(fd) == *fd* ]] && mapfile -t files < <($(fd) -e js -t f . "$SCRIPT_SRC" 2>/dev/null) || \
+    mapfile -t files < <(find "$SCRIPT_SRC" -type f -name "*.js" 2>/dev/null)
+  (( ${#files[@]} == 0 )) && { log userscripts "No files found in $SCRIPT_SRC"; return 0; }
   log userscripts "Processing ${#files[@]} files..."
   has eslint && eslint --fix --quiet --no-warn-ignored "${files[@]}" 2>/dev/null || :
-  export -f _process_js; export REPO OUT R G N
+  export -f _process_js; export REPO SCRIPT_OUT R G N
   local rn; rn=$(runner); export RUNNER=$rn
   [[ -n $(par) ]] && (( ${#files[@]} > 1 )) && printf '%s\n' "${files[@]}" | $(par) -j "$(jobs)" --bar _process_js {} 2>/dev/null || \
     { for f in "${files[@]}"; do _process_js "$f" || :; done; }
-  ok "$(find "$OUT" -name "*.user.js" -type f 2>/dev/null | wc -l) scripts → $OUT/"
+  ok "$(find "$SCRIPT_OUT" -name "*.user.js" -type f 2>/dev/null | wc -l) scripts → $SCRIPT_OUT/"
 }
 
 #── Main ──

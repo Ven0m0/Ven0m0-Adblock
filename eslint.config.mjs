@@ -14,5 +14,5 @@ export default [
     }
   },
   {files: ["**/*.user.js"], languageOptions: {sourceType: "script"}},
-  {ignores: ["node_modules/", "dist/", "*.min.js"]}
+  {ignores: ["node_modules/", "lists/releases/", "userscripts/dist/", "*.min.js"]}
 ];

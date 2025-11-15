@@ -5,13 +5,13 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "**/*.txt"
+      - "lists/sources/**/*.txt"
       - ".aglintrc.*"
       - "package.json"
       - "package-lock.json"
   pull_request:
     paths:
-      - "**/*.txt"
+      - "lists/sources/**/*.txt"
       - ".aglintrc.*"
       - "package.json"
       - "package-lock.json"
