@@ -1,149 +1,32 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# SHARED BASH UTILITIES LIBRARY
-# ==============================================================================
-# Common functions and utilities for bash scripts in this project
-# Source this file in other scripts: source "$(dirname "$0")/lib-common.sh"
-# ==============================================================================
-set -euo pipefail
-shopt -s nullglob globstar
-# ==============================================================================
-# COLORS
-# ==============================================================================
-readonly RED=$'\e[31m'
-readonly GREEN=$'\e[32m'
-readonly YELLOW=$'\e[33m'
-readonly BLUE=$'\e[34m'
-readonly CYAN=$'\e[36m'
-readonly RESET=$'\e[0m'
-# ==============================================================================
-# LOGGING FUNCTIONS
-# ==============================================================================
-log_info(){ printf '%b[info]%b %s\n' "$BLUE" "$RESET" "$*"; }
-log_success(){ printf '%b✓%b %s\n' "$GREEN" "$RESET" "$*"; }
-log_error(){ printf '%b✗%b %s\n' "$RED" "$RESET" "$*" >&2; }
-log_warn(){ printf '%b⚠%b %s\n' "$YELLOW" "$RESET" "$*" >&2; }
-log_debug(){ [[ ${DEBUG:-0} == 1 ]] && printf '%b[debug]%b %s\n' "$CYAN" "$RESET" "$*" >&2; }
-
-# ==============================================================================
-# COMMAND CHECKING
-# ==============================================================================
-# Check if command exists
-check_cmd(){ command -v "$1" &>/dev/null || { log_error "Required command '$1' not found"; return 1; }; }
-# Check if command exists, install if not (npm packages)
-ensure_npm_global(){
-  local pkg="$1"
-  local cmd="${2:-$pkg}"
-  if ! command -v "$cmd" &>/dev/null; then
-    log_info "Installing $pkg globally..."
-    bun i -g "$pkg" || {
-      log_error "Failed to install $pkg"; return 1
-    }
-  fi
-}
-
-# ==============================================================================
-# SYSTEM DETECTION
-# ==============================================================================
-# Get number of CPU cores
-get_cpu_cores(){ nproc 2>/dev/null || echo 4; }
-
-# Detect JS runtime (bun, node, or none)
-detect_js_runtime(){
-  if command -v bun &>/dev/null; then
-    echo "bunx --bun"
-  elif command -v npx &>/dev/null; then
-    echo "npx -y"
-  fi
-}
-
-# ==============================================================================
-# FILE OPERATIONS
-# ==============================================================================
-# Create directory with error handling
-safe_mkdir(){ mkdir -p "$@" || { log_error "Failed to create directory: $*"; return 1; }; }
-
-# Backup file with timestamp
-backup_file(){
-  local file="$1" backup_dir="${2:-.backups}" ts basename
-  [[ -f $file ]] || return 0
-  safe_mkdir "$backup_dir"
-  printf -v ts '%(%Y%m%d_%H%M%S)T' -1
-  basename=${file##*/}
-  cp "$file" "$backup_dir/${basename}.${ts}" && log_success "Backed up: $file → $backup_dir/${basename}.${ts}"
-}
-
-# Safe file write with atomic operation
-safe_write(){
-  local content="$1" dest="$2" tmp
-  tmp=$(mktemp) || return 1
-  printf '%s\n' "$content" > "$tmp" || return 1
-  mv "$tmp" "$dest" || return 1
-}
-
-# ==============================================================================
-# STRING OPERATIONS
-# ==============================================================================
-# Trim whitespace from string
-trim(){
-  local var="$*"
-  var="${var#"${var%%[![:space:]]*}"}"
-  var="${var%"${var##*[![:space:]]}"}"
-  printf '%s' "$var"
-}
-# Convert string to lowercase
-lowercase(){ printf '%s' "$*" | tr '[:upper:]' '[:lower:]'; }
-# Convert string to uppercase
-uppercase(){ printf '%s' "$*" | tr '[:lower:]' '[:upper:]'; }
-
-# ==============================================================================
-# TIMESTAMP FUNCTIONS
-# ==============================================================================
-timestamp_short(){ TZ=UTC printf '%(%Y%m%d%H%M)T\n' -1; }
-timestamp_readable(){ TZ=UTC printf '%(%Y-%m-%d %H:%M:%S UTC)T\n' -1; }
-timestamp_unix(){ printf '%(%s)T\n' -1; }
-
-# ==============================================================================
-# PERFORMANCE HELPERS
-# ==============================================================================
-# Time a command execution
-time_cmd(){
-  local elapsed ret start=${EPOCHREALTIME/./} end=${EPOCHREALTIME/./}
-  "$@"
-  ret=$?
-  elapsed=$(( (end - start) / 1000000 ))
-  log_debug "Execution time: ${elapsed}ms"; return "$ret"
-}
-# Check if parallel processing is available
-can_parallel(){ command -v parallel &>/dev/null && [[ ${1:-1} -gt 1 ]]; }
-
-# ==============================================================================
-# CLEANUP HANDLERS
-# ==============================================================================
-# Register cleanup function
-cleanup_handlers=()
-register_cleanup(){ cleanup_handlers+=("$1"); }
-# Execute all cleanup handlers
-run_cleanup(){ local handler; for handler in "${cleanup_handlers[@]}"; do eval "$handler"; done; }
-# Trap cleanup on exit
-trap run_cleanup EXIT INT TERM
-
-# ==============================================================================
-# VALIDATION
-# ==============================================================================
-# Check if string is a valid URL
-is_url(){ [[ $1 =~ ^https?:// ]]; }
-# Check if file is executable
-is_executable(){ [[ -x $1 ]]; }
-# Check if running as root
-is_root(){ [[ $EUID -eq 0 ]]; }
-
-# ==============================================================================
-# EXPORTS
-# ==============================================================================
-# Export commonly used functions and variables
-export -f log_info log_success log_error log_warn log_debug
-export -f check_cmd ensure_npm_global get_cpu_cores detect_js_runtime
-export -f safe_mkdir backup_file safe_write trim
-export -f timestamp_short timestamp_readable timestamp_unix
-export RED GREEN YELLOW BLUE CYAN RESET
+set -euo pipefail; shopt -s nullglob globstar
+IFS=$'\n\t'; export LC_ALL=C LANG=C
+#── Colors ──
+readonly R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' C=$'\e[36m' N=$'\e[0m'
+#── Logging ──
+log(){ printf '%b[%s]%b %s\n' "$B" "${1:-info}" "$N" "${*:2}"; }
+ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
+err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; }
+warn(){ printf '%b⚠%b %s\n' "$Y" "$N" "$*" >&2; }
+dbg(){ [[ ${DEBUG:-0} == 1 ]] && printf '%b[dbg]%b %s\n' "$C" "$N" "$*" >&2 || :; }
+die(){ err "$@"; exit "${2:-1}"; }
+#── Commands ──
+has(){ command -v "$1" &>/dev/null; }
+chk(){ has "$1" || die "$1 missing"; }
+#── System ──
+ncpu(){ nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4; }
+jsrun(){ has bun && echo "bunx --bun" || has npx && echo "npx -y" || echo ""; }
+#── Files ──
+mktmp(){ mktemp -d -t "${1:-tmp}.XXXXXX"; }
+bak(){ [[ -f $1 ]] && cp "$1" "${1}.$(date +%s).bak"; }
+#── Time ──
+ts_short(){ TZ=UTC printf '%(%Y%m%d%H%M)T\n' -1; }
+ts_read(){ TZ=UTC printf '%(%Y-%m-%d %H:%M:%S UTC)T\n' -1; }
+#── Cleanup ──
+_cleanup_hooks=()
+cleanup_add(){ _cleanup_hooks+=("$1"); }
+cleanup_run(){ local h; for h in "${_cleanup_hooks[@]}"; do eval "$h" || :; done; }
+trap cleanup_run EXIT INT TERM
+#── Export ──
+export -f log ok err warn dbg has chk ts_short ts_read
+export R G Y B C N
