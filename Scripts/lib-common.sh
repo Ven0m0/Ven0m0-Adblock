@@ -54,8 +54,6 @@ detect_js_runtime(){
     echo "bunx --bun"
   elif command -v npx &>/dev/null; then
     echo "npx -y"
-  else
-    echo ""
   fi
 }
 
@@ -67,12 +65,11 @@ safe_mkdir(){ mkdir -p "$@" || { log_error "Failed to create directory: $*"; ret
 
 # Backup file with timestamp
 backup_file(){
-  local file="$1"
-  local backup_dir="${2:-.backups}"
+  local file="$1" backup_dir="${2:-.backups}" ts basename
   [[ -f $file ]] || return 0
   safe_mkdir "$backup_dir"
-  local ts=$(date +%Y%m%d_%H%M%S)
-  local basename="${file##*/}"
+  printf -v ts '%(%Y%m%d_%H%M%S)T' -1
+  basename=${file##*/}
   cp "$file" "$backup_dir/${basename}.${ts}" && log_success "Backed up: $file → $backup_dir/${basename}.${ts}"
 }
 
