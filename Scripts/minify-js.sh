@@ -1,6 +1,27 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# DEPRECATED: This script is deprecated in favor of build-all.sh
+# ==============================================================================
+# Use: ./build-all.sh userscripts
+# The build-all.sh script provides the same functionality plus additional
+# features like filter building, linting, and parallel processing optimizations.
+# This file is kept for backward compatibility only.
+# ==============================================================================
+
 set -euo pipefail; shopt -s nullglob globstar
 LC_ALL=C LANG=C
+
+# Source shared utilities
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[[ -f "$SCRIPT_DIR/lib-common.sh" ]] && source "$SCRIPT_DIR/lib-common.sh" || {
+  # Fallback color definitions if lib not available
+  readonly RED=$'\e[31m' GREEN=$'\e[32m' YELLOW=$'\e[33m' RESET=$'\e[0m'
+  log_warn() { printf '%b⚠%b %s\n' "$YELLOW" "$RESET" "$*" >&2; }
+}
+
+log_warn "DEPRECATED: minify-js.sh is deprecated. Please use './build-all.sh userscripts' instead"
+log_warn "This script will be removed in a future release"
+printf '\n'
 
 readonly repo="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
 readonly src="${1:-userscripts}"
