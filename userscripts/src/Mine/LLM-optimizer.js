@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         ChatGPT/Gemini/Claude Complete Optimization
-// @namespace    http://tampermonkey.net/
+// @namespace    Ven0m0
+// @author       Ven0m0
 // @version      2.0.0
 // @description  Width adjustment, DOM cleanup, auto-continue, and initial load optimization
-// @author       Lucy (merged & optimized)
-// @license      MIT
+// @license      GPLv3
 // @match        https://gemini.google.com/*
 // @match        https://chat.openai.com/*
 // @match        https://chatgpt.com/*
