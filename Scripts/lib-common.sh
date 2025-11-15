@@ -102,23 +102,20 @@ uppercase(){ printf '%s' "$*" | tr '[:lower:]' '[:upper:]'; }
 # ==============================================================================
 # TIMESTAMP FUNCTIONS
 # ==============================================================================
-timestamp_short(){ date -u +"%Y%m%d%H%M"; }
-timestamp_readable(){ date -u +"%Y-%m-%d %H:%M:%S UTC"; }
-timestamp_unix(){ date +%s; }
+timestamp_short(){ TZ=UTC printf '%(%Y%m%d%H%M)T\n' -1; }
+timestamp_readable(){ TZ=UTC printf '%(%Y-%m-%d %H:%M:%S UTC)T\n' -1; }
+timestamp_unix(){ printf '%(%s)T\n' -1; }
 
 # ==============================================================================
 # PERFORMANCE HELPERS
 # ==============================================================================
 # Time a command execution
 time_cmd(){
-  local start end elapsed
-  start=$(date +%s%N 2>/dev/null || date +%s)
+  local elapsed ret start=${EPOCHREALTIME/./} end=${EPOCHREALTIME/./}
   "$@"
-  local ret="$?"
-  end=$(date +%s%N 2>/dev/null || date +%s)
+  ret=$?
   elapsed=$(( (end - start) / 1000000 ))
-  log_debug "Execution time: ${elapsed}ms"
-  return "$ret"
+  log_debug "Execution time: ${elapsed}ms"; return "$ret"
 }
 # Check if parallel processing is available
 can_parallel(){ command -v parallel &>/dev/null && [[ ${1:-1} -gt 1 ]]; }
