@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         YouTube Ultimate Optimizer
-// @namespace    http://tampermonkey.net/
+// @namespace    Ven0m0
+// @author       Ven0m0
 // @version      1.0.0
 // @description  YouTube performance optimization: CPU taming, GPU optimization, resource lock removal, ad blocking
-// @author       Ven0m0
-// @match        https://www.youtube.com/*
+// @match        https://youtube.com/*
 // @match        https://m.youtube.com/*
+// @match        https://music.youtube.com/*
 // @grant        GM_addStyle
+// @license      GPLv3
 // @run-at       document-start
 // ==/UserScript==
 "use strict";
