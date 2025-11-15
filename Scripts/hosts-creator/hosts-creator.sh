@@ -1,159 +1,59 @@
 #!/usr/bin/env bash
 set -euo pipefail; shopt -s nullglob globstar
-LC_ALL=C LANG=C
-
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-GREEN='\033[1;32m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-check_dep() {
-    if [ ! "$(command -v "$1")" ]; then
-        printf '%b\n' "${RED}$2${NC}"
-        exit 1
-    fi
+IFS=$'\n\t'; export LC_ALL=C LANG=C
+#── Config ──
+D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+[[ -f $D/../lib-common.sh ]] && . "$D/../lib-common.sh" || {
+  R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' C=$'\e[36m' N=$'\e[0m'
+  log(){ printf '%b[%s]%b %s\n' "$B" "$1" "$N" "${*:2}"; }
+  ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
+  err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; exit "${2:-1}"; }
 }
-
-startupcheck() {
-
-    [ -d "$current_dir/backups" ] || (printf '%b\n' "${BLUE}creating backups directory${NC}" && mkdir "$current_dir/backups")
-
-    [ -f "$current_dir/backups/$backupfilename.old" ] && printf '%b\n' "${BLUE}there is already 2 backups no need for another${NC}"
-    [ -f "$current_dir/backups/$backupfilename.old" ] && no_need="1" || no_need="0"
-
-    if [ "$no_need" -eq "0" ]; then
-        [ -f "$current_dir/backups/$backupfilename" ] && (printf '%b\n' "${BLUE}renaming old backup and copying new $syshosts_file${NC}" && mv "$current_dir/backups/$backupfilename" "$current_dir/backups/$backupfilename.old" && cp "$syshosts_file" "$current_dir/backups/$backupfilename")
-    fi
-
-    [ -f "$current_dir/backups/$backupfilename" ] || (printf '%b\n' "${BLUE}backing up $syshosts_file${NC}" && cp "$syshosts_file" "$current_dir/backups/$backupfilename")
-
-    [ -f "$current_dir/$newhostsfn" ] && printf '%b\n' "${RED}removing old $newhostsfn file${NC}"
-    [ -f "$current_dir/$newhostsfn" ] && rm "$current_dir/$newhostsfn"
+[[ -f config ]] && . config
+readonly HOSTS_FILE="${syshosts_file:-/etc/hosts}"
+readonly BACKUP_NAME="${backupfilename:-hosts.backup}"
+readonly NEW_NAME="${newhostsfn:-hosts-new}"
+readonly DL="${downloader:-curl}"
+readonly REPLACE="${replacehosts:-1}"
+readonly BACKUP_DIR=backups
+readonly RESOLVE="${RESOLVE_HOST:-127.0.0.1 localhost}"
+#── Checks ──
+command -v "$DL" &>/dev/null || err "$DL missing"
+command -v awk &>/dev/null || err "awk missing"
+#── Backup ──
+mkdir -p "$BACKUP_DIR"
+[[ -f $BACKUP_DIR/$BACKUP_NAME.old ]] || {
+  [[ -f $BACKUP_DIR/$BACKUP_NAME ]] && mv "$BACKUP_DIR/$BACKUP_NAME" "$BACKUP_DIR/$BACKUP_NAME.old"
+  cp "$HOSTS_FILE" "$BACKUP_DIR/$BACKUP_NAME"
+  log info "Backed up $HOSTS_FILE"
 }
-
-downloadhosts() {
-    # number
-    n=0
-    printf '%b\n' "${BLUE}Downloading host lists${NC}"
-    for i in $HOSTS; do
-        n=$((n + 1))
-        printf '%b\n' "${CYAN}$n) ${YELLOW}downloading $i${NC}"
-        $downloader "$i" >>"$current_dir/$newhostsfn"
-    done
+[[ -f $NEW_NAME ]] && rm "$NEW_NAME"
+#── Download ──
+log info "Downloading hosts"
+printf '%s\n' "$RESOLVE" > "$NEW_NAME"
+n=0
+for url in $HOSTS; do
+  n=$((n+1))
+  printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
+  $DL "$url" >> "$NEW_NAME" 2>/dev/null || :
+done
+#── Process ──
+awk_cmd=""
+[[ ${RM_COMMENTS:-0} == 1 ]] && { log info "Removing comments"; awk_cmd="!/^#/"; }
+[[ ${RM_TRAILING_SPACES:-0} == 1 ]] && { log info "Removing trailing spaces"; awk_cmd="${awk_cmd:+$awk_cmd && }{gsub(/^ +| +$/,\"\");print}"; }
+[[ ${RM_DUPLICATE_LINES:-0} == 1 ]] && { log info "Removing duplicates"; awk_cmd="${awk_cmd:+$awk_cmd && }!seen[\$0]++"; }
+[[ -n $awk_cmd ]] && {
+  tmp=$(mktemp)
+  awk "$awk_cmd" "$NEW_NAME" > "$tmp" && mv "$tmp" "$NEW_NAME"
+  ok "Processed"
 }
-
-edithostsfile() {
-    # Build awk script based on enabled options
-    awk_script=""
-    
-    # Build actions and pattern into single awk script
-    actions=""
-    pattern=""
-    
-    # comments - this is a filter pattern
-    if [ "$RM_COMMENTS" = 1 ]; then
-        printf '%b' "${BLUE}removing comments${NC}"
-        pattern="!/^#/"
-    fi
-    
-    # trailing spaces - this is an action
-    if [ "$RM_TRAILING_SPACES" = 1 ]; then
-        if [ "$RM_COMMENTS" = 1 ]; then
-            printf '\n%b' "${BLUE}removing trailing spaces${NC}"
-        else
-            printf '%b' "${BLUE}removing trailing spaces${NC}"
-        fi
-        actions="gsub(/^ +| +$/,\"\");"
-    fi
-    
-    # duplicate lines - this is another filter
-    if [ "$RM_DUPLICATE_LINES" = 1 ]; then
-        if [ "$RM_TRAILING_SPACES" = 1 ] || [ "$RM_COMMENTS" = 1 ]; then
-            printf '\n%b' "${BLUE}removing duplicate lines${NC}"
-        else
-            printf '%b' "${BLUE}removing duplicate lines${NC}"
-        fi
-        if [ -n "$pattern" ]; then
-            pattern="$pattern && !seen[\$0]++"
-        else
-            pattern="!seen[\$0]++"
-        fi
-    fi
-    
-    # Construct final awk script
-    if [ -n "$pattern" ]; then
-        if [ -n "$actions" ]; then
-            awk_script="$pattern {${actions}print}"
-        else
-            awk_script="$pattern {print}"
-        fi
-    elif [ -n "$actions" ]; then
-        awk_script="{${actions}print}"
-    fi
-    
-    # Run combined awk command once if any processing is needed
-    if [ -n "$awk_script" ]; then
-        # Use mktemp for thread-safe temporary file in /tmp
-        tmpfile=$(mktemp)
-        awk "$awk_script" "$current_dir/$newhostsfn" > "$tmpfile" && mv -f "$tmpfile" "$current_dir/$newhostsfn" && printf '%b\n' "${BLUE}: ${GREEN}done${NC}"
-    fi
-}
-
-checksize() {
-    size=$(du -sh "$current_dir/$newhostsfn" | awk '/[MK]/{print $0}')
-    if [ "$(printf '%s\n' "${size}" | awk '/M/{print $0}')" ]; then
-        if [ "$(printf '%s\n' "${size}" | awk '{print $0}' | awk '{print ($0+0)}')" -gt "60" ]; then
-            printf '%b\n' "${RED}your new hosts file is bigger than 60M${NC}"
-        fi
-    fi
-}
-
-replacehosts() {
-    if [ "$(command -v rdo)" ]; then
-        sudo=rdo
-    elif [ "$(command -v doas)" ]; then
-        sudo=doas
-    else
-        sudo=sudo
-    fi
-
-    printf '\n%b\n' "${BLUE}replacing /etc/hosts with the new one${NC}"
-    printf '%b' "${YELLOW}"
-    if ! $sudo mv -iv "$current_dir/$newhostsfn" "$syshosts_file"; then
-        printf '%b\n' "${RED}error: couldn't replace /etc/hosts with the new hosts file${NC}"
-        exit 1
-    fi
-    printf '%b' "${NC}"
-}
-
-main() {
-
-    current_dir=$(pwd)
-
-    [ -f "$current_dir/config" ] && . "$current_dir/config"
-
-    [ -z "$syshosts_file" ] && syshosts_file=/etc/hosts
-    [ -z "$backupfilename" ] && backupfilename=hosts.backup
-    [ -z "$newhostsfn" ] && newhostsfn=hosts-new
-    [ -z "$downloader" ] && downloader=curl
-    [ -z "$replacehosts" ] && replacehosts=1
-
-    check_dep "$downloader" "$downloader is missing, exiting!"
-    check_dep awk "awk is required, exiting!"
-
-    startupcheck
-
-    printf '%s\n' "$RESOLVE_HOST" >"$current_dir/$newhostsfn"
-
-    downloadhosts
-    edithostsfile
-    checksize
-    if [ "$replacehosts" = 1 ]; then
-        replacehosts
-    fi
-}
-
-main
-exit 0
+#── Size check ──
+size=$(du -sh "$NEW_NAME" | awk '{print $1}')
+[[ $size =~ ([0-9]+)M ]] && (( ${BASH_REMATCH[1]} > 60 )) && printf '%b⚠ File >60MB%b\n' "$Y" "$N" >&2
+ok "$NEW_NAME ($size)"
+#── Replace ──
+[[ $REPLACE == 1 ]] || exit 0
+sudo=sudo; command -v doas &>/dev/null && sudo=doas; command -v rdo &>/dev/null && sudo=rdo
+log info "Replacing $HOSTS_FILE"
+$sudo mv -iv "$NEW_NAME" "$HOSTS_FILE" || err "Replace failed"
+ok "Complete"
