@@ -1,11 +1,13 @@
 // ==UserScript==
-// @name         Claude Fork Conversation
-// @namespace    https://lugia19.com
-// @version      0.6.0
-// @description  Fork conversations at any message with model selection
+// @name         Claude tweaks
+// @description  Claude tweaks
+// @namespace    Ven0m0
+// @author       Ven0m0
+// @version      0.0.2
 // @match        https://claude.ai/*
 // @grant        none
 // @license      GPLv3
+// @run-at      document-start
 // ==/UserScript==
 (()=>{'use strict';
 let pendingFork=null,includeFiles=true,isProc=false,useSummary=false,origSettings=null;
