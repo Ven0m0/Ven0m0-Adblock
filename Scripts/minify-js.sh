@@ -7,10 +7,8 @@
 # features like filter building, linting, and parallel processing optimizations.
 # This file is kept for backward compatibility only.
 # ==============================================================================
-
 set -euo pipefail; shopt -s nullglob globstar
 LC_ALL=C LANG=C
-
 # Source shared utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [[ -f "$SCRIPT_DIR/lib-common.sh" ]] && source "$SCRIPT_DIR/lib-common.sh" || {
@@ -18,11 +16,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   readonly RED=$'\e[31m' GREEN=$'\e[32m' YELLOW=$'\e[33m' RESET=$'\e[0m'
   log_warn() { printf '%b⚠%b %s\n' "$YELLOW" "$RESET" "$*" >&2; }
 }
-
 log_warn "DEPRECATED: minify-js.sh is deprecated. Please use './build-all.sh userscripts' instead"
 log_warn "This script will be removed in a future release"
 printf '\n'
-
 readonly repo="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
 readonly src="${1:-userscripts}"
 readonly out="${2:-dist}"
@@ -31,7 +27,6 @@ readonly list="${3:-List}"
 jobs=$(nproc 2>/dev/null || echo 4)
 readonly jobs
 readonly red=$'\e[31m' grn=$'\e[32m' ylw=$'\e[33m' rst=$'\e[0m'
-
 # Detect runtime
 if command -v bun &>/dev/null; then
   readonly runner=(bunx --bun)
@@ -46,10 +41,8 @@ process(){
   fname=${f##*/}
   base=${fname%.user.js}
   [[ $fname == *.user.js ]] || base=${fname%.*}
-
   meta=$(sed -n '/^\/\/ ==UserScript==/,/^\/\/ ==\/UserScript==/{ /^\/\/ ==\/UserScript==/!p }' "$f")
   code=$(sed -n '/^\/\/ ==\/UserScript==/,$p' "$f" | tail -n +2)
-
   if [[ -n $meta ]]; then
     meta=$(sed -E \
       -e '/^\/\/ @(name|description):/!b; /^\/\/ @(name|description):en/!d' \
@@ -57,16 +50,13 @@ process(){
       -e "s|// @updateURL .*|// @updateURL https://raw.githubusercontent.com/$repo/main/$out/$base.meta.js|" \
       <<< "$meta")
   fi
-
   if ! js=$("${runner[@]}" esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1); then
-    printf "%s✗%s %s (esbuild)\n" "$red" "$rst" "$fname" >&2
-    return 1
+    printf "%s✗%s %s (esbuild)\n" "$red" "$rst" "$fname" >&2; return 1
   fi
 
   len=${#js}
   if (( len < 50 )); then
-    printf "%s✗%s %s (%d bytes)\n" "$red" "$rst" "$fname" "$len" >&2
-    return 1
+    printf "%s✗%s %s (%d bytes)\n" "$red" "$rst" "$fname" "$len" >&2; return 1
   fi
 
   if [[ -n $meta ]]; then
@@ -75,7 +65,6 @@ process(){
   else
     printf "%s\n" "$js" > "$out/$base.user.js"
   fi
-
   printf "%s✓%s %s (%d → %d)\n" "$grn" "$rst" "$fname" "$(wc -c < "$f")" "$len"
 }
 export -f process
@@ -86,26 +75,22 @@ download(){
   fname=${url##*/}
   fname=$(tr -cd '[:alnum.]_-' <<< "$fname")
   [[ $fname == *.user.js ]] || fname+=.user.js
-
   if [[ -f $src/$fname ]]; then
     ts=$(date +%s)
     base=${fname%.user.js}
     fname="${base}_${ts}.user.js"
   fi
-
   printf "%s↓%s %s\n" "$ylw" "$rst" "$fname"
   if curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -m 30 "$url" -o "$src/$fname" 2>/dev/null; then
     printf "%s" "$src/$fname"
   else
-    printf "%s✗%s %s\n" "$red" "$rst" "$url" >&2
-    return 1
+    printf "%s✗%s %s\n" "$red" "$rst" "$url" >&2; return 1
   fi
 }
 
 process_list(){
   [[ -f $list ]] || return 0
   local line url fname file updated=()
-
   while IFS= read -r line; do
     if [[ $line =~ https?://[^\ \"]+\.user\.js ]]; then
       url=${BASH_REMATCH[0]}
@@ -117,7 +102,6 @@ process_list(){
       fi
     fi
   done < "$list"
-
   if (( ${#updated[@]} > 0 )); then
     local tmp
     tmp=$(mktemp)
@@ -126,15 +110,14 @@ process_list(){
       IFS='|' read -r old new <<< "$pair"
       sed -i "s|$old|$new|g" "$tmp"
     done
-    mv "$tmp" "$out/README.md"
+    mv -f "$tmp" "$out/README.md"
   else
-    cp "$list" "$out/README.md"
+    cp -f "$list" "$out/README.md"
   fi
 }
 
 main(){
   mkdir -p "$src" "$out"
-
   local -a files=()
   if [[ -d $src ]]; then
     if command -v fd &>/dev/null; then
@@ -143,7 +126,6 @@ main(){
       mapfile -t files < <(find "$src" -type f -name "*.js" 2>/dev/null)
     fi
   fi
-
   if (( ${#files[@]} > 0 )); then
     if (( ${#files[@]} > 1 )) && command -v parallel &>/dev/null; then
       printf "%s\n" "${files[@]}" | parallel -j "$jobs" --bar process {} 2>/dev/null || {
@@ -153,12 +135,9 @@ main(){
       for f in "${files[@]}"; do process "$f" || :; done
     fi
   fi
-
   process_list
-
   local total
   total=$(find "$out" -name "*.user.js" -type f 2>/dev/null | wc -l)
   printf "\n%s✓%s %d scripts → %s/\n" "$grn" "$rst" "$total" "$out"
 }
-
 main "$@"
