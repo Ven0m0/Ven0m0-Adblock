@@ -6,32 +6,34 @@ on:
     branches:
       - main
     paths:
-      # Trigger on source list changes, not generated files.
       - '**.txt'
       - '!Filters/**'
       - 'hostlist-config.json'
-      - 'ragibkl-config.json' # For the Python compiler
+      - 'ragibkl-config.json'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  # Job 1: Lint, compile, and clean using AdGuard's Node.js-based toolchain.
+  # Job 1: Lint, compile, and clean using AdGuard's toolchain with Bun.
   build-adguard-lists:
     name: Build with AdGuard Toolchain
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v6
-        with: {node-version: 22, cache: npm, package-manager-cache: true}
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - name: Install AdGuard Tools
-        run: npm i -g @adguard/hostlist-compiler @adguard/aglint @adguard/dead-domains-linter
+        run: bun add -g @adguard/hostlist-compiler @adguard/aglint @adguard/dead-domains-linter
 
       - name: Lint Source Lists with AGLint
-        # This acts as a quality gate before compilation.
-        run: aglint --all --fail-on-error
+        run: bunx aglint --all --fail-on-error
 
       - name: Compile All Hostfiles
         id: compile
@@ -39,25 +41,22 @@ jobs:
           set -e
           mkdir -p Filters
           declare -a compiler_args
-          # Dynamically find all source .txt files for compilation.
           while IFS= read -r file; do
             compiler_args+=("-i" "$file")
           done < <(find . -type f -name "*.txt" ! -path "./Filters/*")
-          
+
           if [[ ${#compiler_args[@]} -eq 0 ]]; then
             echo "No source hostfiles found."
             echo "changes_detected=false" >> "$GITHUB_OUTPUT"
           else
             echo "Compiling..."
-            hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
+            bunx hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
             echo "changes_detected=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Clean Compiled List with DeadDomainsLinter
         if: steps.compile.outputs.changes_detected == 'true'
-        run: |
-          # The linter modifies the file in-place.
-          dead-domains-linter -i Filters/Venom-Combined.txt -o Filters/Venom-Combined.txt
+        run: bunx dead-domains-linter -i Filters/Venom-Combined.txt -o Filters/Venom-Combined.txt
 
       - name: Commit AdGuard List Changes
         if: steps.compile.outputs.changes_detected == 'true'

@@ -1,6 +1,5 @@
 name: AGLint
-env:
-  NODE_VERSION: 20
+
 on:
   workflow_dispatch:
   push:
@@ -8,49 +7,44 @@ on:
       - "lists/sources/**/*.txt"
       - ".aglintrc.*"
       - "package.json"
-      - "package-lock.json"
+      - "bun.lockb"
   pull_request:
     paths:
       - "lists/sources/**/*.txt"
       - ".aglintrc.*"
       - "package.json"
-      - "package-lock.json"
+      - "bun.lockb"
+
+permissions:
+  contents: write
 
 jobs:
   lint:
     name: Run AGLint
     runs-on: ubuntu-latest
     steps:
-      - name: Check out to repository
+      - name: Check out repository
         uses: actions/checkout@v5
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22'
-          check-latest: true
-          cache: 'npm'
-          package-manager-cache: true
+          bun-version: latest
+
       - name: Install dependencies
-        run: npm install -D @adguard/aglint
-        # Init if no config file present
-      - name: Init
-        shell: bash
-        run: |
-          [[ ! -f ".aglintrc.yml" || ! -f ".aglintrc.yaml" ]] && npx aglint init
-      # If the linter found any errors, it will exit with a non-zero code, which will cause the job to fail
+        run: bun add -D @adguard/aglint
+
+      - name: Init AGLint config
+        if: ${{ !hashFiles('.aglintrc.yml') && !hashFiles('.aglintrc.yaml') }}
+        run: bunx aglint init
+
       - name: Run AGLint
-        run: npx aglint
-  
-      - name: "Commit and push changes"
-        shell: bash
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          # Check if there are any changes in the releases directory
-          if ! git diff --quiet; then
-            git add -A
-            git commit -m "ci(linter): lint filter lists" -m "Built on $(date -u)"
-            git push
-          else
-            echo "No changes to commit. Compiled lists are up-to-date."
-          fi
+        run: bunx aglint
+
+      - name: Commit and push changes
+        if: github.event_name != 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "ci(linter): lint filter lists"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"

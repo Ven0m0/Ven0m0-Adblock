@@ -1,27 +1,31 @@
 name: Convert
+
 on:
   schedule:
     - cron: "0 7 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
+
 jobs:
-  Convert:
-    name: Convert
-    permissions: write-all
+  convert:
+    name: Convert Lists
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22'
-          check-latest: true
-          cache: 'npm'
-          package-manager-cache: true
+          bun-version: latest
+
       - name: Convert
         run: bash convert.sh
         env:
           repository: ${{ github.repository }}
+
       - name: Release
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
@@ -30,8 +34,11 @@ jobs:
           skip_dirty_check: true
           push_options: '--force'
           file_pattern: 'release/*'
-          commit_message: release
-      - name: Delete workflow runs
+          commit_message: "chore(release): update converted lists"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Delete old workflow runs
         uses: Mattraks/delete-workflow-runs@v2.1.0
         with:
           token: ${{ github.token }}

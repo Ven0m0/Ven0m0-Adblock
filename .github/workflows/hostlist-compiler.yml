@@ -3,9 +3,9 @@ name: Hostlist Compiler
 on:
   push:
     branches:
-      - main # Or your default branch
+      - main
     paths:
-      - '**.txt' # Only run when lists change
+      - '**.txt'
       - 'hostlist-config.json'
       - 'configuration_popup_filter.json'
   workflow_dispatch:
@@ -18,28 +18,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v5
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '22'
-          check-latest: true
-          cache: 'npm'
-          package-manager-cache: true
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm install -g @adguard/hostlist-compiler
+        run: bun add -g @adguard/hostlist-compiler
 
       - name: Compile AdGuard DNS filter
         run: |
           mkdir -p Filters
-          hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
+          bunx hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore(filters): Update hostlists"
-          branch: main # Or your default branch
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"

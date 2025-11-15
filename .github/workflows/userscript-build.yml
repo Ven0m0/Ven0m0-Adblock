@@ -20,27 +20,27 @@ on:
         required: false
         default: 'false'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
       with:
-        node-version: '20'
-        cache: 'npm'
+        bun-version: latest
 
     - name: Install dependencies
       run: |
-        npm i -g esbuild >/dev/null
+        bun add -g esbuild
         sudo apt-get -qq update
         sudo apt-get -qq install -y parallel curl >/dev/null
         curl -sLO https://github.com/sharkdp/fd/releases/download/v9.0.0/fd-musl_9.0.0_amd64.deb
