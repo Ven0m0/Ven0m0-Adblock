@@ -1,145 +1,79 @@
-# Keep in mind that in regexp rules, dots may or may not be escaped.
-# So if you want to exclude a rule like:
-# `/example.(com|org)\/ads/`
-# You should replace the dot `.` with `(\.|\\\.)`, resulting in:
-# `\/example(\.|\\\.)\(com\|org\)\\\/ads\/`
-# This regexp will match and block both:
-# `/example.(com|org)\/ads/`
-# `/example\.(com|org)\/ads/`
-# See an example: https://regex101.com/r/L7CsOZ/1
-#
-# https://github.com/AdguardTeam/AGLint#configuration
 root: true
-extends:
-  - aglint:recommended
-syntax:
-  - AdGuard
+extends: [aglint:recommended]
+syntax: [AdGuard]
 rules:
   no-excluded-rules:
     - error
     - regexp-patterns:
-        # Do not forget to escape special regex characters
-        #
-        # https://github.com/hagezi/dns-blocklists/issues/7276
-        - datadog.pool.ntp.org\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/212409
-        - \|\|pro-1w-dataaggregator.onelouder.com\^$
-        # Breaks websites that use Intercom chat widget
-        - ^\|\|api-iam\.intercom\.io\/messenger\/web\/ping$
-        # Breaks adding Yahoo account in email clients
-        - ^\|\|udc.yahoo.com\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/188783#issuecomment-2359649738
-        - ^\|\|bilibili.com\^\$removeparam=mid$
-        # Breaks appconsent.io cookie consents
-        - ^\|\|collector\.appconsent\.io\^$
-        # https://github.com/AdguardTeam/AdguardFilters/commit/3835ef566e40b6374717d39546663a19c2fa7716#r162211924
-        - ^##a?\[href[^*]="(https?:\/\/)?lin\.ee\/?"\]\s$
-        # It seems this sript also used by anti-bot protection.
-        # I can't pay on Taobao when this script is blocked, and applied the scriptlet
-        - ^\|\|g\.alicdn\.com\/alilog\/mlog\/aplus_v2\.js
-        # Breaks player on Independent sites. It loads config of players
-        - ^\|\|pub.pixels.ai\^$
-        # Blocks LiveChat chats completely
-        - ^\|\|(cdn\.)?livechatinc\.com/tracking\.js(?:$|\$domain=~[^\s]*$)
-        # https://github.com/AdguardTeam/AdguardFilters/issues/208130#issuecomment-3012265450
-        # Breaks search results
-        - ^\|\|links.duckduckgo.com\/d\.js\?q=$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/207941
-        - ^\|\|sstats\.adobe\.com\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/208079
-        # Related to GDPR consents, may break sites
-        - ^\|\|global\.ketchcdn\.com\^$
-        # Used by Samsung Internet browser to load config
-        - ^\|\|config-api.internet.apps.samsung.com\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/207250
-        # Blocks the order confirmation popup
-        - etsy.com##.wt-animated--slide-from-bottom$
-        # DataDome bot protection. Visitor may be blocked, if this rule will be applied
-        - \$cookie=datadome$
-        # https://github.com/AdguardTeam/AdguardFilters/commit/2112d107b92d9dd45c7adfd5819f3f554fa4d132
-        - \|\|(www\.)?youtube\.com\^\$removeparam=si$
-        - ^\$removeparam=si,domain=(www\.)?youtube\.com
-        # https://github.com/AdguardTeam/AdguardFilters/issues/206173#issuecomment-2913361836
-        - \|\|oogiri-ads-bucket\.s3\.ap-northeast-3\.amazonaws.com\^$
-        - oogiri-chaya.com##\.ads_insert$
-        # https://github.com/easylist/easylist/issues/20673#issuecomment-2887148428
-        - \|\|prodregistryv2\.org\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/203956
-        - \|\|event\.notifier\.rakuten\.co\.jp\^$
-        - \|\|ashiato\.travel\.rakuten\.co\.jp\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/198683
-        - \|\|insights.alibaba.com\^$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/203905
-        - \|\|roblox.com\^\$cookie=RBXEventTrackerV2
-        # dropbox.com
-        # Broken "Add account recovery" dialog when setting up 2FA
-        # https://www.dropbox.com/account/security?enroll_mfa=1&mfa_checkpoint_token=
-        - dropbox\.com##div\.dig-Banner\[role="alert"\]$
-        - dropbox\.com##\.dig-Banner$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/202560
-        - \|\|hotapi\*\.tiktokv\.\w{2,3}\^$
-        # plvideo.ru - history will be broken
-        - ^\|\|stat\.g2\.plvideo.ru\^
-        # https://github.com/AdguardTeam/AdguardFilters/issues/157889#issuecomment-1660195416
-        - ^\|\|amazon\.\*\$removeparam=psc$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/110571
-        - ^\|\|amazon\.\*\$removeparam=ref$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/88627
-        - ^\|\|amazon\.\*\$removeparam=ref_$
-        - ^\|\|amazon\.\*\$removeparam=ie$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/89163
-        - ^\|\|amazon\.\*\/message-us\$removeparam=origRef$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/148958
-        # Breaks navigation and removes chosen seller id on the item's page
-        - ^\|\|amazon\.\*\$removeparam=smid$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/201809
-        # May break sites
-        - \|\|sdk-v2\.conscent\.in\^(\$third-party)?$
-        # https://github.com/AdguardTeam/AdGuardSDNSFilter/issues/1846
-        - \|\|c-api-bit.shopeemobile.com\^
-        # https://github.com/AdguardTeam/AdguardFilters/issues/201028
-        - \|\|tapi.pureapk.com\^
-        # https://github.com/AdguardTeam/AdguardFilters/issues/200159#issuecomment-2710664591
-        - \|\|market\.yandex\.[a-z]*\$removeparam=do-waremd5
-        # https://github.com/easylist/easylist/issues/21268
-        - \|\|applicationinsights\.io\^
-        # https://github.com/AdguardTeam/AdguardFilters/issues/184034
-        - \|\|events.data.microsoft.com\^
-        # https://github.com/AdguardTeam/AdguardFilters/issues/127008
-        - \|\|bilibili.com\^\$removeparam=from$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/198810
-        # Don't add any too simple filter for this domain without $path
-        - ^ameblo\.jp##div:has\(
-        - ameblo\.jp##div(\[class.=.+\])?:empty
-        # Causes problems on PlayStation consoles
-        - \|\|telemetry\.api\.playstation\.com
-        # https://github.com/AdguardTeam/AdguardFilters/issues/197916
-        - \|\|mobile\.pipe\.aria\.microsoft.com
-        # https://github.com/AdguardTeam/AdguardFilters/issues/146493
-        - \|\|log\.suumo\.jp
-        # Popular baits. Sync with EasyList
-        - ^##\.ad-area$
-        - ^##\.sidebar-ad$
-        - ^##\.Ad-Container$
-        # Cause many false positives
-        - ^##\.cookie-modal$
-        - ^###cookie-modal$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/165972#issuecomment-1815708057
-        - ^ameblo\.jp##\.pickCreative_root$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/191068#issuecomment-2480464336
-        - ^(\/sd)?_ads_updater-$
-        - ^\|\|b\.karte\.io
-        - ^\|\|static\.karte\.io
-        # https://github.com/AdguardTeam/AdguardFilters/commit/a64fb16a9c0ba926f980ca5091ca6d39eeb6ef40
-        - ^tuma(douga)?\.jp##\.index_banner_space$
-        - static-assets\.bamgrid\.com\/analytics
-        - staff-start\.com\/js\/track\/
-        - minkou.jp\/js\/tracking\.js
-        - amazon.com\/1\/batch\/1\/OP\/
-        - amazon.com\/1\/batch\/1\/OE\/
-        # https://github.com/AdguardTeam/AdguardFilters/pull/189856#issuecomment-2422639077
-        - youtube\.com\^\$removeparam=si$
-        # https://github.com/AdguardTeam/AdguardFilters/issues/195335
-        - syndication\.twitter\.com\^
-        # https://github.com/AdguardTeam/AdguardFilters/issues/197918
-        - fiverr\.com\^\$removeparam=ref$
+      # https://github.com/hagezi/dns-blocklists/issues/7276
+      - datadog.pool.ntp.org\^$
+      # https://github.com/AdguardTeam/AdguardFilters/issues/212409
+      - \|\|pro-1w-dataaggregator.onelouder.com\^$
+      - ^\|\|api-iam\.intercom\.io\/messenger\/web\/ping$
+      - ^\|\|udc.yahoo.com\^$
+      - ^\|\|bilibili.com\^\$removeparam=mid$
+      - ^\|\|collector\.appconsent\.io\^$
+      - ^##a?\[href[^*]="(https?:\/\/)?lin\.ee\/?"\]\s$
+      - ^\|\|g\.alicdn\.com\/alilog\/mlog\/aplus_v2\.js
+      - ^\|\|pub.pixels.ai\^$
+      - ^\|\|(cdn\.)?livechatinc\.com/tracking\.js(?:$|\$domain=~[^\s]*$)
+      - ^\|\|links.duckduckgo.com\/d\.js\?q=$
+      - ^\|\|sstats\.adobe\.com\^$
+      - ^\|\|global\.ketchcdn\.com\^$
+      - ^\|\|config-api.internet.apps.samsung.com\^$
+      - etsy.com##.wt-animated--slide-from-bottom$
+      - \$cookie=datadome$
+      - \|\|(www\.)?youtube\.com\^\$removeparam=si$
+      - ^\$removeparam=si,domain=(www\.)?youtube\.com
+      - \|\|oogiri-ads-bucket\.s3\.ap-northeast-3\.amazonaws.com\^$
+      - oogiri-chaya.com##\.ads_insert$
+      - \|\|prodregistryv2\.org\^$
+      - \|\|event\.notifier\.rakuten\.co\.jp\^$
+      - \|\|ashiato\.travel\.rakuten\.co\.jp\^$
+      - \|\|insights.alibaba.com\^$
+      - \|\|roblox.com\^\$cookie=RBXEventTrackerV2
+      - dropbox\.com##div\.dig-Banner\[role="alert"\]$
+      - dropbox\.com##\.dig-Banner$
+      - \|\|hotapi\*\.tiktokv\.\w{2,3}\^$
+      - ^\|\|stat\.g2\.plvideo.ru\^
+      - ^\|\|amazon\.\*\$removeparam=(psc|ref|ref_|ie)$
+      - ^\|\|amazon\.\*\/message-us\$removeparam=origRef$
+      - ^\|\|amazon\.\*\$removeparam=smid$
+      - \|\|sdk-v2\.conscent\.in\^(\$third-party)?$
+      - \|\|c-api-bit.shopeemobile.com\^
+      - \|\|tapi.pureapk.com\^
+      - \|\|market\.yandex\.[a-z]*\$removeparam=do-waremd5
+      - \|\|applicationinsights\.io\^
+      - \|\|events.data.microsoft.com\^
+      - \|\|bilibili.com\^\$removeparam=from$
+      - ^ameblo\.jp##div:has\(
+      - ameblo\.jp##div(\[class.=.+\])?:empty
+      - \|\|telemetry\.api\.playstation\.com
+      - \|\|mobile\.pipe\.aria\.microsoft.com
+      - \|\|log\.suumo\.jp
+      - ^##\.(ad-area|sidebar-ad|Ad-Container|cookie-modal)$
+      - ^###cookie-modal$
+      - ^ameblo\.jp##\.pickCreative_root$
+      - ^(\/sd)?_ads_updater-$
+      - ^\|\|b\.karte\.io
+      - ^\|\|static\.karte\.io
+      - ^tuma(douga)?\.jp##\.index_banner_space$
+      - static-assets\.bamgrid\.com\/analytics
+      - staff-start\.com\/js\/track\/
+      - minkou.jp\/js\/tracking\.js
+      - amazon.com\/1\/batch\/1\/O[EP]\/
+      - youtube\.com\^\$removeparam=si$
+      - syndication\.twitter\.com\^
+      - fiverr\.com\^\$removeparam=ref$
+```
+
+## .eslintignore
+```
+node_modules/
+dist/
+*.min.js
+*.jpeg
+*.jpg
+*.png
+*.webp
+package-lock.json
