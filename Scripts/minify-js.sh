@@ -34,12 +34,11 @@ readonly red=$'\e[31m' grn=$'\e[32m' ylw=$'\e[33m' rst=$'\e[0m'
 
 # Detect runtime
 if command -v bun &>/dev/null; then
-  readonly runner=(bun x)
+  readonly runner=(bunx --bun)
 elif command -v npx &>/dev/null; then
   readonly runner=(npx -y)
 else
-  printf "%s✗%s No JS runtime (install bun or node)\n" "$red" "$rst" >&2
-  exit 1
+  printf "%s✗%s No JS runtime (install bun or node)\n" "$red" "$rst" >&2; exit 1
 fi
 
 process(){
