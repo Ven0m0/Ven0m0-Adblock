@@ -9,7 +9,7 @@ on:
     branches:
       - main # Or your default branch name
     paths:
-      - 'userscripts/Minify/Backup/**.user.js'
+      - 'userscripts/src/**/*.user.js'
 
 jobs:
   build:
@@ -47,12 +47,12 @@ jobs:
       - name: Optimize Scripts
         run: |
           # Ensure the output directory exists
-          mkdir -p userscripts/Minify/Min
+          mkdir -p userscripts/dist
           # Loop through each script in the source directory
-          for file in userscripts/Minify/Backup/*.user.js; do
+          for file in userscripts/src/**/*.user.js; do
             if [ -f "$file" ]; then
               filename=$(basename "$file")
-              output_file="userscripts/Minify/Min/$filename"
+              output_file="userscripts/dist/$filename"
               echo "Compiling: ${file} -> ${output_file}"
               java -jar ~/closure-compiler.jar \
                 --js "$file" \
@@ -69,8 +69,8 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           # Check if there are any changes to commit
-          if ! git diff --quiet userscripts/Minify/Min/; then
-            git add userscripts/Minify/Min/*.user.js
+          if ! git diff --quiet userscripts/dist/; then
+            git add userscripts/dist/*.user.js
             git commit -m "ci: optimize userscripts"
             git push
           else

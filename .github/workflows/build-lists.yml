@@ -30,8 +30,8 @@ jobs:
 
       - name: "Build all lists"
         run: |
-          chmod +x Scripts/build-lists.sh
-          ./Scripts/build-lists.sh
+          chmod +x build-lists.sh
+          ./build-lists.sh
         shell: bash
 
       - name: "Commit and push changes"

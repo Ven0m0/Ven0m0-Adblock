@@ -118,6 +118,12 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # ---------------------
+# Build outputs
+# ---------------------
+lists/releases/
+userscripts/dist/
+
+# ---------------------
 # Other
 # ---------------------
 .idea

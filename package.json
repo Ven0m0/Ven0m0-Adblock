@@ -1,0 +1,49 @@
+{
+  "name": "ven0m0-adblock",
+  "version": "1.0.0",
+  "description": "Comprehensive ad-blocking and web experience enhancement project with filter lists and userscripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "./build-lists.sh",
+    "build:all": "./Scripts/build-all.sh adblock hosts userscripts",
+    "build:adblock": "./Scripts/build-all.sh adblock",
+    "build:hosts": "./Scripts/build-all.sh hosts",
+    "build:userscripts": "./Scripts/build-all.sh userscripts",
+    "lint": "npm run lint:aglint && npm run lint:eslint",
+    "lint:aglint": "./Scripts/aglint.sh",
+    "aglint": "./Scripts/aglint.sh",
+    "lint:eslint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@adguard/aglint": "^2.1.2",
+    "@adguard/hostlist-compiler": "^1.0.26",
+    "@adguard/dead-domains-linter": "^1.1.0",
+    "@eslint/js": "^9.15.0",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3",
+    "husky": "^9.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ven0m0/Ven0m0-Adblock.git"
+  },
+  "keywords": [
+    "adblock",
+    "filter-lists",
+    "userscripts",
+    "ad-blocking",
+    "privacy",
+    "hosts-file"
+  ],
+  "author": "Ven0m0",
+  "license": "GPL-3.0"
+}
