@@ -19,8 +19,10 @@ const isCGPT=h==='chat.openai.com'||h==='chatgpt.com';
 const isGemini=h==='gemini.google.com';
 const isClaude=h==='claude.ai';
 // Fetch interceptor for initial load limit (ChatGPT only)
+// OPTIMIZED: Added safety limits to prevent infinite loops and improved performance
 if(isCGPT){
   const INIT_MSG=10;
+  const MAX_ITERATIONS=1000; // Safety limit to prevent infinite loops
   const rx=/^https:\/\/chatgpt\.com\/backend-api\/conversation\/[a-f0-9\-]{36}$/i;
   const ogFetch=window.fetch;
   window.fetch=function(input,init){
@@ -30,18 +32,25 @@ if(isCGPT){
       try{
         const d=await r.clone().json();
         const nm=[];
-        let nid=d.current_node,nv=0;
-        while(true){
+        const seen=new Set(); // Track visited nodes to prevent infinite loops
+        let nid=d.current_node,nv=0,iterations=0;
+
+        while(iterations++<MAX_ITERATIONS){
+          if(!nid||seen.has(nid))break;
           const m=d.mapping[nid];
+          if(!m)break;
+          seen.add(nid);
+
           if(m.id==="client-created-root"){nm.push(m);break;}
           const cids=[...m.children];
-          while(cids.length){
+          while(cids.length&&iterations<MAX_ITERATIONS){
+            iterations++;
             const cid=cids.pop();
             const c=d.mapping[cid];
-            if(!nm.some(p=>p.id===cid)){
-              nm.push(c);
-              cids.push(...c.children);
-            }
+            if(!c||seen.has(cid))continue;
+            seen.add(cid);
+            nm.push(c);
+            cids.push(...c.children);
           }
           if(nv<INIT_MSG&&d.mapping[m.parent]){
             nm.push(m);
@@ -69,10 +78,19 @@ const runReady=(sel,cb)=>{
   };
   t();
 };
-const applyW=(gf)=>gf().forEach(e=>e.style.setProperty('max-width','98%','important'));
+// OPTIMIZED: Use direct style assignment instead of setProperty for better performance
+const applyW=(gf)=>gf().forEach(e=>{
+  e.style.maxWidth='98%';
+  e.style.cssText+=';max-width:98%!important';
+});
+// OPTIMIZED: Debounce width application to reduce excessive calls
 const observeW=(gf)=>{
+  let timer=null;
   new MutationObserver(ms=>{
-    if(ms.some(m=>m.type==='childList'))applyW(gf);
+    if(ms.some(m=>m.type==='childList')){
+      clearTimeout(timer);
+      timer=setTimeout(()=>applyW(gf),150);
+    }
   }).observe(document.documentElement,{childList:true,subtree:true});
 };
 if(isCGPT){
@@ -91,9 +109,11 @@ if(isCGPT){
   runReady('div[data-is-streaming]',()=>{applyW(gf);observeW(gf);});
 }
 // DOM cleanup & auto-continue (ChatGPT only)
+// OPTIMIZED: Only cleanup when page is visible to save CPU
 if(isCGPT){
   const MAX_MSG=20;
   const cleanup=()=>{
+    if(document.visibilityState!=='visible')return;
     const ms=document.querySelectorAll('[data-testid^="conversation-turn"]');
     if(ms.length>MAX_MSG)Array.from(ms).slice(0,ms.length-MAX_MSG).forEach(e=>e.remove());
   };

@@ -395,12 +395,23 @@ if(CFG.cpu.rafDecimation){
 // ============================================================================
 // 7. FLAG OVERRIDES
 // ============================================================================
+// OPTIMIZED: Use debounced updates and check less frequently
 const updateFlags=()=>{
   const flags=window.yt?.config_?.EXPERIMENT_FLAGS;
   if(flags)Object.assign(flags,CFG.flags);
 };
-const flagObs=new MutationObserver(updateFlags);
-flagObs.observe(document,{subtree:!0,childList:!0});
+let flagUpdateTimer=null;
+const debouncedFlagUpdate=()=>{
+  clearTimeout(flagUpdateTimer);
+  flagUpdateTimer=setTimeout(updateFlags,500);
+};
+const flagObs=new MutationObserver(debouncedFlagUpdate);
+// Only observe <head> instead of entire document for better performance
+if(document.head)flagObs.observe(document.head,{childList:!0});
+// Also update on navigation events
+window.addEventListener('yt-navigate-finish',updateFlags);
+// Initial update
+updateFlags();
 
 // ============================================================================
 // 8. INSTANT NAVIGATION
@@ -421,23 +432,32 @@ if(CFG.ui.instantNav){
 // ============================================================================
 // 9. LAZY THUMBNAILS
 // ============================================================================
+// OPTIMIZED: Share single IntersectionObserver for all thumbnails, debounce mutations
 if(CFG.gpu.lazyThumbs){
-  const lazyLoad=()=>{
-    document.querySelectorAll("ytd-rich-item-renderer,ytd-compact-video-renderer").forEach(el=>{
-      if(!el.dataset.lazyOpt){
-        el.dataset.lazyOpt="1";
-        el.style.display="none";
-        const obs=new IntersectionObserver(([entry],o)=>{
-          if(entry.isIntersecting){
-            el.style.display="";
-            o.disconnect();
-          }
-        },{rootMargin:"800px"});
-        obs.observe(el);
+  const thumbObserver=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.style.display="";
+        thumbObserver.unobserve(entry.target);
       }
     });
+  },{rootMargin:"800px"});
+
+  let lazyTimer=null;
+  const lazyLoad=()=>{
+    document.querySelectorAll("ytd-rich-item-renderer:not([data-lazy-opt]),ytd-compact-video-renderer:not([data-lazy-opt])").forEach(el=>{
+      el.dataset.lazyOpt="1";
+      el.style.display="none";
+      thumbObserver.observe(el);
+    });
   };
-  const lazyObs=new MutationObserver(lazyLoad);
+
+  const debouncedLazyLoad=()=>{
+    clearTimeout(lazyTimer);
+    lazyTimer=setTimeout(lazyLoad,300);
+  };
+
+  const lazyObs=new MutationObserver(debouncedLazyLoad);
   if(document.body)lazyObs.observe(document.body,{childList:!0,subtree:!0});
   document.addEventListener("DOMContentLoaded",()=>{
     lazyLoad();

@@ -198,18 +198,31 @@ function cleanURL(){
     L('URL cleaned');
   }
 }
+// OPTIMIZED: Process links in batches to avoid blocking
 function cleanLinks(){
   if(!cfg.cleanURL)return;
-  document.querySelectorAll('a[href]:not([data-wp-cl])').forEach(a=>{
-    try{
-      const url=new URL(a.href);
-      if(url.href.includes('/ref='))a.href=a.href.replace('/ref=','?ref=');
-      let mod=0;
-      trackParams.forEach(p=>{if(url.searchParams.has(p)){url.searchParams.delete(p);mod=1;}});
-      if(mod)a.href=url.origin+url.pathname+url.search;
-      mark(a,'data-wp-cl');
-    }catch(e){}
-  });
+  const links=document.querySelectorAll('a[href]:not([data-wp-cl])');
+  if(links.length===0)return;
+  // Process in batches of 50 to avoid blocking
+  const batchSize=50;
+  let idx=0;
+  const processBatch=()=>{
+    const end=Math.min(idx+batchSize,links.length);
+    for(let i=idx;i<end;i++){
+      const a=links[i];
+      try{
+        const url=new URL(a.href);
+        if(url.href.includes('/ref='))a.href=a.href.replace('/ref=','?ref=');
+        let mod=0;
+        trackParams.forEach(p=>{if(url.searchParams.has(p)){url.searchParams.delete(p);mod=1;}});
+        if(mod)a.href=url.origin+url.pathname+url.search;
+        mark(a,'data-wp-cl');
+      }catch(e){}
+    }
+    idx=end;
+    if(idx<links.length)idle(processBatch);
+  };
+  processBatch();
 }
 // ============================================================================
 // BYPASS RESTRICTIONS
@@ -247,11 +260,16 @@ function acceptCookies(){
 // ============================================================================
 // GPU ACCELERATION
 // ============================================================================
+// OPTIMIZED: Only apply GPU acceleration to specific high-performance elements
+// instead of ALL elements (which causes memory overhead and is counterproductive)
 function forceGPU(){
   if(!cfg.gpu)return;
-  document.querySelectorAll('*:not([data-wp-gpu])').forEach(el=>{
+  // Target specific high-performance elements that benefit from GPU acceleration
+  const selectors='video,canvas,img[loading="eager"],div[role="img"]:not([data-wp-gpu]),.ytd-thumbnail:not([data-wp-gpu])';
+  document.querySelectorAll(selectors).forEach(el=>{
+    if(marked(el,'data-wp-gpu'))return;
     el.style.transform='translateZ(0)';
-    el.style.willChange='transform,opacity';
+    el.style.willChange='transform';
     el.style.backfaceVisibility='hidden';
     mark(el,'data-wp-gpu');
   });
@@ -463,20 +481,27 @@ function queuePrefetch(url){
   clearTimeout(prefetchT);
   prefetchT=setTimeout(processPrefetchQ,cfg.linkDelay);
 }
+// OPTIMIZED: Cache observer and only observe unmarked links
+let linkObserver=null;
 function setupLinkPrefetch(){
   if(!cfg.linkPrefetch||!cfg.prefetch)return;
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        const a=e.target;
-        if(shouldPrefetch(a)){
-          queuePrefetch(a.href);
-          obs.unobserve(a);
+  if(!linkObserver){
+    linkObserver=new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          const a=e.target;
+          if(shouldPrefetch(a)){
+            queuePrefetch(a.href);
+            linkObserver.unobserve(a);
+          }
         }
-      }
-    });
-  },{rootMargin:'50px'});
-  document.querySelectorAll('a[href]').forEach(a=>obs.observe(a));
+      });
+    },{rootMargin:'50px'});
+  }
+  document.querySelectorAll('a[href]:not([data-wp-prefetch])').forEach(a=>{
+    linkObserver.observe(a);
+    mark(a,'data-wp-prefetch');
+  });
 }
 // ============================================================================
 // APPLY ALL OPTIMIZATIONS
@@ -503,10 +528,16 @@ function applyAll(){
 // ============================================================================
 // DOM OBSERVER
 // ============================================================================
+// OPTIMIZED: Debounce the observer callback to prevent excessive executions
 let observer=null;
+let obsTimer=null;
 function startObs(){
   if(!cfg.observe||observer)return;
-  observer=new MutationObserver(m=>applyAll());
+  const debouncedApply=()=>{
+    clearTimeout(obsTimer);
+    obsTimer=setTimeout(()=>applyAll(),200);
+  };
+  observer=new MutationObserver(debouncedApply);
   observer.observe(document.documentElement||document,{childList:!0,subtree:!0});
   L('observer started');
 }
@@ -602,11 +633,15 @@ function buildUI(){
 // ============================================================================
 // INIT
 // ============================================================================
+// OPTIMIZED: Only run periodic checks when page is visible to save CPU
 (function init(){
   cleanURL();
   buildUI();
   applyAll();
   if(cfg.observe)startObs();
-  setInterval(()=>applyAll(),3e4);
+  // Only run periodic checks when page is visible
+  setInterval(()=>{
+    if(document.visibilityState==='visible')applyAll();
+  },3e4);
   L('Web Pro initialized',cfg);
 })();
