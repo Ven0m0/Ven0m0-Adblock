@@ -4,6 +4,7 @@
 // @namespace   Ven0m0
 // @author      Ven0m0
 // @version     4.0
+// @license      GPLv3
 // @match       *://*/*
 // @grant       GM_setValue
 // @grant       GM_getValue
