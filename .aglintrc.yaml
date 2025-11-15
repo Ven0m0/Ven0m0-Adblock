@@ -1,6 +1,9 @@
+# AGLint config file
+# Documentation: https://github.com/AdguardTeam/AGLint#configuration
 root: true
+allowInlineConfig: true
 extends: [aglint:recommended]
-syntax: [AdGuard]
+syntax: [Common]
 rules:
   no-excluded-rules:
     - error
@@ -66,7 +69,6 @@ rules:
       - syndication\.twitter\.com\^
       - fiverr\.com\^\$removeparam=ref$
 ```
-
 ## .eslintignore
 ```
 node_modules/
