@@ -8,7 +8,7 @@
 // @match        https://gemini.google.com/*
 // @match        https://chat.openai.com/*
 // @match        https://chatgpt.com/*
-// @match        https://claude.ai/chat/*
+// @match        https://claude.ai/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        none
 // @run-at       document-start
