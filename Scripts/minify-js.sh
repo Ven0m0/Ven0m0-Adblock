@@ -28,7 +28,7 @@ readonly src="${1:-userscripts}"
 readonly out="${2:-dist}"
 readonly list="${3:-List}"
 # Separate declaration from assignment to avoid masking return values
-jobs=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+jobs=$(nproc 2>/dev/null || echo 4)
 readonly jobs
 readonly red=$'\e[31m' grn=$'\e[32m' ylw=$'\e[33m' rst=$'\e[0m'
 
