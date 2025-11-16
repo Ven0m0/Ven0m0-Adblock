@@ -1,0 +1,54 @@
+# EditorConfig helps maintain consistent coding styles across different editors and IDEs
+# See: https://editorconfig.org
+
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# JavaScript/TypeScript
+[*.{js,mjs,cjs,ts,jsx,tsx}]
+indent_size = 2
+quote_type = double
+
+# JSON
+[*.json]
+indent_size = 2
+insert_final_newline = false
+
+# YAML
+[*.{yml,yaml}]
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 80
+
+# Shell scripts
+[*.{sh,bash}]
+indent_size = 2
+
+# Python
+[*.py]
+indent_size = 4
+
+# Make
+[Makefile]
+indent_style = tab
+
+# Filter lists and text files
+[*.txt]
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# Package files (don't modify)
+[{package.json,package-lock.json,bun.lockb,yarn.lock,pnpm-lock.yaml}]
+indent_size = 2
+insert_final_newline = true

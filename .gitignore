@@ -1,135 +1,228 @@
-# ---------------------
-# Git
-# ---------------------
-.git/
-
-# ---------------------
-# Dotter
-# ---------------------
-.dotter/local.toml
-.dotter/cache.toml
-.dotter/cache
-
-# ---------------------
-# Dotfiles / shell history
-# ---------------------
-.*history
-*history
-*lesshst
-*-hst
-fishd.*
-.*hist
-.thumbnails/
-
-# ---------------------
-# XDG user dirs
-# ---------------------
-Desktop/
-Documents/
-Downloads/
-Music/
-Pictures/
-Public/
-Templates/
-Videos/
-
-# ---------------------
-# Security
-# ---------------------
-.gnupg/
-.gitconfig.local
-.ssh/
-!.ssh/config
-.android/
-.config/gh/hosts.yml
-
-# ---------------------
-# Backups
-# ---------------------
-*.bak
-*.gho
-*.ori
-*.orig
-*.rej
-*.TAG
-
-# ---------------------
-# Rust / Cargo
-# ---------------------
-.cargo/
-!.cargo/config.toml
-*.rs.bk
-*.mutants.out*/
-
-# ---------------------
-# Logs / tmp
-# ---------------------
-*.log
-*.log.*
-log/
-logs/
-*.old
-*.tmp
-tmp/
-*.kate-swp
-*swp.*
-token
-nohup.out
-.~lock.*
-*.lock
-*.lck
-.cache
-.nv/ComputeCache/
-
-# ---------------------
-# Linux system / editor files
-# ---------------------
-.directory
-.Trash-*
-.Trashes
-.fuse_hidden*
-*~
-.nfs*
-
-# ---------------------
-# Binary / compiled files
-# ---------------------
-*.com
-*.dll
-*.exe
-*.o
-*.so
-__pycache__/
-.pytest_cache/
-*.py[cod]
-*$py.class
+# ====================
+# Dependencies
+# ====================
 node_modules/
-target/
-build/
-go/
-.eslintcache
+jspm_packages/
+bower_components/
 
-# ---------------------
-# Windows system files
-# ---------------------
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# ---------------------
+# ====================
 # Build outputs
-# ---------------------
+# ====================
+dist/
+build/
+out/
 lists/releases/
 userscripts/dist/
+Filters/
 
-# ---------------------
-# Other
-# ---------------------
-.idea
+# Don't ignore these specific files
+!lists/releases/.gitkeep
+!userscripts/dist/.gitkeep
+!Filters/.gitkeep
+
+# ====================
+# Package manager files
+# ====================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-debug.log
+.yarn/
+.npm/
+
+# Keep bun.lockb for reproducible builds
+# bun.lockb should NOT be ignored
+
+# ====================
+# Cache and temp files
+# ====================
+.cache/
+.temp/
+.tmp/
+tmp/
+*.tmp
+*.temp
+.eslintcache
+*.tsbuildinfo
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist/
+
+# ====================
+# Logs
+# ====================
+*.log
+*.log.*
+logs/
+log/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ====================
+# OS generated files
+# ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+*~
+
+# ====================
+# Editor / IDE
+# ====================
+# VSCode
 .vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 !.vscode/extensions.json
-*.tgz
-dist
-.npmrc
+!.vscode/*.code-snippets
+*.code-workspace
+
+# JetBrains
+.idea/
 *.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw[a-p]
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# ====================
+# Environment and secrets
+# ====================
+.env
+.env.*
+!.env.example
+!.env.template
+.envrc
+.secrets
+*.secret
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+.npmrc
+
+# ====================
+# Test coverage
+# ====================
+coverage/
+*.lcov
+.nyc_output/
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# ====================
+# Backups
+# ====================
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.swp
+
+# ====================
+# Archives (usually shouldn't be in repo)
+# ====================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# ====================
+# Media files (if not needed)
+# ====================
+# Uncomment if you don't want media files tracked
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# *.svg
+# *.ico
+# *.mp3
+# *.mp4
+# *.webm
+
+# ====================
+# Compiled binaries
+# ====================
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.obj
+*.class
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ====================
+# Project specific
+# ====================
+# Add your project-specific ignores here
