@@ -1,1 +1,142 @@
+# ====================
+# Git Attributes Configuration
+# ====================
+# See: https://git-scm.com/docs/gitattributes
+
+# ====================
+# Auto-detect text files and normalize line endings
+# ====================
+* text=auto eol=lf
+
+# ====================
+# Language detection for GitHub Linguist
+# ====================
+# Filter lists should be detected as AdBlock
 *.txt linguist-language=AdBlock linguist-detectable
+lists/sources/*.txt linguist-language=AdBlock
+Filters/*.txt linguist-language=AdBlock
+
+# Mark build outputs as generated (excluded from diffs/stats)
+dist/** linguist-generated=true
+lists/releases/** linguist-generated=true
+userscripts/dist/** linguist-generated=true
+*.min.js linguist-generated=true
+*.min.css linguist-generated=true
+
+# Documentation
+*.md linguist-documentation
+LICENSE linguist-documentation
+
+# ====================
+# Explicit file types
+# ====================
+# Source code (ensure LF line endings)
+*.js text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Web files
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.xml text eol=lf
+*.svg text eol=lf
+
+# Config files
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.editorconfig text eol=lf
+.npmrc text eol=lf
+
+# Documentation
+*.md text eol=lf diff=markdown
+*.mdx text eol=lf
+*.txt text eol=lf
+LICENSE text eol=lf
+README text eol=lf
+
+# ====================
+# Binary files
+# ====================
+# Images
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# Audio/Video
+*.mp3 binary
+*.mp4 binary
+*.webm binary
+*.ogg binary
+*.wav binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
+
+# Other binaries
+*.pdf binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# ====================
+# Diff settings
+# ====================
+# Use better diff for specific files
+*.json diff=json
+package.json diff=json
+package-lock.json -diff
+bun.lockb -diff
+yarn.lock -diff
+
+# ====================
+# Merge settings
+# ====================
+# Don't merge lock files
+package-lock.json merge=binary
+bun.lockb merge=binary
+yarn.lock merge=binary
+
+# ====================
+# Export settings (for git archive)
+# ====================
+# Exclude development files from exports
+.github export-ignore
+.vscode export-ignore
+.idea export-ignore
+node_modules export-ignore
+.eslintrc* export-ignore
+.prettierrc* export-ignore
+.editorconfig export-ignore
+*.test.js export-ignore
+*.spec.js export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore

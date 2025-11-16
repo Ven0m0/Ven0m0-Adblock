@@ -1,12 +1,37 @@
 {
   "name": "Ven0m0's Combined Hostlist",
-  "homepage": "https://github.com/Ven0m0/Ven0m0-adblock",
+  "description": "Curated ad-blocking and privacy-focused filter list",
+  "homepage": "https://github.com/Ven0m0/Ven0m0-Adblock",
+  "license": "GPL-3.0",
+  "version": "1.0.0",
   "sources": [
-    {"source": "lists/sources/3rd-party.txt", "type": "adblock"},
-    {"source": "lists/sources/Other.txt", "type": "adblock"},
-    {"source": "lists/sources/Search-Engines.txt", "type": "adblock"},
-    {"source": "lists/sources/TwitterAnnoyances.txt", "type": "adblock"}
+    {
+      "source": "lists/sources/3rd-party.txt",
+      "type": "adblock",
+      "description": "Third-party tracking and ads"
+    },
+    {
+      "source": "lists/sources/Other.txt",
+      "type": "adblock",
+      "description": "Miscellaneous blocking rules"
+    },
+    {
+      "source": "lists/sources/Search-Engines.txt",
+      "type": "adblock",
+      "description": "Search engine tracking and ads"
+    },
+    {
+      "source": "lists/sources/TwitterAnnoyances.txt",
+      "type": "adblock",
+      "description": "Twitter/X annoyances and tracking"
+    }
   ],
   "output": "lists/releases/hosts.txt",
-  "transformations": ["RemoveComments", "Validate", "Sort", "Unique", "Compress"]
+  "transformations": [
+    "RemoveComments",
+    "Validate",
+    "Deduplicate",
+    "Sort",
+    "Compress"
+  ]
 }

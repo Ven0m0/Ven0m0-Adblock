@@ -1,6 +1,49 @@
+# Dependencies
 node_modules/
+bun.lockb
 package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+lists/releases/
+userscripts/dist/
+Filters/
+
+# Minified files
 *.min.js
+*.min.css
+
+# Cache and logs
+.cache/
+*.log
+.eslintcache
+
+# Filter lists (don't format)
+*.txt
+!README.txt
+
+# Media files
 *.jpeg
 *.jpg
 *.png
+*.gif
+*.svg
+*.webp
+*.mp4
+*.mp3
+
+# Archives
+*.zip
+*.tar
+*.gz
+
+# Git
+.git/
+.gitignore
+
+# Generated files
+coverage/
+.nyc_output/

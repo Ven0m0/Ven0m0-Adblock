@@ -10,39 +10,52 @@
     "build:adblock": "./Scripts/build-all.sh adblock",
     "build:hosts": "./Scripts/build-all.sh hosts",
     "build:userscripts": "./Scripts/build-all.sh userscripts",
-    "lint": "npm run lint:aglint && npm run lint:eslint",
-    "lint:aglint": "./Scripts/aglint.sh",
-    "aglint": "./Scripts/aglint.sh",
+    "lint": "bun run lint:aglint && bun run lint:eslint",
+    "lint:aglint": "bunx aglint",
     "lint:eslint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "bun run lint && bun run format:check",
+    "clean": "rm -rf node_modules dist lists/releases userscripts/dist",
+    "clean:cache": "rm -rf node_modules/.cache .eslintcache",
+    "prepare": "command -v husky >/dev/null && husky || true"
   },
-  "dependencies": {},
   "devDependencies": {
     "@adguard/aglint": "^2.1.2",
-    "@adguard/hostlist-compiler": "^1.0.26",
     "@adguard/dead-domains-linter": "^1.1.0",
+    "@adguard/hostlist-compiler": "^1.0.26",
     "@eslint/js": "^9.15.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.15.0",
     "globals": "^15.12.0",
-    "prettier": "^3.3.3",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "prettier": "^3.3.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
   },
+  "packageManager": "bun@1.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Ven0m0/Ven0m0-Adblock.git"
   },
+  "bugs": {
+    "url": "https://github.com/Ven0m0/Ven0m0-Adblock/issues"
+  },
+  "homepage": "https://github.com/Ven0m0/Ven0m0-Adblock#readme",
   "keywords": [
     "adblock",
-    "filter-lists",
-    "userscripts",
+    "adblocker",
     "ad-blocking",
+    "filter-lists",
+    "hostlist",
+    "hosts-file",
     "privacy",
-    "hosts-file"
+    "security",
+    "userscripts",
+    "web-enhancement"
   ],
   "author": "Ven0m0",
   "license": "GPL-3.0"
