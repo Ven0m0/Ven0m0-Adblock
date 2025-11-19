@@ -5,12 +5,7 @@
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
 
 ! Disable telemetry/analytics/error reporting domains
-||telemetry.*^$all
-||analytics.*^$all
-||crash-reports.*^$all
-||error-reporting.*^$all
 ||bugsnag.*^$all
-||sentry.io^$all
 ||*.sentry.io^$all
 ||*/telemetry/*$all
 ||*/analytics/*$all
@@ -27,8 +22,6 @@ $removeparam=utm_campaign
 $removeparam=utm_content
 $removeparam=utm_term
 
-||disqus.com^$3p
-||disquscdn.com^$3p
 ||api.github.com/_private/browser/errors^
 
 ||facebook.com^$important,$3p
@@ -61,11 +54,6 @@ $removeparam=utm_term
 @@||google.com/cse/static^
 @@||cse.google.com/cse^
 !@@||clients1.google.com^
-
-* challenges.cloudflare.com * noop
-* www.google.com * noop
-x.com twitter.com * noop
-twitter.com x.com * noop
 
 ||challenges.cloudflare.com^$3p
 @@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
