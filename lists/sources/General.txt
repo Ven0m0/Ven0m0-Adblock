@@ -48,6 +48,7 @@ $removeparam=utm_term
 @@||google.com^$script,domain=youtube.com
 @@||google*.^$domain=youtube.com|youtube-nocookie.com
 @@||google.com/uds/*visualization$script,stylesheet
+@@||gemini.google.com,domain=gstatic.com
 
 ! Fix sites that use built-in Google search
 ! https://github.com/yokoffing/filterlists/issues/170
