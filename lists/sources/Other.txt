@@ -204,6 +204,7 @@ lumo.proton.me##.text-no-decoration.color-weak.p-3.inline-flex
 ! Github copilot
 github.com##.LegalDisclaimer-module__container--lNe5E
 github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner--L3kg0
+github.com##.prc-Banner-Banner-IR8eJ
 github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u7T1C
 github.com##.NewConversationDownloadActions-module__desktopActions--SOL35
 github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner__visual--dHdzB
@@ -227,4 +228,5 @@ gemini.google.com##button.ng-star-inserted.mat-mdc-menu-item-submenu-trigger.mat
 gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c283640854-5.gds-upsell-button.mat-mdc-button-base.mdc-button
 gemini.google.com##.cdk-mouse-focused.cdk-focused.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
 gemini.google.com##.ng-star-inserted.adv-upsell.buttons-container > .ng-star-inserted.ng-tns-c638556977-30
+
 
