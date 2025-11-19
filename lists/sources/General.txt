@@ -5,8 +5,6 @@
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
 
 ! Disable telemetry/analytics/error reporting domains
-||bugsnag.*^$all
-||*.sentry.io^$all
 ||*/telemetry/*$all
 ||*/analytics/*$all
 ||*/metrics/*$all
