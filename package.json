@@ -36,7 +36,7 @@
     "validate": "bun run test && bun run build"
   },
   "devDependencies": {
-    "@adguard/aglint": "^2.1.2",
+    "@adguard/aglint": "^3.0.0",
     "@adguard/dead-domains-linter": "^1.0.33",
     "@adguard/hostlist-compiler": "^1.0.26",
     "@eslint/js": "^9.15.0",
