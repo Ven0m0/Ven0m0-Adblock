@@ -10,10 +10,10 @@
     "build:adblock": "./Scripts/build-all.sh adblock",
     "build:hosts": "./Scripts/build-all.sh hosts",
     "build:userscripts": "./Scripts/build-all.sh userscripts",
-    "lint": "bun run lint:js && bun run lint:filters && bun run lint:yaml && bun run lint:md",
+    "lint": "bun run lint:js && bun run lint:filters && bun run lint:md",
     "lint:js": "eslint .",
     "lint:filters": "bunx aglint",
-    "lint:yaml": "bunx yamllint -c .yamllint.yml .github/workflows/",
+    "lint:yaml": "echo 'YAML linting available in CI via yamllint action'",
     "lint:md": "bunx markdownlint-cli2 '**/*.md' '#node_modules'",
     "lint:shell": "shellcheck Scripts/*.sh || true",
     "lint:eslint": "eslint .",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@adguard/aglint": "^2.1.2",
-    "@adguard/dead-domains-linter": "^1.1.0",
+    "@adguard/dead-domains-linter": "^1.0.33",
     "@adguard/hostlist-compiler": "^1.0.26",
     "@eslint/js": "^9.15.0",
     "esbuild": "^0.24.0",
@@ -46,8 +46,7 @@
     "husky": "^9.1.7",
     "markdownlint-cli2": "^0.15.0",
     "prettier": "^3.3.3",
-    "terser": "^5.36.0",
-    "yamllint": "^1.0.0"
+    "terser": "^5.36.0"
   },
   "engines": {
     "node": ">=18.0.0",
