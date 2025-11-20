@@ -1,0 +1,180 @@
+name: 🔍 Lint & Format
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Run all linters in parallel for faster feedback
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        linter:
+          - name: ESLint
+            command: bun run lint:eslint
+            paths: "**/*.{js,mjs,cjs}"
+          - name: AGLint
+            command: bun run lint:aglint
+            paths: "lists/sources/**/*.txt"
+          - name: Prettier
+            command: bun run format:check
+            paths: "**/*.{js,json,yml,yaml,md}"
+          - name: YAML
+            command: bunx yamllint -c .yamllint.yml .github/workflows/
+            paths: "**/*.{yml,yaml}"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          bun install --frozen-lockfile
+          # Install additional linters
+          bun add -D yamllint prettier eslint @adguard/aglint
+
+      - name: Check for modified files
+        id: check-files
+        run: |
+          if git diff --name-only origin/main...HEAD | grep -E "${{ matrix.linter.paths }}"; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Run ${{ matrix.linter.name }}
+        if: steps.check-files.outputs.has_changes == 'true' || github.event_name == 'workflow_dispatch'
+        run: ${{ matrix.linter.command }}
+
+      - name: Annotate results
+        if: failure()
+        run: |
+          echo "::error::${{ matrix.linter.name }} found issues"
+
+  # Format and auto-fix issues (only on push to main, not PRs)
+  format:
+    name: Auto-Format & Fix
+    runs-on: ubuntu-latest
+    needs: lint
+    if: |
+      github.event_name != 'pull_request' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run ESLint with auto-fix
+        run: bun run lint:fix
+        continue-on-error: true
+
+      - name: Run Prettier
+        run: bun run format
+        continue-on-error: true
+
+      - name: Run AGLint
+        run: bunx aglint --fix
+        continue-on-error: true
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-format code and fix linting issues"
+          commit_options: "--no-verify"
+          file_pattern: "*.js *.mjs *.cjs *.json *.yml *.yaml *.md lists/sources/**/*.txt"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          skip_dirty_check: false
+
+  # Check shell scripts
+  shellcheck:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: "./Scripts"
+          severity: warning
+          format: gcc
+        continue-on-error: true
+
+  # Summary job
+  summary:
+    name: Lint Summary
+    runs-on: ubuntu-latest
+    needs: [lint, format, shellcheck]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [ "${{ needs.lint.result }}" == "failure" ] || \
+             [ "${{ needs.format.result }}" == "failure" ] || \
+             [ "${{ needs.shellcheck.result }}" == "failure" ]; then
+            echo "::warning::Some linters found issues. Please review the logs."
+            exit 1
+          else
+            echo "::notice::All linting checks passed!"
+          fi
