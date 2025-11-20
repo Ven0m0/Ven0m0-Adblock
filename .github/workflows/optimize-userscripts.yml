@@ -11,6 +11,10 @@ on:
     paths:
       - 'userscripts/src/**/*.user.js'
 
+concurrency:
+  group: userscripts-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -46,6 +50,8 @@ jobs:
 
       - name: Optimize Scripts
         run: |
+          # Enable globstar for recursive globbing
+          shopt -s globstar nullglob
           # Ensure the output directory exists
           mkdir -p userscripts/dist
           # Loop through each script in the source directory
@@ -59,7 +65,10 @@ jobs:
                 --js_output_file "$output_file" \
                 --compilation_level SIMPLE_OPTIMIZATIONS \
                 --language_in ECMASCRIPT_NEXT \
-                --language_out ECMASCRIPT_2020
+                --language_out ECMASCRIPT_2020 || {
+                echo "Error compiling $file"
+                exit 1
+              }
             fi
           done
         shell: bash

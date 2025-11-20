@@ -12,6 +12,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: userscripts-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +29,13 @@ jobs:
           bun-version: latest
 
       - name: Build userscripts
-        run: bash Scripts/build.sh userscripts dist List
+        run: |
+          if [ ! -f Scripts/build.sh ]; then
+            echo "Error: Scripts/build.sh not found"
+            exit 1
+          fi
+          chmod +x Scripts/build.sh
+          bash Scripts/build.sh userscripts dist List
 
       - name: Commit built files
         uses: stefanzweifel/git-auto-commit-action@v7

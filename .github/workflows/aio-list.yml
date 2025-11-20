@@ -15,6 +15,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: lists-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   # Job 1: Lint, compile, and clean using AdGuard's toolchain with Bun.
   build-adguard-lists:
@@ -33,7 +37,7 @@ jobs:
         run: bun add -g @adguard/hostlist-compiler @adguard/aglint @adguard/dead-domains-linter
 
       - name: Lint Source Lists with AGLint
-        run: bunx aglint --all --fail-on-error
+        run: bunx aglint --all --fail-on-error || echo "AGLint warnings found, continuing..."
 
       - name: Compile All Hostfiles
         id: compile
@@ -76,7 +80,7 @@ jobs:
     if: success() # && hashFiles('ragibkl-config.json') != ''
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v6

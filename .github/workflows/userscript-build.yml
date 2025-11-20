@@ -23,6 +23,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: userscripts-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -85,13 +89,20 @@ jobs:
         grep -o 'https\?://[^ "]*\.user\.js' List | while read -r url; do
           filename=$(basename "$url" | tr -cd '[:alnum:]._-')
           echo "::notice::Updating $filename"
-          curl -sL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/$filename" "$url"
+          curl -sL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/$filename" "$url" || {
+            echo "::warning::Failed to download $url"
+            continue
+          }
         done
         echo "unoptimized=true" >> $GITHUB_OUTPUT
 
     - name: Build scripts
       if: steps.detect.outputs.unoptimized == 'true'
       run: |
+        if [ ! -f build-userscripts.sh ]; then
+          echo "Error: build-userscripts.sh not found"
+          exit 1
+        fi
         chmod +x build-userscripts.sh
         ./build-userscripts.sh
 

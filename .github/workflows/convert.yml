@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: convert-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   convert:
     name: Convert Lists
@@ -22,7 +26,13 @@ jobs:
           bun-version: latest
 
       - name: Convert
-        run: bash convert.sh
+        run: |
+          if [ ! -f convert.sh ]; then
+            echo "Error: convert.sh not found"
+            exit 1
+          fi
+          chmod +x convert.sh
+          bash convert.sh
         env:
           repository: ${{ github.repository }}
 

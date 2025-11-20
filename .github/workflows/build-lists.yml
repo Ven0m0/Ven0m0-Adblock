@@ -12,6 +12,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: lists-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-commit:
     name: "Build & Commit Lists"
@@ -28,6 +32,10 @@ jobs:
 
       - name: Build all lists
         run: |
+          if [ ! -f build-lists.sh ]; then
+            echo "Error: build-lists.sh not found"
+            exit 1
+          fi
           chmod +x build-lists.sh
           ./build-lists.sh
 

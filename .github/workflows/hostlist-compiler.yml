@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: lists-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-hostlists:
     runs-on: ubuntu-latest
