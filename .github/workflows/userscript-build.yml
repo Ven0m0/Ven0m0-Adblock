@@ -77,6 +77,7 @@ jobs:
         echo "unoptimized=$unoptimized" >> $GITHUB_OUTPUT
 
     - name: Fetch script updates
+      id: fetch
       if: github.event_name == 'schedule' || github.event.inputs.fetch_updates == 'true'
       run: |
         [[ -f "List" ]] || exit 0
@@ -90,16 +91,16 @@ jobs:
         echo "unoptimized=true" >> $GITHUB_OUTPUT
 
     - name: Build scripts
-      if: steps.detect.outputs.unoptimized == 'true'
+      if: steps.detect.outputs.unoptimized == 'true' || steps.fetch.outputs.unoptimized == 'true'
       run: |
         chmod +x build-userscripts.sh
         ./build-userscripts.sh
 
     - name: Commit and push changes
-      if: steps.detect.outputs.unoptimized == 'true' && github.event_name != 'pull_request'
-      run: |
-        git config --local user.email "actions@github.com"
-        git config --local user.name "GitHub Actions"
-        git add dist/
-        git commit -m "Auto-optimize userscripts [skip ci]" || echo "No changes to commit"
-        git push
+      if: (steps.detect.outputs.unoptimized == 'true' || steps.fetch.outputs.unoptimized == 'true') && github.event_name != 'pull_request'
+      uses: stefanzweifel/git-auto-commit-action@v7
+      with:
+        commit_message: "ci: auto-optimize userscripts [skip ci]"
+        file_pattern: "dist/*"
+        commit_user_name: "github-actions[bot]"
+        commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"

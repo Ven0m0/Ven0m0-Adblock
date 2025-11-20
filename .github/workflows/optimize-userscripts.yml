@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -65,15 +65,9 @@ jobs:
         shell: bash
 
       - name: Commit and Push Changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          # Check if there are any changes to commit
-          if ! git diff --quiet userscripts/dist/; then
-            git add userscripts/dist/*.user.js
-            git commit -m "ci: optimize userscripts"
-            git push
-          else
-            echo "No changes to commit."
-          fi
-        shell: bash
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "ci: optimize userscripts"
+          file_pattern: "userscripts/dist/*.user.js"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
