@@ -1,0 +1,315 @@
+name: 🛡️ Build Filter Lists
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lists/sources/**/*.txt"
+      - "hostlist-config.json"
+      - "configuration_popup_filter.json"
+      - "ragibkl-config.json"
+      - "build-lists.sh"
+  workflow_dispatch:
+  schedule:
+    # Daily at 07:00 UTC
+    - cron: "0 7 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Lint source filter lists
+  lint:
+    name: Lint Sources
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-filters-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-filters-
+
+      - name: Install AGLint
+        run: bun add -g @adguard/aglint
+
+      - name: Run AGLint
+        run: bunx aglint --fix
+        continue-on-error: true
+
+      - name: Commit lint fixes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: lint and fix filter lists"
+          file_pattern: "lists/sources/**/*.txt"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+
+  # Build with AdGuard toolchain
+  build-adguard:
+    name: Build AdGuard Lists
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-adguard-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-adguard-
+
+      - name: Install AdGuard tools
+        run: |
+          bun add -g @adguard/hostlist-compiler @adguard/dead-domains-linter
+
+      - name: Compile AdGuard lists
+        id: compile
+        run: |
+          set -e
+          mkdir -p Filters lists/releases
+
+          # Compile using hostlist-compiler
+          if [ -f "hostlist-config.json" ]; then
+            echo "Compiling with config..."
+            bunx hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
+          fi
+
+          # Compile all sources into combined list
+          declare -a compiler_args=()
+          while IFS= read -r file; do
+            compiler_args+=("-i" "$file")
+          done < <(find lists/sources -type f -name "*.txt" 2>/dev/null || true)
+
+          if [ ${#compiler_args[@]} -gt 0 ]; then
+            echo "Compiling combined list..."
+            bunx hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "No source files found"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Clean with DeadDomainsLinter
+        if: steps.compile.outputs.has_changes == 'true'
+        run: |
+          for file in Filters/*.txt; do
+            [ -f "$file" ] || continue
+            echo "Cleaning: $file"
+            bunx dead-domains-linter -i "$file" -o "$file" || echo "Failed to clean $file"
+          done
+
+      - name: Upload artifacts
+        if: steps.compile.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: adguard-filters
+          path: Filters/*.txt
+          retention-days: 30
+
+  # Build with Ragibkl compiler (Python-based)
+  build-ragibkl:
+    name: Build Ragibkl Lists
+    runs-on: ubuntu-latest
+    needs: lint
+    if: hashFiles('ragibkl-config.json') != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Clone adblock-list-compiler
+        run: |
+          git clone --depth=1 https://github.com/ragibkl/adblock-list-compiler.git compiler
+
+      - name: Install Python dependencies
+        run: |
+          cd compiler
+          pip install -r requirements.txt
+
+      - name: Compile lists
+        id: compile
+        run: |
+          mkdir -p Filters
+          python compiler/main.py \
+            --config ragibkl-config.json \
+            --output Filters/Ragibkl-Combined.txt
+
+          if [ -s "Filters/Ragibkl-Combined.txt" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload artifacts
+        if: steps.compile.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ragibkl-filters
+          path: Filters/Ragibkl-Combined.txt
+          retention-days: 30
+
+  # Run custom build script
+  build-custom:
+    name: Build Custom Lists
+    runs-on: ubuntu-latest
+    needs: lint
+    if: hashFiles('build-lists.sh') != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Run build script
+        run: |
+          chmod +x build-lists.sh
+          ./build-lists.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: custom-filters
+          path: lists/releases/*.txt
+          retention-days: 30
+
+  # Commit all changes
+  commit:
+    name: Commit Changes
+    runs-on: ubuntu-latest
+    needs: [build-adguard, build-ragibkl, build-custom]
+    if: |
+      always() &&
+      (needs.build-adguard.result == 'success' ||
+       needs.build-ragibkl.result == 'success' ||
+       needs.build-custom.result == 'success')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Download AdGuard artifacts
+        if: needs.build-adguard.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: adguard-filters
+          path: Filters/
+        continue-on-error: true
+
+      - name: Download Ragibkl artifacts
+        if: needs.build-ragibkl.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: ragibkl-filters
+          path: Filters/
+        continue-on-error: true
+
+      - name: Download custom artifacts
+        if: needs.build-custom.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: custom-filters
+          path: lists/releases/
+        continue-on-error: true
+
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "ci: build and update filter lists"
+          file_pattern: "Filters/*.txt lists/releases/*.txt"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          skip_dirty_check: false
+
+  # Convert lists to different formats (scheduled only)
+  convert:
+    name: Convert Lists
+    runs-on: ubuntu-latest
+    needs: commit
+    if: github.event_name == 'schedule' && hashFiles('convert.sh') != ''
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Run conversion
+        run: |
+          chmod +x convert.sh
+          bash convert.sh
+        env:
+          repository: ${{ github.repository }}
+
+      - name: Push to release branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: release
+          commit_message: "ci: update converted lists"
+          file_pattern: "release/*"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          create_branch: true
+          push_options: "--force"
+
+  # Cleanup old workflow runs
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    needs: [commit, convert]
+    if: always() && github.event_name == 'schedule'
+    steps:
+      - name: Delete old workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 7
+          keep_minimum_runs: 3
