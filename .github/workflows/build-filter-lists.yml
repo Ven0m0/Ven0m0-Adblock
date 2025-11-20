@@ -54,7 +54,7 @@ jobs:
         continue-on-error: true
 
       - name: Commit lint fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "style: lint and fix filter lists"
           file_pattern: "lists/sources/**/*.txt"
@@ -256,7 +256,7 @@ jobs:
         continue-on-error: true
 
       - name: Commit and push
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "ci: build and update filter lists"
           file_pattern: "Filters/*.txt lists/releases/*.txt"
@@ -289,7 +289,7 @@ jobs:
           repository: ${{ github.repository }}
 
       - name: Push to release branch
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           branch: release
           commit_message: "ci: update converted lists"
