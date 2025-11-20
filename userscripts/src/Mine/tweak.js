@@ -20,7 +20,7 @@ const K='ven0m0.webpro.v4';
 const defs={
   log:0,lazy:1,iframes:1,videos:1,defer:1,observe:1,prefetch:1,preconnect:1,linkPrefetch:1,linkLimit:15,linkDelay:2e3,
   gpu:1,mem:1,preload:1,cleanURL:1,bypass:1,rightClick:0,copy:1,select:1,cookie:1,tabSave:1,
-  cpuTamer:1,rafTamer:1,caching:1,minTimeout:10,minInterval:16
+  cpuTamer:1,rafTamer:1,caching:1,minTimeout:10,minInterval:16,showUI:1
 };
 const cfg=(()=>{try{const s=localStorage.getItem(K);return s?{...defs,...JSON.parse(s)}:{...defs};}catch(e){return{...defs};}})();
 const save=()=>localStorage.setItem(K,JSON.stringify(cfg));
@@ -551,15 +551,30 @@ function stopObs(){
 // ============================================================================
 // UI
 // ============================================================================
+function toggleUI(){
+  const ui=document.getElementById('wp-ui');
+  const indicator=document.getElementById('wp-indicator');
+  if(!ui)return;
+  cfg.showUI=!cfg.showUI;
+  ui.style.display=cfg.showUI?'block':'none';
+  if(indicator)indicator.style.display=cfg.showUI?'none':'flex';
+  save();
+  L('UI toggled:',cfg.showUI?'shown':'hidden');
+}
 function buildUI(){
   if(document.getElementById('wp-ui'))return;
-  const css=`#wp-ui{position:fixed;right:8px;bottom:8px;z-index:2147483647;background:rgba(0,0,0,.85);color:#fff;font:12px monospace;padding:10px;border-radius:6px;user-select:none;max-width:320px;box-shadow:0 0 20px rgba(0,255,0,.3)}.hdr{font-weight:bold;margin-bottom:8px;border-bottom:1px solid #0f0;padding-bottom:6px;color:#0f0;text-align:center}label{display:block;margin:4px 0;cursor:pointer;transition:color .2s}label:hover{color:#0f0}input[type=checkbox]{margin-right:6px}button{width:100%;margin:4px 0;padding:6px;font:11px monospace;background:#111;color:#0f0;border:1px solid #0f0;border-radius:4px;cursor:pointer;transition:all .2s}button:hover{background:#0f0;color:#000}.stats{margin-top:8px;padding-top:8px;border-top:1px solid #333;font-size:10px;color:#0f0;text-align:center}`;
+  const css=`#wp-ui{position:fixed;right:8px;bottom:8px;z-index:2147483647;background:rgba(0,0,0,.85);color:#fff;font:12px monospace;padding:10px;border-radius:6px;user-select:none;max-width:320px;box-shadow:0 0 20px rgba(0,255,0,.3);transition:opacity .2s}#wp-ui.hidden{display:none}#wp-indicator{position:fixed;right:8px;bottom:8px;z-index:2147483646;background:rgba(0,255,0,.2);color:#0f0;font:10px monospace;padding:4px 8px;border-radius:4px;cursor:pointer;display:none;align-items:center;gap:4px;border:1px solid rgba(0,255,0,.3);transition:all .2s}#wp-indicator:hover{background:rgba(0,255,0,.3);transform:scale(1.05)}.hdr{font-weight:bold;margin-bottom:8px;border-bottom:1px solid #0f0;padding-bottom:6px;color:#0f0;text-align:center;display:flex;justify-content:space-between;align-items:center}.hdr-title{flex:1}.hide-btn{background:transparent;border:none;color:#0f0;cursor:pointer;font-size:16px;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;transition:all .2s;margin:0}label{display:block;margin:4px 0;cursor:pointer;transition:color .2s}label:hover{color:#0f0}input[type=checkbox]{margin-right:6px}button{width:100%;margin:4px 0;padding:6px;font:11px monospace;background:#111;color:#0f0;border:1px solid #0f0;border-radius:4px;cursor:pointer;transition:all .2s}button:hover{background:#0f0;color:#000}.hide-btn:hover{transform:scale(1.2)}.stats{margin-top:8px;padding-top:8px;border-top:1px solid #333;font-size:10px;color:#0f0;text-align:center}`;
   const style=document.createElement('style');
   style.textContent=css;
   document.head.appendChild(style);
   const div=document.createElement('div');
   div.id='wp-ui';
-  div.innerHTML='<div class=hdr>⚡ Web Pro v4.0 Enhanced ⚡</div>';
+  div.style.display=cfg.showUI?'block':'none';
+  div.innerHTML='<div class=hdr><span class=hdr-title>⚡ Web Pro v4.0 Enhanced ⚡</span><button class=hide-btn title="Hide UI (Ctrl+Shift+W)">✕</button></div>';
+  setTimeout(()=>{
+    const hideBtn=div.querySelector('.hide-btn');
+    if(hideBtn)hideBtn.addEventListener('click',toggleUI);
+  },100);
   const items=[
     ['log','Verbose logging'],
     ['lazy','Lazy load images'],
@@ -630,7 +645,25 @@ function buildUI(){
     stats.innerHTML=`MEM: ${mem}${cacheInfo} | GPU: ${cfg.gpu?'ON':'OFF'}`;
   },2e3);
   document.documentElement.appendChild(div);
+  // Create indicator for when UI is hidden
+  const indicator=document.createElement('div');
+  indicator.id='wp-indicator';
+  indicator.innerHTML='⚡ WP';
+  indicator.title='Click or press Ctrl+Shift+W to show Web Pro UI';
+  indicator.style.display=cfg.showUI?'none':'flex';
+  indicator.addEventListener('click',toggleUI);
+  document.documentElement.appendChild(indicator);
 }
+// ============================================================================
+// KEYBOARD SHORTCUT
+// ============================================================================
+document.addEventListener('keydown',e=>{
+  // Ctrl+Shift+W to toggle UI
+  if(e.ctrlKey&&e.shiftKey&&e.key==='W'){
+    e.preventDefault();
+    toggleUI();
+  }
+});
 // ============================================================================
 // INIT
 // ============================================================================
