@@ -13,7 +13,7 @@
     "lint": "bun run lint:js && bun run lint:filters && bun run lint:md",
     "lint:js": "eslint .",
     "lint:filters": "bunx aglint",
-    "lint:yaml": "command -v yamllint >/dev/null && yamllint . || echo 'yamllint not installed. Install with: pip install yamllint'",
+    "lint:yaml": "command -v yamllint >/dev/null && yamllint . || { echo 'yamllint not installed. Install with: pip install yamllint' >&2; exit 1; }",
     "lint:md": "bunx markdownlint-cli2 '**/*.md' '#node_modules'",
     "lint:shell": "shellcheck Scripts/*.sh || true",
     "lint:eslint": "eslint .",
