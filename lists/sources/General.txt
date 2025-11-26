@@ -4,6 +4,11 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
 
+!! Smartblock Embed Placeholders
+!!! https://support.mozilla.org/kb/smartblock-enhanced-tracking-protection#w_enabling-embedded-content
+!!! https://searchfox.org/mozilla-central/rev/dce6d549/browser/base/content/browser-siteProtections.js#1384
+@@||smartblock.firefox.etp^
+
 ! Disable telemetry/analytics/error reporting domains
 ||*/telemetry/*$all
 ||*/analytics/*$all
