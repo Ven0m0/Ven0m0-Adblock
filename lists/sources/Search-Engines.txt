@@ -1,10 +1,10 @@
 [Adblock Plus 3.6]
-# Title: Ven0m0's Adblocking Filter
-# Description: Combination List of multiple filters to make the internet comfortable
-# Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
-# Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/Google.txt
+! Title: Ven0m0's Adblocking Filter
+! Description: Combination List of multiple filters to make the internet comfortable
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/Google.txt
 
-# Generics (any page)
+! Generics (any page)
 ##iframe[src*="mellowads"]
 ##iframe[id^=openwrap-ad-]
 ##*[class*="Advert"]
@@ -16,10 +16,10 @@
 ##img[src*="digiadsply"]
 ##.bstn-ad-rail--expanded.bstn-ad-rail
 
-# Google map ads on Search
+! Google map ads on Search
 google.*##.mnr-c.rl-qs-crs-t._Db > ._gt:has(._mB)
 
-# Generic hide for Google Ads
+! Generic hide for Google Ads
 ##ins[id*="aswift"] > iframe
 ###google_image_div
 ###mys-content
@@ -32,34 +32,34 @@ google.*##.mnr-c.rl-qs-crs-t._Db > ._gt:has(._mB)
 ##.head-ad
 ##DIV[id*="adcontent"]
 
-# Block ad blocker detector
+! Block ad blocker detector
 ||cdn.jsdelivr.net/gh/vli-platform/adb-analytics@77bebb/v1.0.min.js$script,important
 ||fundingchoicesmessages.google.com^$script,important
 
-# trying to better collect google ads #1906
+! trying to better collect google ads #1906
 #@#.adsbygoogle
 #@#.ads_1
 *###ads_1:style(height: 1px !important)
 *##.adsbygoogle:style(height: 1px !important)
 
-# Brave search browser ad
+! Brave search browser ad
 search.brave.com##.svelte-1avqjm8.download-cta
 
-# Example searches
+! Example searches
 search.brave.com##.svelte-1avqjm8.noscript-hide.noscrollbar.example-searches
 
-# AI buttons
+! AI buttons
 search.brave.com##.svelte-1tjerau.subutton
 search.brave.com##.svelte-rany9i.llm.t-secondary.desktop-large-regular.suggestion
 
-# Settings feedback
+! Settings feedback
 search.brave.com##.headerless.svelte-9ouv38.card > .layout-row.svelte-5r82hb
 
-# Feedback button
+! Feedback button
 search.brave.com##.svelte-1yt5tdo.primary-right
 
-# Rerank button
+! Rerank button
 search.brave.com###quick-goggles-button
 
-# Bottom bloat
+! Bottom bloat
 search.brave.com###main > .svelte-6sdecn

@@ -6,11 +6,6 @@
   "version": "1.0.0",
   "sources": [
     {
-      "source": "lists/sources/3rd-party.txt",
-      "type": "adblock",
-      "description": "Third-party tracking and ads"
-    },
-    {
       "source": "lists/sources/Other.txt",
       "type": "adblock",
       "description": "Miscellaneous blocking rules"

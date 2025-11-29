@@ -30,7 +30,7 @@ runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RU
 
 #── Adblock filter ──
 build_adblock(){
-  local -a src=(3rd-party.txt Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
+  local -a src=(Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
   local out=$FILTER_OUT/adblock.txt v ts
   log adblock "Building..."
   mkdir -p "$FILTER_OUT"
@@ -56,7 +56,7 @@ EOF
 
 #── Hosts ──
 build_hosts(){
-  local -a src=(3rd-party.txt Other.txt)
+  local -a src=(Other.txt)
   local out=$FILTER_OUT/hosts.txt ts
   log hosts "Building..."
   mkdir -p "$FILTER_OUT"

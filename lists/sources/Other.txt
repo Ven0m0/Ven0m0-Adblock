@@ -4,7 +4,7 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! Duckduckgo
-# Share feedback
+! Share feedback
 duckduckgo.com##.WktWJWUFfihMbuzAEqk2.hUUdRtuaOUx7mcSwc56s.ffON2NH02oMAcqyoh2UU
 
 ! Nexusmods

@@ -6,9 +6,11 @@
 ! Login popup
 twitter.com##div#layers div[data-testid="sheetDialog"]:upward(div[role="group"][tabindex="0"])
 twitter.com##html:style(overflow: auto !important;)
+twitter.com#?##layers > div[class*=" "]:first-of-type:-abp-has(a[href="/i/flow/signup"])
 
 ! Twitter cookie banner
 twitter.com##.r-13qz1uu.r-1f1sjgu.r-ymttw5.r-1d7fvdj.r-18u37iz.r-15ce4ve.r-1sw30gj.r-1awozwy.css-1dbjc4n
+twitter.com###layers > div > div:nth-of-type(2):last-of-type
 
 ! Footer
 twitter.com##div:has(> nav[role="navigation"][aria-label="Footer"])
