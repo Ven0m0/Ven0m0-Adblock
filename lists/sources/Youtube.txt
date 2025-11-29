@@ -35,7 +35,7 @@ youtube.com##ytp-ad-text
 youtube.com##ytp-ad-module
 youtube.com##ytp-ad-player-overlay
 
-# Collecting Youtube Banner Ads #1353
+! Collecting Youtube Banner Ads #1353
 youtube.com#@#.sparkles-light-cta
 youtube.com#@#ytd-promoted-sparkles-web-renderer
 youtube.com##ytd-promoted-sparkles-web-renderer #sparkles-container:style(height: 0px !important; opacity: 0 !important;) 

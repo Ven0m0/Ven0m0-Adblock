@@ -34,7 +34,7 @@ $removeparam=utm_term
 ||twitter.com^$3p
 ||x.com^$3p
 
-# https://github.com/celenityy/ublock-origin-settings
+! https://github.com/celenityy/ublock-origin-settings
 ||doubleclick.net^$3p,important
 ||google-analytics.com^$3p,important
 ||firebase.com^$3p,important
