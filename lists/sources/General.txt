@@ -15,7 +15,6 @@
 ||*/metrics/*$all
 ||*/crash/*$all
 ||*/error-report/*$all
-||*/feedback/*$all
 ||*/diagnostics/*$all
 
 ! Common tracker params
