@@ -71,7 +71,7 @@ const IDLE_ATTR = "data-yt-idle";
 const CV_OFF_ATTR = "data-yt-cv-off";
 
 // ============================================================================
-// OPTIMIZED: Shared utilities to avoid code duplication
+// OPTIMIZED: Inline Shared Utilities
 // ============================================================================
 
 // Optimized debounce function with better performance
@@ -112,8 +112,6 @@ const rafThrottle = (fn) => {
 // ============================================================================
 // 1. OPTIMIZED RESOURCE LOCKS REMOVAL
 // ============================================================================
-
-// OPTIMIZED: More efficient resource lock removal with better memory management
 (() => {
   const AsyncFn = (async () => {}).constructor;
   const w = window;
@@ -128,7 +126,7 @@ const rafThrottle = (fn) => {
   const hasIDB = w?.indexedDB?.constructor?.name === "IDBFactory";
   if (hasIDB) {
     const openDBs = new Set();
-    const closedDBs = new Map();  // Changed to Map for better cleanup tracking
+    const closedDBs = new Map();
     
     let cleanupTimer = 0;
     const cleanup = () => {
@@ -194,8 +192,6 @@ const rafThrottle = (fn) => {
 // ============================================================================
 // 2. OPTIMIZED GPU OPTIMIZATION
 // ============================================================================
-
-// OPTIMIZED: More efficient codec blocking
 if (CFG.gpu.blockAV1) {
   const origCanPlay = HTMLMediaElement.prototype.canPlayType;
   HTMLMediaElement.prototype.canPlayType = function(type) {
@@ -219,8 +215,6 @@ if (CFG.gpu.blockAV1) {
 // ============================================================================
 // 3. OPTIMIZED CSS INJECTION
 // ============================================================================
-
-// OPTIMIZED: Single CSS injection with better performance
 (() => {
   let css = "";
   if (CFG.ui.disableAnimations) {
@@ -242,7 +236,6 @@ if (CFG.gpu.blockAV1) {
   }
   
   if (css) {
-    // OPTIMIZED: Use insertRule for better performance
     const style = document.createElement("style");
     style.textContent = css;
     (document.head || document.documentElement).appendChild(style);
@@ -253,19 +246,17 @@ if (CFG.gpu.blockAV1) {
 // ============================================================================
 // 4. OPTIMIZED EVENT THROTTLING
 // ============================================================================
-
 if (CFG.cpu.eventThrottle) {
   const origAdd = EventTarget.prototype.addEventListener;
   const origRem = EventTarget.prototype.removeEventListener;
-  const wrappedMap = new WeakMap();  // Use WeakMap for better memory management
+  const wrappedMap = new WeakMap();
   
   const throttleEvents = new Set(["mousemove", "pointermove", "touchmove"]);
-  const debounceEvents = new Map([["scroll", 60], ["wheel", 60], ["resize", 120]]);  // Increased delays for better performance
+  const debounceEvents = new Map([["scroll", 60], ["wheel", 60], ["resize", 120]]);
   
   const isPlayer = (el) => el instanceof HTMLVideoElement || el.closest?.(".ytp-chrome-bottom,.ytp-volume-panel,.ytp-progress-bar");
   const isGlobal = (el) => el === window || el === document || el === document.documentElement || el === document.body;
   
-  // OPTIMIZED: Use single RAF queue for all throttled events
   const rafQueue = new Map();
   let rafScheduled = false;
   
@@ -323,7 +314,6 @@ if (CFG.cpu.eventThrottle) {
 // ============================================================================
 // 5. OPTIMIZED RAF DECIMATION
 // ============================================================================
-
 if (CFG.cpu.rafDecimation) {
   const origRAF = window.requestAnimationFrame.bind(window);
   const origCAF = window.cancelAnimationFrame.bind(window);
@@ -333,7 +323,6 @@ if (CFG.cpu.rafDecimation) {
   let rafScheduled = false;
   let nextFrame = performance.now();
   
-  // OPTIMIZED: Use single interval for RAF scheduling
   const getInterval = () => document.visibilityState === "visible" ? 1e3/CFG.cpu.rafFpsVisible : 1e3/CFG.cpu.rafFpsHidden;
   
   const processQueue = () => {
@@ -348,7 +337,6 @@ if (CFG.cpu.rafDecimation) {
       const callbacks = Array.from(rafQueue.values());
       rafQueue.clear();
       
-      // OPTIMIZED: Process callbacks in batches to prevent blocking
       const batchSize = Math.min(callbacks.length, 10);
       for (let i = 0; i < batchSize; i++) {
         try {
@@ -358,7 +346,6 @@ if (CFG.cpu.rafDecimation) {
         }
       }
       
-      // Schedule remaining callbacks for next frame
       for (let i = batchSize; i < callbacks.length; i++) {
         origRAF(() => {
           try {
@@ -391,7 +378,6 @@ if (CFG.cpu.rafDecimation) {
     typeof id === "number" && id >= BASE_ID ? rafQueue.delete(id) : origCAF(id);
   };
   
-  // OPTIMIZED: Use throttled visibility change handler
   const throttledVisibilityChange = createThrottledFn(() => {
     nextFrame = performance.now();
   }, 1000);
@@ -403,8 +389,6 @@ if (CFG.cpu.rafDecimation) {
 // ============================================================================
 // 6. OPTIMIZED TIMER PATCHES + IDLE DETECTION
 // ============================================================================
-
-// OPTIMIZED: More efficient timer patching with better idle detection
 (async () => {
   if (!CFG.cpu.timerPatch) return;
   
@@ -415,7 +399,6 @@ if (CFG.cpu.rafDecimation) {
     clearInterval: window.clearInterval.bind(window)
   };
   
-  // OPTIMIZED: Wait for DOM more efficiently
   if (!document.documentElement) {
     await new Promise(resolve => {
       if (document.documentElement) resolve();
@@ -423,7 +406,6 @@ if (CFG.cpu.rafDecimation) {
     });
   }
   
-  // OPTIMIZED: Create iframe only if needed
   let iframeTimers = nativeTimers;
   if (document.visibilityState === "visible") {
     const iframe = document.createElement("iframe");
@@ -458,7 +440,6 @@ if (CFG.cpu.rafDecimation) {
   let minDelay = CFG.cpu.minDelayBase;
   let lastActivity = performance.now();
   
-  // OPTIMIZED: Use more efficient scheduling
   const scheduleCallback = (callback) => {
     if (document.visibilityState === "visible") {
       return new Promise(resolve => {
@@ -513,7 +494,6 @@ if (CFG.cpu.rafDecimation) {
   if (CFG.cpu.idleBoost) {
     const activityEvents = ["mousemove", "mousedown", "keydown", "wheel", "touchstart", "pointerdown", "focusin"];
     
-    // OPTIMIZED: Use throttled activity handler
     const throttledActivity = createThrottledFn(() => {
       lastActivity = performance.now();
       if (document.documentElement.hasAttribute(IDLE_ATTR)) {
@@ -522,15 +502,14 @@ if (CFG.cpu.rafDecimation) {
         minDelay = CFG.cpu.minDelayBase;
         log("Idle mode OFF");
       }
-    }, 100);  // Throttle activity events to prevent excessive processing
+    }, 100);
     
     activityEvents.forEach(evt => {
       window.addEventListener(evt, throttledActivity, { capture: true, passive: true });
     });
     
-    // OPTIMIZED: Use less frequent idle checks
     const idleCheckInterval = setInterval(() => {
-      if (document.visibilityState !== "visible") return;  // Only check when visible
+      if (document.visibilityState !== "visible") return;
       
       const now = performance.now();
       const idleThreshold = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
@@ -544,15 +523,14 @@ if (CFG.cpu.rafDecimation) {
           log(`Idle mode ON (throttle=${throttleTimers})`);
         }
       }
-    }, 2e3);  // Check every 2 seconds instead of every 1 second
+    }, 2e3);
     
     log("Idle boost enabled");
   }
   
-  // OPTIMIZED: Use throttled navigation handler
   const throttledNavigate = createDebouncedFn(() => {
     unpatchTimers();
-    setTimeout(patchTimers, 800);  // Increased delay to reduce flicker
+    setTimeout(patchTimers, 800);
   }, 500);
   
   window.addEventListener("yt-navigate-finish", throttledNavigate);
@@ -561,49 +539,39 @@ if (CFG.cpu.rafDecimation) {
 // ============================================================================
 // 7. OPTIMIZED FLAG OVERRIDES
 // ============================================================================
-
-// OPTIMIZED: Use debounced updates and check less frequently
 const updateFlags = () => {
   const flags = window.yt?.config_?.EXPERIMENT_FLAGS;
   if (flags) Object.assign(flags, CFG.flags);
 };
 
-// OPTIMIZED: Use throttled flag updates
 const throttledFlagUpdate = createThrottledFn(updateFlags, 1000);
 
-// OPTIMIZED: Only observe <head> instead of entire document for better performance
 if (document.head) {
   const flagObserver = new MutationObserver(throttledFlagUpdate);
   flagObserver.observe(document.head, { childList: true, subtree: true });
 }
 
-// Also update on navigation events
 window.addEventListener('yt-navigate-finish', throttledFlagUpdate);
-
-// Initial update
 updateFlags();
 
 // ============================================================================
 // 8. OPTIMIZED INSTANT NAVIGATION
 // ============================================================================
-
 if (CFG.ui.instantNav) {
-  // OPTIMIZED: Use throttled mouseover handler
   const throttledMouseover = createThrottledFn((e) => {
     const link = e.target.closest('a[href^="/watch"]');
     if (link) {
       const prefetch = document.createElement("link");
       prefetch.rel = "prefetch";
       prefetch.href = link.href;
-      prefetch.fetchPriority = "low";  // Added fetchPriority for better performance
+      prefetch.fetchPriority = "low";
       document.head.appendChild(prefetch);
       
-      // Clean up prefetch link after delay to prevent memory buildup
       setTimeout(() => {
         if (prefetch.parentNode) prefetch.parentNode.removeChild(prefetch);
-      }, 30e3);  // Remove after 30 seconds
+      }, 30e3);
     }
-  }, 200);  // Throttle to prevent excessive prefetching
+  }, 200);
   
   document.addEventListener("mouseover", throttledMouseover, { passive: true });
   log("Instant navigation enabled");
@@ -612,24 +580,19 @@ if (CFG.ui.instantNav) {
 // ============================================================================
 // 9. OPTIMIZED LAZY THUMBNAILS
 // ============================================================================
-
-// OPTIMIZED: Share single IntersectionObserver for all thumbnails, debounce mutations
 if (CFG.gpu.lazyThumbs) {
   const thumbObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        // OPTIMIZED: Only set display if it was previously hidden
         if (entry.target.style.display === "none") {
           entry.target.style.display = "";
         }
         thumbObserver.unobserve(entry.target);
       }
     });
-  }, { rootMargin: "1000px" });  // Increased margin for earlier loading
+  }, { rootMargin: "1000px" });
 
-  let lazyTimer = 0;
   const lazyLoad = () => {
-    // OPTIMIZED: Use more specific selectors to target only YouTube thumbnail containers
     const elements = document.querySelectorAll(
       "ytd-rich-item-renderer:not([data-lazy-opt])," +
       "ytd-compact-video-renderer:not([data-lazy-opt])," +
@@ -638,13 +601,11 @@ if (CFG.gpu.lazyThumbs) {
     
     elements.forEach(el => {
       el.dataset.lazyOpt = "1";
-      // OPTIMIZED: Pre-hide elements more efficiently
       el.style.display = "none";
       thumbObserver.observe(el);
     });
   };
 
-  // OPTIMIZED: Use throttled lazy loading
   const throttledLazyLoad = createThrottledFn(lazyLoad, 500);
 
   const lazyObserver = new MutationObserver(throttledLazyLoad);
@@ -652,11 +613,10 @@ if (CFG.gpu.lazyThumbs) {
     lazyObserver.observe(document.body, { childList: true, subtree: true });
   }
   
-  // OPTIMIZED: Run lazy loading after DOM is ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", lazyLoad);
   } else {
-    setTimeout(lazyLoad, 100);  // Small delay to allow initial render
+    setTimeout(lazyLoad, 100);
   }
   
   log("Lazy thumbnails enabled");
@@ -665,7 +625,6 @@ if (CFG.gpu.lazyThumbs) {
 // ============================================================================
 // 10. OPTIMIZED AMBIENT MODE DISABLER
 // ============================================================================
-
 if (CFG.gpu.disableAmbient) {
   const disableAmbient = () => {
     const flexy = document.querySelector("ytd-watch-flexy");
@@ -673,7 +632,6 @@ if (CFG.gpu.disableAmbient) {
     
     flexy.dataset.ambientDis = "1";
     
-    // OPTIMIZED: Use more efficient observer configuration
     const ambientObserver = new MutationObserver((mutations) => {
       mutations.forEach(mutation => {
         if (mutation.type === "attributes" && 
@@ -690,14 +648,12 @@ if (CFG.gpu.disableAmbient) {
     });
   };
   
-  // OPTIMIZED: Use more efficient DOM ready detection
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", disableAmbient);
   } else {
-    setTimeout(disableAmbient, 500);  // Delay to ensure element exists
+    setTimeout(disableAmbient, 500);
   }
   
-  // OPTIMIZED: Use throttled navigation handler
   const throttledAmbient = createThrottledFn(disableAmbient, 1000);
   window.addEventListener("yt-navigate-finish", throttledAmbient);
   
@@ -707,8 +663,6 @@ if (CFG.gpu.disableAmbient) {
 // ============================================================================
 // 11. OPTIMIZED APPLY UI ATTRIBUTES
 // ============================================================================
-
-// OPTIMIZED: Apply attributes only once at the end
 if (CFG.ui.disableAnimations) document.documentElement.setAttribute("no-anim", "");
 if (CFG.ui.hideShorts) document.documentElement.setAttribute("hide-shorts", "");
 
