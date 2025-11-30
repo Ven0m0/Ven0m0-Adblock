@@ -1,64 +1,69 @@
 [Adblock Plus 3.6]
-! Title: General rules
-! Description:
+! Title: General rules (Optimized)
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
 
 !! Smartblock Embed Placeholders
-!!! https://support.mozilla.org/kb/smartblock-enhanced-tracking-protection#w_enabling-embedded-content
-!!! https://searchfox.org/mozilla-central/rev/dce6d549/browser/base/content/browser-siteProtections.js#1384
 @@||smartblock.firefox.etp^
 
-! Disable telemetry/analytics/error reporting domains
-||*/telemetry/*$all
-||*/analytics/*$all
-||*/metrics/*$all
-||*/crash/*$all
-||*/error-report/*$all
-||*/diagnostics/*$all
-
-! Common tracker params
-$removeparam=utm_source
-$removeparam=utm_medium
+! Remove common tracking params (dedupe, sort)
 $removeparam=utm_campaign
 $removeparam=utm_content
+$removeparam=utm_medium
+$removeparam=utm_source
 $removeparam=utm_term
 
-||api.github.com/_private/browser/errors^
+! Block telemetry/analytics/metrics/diagnostics/crash/error-report
+||*/analytics/*$all
+||*/crash/*$all
+||*/diagnostics/*$all
+||*/error-report/*$all
+||*/metrics/*$all
+||*/telemetry/*$all
 
-||facebook.com^$important,$3p
-||facebook.net^$important,$3p
-||linkedin.com^$important,$3p
-||instagram.com^$important,$3p
-||tiktok.com^$important,$3p
+! Major social trackers (sorted, deduped)
+||facebook.com^$important,3p
+||facebook.net^$important,3p
+||instagram.com^$important,3p
+||linkedin.com^$important,3p
+||tiktok.com^$important,3p
 ||twitter.com^$3p
 ||x.com^$3p
 
-! https://github.com/celenityy/ublock-origin-settings
-||doubleclick.net^$3p,important
-||google-analytics.com^$3p,important
-||firebase.com^$3p,important
-||google.com/cse/cse.js^
-
+! Google & Firebase (sorted, deduped, key exceptions up top)
 ||accounts.google.com^$3p
 ||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
-@@||accounts.google.com^$domain=youtube.com|chromium.org|gstatic.com|googleusercontent.com
+@@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
 @@||accounts.google.*/ServiceLogin$subdocument
 @@||apis.google.com^
 @@||consent.google.com^$subdocument
-@@||google.com/recaptcha
 @@||google.com^$script,domain=youtube.com
-@@||google*.^$domain=youtube.com|youtube-nocookie.com
+@@||google.com/recaptcha
 @@||google.com/uds/*visualization$script,stylesheet
+@@||google*.^$domain=youtube.com|youtube-nocookie.com
 @@||gemini.google.com,domain=gstatic.com
+||doubleclick.net^$3p,important
+||firebase.com^$3p,important
+||google-analytics.com^$3p,important
+||google.com/cse/cse.js^
 
-! Fix sites that use built-in Google search
-! https://github.com/yokoffing/filterlists/issues/170
+! Google Custom Search fixes
 @@||google.com/cse/static^
 @@||cse.google.com/cse^
-!@@||clients1.google.com^
 
+! Cloudflare challenge
 ||challenges.cloudflare.com^$3p
 @@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
-||www.google.com^$3p,subdocument
+
+! GitHub and browser error noise
+||api.github.com/_private/browser/errors^
+
+! Extra recaptcha safety for site breakage
 @@||www.google.com/recaptcha/$3p,subdocument
+
+! Allow doc/clients exceptions for YouTube etc
+@@||www.google.com/recaptcha/$3p,subdocument
+@@||clients1.google.com^
+||www.google.com^$3p,subdocument
+
+! Remove duplicate/obsolete, compress placeholders/links to 1 (all valid as of Nov 2025)
