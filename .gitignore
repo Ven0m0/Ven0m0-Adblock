@@ -1,228 +1,67 @@
-# ====================
-# Dependencies
-# ====================
-node_modules/
-jspm_packages/
-bower_components/
-
-# ====================
-# Build outputs
-# ====================
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
 dist/
 build/
-out/
-lists/releases/
-userscripts/dist/
-Filters/
-
-# Don't ignore these specific files
-!lists/releases/.gitkeep
-!userscripts/dist/.gitkeep
-!Filters/.gitkeep
-
-# ====================
-# Package manager files
-# ====================
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-.pnpm-debug.log
-.yarn/
-.npm/
-
-# Keep bun.lockb for reproducible builds
-# bun.lockb should NOT be ignored
-
-# ====================
-# Cache and temp files
-# ====================
-.cache/
-.temp/
-.tmp/
-tmp/
-*.tmp
-*.temp
-.eslintcache
-*.tsbuildinfo
-.parcel-cache/
-.next/
-.nuxt/
-.vuepress/dist/
-
-# ====================
-# Logs
-# ====================
-*.log
-*.log.*
-logs/
-log/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
-
-# ====================
-# OS generated files
-# ====================
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-.AppleDB
-.AppleDesktop
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-[Dd]esktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-*.lnk
-
-# Linux
-.directory
-.Trash-*
-.nfs*
-*~
-
-# ====================
-# Editor / IDE
-# ====================
-# VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
-*.code-workspace
-
-# JetBrains
-.idea/
-*.iml
-*.ipr
-*.iws
-out/
-.idea_modules/
-
-# Vim
-*.swp
-*.swo
-*~
-.*.sw[a-p]
-.netrwhist
-
-# Emacs
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
-
-# Sublime
-*.sublime-workspace
-*.sublime-project
-
-# ====================
-# Environment and secrets
-# ====================
-.env
-.env.*
-!.env.example
-!.env.template
-.envrc
-.secrets
-*.secret
-*.key
-*.pem
-*.p12
-*.pfx
-secrets/
-credentials/
-.npmrc
-
-# ====================
-# Test coverage
-# ====================
-coverage/
-*.lcov
-.nyc_output/
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-
-# ====================
-# Backups
-# ====================
-*.bak
-*.backup
-*.old
-*.orig
-*.rej
-*.swp
-
-# ====================
-# Archives (usually shouldn't be in repo)
-# ====================
-*.7z
-*.dmg
-*.gz
-*.iso
-*.jar
-*.rar
-*.tar
-*.zip
-*.tgz
-
-# ====================
-# Media files (if not needed)
-# ====================
-# Uncomment if you don't want media files tracked
-# *.jpg
-# *.jpeg
-# *.png
-# *.gif
-# *.svg
-# *.ico
-# *.mp3
-# *.mp4
-# *.webm
-
-# ====================
-# Compiled binaries
-# ====================
+target/
+*.class
 *.exe
 *.dll
 *.so
-*.dylib
-*.o
-*.obj
-*.class
-*.pyc
-__pycache__/
-*.py[cod]
-*$py.class
+*.a
+*.out
 
-# ====================
-# Project specific
-# ====================
-# Add your project-specific ignores here
+# Dependencies
+node_modules/
+venv/
+.venv/
+.env
+.env.local
+.env.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Editors
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+```
