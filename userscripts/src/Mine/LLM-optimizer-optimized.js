@@ -90,7 +90,6 @@
   // OPTIMIZED: Width adjustment with better performance
   // ============================================================================
 
-  // OPTIMIZED: More efficient element selection and style application
   const runReady = (sel, cb) => {
     let n = 0;
     const maxAttempts = 25; // Reduced attempts for better performance
@@ -102,7 +101,6 @@
     t();
   };
   
-  // OPTIMIZED: Use direct style assignment with batch processing
   const applyW = (gf) => {
     const elements = gf();
     for (const e of elements) {
@@ -111,7 +109,6 @@
     }
   };
   
-  // OPTIMIZED: More efficient mutation observer with throttling
   const observeW = (gf) => {
     let timer = null;
     const throttledApply = () => {
@@ -161,7 +158,6 @@
   // OPTIMIZED: DOM cleanup & auto-continue (ChatGPT only)
   // ============================================================================
 
-  // OPTIMIZED: Only cleanup when page is visible to save CPU and use more efficient cleanup
   if (isCGPT) {
     const MAX_MSG = 15; // Reduced for better performance
     const cleanup = () => {
@@ -169,7 +165,6 @@
       
       const ms = document.querySelectorAll('[data-testid^="conversation-turn"]');
       if (ms.length > MAX_MSG) {
-        // OPTIMIZED: Remove elements in a single batch operation
         const elementsToRemove = Array.from(ms).slice(0, ms.length - MAX_MSG);
         for (const e of elementsToRemove) {
           e.remove();
@@ -177,7 +172,6 @@
       }
     };
     
-    // OPTIMIZED: Simplified cleanup scheduling with better performance
     const intervals = [
       { delay: 8000, interval: 1500 },  // Faster initial cleanup
       { delay: 12000, interval: 2500 },
@@ -208,7 +202,6 @@
     // OPTIMIZED: Auto-continue logic with better performance
     // ============================================================================
     
-    // OPTIMIZED: Cache DOM queries for better performance
     let txCache = null;
     let stopBtnCache = null;
     let submitCache = null;
@@ -219,7 +212,6 @@
       submitCache = null;
     };
     
-    // OPTIMIZED: Throttled DOM cache invalidation
     const throttledInvalidate = (() => {
       let timeout = null;
       return () => {
@@ -279,7 +271,6 @@
       await init();
       let first = true;
       
-      // OPTIMIZED: Use throttled interval for better performance
       const throttledMainLoop = (() => {
         let isRunning = false;
         return async () => {
@@ -321,7 +312,6 @@
         };
       })();
       
-      // OPTIMIZED: Use throttled main loop
       setInterval(throttledMainLoop, 800); // Faster interval for better responsiveness
     };
     
@@ -339,7 +329,6 @@
   let pendingFork = null, includeFiles = true, isProc = false, useSummary = false, origSettings = null;
   const ogFetch = window.fetch;
   
-  // UI creation
   const createBtn = () => {
     const b = document.createElement('button');
     b.className = 'branch-button flex flex-row items-center gap-1 rounded-md p-1 py-0.5 text-xs transition-opacity delay-100 hover:bg-bg-200 group/button';
@@ -400,7 +389,6 @@
     } catch (e) { console.error('Error adding buttons:', e); } finally { isProc = false; }
   };
 
-  // API helpers
   const getCtx = async (oid, cid, mid) => {
     const r = await fetch(`/api/organizations/${oid}/chat_conversations/${cid}?tree=False&rendering_mode=messages&render_all_tools=true`);
     const d = await r.json();
@@ -490,7 +478,6 @@
     }
   };
 
-  // Fork click handler
   const forkClicked = async (model, btn, modal, sum = false) => {
     const cid = window.location.pathname.split('/').pop();
     if (origSettings) {
@@ -512,7 +499,6 @@
     }
   };
 
-  // Fetch intercept
   window.fetch = async (...args) => {
     const [input, config] = args;
     let url;
