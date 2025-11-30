@@ -4,7 +4,7 @@
 // @namespace   Ven0m0
 // @author      Ven0m0
 // @version     4.1.0
-// @license      GPLv3
+// @license     GPLv3
 // @match       *://*/*
 // @grant       none
 // @run-at      document-start
@@ -60,15 +60,19 @@ const save = () => localStorage.setItem(K, JSON.stringify(cfg));
 const L = (...a) => cfg.log && console.debug('webpro (optimized):', ...a);
 
 // ============================================================================
-// OPTIMIZED: UTILITIES
+// OPTIMIZED: UTILITIES (INLINED FROM SHARED-UTILS)
 // ============================================================================
 
-// OPTIMIZED: More efficient utility functions
-const isHttp = u => /^\\s*https?:/i.test(u);
+// Check if URL is HTTP/HTTPS
+const isHttp = u => /^\s*https?:/i.test(u);
+
+// Mark element with attribute
 const mark = (e, k = 'data-wp') => e?.setAttribute(k, '1');
+
+// Check if element is marked
 const marked = (e, k = 'data-wp') => e?.getAttribute(k) === '1';
 
-// OPTIMIZED: More efficient idle callback with better fallback
+// Optimized idle callback with better fallback
 const idle = (fn, timeout = 1500) => {  // Increased timeout for better performance
   if (window.requestIdleCallback) {
     return requestIdleCallback(fn, { timeout });
@@ -77,7 +81,7 @@ const idle = (fn, timeout = 1500) => {  // Increased timeout for better performa
   }
 };
 
-// OPTIMIZED: More efficient debounce and throttle
+// Debounce function - delays execution until after wait period
 const debounce = (fn, ms) => {
   let timeoutId;
   return function(...args) {
@@ -86,6 +90,7 @@ const debounce = (fn, ms) => {
   };
 };
 
+// Throttle function - limits execution to once per wait period
 const throttle = (fn, ms) => {
   let lastExecTime = 0;
   return function(...args) {
