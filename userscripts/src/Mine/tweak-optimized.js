@@ -622,7 +622,10 @@ function restoreScripts() {
   document.querySelectorAll('script[type="text/wp-blocked"][data-wp-src]').forEach(s => {
     const src = s.getAttribute('data-wp-src');
     if (!src) return;
-    
+
+    // Only allow http(s) URLs and same-origin relative URLs
+    if (!isSafeScriptSrc(src)) return;
+
     const n = document.createElement('script');
     n.src = src;
     n.async = true;
@@ -630,6 +633,22 @@ function restoreScripts() {
     s.parentNode.replaceChild(n, s);
     L('restored:', src);
   });
+}
+
+// Helper to validate script src URLs: Only allow http(s) and same-origin relative paths
+function isSafeScriptSrc(src) {
+  try {
+    const url = new URL(src, document.baseURI);
+    if (url.protocol === 'http:' || url.protocol === 'https:') {
+      // Optionally require same-origin, or allow all http(s). For stricter: add origin check here.
+      return true;
+    }
+    // If it's a relative URL, it will resolve to the current origin and be http(s)
+    return false;
+  } catch (e) {
+    // Invalid URL
+    return false;
+  }
 }
 
 // OPTIMIZED: More efficient interaction binding
