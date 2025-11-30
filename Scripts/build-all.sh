@@ -54,6 +54,8 @@ EOF
   ok "$out ($(wc -l < "$out") rules)"
 }
 
+Install-Module -Name PSCompletions -Repository PSGallery -Scope CurrentUser -Force
+
 #── Hosts ──
 build_hosts(){
   local -a src=(Other.txt)
