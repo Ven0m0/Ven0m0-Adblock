@@ -1,669 +1,393 @@
 // ==UserScript==
-// @name         YouTube Ultimate Optimizer (Optimized)
-// @namespace    Ven0m0
-// @author       Ven0m0
-// @version      1.1.0
-// @description  YouTube performance optimization: CPU taming, GPU optimization, resource lock removal, ad blocking - Optimized version
+// @name         YouTube Ultimate Optimizer (Compact)
 // @match        https://youtube.com/*
 // @match        https://m.youtube.com/*
 // @match        https://music.youtube.com/*
-// @grant        none
-// @license      GPLv3
 // @run-at       document-start
 // ==/UserScript==
 "use strict";
+const GUARD="__yt_ultimate_optimizer_v2__";
+if(window[GUARD])return;
+window[GUARD]=1;
 
-// ============================================================================
-// GUARD: Prevent duplicate execution
-// ============================================================================
-const GUARD = "__yt_ultimate_optimizer_v2__";
-if (window[GUARD]) return;
-window[GUARD] = !0;
+const CFG={
+ debug:0,
+ cpu:{
+  eventThrottle:1,
+  rafDecimation:1,
+  timerPatch:1,
+  idleBoost:1,
+  idleDelayNormal:8e3,
+  idleDelayShorts:15e3,
+  rafFpsVisible:20,
+  rafFpsHidden:3,
+  minDelayIdle:200,
+  minDelayBase:75
+ },
+ gpu:{
+  blockAV1:1,
+  disableAmbient:1,
+  lazyThumbs:1
+ },
+ ui:{
+  hideSpinner:1,
+  hideShorts:1,
+  disableAnimations:1,
+  contentVisibility:1,
+  instantNav:1
+ },
+ flags:{
+  IS_TABLET:1,
+  DISABLE_YT_IMG_DELAY_LOADING:1,
+  polymer_verifiy_app_state:0,
+  desktop_delay_player_resizing:0,
+  web_animated_actions:0,
+  web_animated_like:0,
+  render_unicode_emojis_as_small_images:1,
+  smartimation_background:0,
+  kevlar_refresh_on_theme_change:0,
+  kevlar_watch_cinematics:0,
+  web_cinematic_theater_mode:0,
+  web_cinematic_fullscreen:0
+ }
+};
 
-// ============================================================================
-// CONFIG - Optimized for performance
-// ============================================================================
-const CFG = {
-  debug: false,  // Set to false by default for production performance
-  cpu: {
-    eventThrottle: true,
-    rafDecimation: true,
-    timerPatch: true,
-    idleBoost: true,
-    idleDelayNormal: 8e3,    // Increased to reduce CPU usage
-    idleDelayShorts: 15e3,   // Increased for shorts
-    rafFpsVisible: 20,       // Reduced from 24 for better performance
-    rafFpsHidden: 3,         // Reduced from 5 for better performance
-    minDelayIdle: 200,       // Increased for better CPU savings
-    minDelayBase: 75         // Increased for better CPU savings
-  },
-  gpu: {
-    blockAV1: true,
-    disableAmbient: true,    // Enabled by default
-    lazyThumbs: true
-  },
-  ui: {
-    hideSpinner: true,       // Enabled by default
-    hideShorts: true,
-    disableAnimations: true, // Enabled by default
-    contentVisibility: true,
-    instantNav: true
-  },
-  flags: {
-    IS_TABLET: true,
-    DISABLE_YT_IMG_DELAY_LOADING: true,
-    polymer_verifiy_app_state: false,
-    desktop_delay_player_resizing: false,
-    web_animated_actions: false,
-    web_animated_like: false,
-    render_unicode_emojis_as_small_images: true,
-    smartimation_background: false,
-    kevlar_refresh_on_theme_change: false,
-    kevlar_watch_cinematics: false,
-    web_cinematic_theater_mode: false,
-    web_cinematic_fullscreen: false
+const log=(...a)=>CFG.debug&&console.log("[YT Optimizer]",...a);
+const isShorts=()=>location.pathname.startsWith("/shorts");
+const IDLE_ATTR="data-yt-idle";
+const CV_OFF_ATTR="data-yt-cv-off";
+
+const throttle=(fn,ms)=>{
+ let last=0;
+ return function(...a){
+  let now=Date.now();
+  if(now-last>=ms){fn.apply(this,a);last=now;}
+ };
+};
+
+const debounce=(fn,delay)=>{
+ let t;
+ return function(...a){
+  clearTimeout(t);
+  t=setTimeout(()=>fn.apply(this,a),delay);
+ };
+};
+
+const rafThrottle=fn=>{
+ let q=0;
+ return function(...a){
+  if(!q){
+   q=1;
+   requestAnimationFrame(()=>{
+    fn.apply(this,a);
+    q=0;
+   });
   }
+ };
 };
 
-const log = (...a) => CFG.debug && console.log("[YT Optimizer]", ...a);
-const isShorts = () => location.pathname.startsWith("/shorts");
-const IDLE_ATTR = "data-yt-idle";
-const CV_OFF_ATTR = "data-yt-cv-off";
-
-// ============================================================================
-// OPTIMIZED: Inline Shared Utilities
-// ============================================================================
-
-// Optimized debounce function with better performance
-const createDebouncedFn = (fn, delay) => {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn.apply(this, args), delay);
+// --- Resource Locks/IndexedDB ---
+(()=>{
+ const win=window;
+ if(typeof win?.navigator?.locks?.request==="function"){
+  win.navigator.locks.query=()=>Promise.resolve({});
+  win.navigator.locks.request=()=>new ((async()=>{}).constructor);
+ }
+ if(win?.indexedDB?.constructor?.name==="IDBFactory"){
+  const origOpen=win.indexedDB.constructor.prototype.open;
+  const openDBs=new Set(),closedDBs=new Map();
+  let cleanupTimer=0;
+  const cleanup=()=>{
+   for(const req of openDBs)try{req.result?.close()}catch(_){}
+   openDBs.clear();
+   for(const [db,] of closedDBs)try{db&&db.close()}catch(_){}
+   closedDBs.clear();
   };
-};
-
-// Optimized throttle function with RAF
-const createThrottledFn = (fn, delay) => {
-  let lastExecTime = 0;
-  return (...args) => {
-    const currentTime = Date.now();
-    if (currentTime - lastExecTime >= delay) {
-      fn.apply(this, args);
-      lastExecTime = currentTime;
-    }
+  const dbCloseMap=new WeakMap();
+  const scheduleClose=(db,name)=>{
+   clearTimeout(cleanupTimer);
+   closedDBs.set(db,Date.now());
+   cleanupTimer=setTimeout(cleanup,20e3);
   };
-};
-
-// Optimized RAF throttle
-const rafThrottle = (fn) => {
-  let queued = false;
-  return function(...args) {
-    if (!queued) {
-      queued = true;
-      requestAnimationFrame(() => {
-        fn.apply(this, args);
-        queued = false;
-      });
-    }
+  win.indexedDB.constructor.prototype.open=function(name,ver){
+   const req=origOpen.call(this,name,ver);
+   req.onsuccess=e=>{
+    const db=e.target.result;
+    dbCloseMap.set(db,{name,openTime:Date.now()});
+    scheduleClose(db,name);
+   };
+   openDBs.add(req);
+   return req;
   };
-};
-
-// ============================================================================
-// 1. OPTIMIZED RESOURCE LOCKS REMOVAL
-// ============================================================================
-(() => {
-  const AsyncFn = (async () => {}).constructor;
-  const w = window;
-  
-  if (typeof w?.navigator?.locks?.request === "function") {
-    w.navigator.locks.query = () => Promise.resolve({});
-    w.navigator.locks.request = () => new AsyncFn(() => {});
-    log("Navigator locks disabled");
-  }
-
-  // OPTIMIZED: More efficient IndexedDB management
-  const hasIDB = w?.indexedDB?.constructor?.name === "IDBFactory";
-  if (hasIDB) {
-    const openDBs = new Set();
-    const closedDBs = new Map();
-    
-    let cleanupTimer = 0;
-    const cleanup = () => {
-      // Close all open databases
-      for (const request of openDBs) {
-        try {
-          if (request.result && request.result.close) {
-            request.result.close();
-          }
-        } catch (e) {}
-      }
-      openDBs.clear();
-      
-      // Close databases in closedDBs map
-      for (const [db, closeTime] of closedDBs) {
-        try {
-          if (db && db.close) {
-            db.close();
-          }
-        } catch (e) {}
-      }
-      closedDBs.clear();
-    };
-    
-    // OPTIMIZED: Use WeakMap for better memory management
-    const dbCloseMap = new WeakMap();
-    
-    const scheduleClose = (db, name) => {
-      clearTimeout(cleanupTimer);
-      closedDBs.set(db, Date.now());
-      cleanupTimer = setTimeout(cleanup, 20e3); // Increased cleanup interval
-    };
-    
-    const origOpen = w.indexedDB.constructor.prototype.open;
-    w.indexedDB.constructor.prototype.open = function(name, version) {
-      const req = origOpen.call(this, name, version);
-      const successHandler = (event) => {
-        const db = event.target.result;
-        dbCloseMap.set(db, { name, openTime: Date.now() });
-        scheduleClose(db, name);
-      };
-      
-      req.onsuccess = successHandler;
-      const origSuccess = req.addEventListener;
-      req.addEventListener = function(type, listener, options) {
-        if (type === "success") {
-          const wrappedListener = (event) => {
-            successHandler(event);
-            return listener && listener.call(this, event);
-          };
-          return origSuccess.call(this, type, wrappedListener, options);
-        }
-        return origSuccess.call(this, type, listener, options);
-      };
-      
-      openDBs.add(req);
-      return req;
-    };
-    log("IndexedDB auto-close enabled");
-  }
+ }
 })();
 
-// ============================================================================
-// 2. OPTIMIZED GPU OPTIMIZATION
-// ============================================================================
-if (CFG.gpu.blockAV1) {
-  const origCanPlay = HTMLMediaElement.prototype.canPlayType;
-  HTMLMediaElement.prototype.canPlayType = function(type) {
-    if (type && /av01/i.test(type)) return "";
-    return origCanPlay.call(this, type);
+// --- AV1 block ---
+if(CFG.gpu.blockAV1){
+ const cp=HTMLMediaElement.prototype.canPlayType;
+ HTMLMediaElement.prototype.canPlayType=function(type){
+  if(type&&/av01/i.test(type))return"";
+  return cp.call(this,type);
+ };
+ if(navigator.mediaCapabilities?.decodingInfo){
+  const origDecode=navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
+  navigator.mediaCapabilities.decodingInfo=async config=>{
+   if(/av01/i.test(config?.video?.contentType||""))
+    return {supported:0,powerEfficient:0,smooth:0};
+   return origDecode(config);
   };
-  
-  if (navigator.mediaCapabilities?.decodingInfo) {
-    const origDecode = navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
-    navigator.mediaCapabilities.decodingInfo = async (config) => {
-      const contentType = config?.video?.contentType || "";
-      if (/av01/i.test(contentType)) {
-        return { supported: false, powerEfficient: false, smooth: false };
-      }
-      return origDecode(config);
-    };
-  }
-  log("AV1 codec blocked");
+ }
+ log("AV1 blocked");
 }
 
-// ============================================================================
-// 3. OPTIMIZED CSS INJECTION
-// ============================================================================
-(() => {
-  let css = "";
-  if (CFG.ui.disableAnimations) {
-    css += `[no-anim] *{transition:none!important;animation:none!important}html{scroll-behavior:auto!important}`;
-    css += `.ytd-ghost-grid-renderer *,.ytd-continuation-item-renderer *{animation:none!important}`;
-  }
-  if (CFG.ui.contentVisibility) {
-    css += `html:not([${CV_OFF_ATTR}]) #comments,html:not([${CV_OFF_ATTR}]) #related,html:not([${CV_OFF_ATTR}]) ytd-watch-next-secondary-results-renderer{content-visibility:auto!important;contain-intrinsic-size:800px 600px!important}`;
-  }
-  if (CFG.ui.hideSpinner) {
-    css += `.ytp-spinner,.ytp-spinner *{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}`;
-  }
-  if (CFG.gpu.disableAmbient) {
-    css += `.ytp-ambient-light,ytd-watch-flexy[ambient-mode-enabled] .ytp-ambient-light{display:none!important}`;
-    css += `ytd-app,ytd-watch-flexy,#content,#page-manager{backdrop-filter:none!important;filter:none!important;animation:none!important;will-change:auto!important}`;
-  }
-  if (CFG.ui.hideShorts) {
-    css += `[hide-shorts] ytd-rich-section-renderer,ytd-reel-shelf-renderer,#endpoint[title="Shorts"],a[title="Shorts"]{display:none!important}`;
-  }
-  
-  if (css) {
-    const style = document.createElement("style");
-    style.textContent = css;
-    (document.head || document.documentElement).appendChild(style);
-    log("CSS injected");
-  }
+// --- CSS Tweaks ---
+(()=>{
+ let css="";
+ if(CFG.ui.disableAnimations)
+  css+='[no-anim] *{transition:none!important;animation:none!important}html{scroll-behavior:auto!important}.ytd-ghost-grid-renderer *,.ytd-continuation-item-renderer *{animation:none!important}';
+ if(CFG.ui.contentVisibility)
+  css+=`html:not([${CV_OFF_ATTR}]) #comments,html:not([${CV_OFF_ATTR}]) #related,html:not([${CV_OFF_ATTR}]) ytd-watch-next-secondary-results-renderer{content-visibility:auto!important;contain-intrinsic-size:auto!important}`;
+ if(CFG.ui.hideSpinner)
+  css+='.ytp-spinner,.ytp-spinner *{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}';
+ if(CFG.gpu.disableAmbient)
+  css+='.ytp-ambient-light,ytd-watch-flexy[ambient-mode-enabled] .ytp-ambient-light{display:none!important}ytd-app,ytd-watch-flexy,#content,#page-manager{backdrop-filter:none!important;filter:none!important;animation:none!important;will-change:auto!important}';
+ if(CFG.ui.hideShorts)
+  css+='[hide-shorts] ytd-rich-section-renderer,ytd-reel-shelf-renderer,#endpoint[title="Shorts"],a[title="Shorts"]{display:none!important}';
+ if(css){
+  const s=document.createElement("style");
+  s.textContent=css;
+  (document.head||document.documentElement).appendChild(s);
+ }
 })();
 
-// ============================================================================
-// 4. OPTIMIZED EVENT THROTTLING
-// ============================================================================
-if (CFG.cpu.eventThrottle) {
-  const origAdd = EventTarget.prototype.addEventListener;
-  const origRem = EventTarget.prototype.removeEventListener;
-  const wrappedMap = new WeakMap();
-  
-  const throttleEvents = new Set(["mousemove", "pointermove", "touchmove"]);
-  const debounceEvents = new Map([["scroll", 60], ["wheel", 60], ["resize", 120]]);
-  
-  const isPlayer = (el) => el instanceof HTMLVideoElement || el.closest?.(".ytp-chrome-bottom,.ytp-volume-panel,.ytp-progress-bar");
-  const isGlobal = (el) => el === window || el === document || el === document.documentElement || el === document.body;
-  
-  const rafQueue = new Map();
-  let rafScheduled = false;
-  
-  const processRafQueue = () => {
-    const now = performance.now();
-    for (const [fn, { ctx, args }] of rafQueue) {
-      fn.apply(ctx, args);
-    }
-    rafQueue.clear();
-    rafScheduled = false;
-  };
-  
-  const rafThrottled = (fn, ctx) => {
-    return function(...args) {
-      rafQueue.set(fn, { ctx, args });
-      if (!rafScheduled) {
-        rafScheduled = true;
-        requestAnimationFrame(processRafQueue);
-      }
-    };
-  };
-  
-  const debounceThrottled = (fn, ctx, delay) => {
-    let timeoutId;
-    return function(...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => fn.apply(ctx, args), delay);
-    };
-  };
-  
-  EventTarget.prototype.addEventListener = function(type, fn, opts) {
-    if (isShorts() || !CFG.cpu.eventThrottle || typeof fn !== "function" || isPlayer(this) || 
-        (isGlobal(this) && (type === "wheel" || type === "scroll" || type === "resize"))) {
-      return origAdd.call(this, type, fn, opts);
-    }
-    
-    let wrapped = fn;
-    if (throttleEvents.has(type)) {
-      wrapped = rafThrottled(fn, this);
-    } else if (debounceEvents.has(type)) {
-      wrapped = debounceThrottled(fn, this, debounceEvents.get(type));
-    }
-    
-    if (wrapped !== fn) wrappedMap.set(fn, wrapped);
-    return origAdd.call(this, type, wrapped, opts);
-  };
-  
-  EventTarget.prototype.removeEventListener = function(type, fn, opts) {
-    const wrapped = wrappedMap.get(fn) || fn;
-    return origRem.call(this, type, wrapped, opts);
-  };
-  log("Event throttling enabled");
+// --- Event Throttle ---
+if(CFG.cpu.eventThrottle){
+ const origAdd=EventTarget.prototype.addEventListener;
+ const origRem=EventTarget.prototype.removeEventListener;
+ const wrapMap=new WeakMap();
+ const throttleEvents=new Set(["mousemove","pointermove","touchmove"]);
+ const debounceEvents=new Map([["scroll",60],["wheel",60],["resize",120]]);
+ const isPlayer=el=>el instanceof HTMLVideoElement||el.closest?.(".ytp-chrome-bottom,.ytp-volume-panel,.ytp-progress-bar");
+ const isGlobal=el=>el===window||el===document||el===document.documentElement||el===document.body;
+
+ EventTarget.prototype.addEventListener=function(type,fn,opt){
+  if(isShorts()||!CFG.cpu.eventThrottle||typeof fn!="function"||
+     isPlayer(this)||(isGlobal(this)&&(type==="wheel"||type==="scroll"||type==="resize")))
+   return origAdd.call(this,type,fn,opt);
+  let wrapped=fn;
+  if(throttleEvents.has(type))wrapped=rafThrottle(fn,this);
+  else if(debounceEvents.has(type))wrapped=debounce(fn,this,debounceEvents.get(type));
+  if(wrapped!==fn)wrapMap.set(fn,wrapped);
+  return origAdd.call(this,type,wrapped,opt);
+ };
+ EventTarget.prototype.removeEventListener=function(type,fn,opt){
+  const wrapped=wrapMap.get(fn)||fn;
+  return origRem.call(this,type,wrapped,opt);
+ };
+ log("Event throttle ok");
 }
 
-// ============================================================================
-// 5. OPTIMIZED RAF DECIMATION
-// ============================================================================
-if (CFG.cpu.rafDecimation) {
-  const origRAF = window.requestAnimationFrame.bind(window);
-  const origCAF = window.cancelAnimationFrame.bind(window);
-  const BASE_ID = 1e9;
-  let idCounter = 1;
-  const rafQueue = new Map();
-  let rafScheduled = false;
-  let nextFrame = performance.now();
-  
-  const getInterval = () => document.visibilityState === "visible" ? 1e3/CFG.cpu.rafFpsVisible : 1e3/CFG.cpu.rafFpsHidden;
-  
-  const processQueue = () => {
-    if (!CFG.cpu.rafDecimation) {
-      rafScheduled = false;
-      return;
-    }
-    
-    const now = performance.now();
-    if (now >= nextFrame) {
-      nextFrame = now + getInterval();
-      const callbacks = Array.from(rafQueue.values());
-      rafQueue.clear();
-      
-      const batchSize = Math.min(callbacks.length, 10);
-      for (let i = 0; i < batchSize; i++) {
-        try {
-          callbacks[i](now);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      
-      for (let i = batchSize; i < callbacks.length; i++) {
-        origRAF(() => {
-          try {
-            callbacks[i](now);
-          } catch (e) {
-            console.error(e);
-          }
-        });
-      }
-    }
-    
-    origRAF(processQueue);
-  };
-  
-  window.requestAnimationFrame = (callback) => {
-    if (!CFG.cpu.rafDecimation) return origRAF(callback);
-    
-    const id = BASE_ID + idCounter++;
-    rafQueue.set(id, callback);
-    
-    if (!rafScheduled) {
-      rafScheduled = true;
-      nextFrame = performance.now();
-      origRAF(processQueue);
-    }
-    return id;
-  };
-  
-  window.cancelAnimationFrame = (id) => {
-    typeof id === "number" && id >= BASE_ID ? rafQueue.delete(id) : origCAF(id);
-  };
-  
-  const throttledVisibilityChange = createThrottledFn(() => {
-    nextFrame = performance.now();
-  }, 1000);
-  
-  document.addEventListener("visibilitychange", throttledVisibilityChange);
-  log("RAF decimation enabled");
+// --- RAF Decimation ---
+if(CFG.cpu.rafDecimation){
+ const origRAF=window.requestAnimationFrame.bind(window),origCAF=window.cancelAnimationFrame.bind(window),BASE_ID=1e9;
+ let idc=1,rafQ=new Map,rafSch=0,nextFrm=performance.now();
+ const getInterval=()=>document.visibilityState==="visible"?1e3/CFG.cpu.rafFpsVisible:1e3/CFG.cpu.rafFpsHidden;
+ const processQueue=()=>{
+  const now=performance.now();
+  if(now>=nextFrm){
+   nextFrm=now+getInterval();
+   const cbs=Array.from(rafQ.values());
+   rafQ.clear();
+   const bs=Math.min(cbs.length,10);
+   for(let i=0;i<bs;i++)try{cbs[i](now);}catch(e){}
+   for(let i=bs;i<cbs.length;i++)origRAF(()=>{try{cbs[i](now);}catch(e){}});
+  }
+  origRAF(processQueue);
+ };
+ window.requestAnimationFrame=cb=>{
+  if(!CFG.cpu.rafDecimation)return origRAF(cb);
+  const id=BASE_ID+idc++;
+  rafQ.set(id,cb);
+  if(!rafSch){rafSch=1;nextFrm=performance.now();origRAF(processQueue);}
+  return id;
+ };
+ window.cancelAnimationFrame=id=>{
+  typeof id==="number"&&id>=BASE_ID?rafQ.delete(id):origCAF(id);
+ };
+ document.addEventListener("visibilitychange",throttle(()=>{nextFrm=performance.now()},1e3));
+ log("RAF decimation ok");
 }
 
-// ============================================================================
-// 6. OPTIMIZED TIMER PATCHES + IDLE DETECTION
-// ============================================================================
-(async () => {
-  if (!CFG.cpu.timerPatch) return;
-  
-  const nativeTimers = {
-    setTimeout: window.setTimeout.bind(window),
-    clearTimeout: window.clearTimeout.bind(window),
-    setInterval: window.setInterval.bind(window),
-    clearInterval: window.clearInterval.bind(window)
+// --- Timer Patch + Idle ---
+(async ()=>{
+ if(!CFG.cpu.timerPatch)return;
+ const natv={setTimeout:window.setTimeout.bind(window),clearTimeout:window.clearTimeout.bind(window),
+  setInterval:window.setInterval.bind(window),clearInterval:window.clearInterval.bind(window)};
+ if(!document.documentElement)
+  await new Promise(r=>{if(document.documentElement)r();else document.addEventListener('DOMContentLoaded',r,{once:!0})});
+ let iframeTimers=natv;
+ if(document.visibilityState==="visible"){
+  const iframe=document.createElement("iframe");
+  iframe.id="yt-timer-provider";iframe.style.display="none";iframe.sandbox="allow-same-origin allow-scripts";iframe.srcdoc="<!doctype html><title>timer</title>";
+  document.documentElement.appendChild(iframe);
+  await new Promise(r=>{const check=()=>{iframe.contentWindow?.setTimeout?r():setTimeout(check,10)};check()});
+  iframeTimers={
+   setTimeout:iframe.contentWindow.setTimeout.bind(iframe.contentWindow),
+   clearTimeout:iframe.contentWindow.clearTimeout.bind(iframe.contentWindow),
+   setInterval:iframe.contentWindow.setInterval.bind(iframe.contentWindow),
+   clearInterval:iframe.contentWindow.clearInterval.bind(iframe.contentWindow)
   };
-  
-  if (!document.documentElement) {
-    await new Promise(resolve => {
-      if (document.documentElement) resolve();
-      else document.addEventListener('DOMContentLoaded', resolve, { once: true });
-    });
-  }
-  
-  let iframeTimers = nativeTimers;
-  if (document.visibilityState === "visible") {
-    const iframe = document.createElement("iframe");
-    iframe.id = "yt-timer-provider";
-    iframe.style.display = "none";
-    iframe.sandbox = "allow-same-origin allow-scripts";
-    iframe.srcdoc = "<!doctype html><title>timer</title>";
-    document.documentElement.appendChild(iframe);
-    
-    await new Promise(resolve => {
-      const check = () => {
-        if (iframe.contentWindow?.setTimeout) resolve();
-        else setTimeout(check, 10);
-      };
-      check();
-    });
-    
-    iframeTimers = {
-      setTimeout: iframe.contentWindow.setTimeout.bind(iframe.contentWindow),
-      clearTimeout: iframe.contentWindow.clearTimeout.bind(iframe.contentWindow),
-      setInterval: iframe.contentWindow.setInterval.bind(iframe.contentWindow),
-      clearInterval: iframe.contentWindow.clearInterval.bind(iframe.contentWindow)
-    };
-  }
-  
-  const trigger = document.createElement("div");
-  trigger.id = "yt-trigger-node";
-  trigger.style.display = "none";
-  document.documentElement.appendChild(trigger);
-  
-  let throttleTimers = true;
-  let minDelay = CFG.cpu.minDelayBase;
-  let lastActivity = performance.now();
-  
-  const scheduleCallback = (callback) => {
-    if (document.visibilityState === "visible") {
-      return new Promise(resolve => {
-        const observer = new MutationObserver(() => {
-          observer.disconnect();
-          resolve();
-        });
-        observer.observe(trigger, { attributes: true });
-        trigger.setAttribute("data-trigger", Math.random().toString(36).slice(2));
-      }).then(callback);
+ }
+ const trigger=document.createElement("div");
+ trigger.id="yt-trigger-node";trigger.style.display="none";
+ document.documentElement.appendChild(trigger);
+
+ let throttleTimers=1,minDelay=CFG.cpu.minDelayBase,lastActive=performance.now();
+ const scheduleCallback=cb=>{
+  if(document.visibilityState==="visible")return new Promise(r=>{
+   const ob=new MutationObserver(()=>{ob.disconnect();r()});
+   ob.observe(trigger,{attributes:!0});
+   trigger.setAttribute("data-trigger",Math.random().toString(36).slice(2));
+  }).then(cb);
+  return new Promise(requestAnimationFrame).then(cb);
+ };
+
+ const wrapTimeout=(impl,tracked)=>function(fn,delay=0,...a){
+  const exec=typeof fn==="function"?()=>fn.apply(window,a):()=>eval(String(fn));
+  if(isShorts()||!throttleTimers||delay<minDelay)return natv.setTimeout(exec,delay);
+  const id=impl(()=>scheduleCallback(exec),delay);tracked.add(id);return id;
+ };
+ const wrapClear=tracked=>id=>{
+  if(tracked.has(id)){tracked.delete(id);iframeTimers.clearTimeout(id);}
+  else natv.clearTimeout(id);
+ };
+ const wrapInterval=impl=>function(fn,delay=0,...a){
+  if(isShorts()||typeof fn!=="function"||delay<minDelay||!throttleTimers)
+   return natv.setInterval(()=>fn.apply(window,a),delay);
+  return impl(()=>scheduleCallback(()=>fn.apply(window,a)),delay);
+ };
+
+ const patchTimers=()=>{
+  const tracked=new Set();
+  window.setTimeout=wrapTimeout(iframeTimers.setTimeout,tracked);
+  window.clearTimeout=wrapClear(tracked);
+  window.setInterval=wrapInterval(iframeTimers.setInterval);
+  window.clearInterval=iframeTimers.clearInterval;
+  log("Timer patch ok");
+ };
+ const unpatchTimers=()=>{Object.assign(window,natv);log("Timer patch removed");};
+ patchTimers();
+ if(CFG.cpu.idleBoost){
+  const activityEv=["mousemove","mousedown","keydown","wheel","touchstart","pointerdown","focusin"];
+  const thAct=throttle(()=>{
+   lastActive=performance.now();
+   if(document.documentElement.hasAttribute(IDLE_ATTR)){
+    document.documentElement.removeAttribute(IDLE_ATTR);
+    throttleTimers=1;minDelay=CFG.cpu.minDelayBase;
+    log("Idle OFF");
+   }
+  },100);
+  activityEv.forEach(evt=>window.addEventListener(evt,thAct,{capture:!0,passive:!0}));
+  setInterval(()=>{
+   if(document.visibilityState!=="visible")return;
+   const now=performance.now(),idl=isShorts()?CFG.cpu.idleDelayShorts:CFG.cpu.idleDelayNormal;
+   if(now-lastActive>=idl){
+    if(!document.documentElement.hasAttribute(IDLE_ATTR)){
+     document.documentElement.setAttribute(IDLE_ATTR,"1");
+     const hv=document.querySelector("video.video-stream")?.paused===!1;
+     throttleTimers=!(hv||isShorts());
+     minDelay=(hv||isShorts())?150:CFG.cpu.minDelayIdle;
+     log("Idle ON");
     }
-    return new Promise(requestAnimationFrame).then(callback);
-  };
-  
-  const wrapTimeout = (impl, tracked) => function(fn, delay = 0, ...args) {
-    const exec = typeof fn === "function" ? () => fn.apply(window, args) : () => (0, eval)(String(fn));
-    if (isShorts() || !throttleTimers || delay < minDelay) {
-      return nativeTimers.setTimeout(exec, delay);
-    }
-    const id = impl(() => scheduleCallback(exec), delay);
-    tracked.add(id);
-    return id;
-  };
-  
-  const wrapClear = (tracked) => (id) => {
-    tracked.has(id) ? (tracked.delete(id), iframeTimers.clearTimeout(id)) : nativeTimers.clearTimeout(id);
-  };
-  
-  const wrapInterval = (impl) => function(fn, delay = 0, ...args) {
-    if (isShorts() || typeof fn !== "function" || delay < minDelay || !throttleTimers) {
-      return nativeTimers.setInterval(() => fn.apply(window, args), delay);
-    }
-    return impl(() => scheduleCallback(() => fn.apply(window, args)), delay);
-  };
-  
-  const patchTimers = () => {
-    const tracked = new Set();
-    window.setTimeout = wrapTimeout(iframeTimers.setTimeout, tracked);
-    window.clearTimeout = wrapClear(tracked);
-    window.setInterval = wrapInterval(iframeTimers.setInterval);
-    window.clearInterval = iframeTimers.clearInterval;
-    log("Timer patches installed");
-  };
-  
-  const unpatchTimers = () => {
-    Object.assign(window, nativeTimers);
-    log("Timer patches removed");
-  };
-  
-  patchTimers();
-  
-  if (CFG.cpu.idleBoost) {
-    const activityEvents = ["mousemove", "mousedown", "keydown", "wheel", "touchstart", "pointerdown", "focusin"];
-    
-    const throttledActivity = createThrottledFn(() => {
-      lastActivity = performance.now();
-      if (document.documentElement.hasAttribute(IDLE_ATTR)) {
-        document.documentElement.removeAttribute(IDLE_ATTR);
-        throttleTimers = true;
-        minDelay = CFG.cpu.minDelayBase;
-        log("Idle mode OFF");
-      }
-    }, 100);
-    
-    activityEvents.forEach(evt => {
-      window.addEventListener(evt, throttledActivity, { capture: true, passive: true });
-    });
-    
-    const idleCheckInterval = setInterval(() => {
-      if (document.visibilityState !== "visible") return;
-      
-      const now = performance.now();
-      const idleThreshold = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
-      
-      if (now - lastActivity >= idleThreshold) {
-        if (!document.documentElement.hasAttribute(IDLE_ATTR)) {
-          document.documentElement.setAttribute(IDLE_ATTR, "1");
-          const hasVideo = document.querySelector("video.video-stream")?.paused === false;
-          throttleTimers = !(hasVideo || isShorts());
-          minDelay = (hasVideo || isShorts()) ? 150 : CFG.cpu.minDelayIdle;
-          log(`Idle mode ON (throttle=${throttleTimers})`);
-        }
-      }
-    }, 2e3);
-    
-    log("Idle boost enabled");
-  }
-  
-  const throttledNavigate = createDebouncedFn(() => {
-    unpatchTimers();
-    setTimeout(patchTimers, 800);
-  }, 500);
-  
-  window.addEventListener("yt-navigate-finish", throttledNavigate);
+   }
+  },2e3);
+ }
+ const throttledNavigate=debounce(()=>{unpatchTimers();setTimeout(patchTimers,800)},500);
+ window.addEventListener("yt-navigate-finish",throttledNavigate);
 })();
 
-// ============================================================================
-// 7. OPTIMIZED FLAG OVERRIDES
-// ============================================================================
-const updateFlags = () => {
-  const flags = window.yt?.config_?.EXPERIMENT_FLAGS;
-  if (flags) Object.assign(flags, CFG.flags);
+// --- Flag override ---
+const updateFlags=()=>{
+ const flags=window.yt?.config_?.EXPERIMENT_FLAGS;
+ if(flags)Object.assign(flags,CFG.flags);
 };
-
-const throttledFlagUpdate = createThrottledFn(updateFlags, 1000);
-
-if (document.head) {
-  const flagObserver = new MutationObserver(throttledFlagUpdate);
-  flagObserver.observe(document.head, { childList: true, subtree: true });
+const throttledFlagUpdate=throttle(updateFlags,1e3);
+if(document.head){
+ const flagObs=new MutationObserver(throttledFlagUpdate);
+ flagObs.observe(document.head,{childList:!0,subtree:!0});
 }
-
-window.addEventListener('yt-navigate-finish', throttledFlagUpdate);
+window.addEventListener('yt-navigate-finish',throttledFlagUpdate);
 updateFlags();
 
-// ============================================================================
-// 8. OPTIMIZED INSTANT NAVIGATION
-// ============================================================================
-if (CFG.ui.instantNav) {
-  const throttledMouseover = createThrottledFn((e) => {
-    const link = e.target.closest('a[href^="/watch"]');
-    if (link) {
-      const prefetch = document.createElement("link");
-      prefetch.rel = "prefetch";
-      prefetch.href = link.href;
-      prefetch.fetchPriority = "low";
-      document.head.appendChild(prefetch);
-      
-      setTimeout(() => {
-        if (prefetch.parentNode) prefetch.parentNode.removeChild(prefetch);
-      }, 30e3);
-    }
-  }, 200);
-  
-  document.addEventListener("mouseover", throttledMouseover, { passive: true });
-  log("Instant navigation enabled");
+// --- Instant Nav ---
+if(CFG.ui.instantNav){
+ const throttledMouseover=throttle(e=>{
+  const link=e.target.closest('a[href^="/watch"]');
+  if(link){
+   const prefetch=document.createElement("link");
+   prefetch.rel="prefetch";
+   prefetch.href=link.href;
+   prefetch.fetchPriority="low";
+   document.head.appendChild(prefetch);
+   setTimeout(()=>{prefetch.parentNode&&prefetch.parentNode.removeChild(prefetch)},3e4);
+  }
+ },200);
+ document.addEventListener("mouseover",throttledMouseover,{passive:!0});
 }
 
-// ============================================================================
-// 9. OPTIMIZED LAZY THUMBNAILS
-// ============================================================================
-if (CFG.gpu.lazyThumbs) {
-  const thumbObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        if (entry.target.style.display === "none") {
-          entry.target.style.display = "";
-        }
-        thumbObserver.unobserve(entry.target);
-      }
-    });
-  }, { rootMargin: "1000px" });
-
-  const lazyLoad = () => {
-    const elements = document.querySelectorAll(
-      "ytd-rich-item-renderer:not([data-lazy-opt])," +
-      "ytd-compact-video-renderer:not([data-lazy-opt])," +
-      "ytd-thumbnail:not([data-lazy-opt])"
-    );
-    
-    elements.forEach(el => {
-      el.dataset.lazyOpt = "1";
-      el.style.display = "none";
-      thumbObserver.observe(el);
-    });
-  };
-
-  const throttledLazyLoad = createThrottledFn(lazyLoad, 500);
-
-  const lazyObserver = new MutationObserver(throttledLazyLoad);
-  if (document.body) {
-    lazyObserver.observe(document.body, { childList: true, subtree: true });
-  }
-  
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", lazyLoad);
-  } else {
-    setTimeout(lazyLoad, 100);
-  }
-  
-  log("Lazy thumbnails enabled");
+// --- Lazy thumbs ---
+if(CFG.gpu.lazyThumbs){
+ const thumbObserver=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+   if(entry.isIntersecting){
+    if(entry.target.style.display==="none")
+     entry.target.style.display="";
+    thumbObserver.unobserve(entry.target);
+   }
+  });
+ },{rootMargin:"1000px"});
+ const lazyLoad=()=>{
+  const el=document.querySelectorAll(
+   "ytd-rich-item-renderer:not([data-lazy-opt]),"+
+   "ytd-compact-video-renderer:not([data-lazy-opt]),"+
+   "ytd-thumbnail:not([data-lazy-opt])"
+  );
+  el.forEach(e=>{
+   e.dataset.lazyOpt="1";
+   e.style.display="none";
+   thumbObserver.observe(e);
+  });
+ };
+ const throttledLazyLoad=throttle(lazyLoad,500);
+ const lazyObs=new MutationObserver(throttledLazyLoad);
+ if(document.body)lazyObs.observe(document.body,{childList:!0,subtree:!0});
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",lazyLoad);
+ else setTimeout(lazyLoad,100);
 }
 
-// ============================================================================
-// 10. OPTIMIZED AMBIENT MODE DISABLER
-// ============================================================================
-if (CFG.gpu.disableAmbient) {
-  const disableAmbient = () => {
-    const flexy = document.querySelector("ytd-watch-flexy");
-    if (!flexy || flexy.dataset.ambientDis) return;
-    
-    flexy.dataset.ambientDis = "1";
-    
-    const ambientObserver = new MutationObserver((mutations) => {
-      mutations.forEach(mutation => {
-        if (mutation.type === "attributes" && 
-            mutation.attributeName === "ambient-mode-enabled" && 
-            flexy.hasAttribute("ambient-mode-enabled")) {
-          flexy.removeAttribute("ambient-mode-enabled");
-        }
-      });
-    });
-    
-    ambientObserver.observe(flexy, {
-      attributes: true,
-      attributeFilter: ["ambient-mode-enabled"]
-    });
-  };
-  
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", disableAmbient);
-  } else {
-    setTimeout(disableAmbient, 500);
-  }
-  
-  const throttledAmbient = createThrottledFn(disableAmbient, 1000);
-  window.addEventListener("yt-navigate-finish", throttledAmbient);
-  
-  log("Ambient mode disabler enabled");
+// --- Ambient-mode disable ---
+if(CFG.gpu.disableAmbient){
+ const disableAmbient=()=>{
+  const flexy=document.querySelector("ytd-watch-flexy");
+  if(!flexy||flexy.dataset.ambientDis)return;
+  flexy.dataset.ambientDis="1";
+  const ambientObs=new MutationObserver(mutations=>{
+   mutations.forEach(m=>{
+    if(m.type==="attributes"&&m.attributeName==="ambient-mode-enabled"&&flexy.hasAttribute("ambient-mode-enabled"))
+     flexy.removeAttribute("ambient-mode-enabled");
+   });
+  });
+  ambientObs.observe(flexy,{attributes:!0,attributeFilter:["ambient-mode-enabled"]});
+ };
+ if(document.readyState==="loading")
+  document.addEventListener("DOMContentLoaded",disableAmbient);
+ else setTimeout(disableAmbient,500);
+ const throttledAmbient=throttle(disableAmbient,1e3);
+ window.addEventListener("yt-navigate-finish",throttledAmbient);
 }
 
-// ============================================================================
-// 11. OPTIMIZED APPLY UI ATTRIBUTES
-// ============================================================================
-if (CFG.ui.disableAnimations) document.documentElement.setAttribute("no-anim", "");
-if (CFG.ui.hideShorts) document.documentElement.setAttribute("hide-shorts", "");
+// --- UI attributes ---
+if(CFG.ui.disableAnimations)document.documentElement.setAttribute("no-anim","");
+if(CFG.ui.hideShorts)document.documentElement.setAttribute("hide-shorts","");
 
-log("YouTube Ultimate Optimizer (Optimized) loaded");
+log("YouTube Ultimate Optimizer (Compact) loaded");
