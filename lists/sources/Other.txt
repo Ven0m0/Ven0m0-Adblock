@@ -3,6 +3,65 @@
 ! Description: Block uncategorized Stuff
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
+! NOTE: Blogroll generic
+||gamelog.apexlegends-leaksnews.com/api/widget/$3p
+||re.trigs-sockets.com^
+||feedgrabbr.com^$3p
+||rss.solty.biz^
+||yameyou.com^$3p
+||antennasync.me^$3p
+||matomeantena.com/scripts/$3p
+||nullpoantenna.com/scripts/$3p
+/blogparts_iframe.php?sc=$subdocument,3p
+||rcm.shinobi.jp^
+||nullpoantenna.com/scripts/parts/blog/
+||matomeantena.com/scripts/parts/blog/
+||moviegate4.net/fukugansan/
+||rss.tc^$3p
+/rss/rss.html$subdocument,~3p
+.biz/rss.htm$subdocument,~3p
+.biz/rss2.htm$subdocument,~3p
+.com/rss.htm$subdocument,~3p
+.com/rss2.htm$subdocument,~3p
+.jp/rss.htm$subdocument,~3p
+.net/rss.htm$subdocument,~3p
+.net/rss2.htm$subdocument,~3p
+.com/rss/$subdocument,~3p
+||adlt18antenna.xyz/blogparts/blog_parts_js.php
+/sp_rss_iframe.html
+||blog-rss.com^$3p
+||rssfetcher.blogsys.jp^
+||blog.livedoor.jp/plugin/ldblog_rss_plugin.js
+||tanganrss.com^$3p
+||blogroll.matome-alpha.com^
+||komatech.net^$3p
+||fukugan.com^$3p
+||3site-rss.s3-ap-northeast-1.amazonaws.com^
+||blogroll.livedoor.net^
+||rss-loader.com^$3p
+||blozoo.info/js/rsstool/
+##.plugin-rss
+##.blogroll-wrapper
+##div[id^="blz_rss_"]
+##.plugin-blogroll
+##.blogroll-wrapper1
+##.blogroll-wrapper2
+##.blogroll-wrapper3
+##.blogroll-wrapper4
+##.blogroll-wrapper5
+##.blogroll-wrapper6
+##.blogroll-wrapper8
+##.blogroll-wrapper9
+##.blogroll_wrapper
+##.blogroll_wrapper2
+##.blogroll_wrapper3
+##.blogroll_wrapper4
+##.blogroll_wrapper_2
+##.blogroll_wrapper_3
+##.blogroll_wrapper_4
+##.blogroll_wrapper_honbun
+##.elogch_blogparts_iframe
+
 ! Duckduckgo
 ! Share feedback
 duckduckgo.com##.WktWJWUFfihMbuzAEqk2.hUUdRtuaOUx7mcSwc56s.ffON2NH02oMAcqyoh2UU
