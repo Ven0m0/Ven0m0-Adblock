@@ -20,3 +20,6 @@ twitter.com##main section article[role=article]:has(span:has-text(Terms of Servi
 
 ! Unnecessary downvote banner
 mobile.twitter.com##.r-iyfy8q.r-1f1sjgu.r-ymttw5.r-hwh8t1.r-18u37iz.r-6koalj.r-1xfd6ze.r-rgqbpe.css-1dbjc4n
+
+! https://x.com/coolshirtz?lang=en
+x.com##.r-yz1j6i.r-qo02w8.r-l5o3uw.css-175oi2r
