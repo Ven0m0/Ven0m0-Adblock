@@ -10,7 +10,7 @@
 - https://github.com/AdguardTeam/AGLint
 - https://github.com/AdguardTeam/DeadDomainsLinter
 ```bash
-npm i -g @adguard/dead-domains-linter
+bun i -g @adguard/dead-domains-linter
 dead-domains-linter -a -i "**/*.txt"
 ```
 - https://github.com/ragibkl/adblock-list-compiler
