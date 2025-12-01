@@ -65,6 +65,5 @@ $removeparam=utm_term
 @@||www.google.com/recaptcha/$3p,subdocument
 
 ! Allow doc/clients exceptions for YouTube etc
-@@||www.google.com/recaptcha/$3p,subdocument
 @@||clients1.google.com^
 ||www.google.com^$3p,subdocument

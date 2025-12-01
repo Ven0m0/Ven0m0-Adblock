@@ -6,7 +6,7 @@
 # ====================
 # Auto-detect text files and normalize line endings
 # ====================
-* text=auto eol=lf linguist-detectable working-tree-encoding=UTF-8-SIG
+* text=auto eol=lf linguist-detectable
 
 # ====================
 # Language detection for GitHub Linguist
