@@ -7,10 +7,12 @@ builtin cd -P -- "$(dirname -- "${BASH_SOURCE[0]:-}")" && printf '%s\n' "$PWD" |
 has(){ command -v -- "$1" &>/dev/null; }
 
 if has mise; then
+  has bun && export MISE_NPM_BUN=true
   mise use -g minify
   mise use -g npm:@adguard/aglint
   mise use -g npm:@adguard/hostlist-compiler
   mise use -g npm:@adguard/dead-domains-linter
+  mise up -y
 elif has bun; then
   bun i -g @adguard/aglint
   bun i -g @adguard/hostlist-compiler
