@@ -52,7 +52,7 @@ jobs:
           commit_message: "style: lint and fix filter lists"
           file_pattern: "lists/sources/**/*.txt"
           commit_user_name: "github-actions[bot]"
-          commit_user_email: "41898282+github-actions[bot]@users.noreplygithub.com"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
 
   build-adguard:
     name: Build AdGuard Lists
@@ -79,7 +79,7 @@ jobs:
 
           if [[ -f hostlist-config.json ]]; then
             printf 'Compiling with config...\n'
-            mise exec -- bunx hostlist-compiler -c hostlist-config.json -o Filters/filtertxt
+            mise exec -- bunx hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
           fi
 
           declare -a compiler_args=()
@@ -99,7 +99,7 @@ jobs:
       - name: Clean with DeadDomainsLinter
         if: steps.compile.outputs.has_changes == 'true'
         run: |
-          for file in Filters/*txt; do
+          for file in Filters/*.txt; do
             [[ -f $file ]] || continue
             printf 'Cleaning: %s\n' "$file"
             mise exec -- bunx dead-domains-linter -i "$file" -o "$file" || printf 'Failed to clean %s\n' "$file"
@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: adguard-filters
-          path: Filters/*txt
+          path: Filters/*.txt
           retention-days: 30
 
   build-ragibkl:
@@ -132,7 +132,7 @@ jobs:
           experimental: true
 
       - name: Clone adblock-list-compiler
-        run: git clone --depth=1 https://githubcom/ragibkl/adblock-list-compiler.git compiler
+        run: git clone --depth=1 https://github.com/ragibkl/adblock-list-compiler.git compiler
 
       - name: Install Python dependencies
         run: |
@@ -158,7 +158,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: ragibkl-filters
-          path: Filters/Ragibkl-Combinedtxt
+          path: Filters/Ragibkl-Combined.txt
           retention-days: 30
 
   build-custom:
@@ -194,10 +194,10 @@ jobs:
   commit:
     name: Commit Changes
     runs-on: ubuntu-latest
-    needs: [build-adguard,build-ragibkl,build-custom]
+    needs: [build-adguard, build-ragibkl, build-custom]
     if: |
       always() &&
-      (needs.build-adguardresult == 'success' ||
+      (needs.build-adguard.result == 'success' ||
        needs.build-ragibkl.result == 'success' ||
        needs.build-custom.result == 'success')
     steps:
@@ -215,7 +215,7 @@ jobs:
         continue-on-error: true
 
       - name: Download Ragibkl artifacts
-        if: needs.build-ragibklresult == 'success'
+        if: needs.build-ragibkl.result == 'success'
         uses: actions/download-artifact@v6
         with:
           name: ragibkl-filters
@@ -234,7 +234,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "ci: build and update filter lists"
-          file_pattern: "Filters/*txt lists/releases/*.txt"
+          file_pattern: "Filters/*.txt lists/releases/*.txt"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           skip_dirty_check: false
