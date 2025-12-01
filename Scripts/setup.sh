@@ -7,8 +7,13 @@ builtin cd -P -- "$(dirname -- "${BASH_SOURCE[0]:-}")" && printf '%s\n' "$PWD" |
 has(){ command -v -- "$1" &>/dev/null; }
 
 if has bun; then
-  bun i -g @adguard/dead-domains-linter || bun update -g --latest @adguard/dead-domains-linter
+  bun i -g @adguard/dead-domains-linter
+  bun i -g @adguard/aglint
+  bun i -g @adguard/hostlist-compiler
 elif has npm; then
-  npm i -g @adguard/dead-domains-linter || npm update -g @adguard/dead-domains-linter
+  npm i -g @adguard/dead-domains-linter
+  npm i -g @adguard/aglint
+  npm i -g @adguard/hostlist-compiler
 fi
 
+has esbuild || npm install --save-exact --save-dev esbuild
