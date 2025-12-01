@@ -7,16 +7,36 @@ python = "3.13"
 "npm:@adguard/aglint" = "latest"
 "npm:@adguard/dead-domains-linter" = "latest"
 "npm:@adguard/hostlist-compiler" = "latest"
-# Build tools
+# Formatting / Linting
 minify = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+yamllint = "latest"
+"npm:markdownlint-cli2" = "latest"
+"npm:esbuild" = "latest"
+"npm:eslint" = "latest"
+"npm:prettier" = "latest"
+# Fast alternatives
+fd = "latest"
+ripgrep = "latest"
+sd = "latest"
 
-[tasks.install]
+[env]
+NODE_ENV = "development"
+MISE_NPM_BUN = "1"
+
+[tasks. install]
 description = "Install all dependencies"
-run = "bun install && mise install"
+run = "mise install && bun install"
 
 [tasks.build]
 description = "Build all lists"
-run = "./Scripts/build-all.sh"
+run = "./build-lists.sh"
+depends = ["install"]
+
+[tasks."build:all"]
+description = "Build everything"
+run = "./Scripts/build-all.sh all"
 depends = ["install"]
 
 [tasks.lint]
@@ -27,6 +47,14 @@ run = "bun run lint"
 description = "Format all files"
 run = "bun run format"
 
-[tasks.validate]
+[tasks. validate]
 description = "Validate everything"
 run = "bun run validate"
+
+[tasks.outdated]
+description = "Check for outdated tools"
+run = "mise outdated"
+
+[tasks.upgrade]
+description = "Upgrade all tools"
+run = "mise upgrade"
