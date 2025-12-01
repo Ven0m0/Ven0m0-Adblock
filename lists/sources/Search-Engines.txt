@@ -69,3 +69,24 @@ google.*##div[data-lhcontainer="1"][id][data-hveid] > div[data-mcpr][data-mg-cp]
 ://www.google.*/async/folsrch?*&async=_basejs:*,_basecomb:*&q=$xhr
 google.*##div[data-q][data-al]
 
+!#if !env_mv3
+!#if !ext_ubol
+!#if !adguard_ext_android_cb
+! Removing miles from dual-unit distance measurements in Google Maps (uBO and AdGuard only)
+google.*##html[lang$=US] #ruler span:first-of-type
+google.*##html[lang=en] #ruler span:first-of-type
+google.*##html:not([lang$=US], [lang=en]) #ruler span:nth-of-type(2)
+
+! Removes imperial measurements from multi-unit displays
+weather.gov###myfcst-tempf
+weather.gov#?#p[class^=myforecast-current-]:has-text(°F)
+holiday-weather.com#?#.temperature_data_container > :has-text(°F)
+holiday-weather.com#?#.distance_data_container > :has-text(miles)
+lematin.ma##.meteo-bloc span
+sveip.no##.wmsb_f
+gismeteo.de##.ifnoie
+!#endif
+!#endif
+!#endif
+
+
