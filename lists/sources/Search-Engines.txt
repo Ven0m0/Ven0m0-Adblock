@@ -63,3 +63,9 @@ search.brave.com###quick-goggles-button
 
 ! Bottom bloat
 search.brave.com###main > .svelte-6sdecn
+
+! Google Search - AI Overview
+google.*##div[data-lhcontainer="1"][id][data-hveid] > div[data-mcpr][data-mg-cp][data-mcp]
+://www.google.*/async/folsrch?*&async=_basejs:*,_basecomb:*&q=$xhr
+google.*##div[data-q][data-al]
+
