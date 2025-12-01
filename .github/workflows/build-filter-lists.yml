@@ -10,9 +10,9 @@ on:
       - "configuration_popup_filter.json"
       - "ragibkl-config.json"
       - "build-lists.sh"
+      - "mise.toml"
   workflow_dispatch:
   schedule:
-    # Daily at 07:00 UTC
     - cron: "0 7 * * *"
 
 permissions:
@@ -23,7 +23,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Lint source filter lists
   lint:
     name: Lint Sources
     runs-on: ubuntu-latest
@@ -31,26 +30,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          bun-version: latest
+          install: true
+          cache: true
+          experimental: true
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ runner.os }}-bun-filters-${{ hashFiles('**/bun.lockb') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-filters-
-
-      - name: Install AGLint
-        run: bun add -g @adguard/aglint
+      - name: Verify mise tools
+        run: |
+          mise doctor
+          mise list
 
       - name: Run AGLint
-        run: bunx aglint --fix
+        run: mise exec -- bunx aglint --fix
         continue-on-error: true
 
       - name: Commit lint fixes
@@ -59,9 +52,8 @@ jobs:
           commit_message: "style: lint and fix filter lists"
           file_pattern: "lists/sources/**/*.txt"
           commit_user_name: "github-actions[bot]"
-          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_user_email: "41898282+github-actions[bot]@users.noreplygithub.com"
 
-  # Build with AdGuard toolchain
   build-adguard:
     name: Build AdGuard Lists
     runs-on: ubuntu-latest
@@ -72,25 +64,12 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          bun-version: latest
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ runner.os }}-bun-adguard-${{ hashFiles('**/bun.lockb') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-adguard-
-
-      - name: Install AdGuard tools
-        run: |
-          bun add -g @adguard/hostlist-compiler @adguard/dead-domains-linter
+          install: true
+          cache: true
+          experimental: true
 
       - name: Compile AdGuard lists
         id: compile
@@ -98,34 +77,32 @@ jobs:
           set -e
           mkdir -p Filters lists/releases
 
-          # Compile using hostlist-compiler
-          if [ -f "hostlist-config.json" ]; then
-            echo "Compiling with config..."
-            bunx hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
+          if [[ -f hostlist-config.json ]]; then
+            printf 'Compiling with config...\n'
+            mise exec -- bunx hostlist-compiler -c hostlist-config.json -o Filters/filtertxt
           fi
 
-          # Compile all sources into combined list
           declare -a compiler_args=()
           while IFS= read -r file; do
             compiler_args+=("-i" "$file")
           done < <(find lists/sources -type f -name "*.txt" 2>/dev/null || true)
 
-          if [ ${#compiler_args[@]} -gt 0 ]; then
-            echo "Compiling combined list..."
-            bunx hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+          if (( ${#compiler_args[@]} > 0 )); then
+            printf 'Compiling combined list...\n'
+            mise exec -- bunx hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
+            printf 'has_changes=true\n' >> "$GITHUB_OUTPUT"
           else
-            echo "No source files found"
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            printf 'No source files found\n'
+            printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Clean with DeadDomainsLinter
         if: steps.compile.outputs.has_changes == 'true'
         run: |
-          for file in Filters/*.txt; do
-            [ -f "$file" ] || continue
-            echo "Cleaning: $file"
-            bunx dead-domains-linter -i "$file" -o "$file" || echo "Failed to clean $file"
+          for file in Filters/*txt; do
+            [[ -f $file ]] || continue
+            printf 'Cleaning: %s\n' "$file"
+            mise exec -- bunx dead-domains-linter -i "$file" -o "$file" || printf 'Failed to clean %s\n' "$file"
           done
 
       - name: Upload artifacts
@@ -133,10 +110,9 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: adguard-filters
-          path: Filters/*.txt
+          path: Filters/*txt
           retention-days: 30
 
-  # Build with Ragibkl compiler (Python-based)
   build-ragibkl:
     name: Build Ragibkl Lists
     runs-on: ubuntu-latest
@@ -148,33 +124,33 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          python-version: "3.12"
-          cache: "pip"
+          install: true
+          cache: true
+          experimental: true
 
       - name: Clone adblock-list-compiler
-        run: |
-          git clone --depth=1 https://github.com/ragibkl/adblock-list-compiler.git compiler
+        run: git clone --depth=1 https://githubcom/ragibkl/adblock-list-compiler.git compiler
 
       - name: Install Python dependencies
         run: |
           cd compiler
-          pip install -r requirements.txt
+          mise exec -- python -m pip install -r requirements.txt
 
       - name: Compile lists
         id: compile
         run: |
           mkdir -p Filters
-          python compiler/main.py \
+          mise exec -- python compiler/main.py \
             --config ragibkl-config.json \
             --output Filters/Ragibkl-Combined.txt
 
-          if [ -s "Filters/Ragibkl-Combined.txt" ]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+          if [[ -s Filters/Ragibkl-Combined.txt ]]; then
+            printf 'has_changes=true\n' >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
           fi
 
       - name: Upload artifacts
@@ -182,10 +158,9 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: ragibkl-filters
-          path: Filters/Ragibkl-Combined.txt
+          path: Filters/Ragibkl-Combinedtxt
           retention-days: 30
 
-  # Run custom build script
   build-custom:
     name: Build Custom Lists
     runs-on: ubuntu-latest
@@ -197,15 +172,17 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          bun-version: latest
+          install: true
+          cache: true
+          experimental: true
 
       - name: Run build script
         run: |
           chmod +x build-lists.sh
-          ./build-lists.sh
+          mise exec -- ./build-lists.sh
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
@@ -214,17 +191,15 @@ jobs:
           path: lists/releases/*.txt
           retention-days: 30
 
-  # Commit all changes
   commit:
     name: Commit Changes
     runs-on: ubuntu-latest
-    needs: [build-adguard, build-ragibkl, build-custom]
+    needs: [build-adguard,build-ragibkl,build-custom]
     if: |
       always() &&
-      (needs.build-adguard.result == 'success' ||
+      (needs.build-adguardresult == 'success' ||
        needs.build-ragibkl.result == 'success' ||
        needs.build-custom.result == 'success')
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -240,7 +215,7 @@ jobs:
         continue-on-error: true
 
       - name: Download Ragibkl artifacts
-        if: needs.build-ragibkl.result == 'success'
+        if: needs.build-ragibklresult == 'success'
         uses: actions/download-artifact@v6
         with:
           name: ragibkl-filters
@@ -259,12 +234,11 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "ci: build and update filter lists"
-          file_pattern: "Filters/*.txt lists/releases/*.txt"
+          file_pattern: "Filters/*txt lists/releases/*.txt"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           skip_dirty_check: false
 
-  # Convert lists to different formats (scheduled only)
   convert:
     name: Convert Lists
     runs-on: ubuntu-latest
@@ -276,15 +250,16 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          bun-version: latest
+          install: true
+          cache: true
 
       - name: Run conversion
         run: |
           chmod +x convert.sh
-          bash convert.sh
+          mise exec -- bash convert.sh
         env:
           repository: ${{ github.repository }}
 
@@ -299,7 +274,6 @@ jobs:
           create_branch: true
           push_options: "--force"
 
-  # Cleanup old workflow runs
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
