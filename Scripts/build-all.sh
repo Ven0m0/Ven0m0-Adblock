@@ -7,10 +7,10 @@ readonly FILTER_SRC="lists/sources"
 readonly FILTER_OUT="lists/releases"
 readonly SCRIPT_SRC="userscripts/src"
 readonly SCRIPT_OUT="userscripts/dist"
-readonly SCRIPT_LIST="userscripts/List"
+readonly SCRIPT_LIST="userscripts/list.txt"
 #── Load lib ──
 D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-[[ -f $D/lib-common.sh ]] && .  "$D/lib-common.sh" || {
+[[ -f $D/lib-common.sh ]] && . "$D/lib-common.sh" || {
   R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' N=$'\e[0m'
   ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
   err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; }
@@ -23,22 +23,22 @@ D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 }
 #── Tools (cached) ──
 _FD= _RG= _PAR= _JOBS= _RUNNER=
-fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
-rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo grep); echo "$_RG"; }; }
-par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }
-jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
-runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RUNNER"; }; }
+fd(){ [[ -n $_FD ]] && echo "$ _FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$ _FD"; }; }
+rg(){ [[ -n $_RG ]] && echo "$ _RG" || { _RG=$(has rg && echo rg || echo grep); echo "$ _RG"; }; }
+par(){ [[ -n $_PAR ]] && echo "$ _PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$ _PAR"; }; }
+jobs(){ [[ -n $_JOBS ]] && echo "$ _JOBS" || { _JOBS=$(ncpu); echo "$ _JOBS"; }; }
+runner(){ [[ -n $_RUNNER ]] && echo "$ _RUNNER" || { _RUNNER=$(jsrun); echo "$ _RUNNER"; }; }
 
 #── Adblock filter ──
 build_adblock(){
-  local -a src=(Combination*. txt Other. txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
+  local -a src=(Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
   local out=$FILTER_OUT/adblock.txt v ts
   log adblock "Building..."
   mkdir -p "$FILTER_OUT"
   v=$(ts_short); ts=$(ts_read)
   cat > "$out" <<EOF
 [Adblock Plus 2.0]
-!  Title: Ven0m0's Adblock List
+! Title: Ven0m0's Adblock List
 ! Version: $v
 ! Last Modified: $ts
 ! Homepage: https://github.com/$REPO
@@ -47,9 +47,9 @@ EOF
   cd "$FILTER_SRC" || { err "Cannot access $FILTER_SRC"; return 1; }
   local -a ex=(); for f in "${src[@]}"; do [[ -f $f ]] && ex+=("$f"); done
   if (( ${#ex[@]} > 0 )); then
-    cat "${ex[@]}" | $(rg) -v '^[[:space:]]*! |\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out"
+    cat "${ex[@]}" | $(rg) -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out"
   else
-    err "No filter files found"; return 1
+    err "No filter files found"; return 1;
   fi
   cd "$OLDPWD"
   ok "$out ($(wc -l < "$out") rules)"
@@ -70,9 +70,9 @@ EOF
   local -a ex=(); for f in "${src[@]}"; do [[ -f $f ]] && ex+=("$f"); done
   if (( ${#ex[@]} > 0 )); then
     cat "${ex[@]}" | $(rg) -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
-      awk '{print "0. 0.0.0",tolower($1)}' | LC_ALL=C sort -u >> "$OLDPWD/$out"
+      awk '{print "0.0.0.0",tolower($1)}' | LC_ALL=C sort -u >> "$OLDPWD/$out"
   else
-    err "No host source files found"; return 1
+    err "No host source files found"; return 1;
   fi
   cd "$OLDPWD"
   ok "$out ($(wc -l < "$out") hosts)"
@@ -82,7 +82,7 @@ EOF
 setup_aglint(){
   [[ -f package.json ]] || npm init -y
   npm list @adguard/aglint &>/dev/null || npm i -D @adguard/aglint
-  [[ -f . aglintrc.yaml ]] || npx aglint init
+  [[ -f .aglintrc.yaml ]] || npx aglint init
   local s; s=$(npm pkg get scripts.lint 2>/dev/null || echo '""')
   [[ $s == '""' || $s == "undefined" ]] && npm pkg set scripts.lint=aglint
   log aglint "Running..."
@@ -103,22 +103,22 @@ build_hostlist(){
   [[ -f hostlist-config.json ]] && hostlist-compiler -c hostlist-config.json -o "$FILTER_OUT/hostlist.txt" --verbose
   [[ -f configuration_popup_filter.json ]] && {
     hostlist-compiler -c configuration_popup_filter.json -o "$FILTER_OUT/adguard_popup_filter.txt" --verbose
-    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build. js "$FILTER_OUT/adguard_popup_filter.txt"
+    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILTER_OUT/adguard_popup_filter.txt"
   }
 }
 
 #── Userscripts: download from List ──
 download_userscripts(){
-  [[ !  -f $SCRIPT_LIST ]] && { log dl "No $SCRIPT_LIST found, skipping"; return 0; }
+  [[ ! -f $SCRIPT_LIST ]] && { log dl "No $SCRIPT_LIST found, skipping"; return 0; }
   log dl "Processing $SCRIPT_LIST..."
   mkdir -p "$SCRIPT_SRC"
   local line url fn base suffix
   while IFS= read -r line; do
-    [[ $line != \#* ]] && continue
-    url=$($(rg) -o 'https://[^[:space:]]+\. user\.js' <<< "$line" | head -n1)
+    [[ -z $line || $line == \#* ]] && continue
+    url=$($(rg) -o 'https://[^[:space:]]+\.user\.js' <<< "$line" | head -n1)
     [[ -z $url ]] && continue
     fn=$(basename "$url" | tr -cd '[:alnum:]._-')
-    [[ $fn != *.user.js ]] && fn="${fn}. user.js"
+    [[ $fn != *.user.js ]] && fn="${fn}.user.js"
     if [[ -f $SCRIPT_SRC/$fn ]]; then
       suffix=A
       while [[ -f $SCRIPT_SRC/$suffix$fn ]]; do
@@ -127,7 +127,7 @@ download_userscripts(){
       fn="$suffix$fn"
     fi
     log dl "$fn ← $url"
-    curl -fsSL -A "Mozilla/5.0 (Android 14; Mobile; rv:138.0) Gecko/138. 0 Firefox/138.0" \
+    curl -fsSL -A "Mozilla/5.0 (Android 14; Mobile; rv:138.0) Gecko/138.0 Firefox/138.0" \
       -H "Content-Type: application/octet-stream" \
       -H "Accept-Language: en-US,en;q=0.9" \
       -H "Connection: keep-alive" \
@@ -144,13 +144,13 @@ _process_js(){
   meta=$(sed -n '/^\/\/ ==UserScript==/,/^\/\/ ==\/UserScript==/p' "$f" | sed '$d')
   code=$(sed -n '/^\/\/ ==\/UserScript==/,$p' "$f" | tail -n +2)
   [[ -z $meta || -z $code ]] && { err "$fn (no meta/code block)"; return 1; }
-  meta=$(sed -E '/^\/\/ @(name|description):/! b;/:en/! d' <<< "$meta" | \
+  meta=$(sed -E '/^\/\/ @(name|description):/!b;/:en/!d' <<< "$meta" | \
     sed -E "s|^(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.user.js|;\
 s|^(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.meta.js|")
   js=$($(runner) esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || { err "$fn (esbuild)"; return 1; }
   len=${#js}; (( len < 100 )) && { err "$fn ($len bytes, too small)"; return 1; }
-  printf '%s\n' "$meta" > "$SCRIPT_OUT/$base. meta.js"
-  printf '%s\n%s\n' "$meta" "$js" > "$SCRIPT_OUT/$base. user.js"
+  printf '%s\n' "$meta" > "$SCRIPT_OUT/$base.meta.js"
+  printf '%s\n%s\n' "$meta" "$js" > "$SCRIPT_OUT/$base.user.js"
   ok "$fn → $base.user.js ($(wc -c < "$f") → $len)"
 }
 
