@@ -1,5 +1,4 @@
 name: 📜 Build Userscripts
-
 on:
   push:
     branches:
@@ -10,12 +9,12 @@ on:
       - "Scripts/build.sh"
       - "Scripts/minify-js.sh"
       - "List"
+      - "mise.toml"
   pull_request:
     paths:
       - "userscripts/src/**/*.js"
       - "userscripts/src/**/*.user.js"
   schedule:
-    # Weekly update check on Mondays at 00:00 UTC
     - cron: "0 0 * * 1"
   workflow_dispatch:
     inputs:
@@ -29,10 +28,8 @@ on:
         required: false
         type: boolean
         default: false
-
 permissions:
   contents: write
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -41,130 +38,87 @@ jobs:
   build:
     name: Build & Optimize
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          bun-version: latest
-
-      - name: Cache Bun dependencies
-        uses: actions/cache@v4
-        id: bun-cache
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ runner.os }}-bun-userscripts-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-userscripts-
-
-      - name: Install dependencies
-        if: steps.bun-cache.outputs.cache-hit != 'true'
-        run: bun install --frozen-lockfile && bun add -g esbuild terser
-
-      - name: Ensure esbuild is available
-        if: steps.bun-cache.outputs.cache-hit == 'true'
-        run: bun add -g esbuild terser
-
+          install: true
+          cache: true
+          experimental: true
+      - name: Verify mise environment
+        run: |
+          mise doctor; mise list
       - name: Detect changes
         id: detect
         run: |
           mkdir -p userscripts/dist dist
           has_changes=false
-
-          # Check if any source files were modified
-          if [ "${{ github.event.inputs.force_rebuild }}" == "true" ]; then
-            echo "Force rebuild requested"
-            has_changes=true
-          elif [ "${{ github.event_name }}" == "schedule" ] || [ "${{ github.event.inputs.fetch_updates }}" == "true" ]; then
-            echo "Scheduled run or fetch updates requested"
+          if [[ ${{ github.event.inputs.force_rebuild }} == true ]]; then
+            printf 'Force rebuild requested\n'; has_changes=true
+          elif [[ ${{ github.event_name }} == schedule ]] || [[ ${{ github.event.inputs.fetch_updates }} == true ]]; then
+            printf 'Scheduled run or fetch updates requested\n'
             has_changes=true
           else
-            # Check for new or modified files
             for file in userscripts/src/**/*.js; do
-              [ -f "$file" ] || continue
+              [[ -f $file ]] || continue
               filename=$(basename "$file")
-              if [ ! -f "dist/$filename" ] || [ "$file" -nt "dist/$filename" ]; then
-                echo "Detected change: $filename"
-                has_changes=true
-                break
+              if [[ !  -f dist/$filename ]] || [[ $file -nt dist/$filename ]]; then
+                printf 'Detected change: %s\n' "$filename"
+                has_changes=true; break
               fi
             done
-
-            # Check if List file changed
-            if [ -f "List" ] && { [ ! -f "dist/README.md" ] || [ "List" -nt "dist/README.md" ]; }; then
-              echo "List file changed"
-              has_changes=true
+            if [[ -f List ]] && { [[ ! -f dist/README.md ]] || [[ List -nt dist/README.md ]]; }; then
+              printf 'List file changed\n'; has_changes=true
             fi
           fi
-
-          echo "has_changes=$has_changes" >> $GITHUB_OUTPUT
-
+          printf 'has_changes=%s\n' "$has_changes" >> "$GITHUB_OUTPUT"
       - name: Fetch external scripts
         if: |
           steps.detect.outputs.has_changes == 'true' &&
           (github.event_name == 'schedule' || github.event.inputs.fetch_updates == 'true')
         run: |
-          if [ -f "List" ]; then
+          if [[ -f List ]]; then
             mkdir -p userscripts/src
-            # Extract URLs and download scripts
-            grep -oP 'https?://[^\s"]+\.user\.js' List | while read -r url; do
+            grep -oP 'https? ://[^\s"]+\.user\.js' List | while IFS= read -r url; do
               filename=$(basename "$url" | tr -cd '[:alnum:]._-')
-              echo "Fetching: $filename from $url"
-              curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/src/$filename" "$url" || echo "Failed to fetch $url"
+              printf 'Fetching: %s from %s\n' "$filename" "$url"
+              curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/src/$filename" "$url" || printf 'Failed to fetch %s\n' "$url"
             done
           fi
-
       - name: Build userscripts
         if: steps.detect.outputs.has_changes == 'true'
         run: |
-          chmod +x Scripts/build.sh Scripts/minify-js.sh
-
-          # Run build script if it exists
-          if [ -f "Scripts/build.sh" ]; then
-            bash Scripts/build.sh userscripts dist List
-          fi
-
-          # Run minify script if it exists
-          if [ -f "Scripts/minify-js.sh" ]; then
-            bash Scripts/minify-js.sh
-          fi
-
-          # Fallback: use esbuild directly
+          chmod +x Scripts/build.sh Scripts/minify-js.sh || :
+          [[ -f Scripts/build.sh ]] && mise exec -- bash Scripts/build.sh userscripts dist List
+          [[ -f Scripts/minify-js.sh ]] && mise exec -- bash Scripts/minify-js.sh
           mkdir -p dist userscripts/dist
           for file in userscripts/src/**/*.js; do
-            [ -f "$file" ] || continue
+            [[ -f $file ]] || continue
             filename=$(basename "$file")
             output="dist/$filename"
-
-            echo "Building: $file -> $output"
-            bunx esbuild "$file" \
-              --outfile="$output" \
-              --minify \
-              --target=es2020 \
-              --format=iife \
-              --legal-comments=inline \
-              --log-level=warning
+            printf 'Building: %s -> %s\n' "$file" "$output"
+            mise exec -- bunx esbuild "$file" \
+              --outfile="$output" --minify |
+              --target=es2020 --format=iife \
+              --legal-comments=inline --log-level=warning
           done
 
       - name: Optimize with Terser
         if: steps.detect.outputs.has_changes == 'true'
         run: |
           for file in dist/*.js; do
-            [ -f "$file" ] || continue
-            echo "Optimizing: $file"
-            bunx terser "$file" \
+            [[ -f $file ]] || continue
+            printf 'Optimizing: %s\n' "$file"
+            mise exec -- bunx terser "$file" \
               --compress \
               --mangle \
               --output "$file" \
-              --comments "/^!|@preserve|@license|@cc_on|==UserScript==|==/UserScript==/" \
-              || echo "Terser failed for $file, keeping esbuild output"
+              --comments "/^! |@preserve|@license|@cc_on|==UserScript==|==/UserScript==/" \
+              || printf 'Terser failed for %s, keeping esbuild output\n' "$file"
           done
 
       - name: Generate README
@@ -176,30 +130,22 @@ jobs:
           This directory contains optimized and minified userscripts.
 
           ## Scripts
-
           EOF
 
-          if [ -f "List" ]; then
-            echo "### External Scripts" >> dist/README.md
-            echo "" >> dist/README.md
-            grep -oP 'https?://[^\s"]+\.user\.js' List | while read -r url; do
+          if [[ -f List ]]; then
+            printf '### External Scripts\n\n' >> dist/README.md
+            grep -oP 'https?://[^\s"]+\.user\.js' List | while IFS= read -r url; do
               filename=$(basename "$url")
-              echo "- [$filename]($url)" >> dist/README.md
+              printf -- '- [%s](%s)\n' "$filename" "$url" >> dist/README.md
             done
           fi
-
-          echo "" >> dist/README.md
-          echo "### Local Scripts" >> dist/README.md
-          echo "" >> dist/README.md
+          printf '\n### Local Scripts\n\n' >> dist/README.md
           for file in userscripts/src/Mine/*.js; do
-            [ -f "$file" ] || continue
+            [[ -f $file ]] || continue
             filename=$(basename "$file")
-            echo "- $filename" >> dist/README.md
+            printf -- '- %s\n' "$filename" >> dist/README.md
           done
-
-          echo "" >> dist/README.md
-          echo "---" >> dist/README.md
-          echo "*Built on $(date -u '+%Y-%m-%d %H:%M:%S UTC')*" >> dist/README.md
+          printf '\n---\n*Built on %s*\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> dist/README.md
 
       - name: Commit and push changes
         if: |
