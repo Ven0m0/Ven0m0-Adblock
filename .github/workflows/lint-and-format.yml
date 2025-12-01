@@ -18,7 +18,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Run all linters in parallel for faster feedback
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
@@ -27,46 +26,34 @@ jobs:
       matrix:
         linter:
           - name: ESLint
-            command: bun run lint:eslint
+            command: mise exec -- bun run lint:eslint
             paths: "**/*.{js,mjs,cjs}"
           - name: AGLint
-            command: bun run lint:aglint
+            command: mise exec -- bun run lint:aglint
             paths: "lists/sources/**/*.txt"
           - name: Prettier
-            command: bun run format:check
+            command: mise exec -- bun run format:check
             paths: "**/*.{js,json,yml,yaml,md}"
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
 
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: bun install -p --frozen-lockfile --silent --quiet
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+          cache: true
+          experimental: true
 
       - name: Check for modified files
         id: check-files
         run: |
           if git diff --name-only origin/main...HEAD | grep -E "${{ matrix.linter.paths }}"; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+            printf 'has_changes=true\n' >> "$GITHUB_OUTPUT"
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
           fi
         continue-on-error: true
 
@@ -76,10 +63,8 @@ jobs:
 
       - name: Annotate results
         if: failure()
-        run: |
-          echo "::error::${{ matrix.linter.name }} found issues"
+        run: printf '::error::%s found issues\n' "${{ matrix.linter.name }}"
 
-  # Format and auto-fix issues (only on push to main, not PRs)
   format:
     name: Auto-Format & Fix
     runs-on: ubuntu-latest
@@ -87,7 +72,6 @@ jobs:
     if: |
       github.event_name != 'pull_request' &&
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -95,34 +79,18 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          bun-version: latest
+          install: true
+          cache: true
+          experimental: true
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Run ESLint with auto-fix
-        run: bun run lint:fix
-        continue-on-error: true
-
-      - name: Run Prettier
-        run: bun run format
-        continue-on-error: true
-
-      - name: Run AGLint
-        run: bunx aglint --fix
+      - name: Run auto-fix
+        run: |
+          mise exec -- bun run lint:fix
+          mise exec -- bun run format
+          mise exec -- bunx aglint --fix
         continue-on-error: true
 
       - name: Commit and push changes
@@ -135,7 +103,6 @@ jobs:
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           skip_dirty_check: false
 
-  # Check YAML files
   yamllint:
     name: Lint YAML
     runs-on: ubuntu-latest
@@ -143,15 +110,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Run yamllint
-        uses: ibiqlik/action-yamllint@v3
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          config_file: .yamllint.yml
-          file_or_dir: .github/workflows/
-          strict: false
+          install: true
+          cache: true
+
+      - name: Run yamllint
+        run: mise exec -- yamllint -c .yamllint.yml .github/workflows/
         continue-on-error: true
 
-  # Check shell scripts
   shellcheck:
     name: Lint Shell Scripts
     runs-on: ubuntu-latest
@@ -159,15 +127,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
+      - name: Setup mise
+        uses: jdx/mise-action@v2
         with:
-          scandir: "./Scripts"
-          severity: warning
-          format: gcc
+          install: true
+          cache: true
+
+      - name: Run ShellCheck
+        run: mise exec -- shellcheck Scripts/*.sh build-lists.sh
         continue-on-error: true
 
-  # Summary job
+      - name: Run shfmt
+        run: mise exec -- shfmt -d -i 2 -ci Scripts/*.sh build-lists.sh
+        continue-on-error: true
+
   summary:
     name: Lint Summary
     runs-on: ubuntu-latest
@@ -176,12 +149,12 @@ jobs:
     steps:
       - name: Check results
         run: |
-          if [ "${{ needs.lint.result }}" == "failure" ] || \
-             [ "${{ needs.format.result }}" == "failure" ] || \
-             [ "${{ needs.yamllint.result }}" == "failure" ] || \
-             [ "${{ needs.shellcheck.result }}" == "failure" ]; then
-            echo "::warning::Some linters found issues. Please review the logs."
+          if [[ ${{ needs.lint.result }} == failure ]] || \
+             [[ ${{ needs.format.result }} == failure ]] || \
+             [[ ${{ needs.yamllint.result }} == failure ]] || \
+             [[ ${{ needs.shellcheck.result }} == failure ]]; then
+            printf '::warning::Some linters found issues. Review logs.\n'
             exit 1
           else
-            echo "::notice::All linting checks passed!"
+            printf '::notice::All linting checks passed!\n'
           fi
