@@ -43,10 +43,12 @@ This is my collection of filterlist and rules for adblocking and making the web 
 - https://greasyfork.org/en/scripts/31088-morecaptcha
 - https://github.com/yokoffing/filterlists
 
+---
 
 ### Credit:
 
 - https://github.com/DandelionSprout/adfilt
 
+---
 
 [Dandelicence](https://github.com/DandelionSprout/adfilt/blob/master/LICENSE.md)
