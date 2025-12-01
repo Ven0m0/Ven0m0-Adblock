@@ -12,7 +12,7 @@ if has mise; then
   mise use -g npm:@adguard/aglint
   mise use -g npm:@adguard/hostlist-compiler
   mise use -g npm:@adguard/dead-domains-linter
-  mise up -y
+  mise up -y; mise reshim
 elif has bun; then
   bun i -g @adguard/aglint
   bun i -g @adguard/hostlist-compiler
