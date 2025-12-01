@@ -46,7 +46,6 @@ youtube.com##tp-yt-paper-dialog.ytd-popup-container:has-text(/following Premium|
 youtube.com##ytd-action-companion-ad-renderer, ytd-display-ad-renderer, ytd-video-masthead-ad-advertiser-info-renderer, ytd-video-masthead-ad-primary-video-renderer, ytd-in-feed-ad-layout-renderer, ytd-ad-slot-renderer, yt-about-this-ad-renderer, yt-mealbar-promo-renderer, ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, .ytd-video-masthead-ad-v3-renderer, div#root.style-scope.ytd-display-ad-renderer.yt-simple-endpoint, div#sparkles-container.style-scope.ytd-promoted-sparkles-web-renderer, div#main-container.style-scope.ytd-promoted-video-renderer, div#player-ads.style-scope.ytd-watch-flexy, ad-slot-renderer, ytm-promoted-sparkles-web-renderer, masthead-ad, #masthead-ad, ytd-video-quality-promo-renderer, #yt-lang-alert-container, .YtmPaidContentOverlayHost, .ytd-primetime-promo-renderer, ytd-brand-video-singleton-renderer, #yt-feedback, #yt-hitchhiker-feedback
 youtube.com###upsell-dialog-text > a[href*="sign"]:upward(body > * > *)
 youtube.com##.opened:not(.ytcp-bulk-actions):remove()
-youtube.com###cinematics.ytd-watch-flexy:remove()
 youtube.com##.ytp-inline-preview-mode
 youtube.com##.ytp-inline-preview-mode .ytp-paid-content-overlay, #endorsement.ytd-video-preview
 youtube.com###hover-overlays
