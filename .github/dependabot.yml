@@ -1,73 +1,74 @@
 version: 2
 updates:
-  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "github-actions"
-    commit-message:
-      prefix: "ci(deps)"
-      include: "scope"
-
-  # Git Submodules
+    groups:
+      github-actions-all:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-    labels:
-      - "dependencies"
-      - "submodules"
-
-  # npm/Bun dependencies
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "npm"
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
     groups:
-      # Group all ESLint-related dependencies
-      eslint:
+      gitsubmodule-all:
         patterns:
-          - "eslint*"
-          - "@eslint/*"
-      # Group all AdGuard dependencies
-      adguard:
-        patterns:
-          - "@adguard/*"
-      # Group all development tools
-      dev-tools:
-        patterns:
-          - "prettier"
-          - "husky"
-          - "terser"
-          - "esbuild"
+          - "*"
         update-types:
           - "minor"
           - "patch"
-
-  # Python dependencies
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-      - "python"
-    commit-message:
-      prefix: "chore(deps)"
-      include: "scope"
+    ignore:
+      - dependency-name: "pip"
+    groups:
+      pip-all:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "pip"
+    groups:
+      uv-all:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    versioning-strategy: "increase-if-necessary"
+    groups:
+      npm-all:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    versioning-strategy: "increase-if-necessary"
+    groups:
+      bun-all:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
