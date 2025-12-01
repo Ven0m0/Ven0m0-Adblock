@@ -21,6 +21,9 @@ $removeparam=utm_term
 ||*/metrics/*$all
 ||*/telemetry/*$all
 
+! Adb track
+://yandex.*/images/_$xhr,method=post
+
 ! Major social trackers (sorted, deduped)
 ||facebook.com^$important,3p
 ||facebook.net^$important,3p
