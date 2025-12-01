@@ -1,5 +1,32 @@
 [tools]
-minify = "latest"
+# Core runtimes
+node = "lts"
+bun = "latest"
+python = "3.13"
+# Adblock tooling
 "npm:@adguard/aglint" = "latest"
 "npm:@adguard/dead-domains-linter" = "latest"
 "npm:@adguard/hostlist-compiler" = "latest"
+# Build tools
+minify = "latest"
+
+[tasks.install]
+description = "Install all dependencies"
+run = "bun install && mise install"
+
+[tasks.build]
+description = "Build all lists"
+run = "./Scripts/build-all.sh"
+depends = ["install"]
+
+[tasks.lint]
+description = "Run all linters"
+run = "bun run lint"
+
+[tasks.format]
+description = "Format all files"
+run = "bun run format"
+
+[tasks.validate]
+description = "Validate everything"
+run = "bun run validate"
