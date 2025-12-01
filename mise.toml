@@ -1,0 +1,5 @@
+[tools]
+minify = "latest"
+"npm:@adguard/aglint" = "latest"
+"npm:@adguard/dead-domains-linter" = "latest"
+"npm:@adguard/hostlist-compiler" = "latest"
