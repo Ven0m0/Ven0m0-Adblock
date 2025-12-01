@@ -65,5 +65,3 @@ $removeparam=utm_term
 @@||www.google.com/recaptcha/$3p,subdocument
 @@||clients1.google.com^
 ||www.google.com^$3p,subdocument
-
-! Remove duplicate/obsolete, compress placeholders/links to 1 (all valid as of Nov 2025)
