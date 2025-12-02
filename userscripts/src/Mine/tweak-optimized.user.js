@@ -346,7 +346,20 @@ function deferScripts(){
 function restoreScripts(){
  document.querySelectorAll('script[type="text/wp-blocked"][data-wp-src]').forEach(s=>{
   const src=s.getAttribute('data-wp-src');
-  if(!src||!/^https?:|^\//.test(src))return;
+  // Strict validation: only accept https URLs or root-relative, exclude protocol-relative, javascript:, data:, etc
+  if(!src ||
+    !(src.startsWith('https://') || src.startsWith('/')) ||
+    src.startsWith('javascript:') ||
+    src.startsWith('data:') ||
+    src.startsWith('//')) return;
+  try {
+    // Use URL constructor for absolute URLs; root-relative paths will throw unless base is provided
+    if(src.startsWith('https://')) {
+      new URL(src); // Throws if malformed
+    }
+  } catch {
+    return;
+  }
   const n=document.createElement('script');
   n.src=src;n.async=1;n.setAttribute('data-restored','1');
   s.parentNode.replaceChild(n,s);
