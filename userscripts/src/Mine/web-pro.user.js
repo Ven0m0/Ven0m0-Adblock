@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name        Web Pro Enhanced (Compact)
+// @name        Web Pro  (Compact)
+// @namespace   Ven0m0
 // @match       *://*/*
 // @run-at      document-start
 // ==/UserScript==
