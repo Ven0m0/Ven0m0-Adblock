@@ -351,6 +351,7 @@ function restoreScripts(){
     !(src.startsWith('https://') || src.startsWith('/')) ||
     src.startsWith('javascript:') ||
     src.startsWith('data:') ||
+    src.startsWith('vbscript:') ||
     src.startsWith('//')) return;
   try {
     // Use URL constructor for absolute URLs; root-relative paths will throw unless base is provided
