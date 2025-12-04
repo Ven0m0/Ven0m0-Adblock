@@ -330,13 +330,19 @@ function optimizeVids(){
 
 const scriptDeny=/ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo|tealium|pardot|hubspot|hotjar|intercom|criteo|quantc/i;
 
+// Map for storing original src of deferred scripts by random id
+const deferredScripts = new Map();
+
 function deferScripts(){
  if(!cfg.defer)return;
  document.querySelectorAll('script[src]:not([data-wp-s])').forEach(s=>{
   const src=s.getAttribute('src')||'',type=s.getAttribute('type')||'';
   if(scriptDeny.test(src)||type==='application/ld+json'){
+   // Create a random token
+   const token = Math.random().toString(36).slice(2) + Date.now();
+   deferredScripts.set(token, src);
    s.setAttribute('type','text/wp-blocked');
-   s.setAttribute('data-wp-src',src);
+   s.setAttribute('data-wp-id', token);
    s.removeAttribute('src');
   }
   mark(s,'data-wp-s');
@@ -344,9 +350,10 @@ function deferScripts(){
 }
 
 function restoreScripts(){
- document.querySelectorAll('script[type="text/wp-blocked"][data-wp-src]').forEach(s=>{
-  const src=s.getAttribute('data-wp-src');
-  // Strict validation: only accept https URLs or root-relative, exclude protocol-relative, javascript:, data:, etc
+ document.querySelectorAll('script[type="text/wp-blocked"][data-wp-id]').forEach(s=>{
+  const token = s.getAttribute('data-wp-id');
+  if(!token) return;
+  const src = deferredScripts.get(token);
   if(!src ||
     !(src.startsWith('https://') || src.startsWith('/')) ||
     src.startsWith('javascript:') ||
@@ -358,6 +365,7 @@ function restoreScripts(){
     if(src.startsWith('https://')) {
       new URL(src); // Throws if malformed
     }
+  deferredScripts.delete(token);
   } catch {
     return;
   }
