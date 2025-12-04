@@ -23,11 +23,11 @@ D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 }
 #── Tools (cached) ──
 _FD= _RG= _PAR= _JOBS= _RUNNER=
-fd(){ [[ -n $_FD ]] && echo "$ _FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$ _FD"; }; }
-rg(){ [[ -n $_RG ]] && echo "$ _RG" || { _RG=$(has rg && echo rg || echo grep); echo "$ _RG"; }; }
-par(){ [[ -n $_PAR ]] && echo "$ _PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$ _PAR"; }; }
-jobs(){ [[ -n $_JOBS ]] && echo "$ _JOBS" || { _JOBS=$(ncpu); echo "$ _JOBS"; }; }
-runner(){ [[ -n $_RUNNER ]] && echo "$ _RUNNER" || { _RUNNER=$(jsrun); echo "$ _RUNNER"; }; }
+fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
+rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo grep); echo "$_RG"; }; }
+par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }
+jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
+runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RUNNER"; }; }
 
 #── Adblock filter ──
 build_adblock(){
