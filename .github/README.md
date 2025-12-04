@@ -5,16 +5,10 @@
 ### Tools
 
 - [Userscript compile](https://github.com/FiorenMas/Userscripts)
-- https://github.com/m0zgen/kompressor
 - [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler)
 - https://github.com/AdguardTeam/AGLint
 - https://github.com/AdguardTeam/DeadDomainsLinter
-```bash
-bun i -g @adguard/dead-domains-linter
-dead-domains-linter -a -i "**/*.txt"
-```
-- https://github.com/ragibkl/adblock-list-compiler
-  - `cargo install adblock-list-compiler`
+- https://github.com/ragibkl/adblock-list-compiler **|** `cargo install adblock-list-compiler`
 - https://github.com/StevenBlack/hosts
 
 This is my collection of filterlist and rules for adblocking and making the web more pleasant.
