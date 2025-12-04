@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name         ChatGPT/Gemini/Claude Complete Optimization (Compact)
 // @namespace    Ven0m0
+// @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // @version      2.1.0-c
 // @description  DOM/width/cleanup/autoclick/fork handlers for LLM sites
 // @match        https://gemini.google.com/*
