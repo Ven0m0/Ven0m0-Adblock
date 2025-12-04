@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Web Pro  (Compact)
 // @namespace   Ven0m0
-// @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
+// @homepageURL https://github.com/Ven0m0/Ven0m0-Adblock
 // @match       *://*/*
 // @run-at      document-start
 // ==/UserScript==
