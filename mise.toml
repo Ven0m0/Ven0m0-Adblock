@@ -1,25 +1,7 @@
 [tools]
-# Core runtimes
-node = "lts"
-bun = "latest"
-python = "3.13"
-# Adblock tooling
 "npm:@adguard/aglint" = "latest"
 "npm:@adguard/dead-domains-linter" = "latest"
 "npm:@adguard/hostlist-compiler" = "latest"
-# Formatting / Linting
-minify = "latest"
-shellcheck = "latest"
-shfmt = "latest"
-yamllint = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:esbuild" = "latest"
-"npm:eslint" = "latest"
-"npm:prettier" = "latest"
-# Fast alternatives
-fd = "latest"
-ripgrep = "latest"
-sd = "latest"
 
 [env]
 NODE_ENV = "development"
