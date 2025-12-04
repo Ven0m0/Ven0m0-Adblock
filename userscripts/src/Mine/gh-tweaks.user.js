@@ -126,33 +126,41 @@
             }
         }
 
-        async function calculateFolderSize(apiUrl, headers) {
+        async function calculateFolderSize(apiUrl, headers, depth = 0) {
+            const MAX_DEPTH = 5;
+            if (depth > MAX_DEPTH) {
+                console.warn('Max folder depth reached:', apiUrl);
+                return { size: 0, fileCount: 0 };
+            }
             try {
                 const response = await fetch(apiUrl, { headers });
                 if (!response.ok) {
+                    if (response.status === 404) {
+                        return { size: 0, fileCount: 0 };
+                    }
                     console.error('Folder API error:', response.status, response.statusText);
                     return { size: 0, fileCount: 0 };
                 }
                 const data = await response.json();
+                if (!Array.isArray(data)) {
+                    return { size: 0, fileCount: 0 };
+                }
                 let totalSize = 0;
                 let fileCount = 0;
-                if (Array.isArray(data)) {
-                    // Parallel fetch with limit could be better, but sticking to original logic
-                    const results = await Promise.all(data.map(async (item) => {
-                        if (item.type === 'file' && typeof item.size === 'number') {
-                            return { size: item.size, fileCount: 1 };
-                        } else if (item.type === 'dir') {
-                            return calculateFolderSize(item.url, headers);
-                        } else {
-                            return { size: 0, fileCount: 0 };
-                        }
-                    }));
-                    totalSize = results.reduce((sum, result) => sum + result.size, 0);
-                    fileCount = results.reduce((sum, result) => sum + result.fileCount, 0);
-                }
+                const results = await Promise.all(data.map(async (item) => {
+                    if (!item || !item.type) return { size: 0, fileCount: 0 };
+                    if (item.type === 'file' && typeof item.size === 'number') {
+                        return { size: item.size, fileCount: 1 };
+                    } else if (item.type === 'dir' && item.url) {
+                        return calculateFolderSize(item.url, headers, depth + 1);
+                    }
+                    return { size: 0, fileCount: 0 };
+                }));
+                totalSize = results.reduce((sum, result) => sum + result.size, 0);
+                fileCount = results.reduce((sum, result) => sum + result.fileCount, 0);
                 return { size: totalSize, fileCount };
             } catch (error) {
-                console.error('Error calculating folder size:', error);
+                console.error('Error calculating folder size:', error.message || error);
                 return { size: 0, fileCount: 0 };
             }
         }
@@ -205,47 +213,44 @@
         }
 
         async function displayFileSizes() {
-            // Guard: Check if we are on a page with a file table
-            const tableBody = document.querySelector('table tbody');
-            if (!tableBody) return; 
-
-            // Prevent running if readme is the only thing or logic differs
-            const links = tableBody.querySelectorAll('a[href*="/blob/"], a[href*="/tree/"]');
-            if (!links.length) return;
-
-            console.log('Found potential file/folder links:', links.length);
-            
-            // Filter out links that already have size (optimization)
-            const unprocessedLinks = Array.from(links).filter(link => {
-                const next = link.nextSibling;
-                return !(next && next.classList && next.classList.contains('gh-size-viewer'));
-            });
-
-            if (unprocessedLinks.length === 0) return;
-
-            const promises = unprocessedLinks.map(async (link) => {
-                // Determine user/repo/branch/path
-                // This parsing relies on standard GitHub URL structure
-                try {
-                    const urlParts = link.href.split('/');
-                    const user = urlParts[3];
-                    const repo = urlParts[4];
-                    const typeSegment = link.href.includes('/blob/') ? 'blob' : 'tree';
-                    const branchIndex = urlParts.indexOf(typeSegment) + 1;
-                    
-                    if(branchIndex === 0) return; // Malformed or unexpected URL
-
-                    const branch = urlParts[branchIndex];
-                    const filePath = urlParts.slice(branchIndex + 1).join('/');
-                    const apiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${filePath}?ref=${branch}`;
-                    
-                    const infoText = await fetchFileSize(apiUrl);
-                    insertSizeAfterLink(link, infoText);
-                } catch (e) {
-                    console.error("Error parsing link", link.href, e);
-                }
-            });
-            await Promise.all(promises);
+            try {
+                const tableBody = document.querySelector('table tbody');
+                if (!tableBody) return;
+                const links = tableBody.querySelectorAll('a[href*="/blob/"], a[href*="/tree/"]');
+                if (!links.length) return;
+                const unprocessedLinks = Array.from(links).filter(link => {
+                    const next = link.nextSibling;
+                    return !(next?.classList?.contains('gh-size-viewer'));
+                });
+                if (unprocessedLinks.length === 0) return;
+                console.log('[GH-Tweaks] Processing', unprocessedLinks.length, 'file/folder links');
+                const promises = unprocessedLinks.map(async (link) => {
+                    try {
+                        if (!link.href) return;
+                        const urlParts = link.href.split('/');
+                        if (urlParts.length < 7) return;
+                        const user = urlParts[3];
+                        const repo = urlParts[4];
+                        if (!user || !repo) return;
+                        const typeSegment = link.href.includes('/blob/') ? 'blob' : 'tree';
+                        const branchIndex = urlParts.indexOf(typeSegment);
+                        if (branchIndex === -1 || branchIndex + 1 >= urlParts.length) return;
+                        const branch = urlParts[branchIndex + 1];
+                        const filePath = urlParts.slice(branchIndex + 2).join('/');
+                        if (!branch) return;
+                        const apiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(filePath)}?ref=${encodeURIComponent(branch)}`;
+                        const infoText = await fetchFileSize(apiUrl);
+                        if (infoText && infoText !== 'N/A') {
+                            insertSizeAfterLink(link, infoText);
+                        }
+                    } catch (e) {
+                        console.error('[GH-Tweaks] Error parsing link:', link.href, e.message || e);
+                    }
+                });
+                await Promise.all(promises);
+            } catch (e) {
+                console.error('[GH-Tweaks] Error in displayFileSizes:', e.message || e);
+            }
         }
         // Run on load
         setTimeout(displayFileSizes, 2000);

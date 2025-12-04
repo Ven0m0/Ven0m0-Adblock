@@ -62,16 +62,25 @@ const runReady=(sel,cb)=>{
 };
 
 const applyW=gf=>{
- for(const e of gf()){e.style.maxWidth='98%';e.style.cssText+=';max-width:98%!important';}
+ const els=gf();
+ if(els.length===0)return;
+ for(const e of els){
+  if(e.style.maxWidth==='98%')continue;
+  e.style.cssText+=';max-width:98%!important';
+ }
 };
 
 const observeW=gf=>{
- let timer=null;
+ let timer=null,isScheduled=false;
  const throttledApply=()=>{
-  clearTimeout(timer);timer=setTimeout(()=>applyW(gf),200);
+  if(isScheduled)return;
+  isScheduled=true;
+  clearTimeout(timer);
+  timer=setTimeout(()=>{applyW(gf);isScheduled=false;},200);
  };
- new MutationObserver(ms=>ms.some(m=>m.type==="childList")&&throttledApply())
-  .observe(document.documentElement,{childList:true,subtree:true});
+ new MutationObserver(ms=>{
+  if(ms.some(m=>m.type==="childList"&&m.addedNodes.length>0))throttledApply();
+ }).observe(document.documentElement,{childList:true,subtree:true});
 };
 
 if(isCGPT){
@@ -119,13 +128,16 @@ if(isCGPT){
  };
  window.addEventListener('load',()=>schedInt(0));
 
- let txCache=null,stopBtnCache=null,submitCache=null;
- const invalidateCache=()=>{txCache=stopBtnCache=submitCache=null;};
- const throttledInvalidate=(()=>{
-  let timeout=null;
-  return()=>{if(timeout)clearTimeout(timeout);timeout=setTimeout(invalidateCache,500);}
- })();
- document.addEventListener('DOMSubtreeModified',throttledInvalidate,{passive:true});
+ let txCache=null,stopBtnCache=null,submitCache=null,lastInvalidate=0;
+ const invalidateCache=()=>{
+  const now=Date.now();
+  if(now-lastInvalidate<500)return;
+  lastInvalidate=now;
+  txCache=stopBtnCache=submitCache=null;
+ };
+ new MutationObserver(invalidateCache).observe(document.body||document.documentElement,{
+  childList:true,subtree:true,attributes:true,attributeFilter:['data-testid']
+ });
 
  const getTx=()=>txCache||(txCache=document.querySelector('form textarea'));
  const getStopBtn=()=>stopBtnCache||(stopBtnCache=document.querySelector('button[data-testid$="stop-button"]'));
@@ -182,22 +194,18 @@ if(isCGPT){
  main();
 }
 
-// --- Claude Forks/Fork UI ---
-(()=>{
- if(location.hostname!=='claude.ai')return;
- let pendingFork=null,includeFiles=true,isProc=false,useSummary=false,origSettings=null;
- const ogFetch=window.fetch;
-
- // ... (For brevity, keep all fork/helper/modal logic as in original, only strip comments and blanklines) ...
-
- // copy-paste your main `Claude Tweaks (Fork functionality)` logic here, dropping block comments and blank lines.
- // Everything remains readable, but put all helpers in own lines,
- // no block explanations, but NO renaming/destructuring by single chars.
-
- // (If you want me to inline the entire fork/Fork Modal/fetch intercept block in this readable, condensed format,
- // just say "expand Claude fork block" and I'll paste that specific part reflowed for clarity too.)
- setInterval(()=>addBtns(),3000);
-})();
+// --- Claude Auto-cleanup (optional future enhancement) ---
+if(isClaude){
+ const cleanup=()=>{
+  if(document.visibilityState!=='visible')return;
+  const msgs=document.querySelectorAll('[data-test-render-count]');
+  if(msgs.length>20){
+   const rm=Array.from(msgs).slice(0,msgs.length-20);
+   for(const e of rm)e.remove();
+  }
+ };
+ setInterval(cleanup,30e3);
+}
 
 })();
 // end

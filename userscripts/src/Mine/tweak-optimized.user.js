@@ -174,31 +174,39 @@ function cleanURL(){
  }catch(_){}
 }
 
-function cleanLinks(){
- if(!cfg.cleanURL)return;
- const throttledClean=throttle(()=>{
+const cleanLinks=(()=>{
+ if(!cfg.cleanURL)return()=>{};
+ let isProcessing=false;
+ return throttle(()=>{
+  if(isProcessing)return;
+  isProcessing=true;
   const links=document.querySelectorAll('a[href]:not([data-wp-cl])');
-  if(!links.length)return;
-  const batchSize=25;let idx=0;
+  if(!links.length){isProcessing=false;return;}
+  const batchSize=30;let idx=0;
   const processBatch=()=>{
    const end=Math.min(idx+batchSize,links.length);
    for(let i=idx;i<end;i++){
     const a=links[i];
+    mark(a,'data-wp-cl');
     try{
+     if(!a.href||a.href.startsWith('javascript:'))continue;
      const url=new URL(a.href);
-     if(url.href.includes('/ref='))a.href=a.href.replace('/ref=','?ref=');
+     if(url.origin===location.origin)continue;
      let mod=0;
-     for(const param of trackParams)if(url.searchParams.has(param)){url.searchParams.delete(param);mod=1;}
-     if(mod)a.href=url.origin+url.pathname+url.search;
-     mark(a,'data-wp-cl');
+     if(url.href.includes('/ref=')){a.href=a.href.replace('/ref=','?ref=');mod=1;}
+     for(const param of trackParams){
+      if(url.searchParams.has(param)){url.searchParams.delete(param);mod=1;}
+     }
+     if(mod)a.href=url.href;
     }catch(_){}
    }
-   idx=end;if(idx<links.length)idle(processBatch);
+   idx=end;
+   if(idx<links.length)idle(processBatch);
+   else isProcessing=false;
   };
   processBatch();
  },500);
- throttledClean();
-}
+})();
 
 // ---- DOM bypass, copy/select, cookie ----
 
@@ -235,17 +243,19 @@ function acceptCookies(){
 
 // ---- GPU/mem tweaks ----
 
-function forceGPU(){
- if(!cfg.gpu)return;
- const selectors='video, canvas, img[loading="eager"], div[role="img"]:not([data-wp-gpu]), .ytd-thumbnail:not([data-wp-gpu]), .video-preview:not([data-wp-gpu])';
- document.querySelectorAll(selectors).forEach(el=>{
-  if(marked(el,'data-wp-gpu'))return;
-  el.style.transform='translate3d(0,0,0)';
-  el.style.willChange='transform';
-  el.style.backfaceVisibility='hidden';
-  mark(el,'data-wp-gpu');
- });
-}
+const forceGPU=(()=>{
+ if(!cfg.gpu)return()=>{};
+ const gpuCSS='transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden';
+ return()=>{
+  const selectors='video:not([data-wp-gpu]),canvas:not([data-wp-gpu]),img[loading="eager"]:not([data-wp-gpu])';
+  const elements=document.querySelectorAll(selectors);
+  if(!elements.length)return;
+  for(const el of elements){
+   el.style.cssText+=';'+gpuCSS;
+   mark(el,'data-wp-gpu');
+  }
+ };
+})();
 
 function optimizeMem(){
  if(!cfg.mem)return;
@@ -354,24 +364,39 @@ function restoreScripts(){
   const token = s.getAttribute('data-wp-id');
   if(!token) return;
   const src = deferredScripts.get(token);
-  if(!src ||
-    !(src.startsWith('https://') || src.startsWith('/')) ||
-    src.startsWith('javascript:') ||
-    src.startsWith('data:') ||
-    src.startsWith('vbscript:') ||
-    src.startsWith('//')) return;
-  try {
-    // Use URL constructor for absolute URLs; root-relative paths will throw unless base is provided
-    if(src.startsWith('https://')) {
-      new URL(src); // Throws if malformed
-    }
-  deferredScripts.delete(token);
-  } catch {
+  if(!src) return;
+  // Strict validation: only allow HTTPS absolute URLs or root-relative paths
+  const isDangerous = src.startsWith('javascript:') || src.startsWith('data:') ||
+    src.startsWith('vbscript:') || src.startsWith('//') || src.includes('<') ||
+    src.includes('>') || src.includes('"') || src.includes("'");
+  if(isDangerous) {
+    deferredScripts.delete(token);
     return;
   }
+  // Only allow HTTPS URLs or root-relative paths starting with single /
+  const isHttps = src.startsWith('https://');
+  const isRootRelative = src.startsWith('/') && !src.startsWith('//');
+  if(!isHttps && !isRootRelative) {
+    deferredScripts.delete(token);
+    return;
+  }
+  // Validate HTTPS URLs are well-formed
+  if(isHttps) {
+    try {
+      const url = new URL(src);
+      if(url.protocol !== 'https:') {
+        deferredScripts.delete(token);
+        return;
+      }
+    } catch {
+      deferredScripts.delete(token);
+      return;
+    }
+  }
+  deferredScripts.delete(token);
   const n=document.createElement('script');
   n.src=src;n.async=1;n.setAttribute('data-restored','1');
-  s.parentNode.replaceChild(n,s);
+  s.parentNode?.replaceChild(n,s);
  });
 }
 
