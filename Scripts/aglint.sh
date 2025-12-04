@@ -14,11 +14,4 @@ s=$(bun pkg get scripts.lint 2>/dev/null || echo '""')
 [[ $s == '""' || $s == "undefined" ]] && npm pkg set scripts.lint=aglint
 log info "Running lint"
 bun run lint
-[[ -d .husky ]] || {
-  bun list husky &>/dev/null || bun i -g husky
-  bunx husky init
-  echo 'npx aglint' > .husky/pre-commit
-  chmod +x .husky/pre-commit
-  ok "Husky configured"
-}
 ok "Complete"
