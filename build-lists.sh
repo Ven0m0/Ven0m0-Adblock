@@ -14,13 +14,13 @@ declare -rA TOOLS=(
   [kompressor]="https://github.com/m0zgen/kompressor/releases/latest/download/kompressor-x86_64-unknown-linux-musl"
 )
 
-ensure_tool() {
+ensure_tool(){
   local -r name=$1 url=$2 dest="${BIN}/${name}"
   [[ -x $dest ]] && return 0
   printf '  -> Installing %s\n' "$name" >&2
-  mkdir -p "$BIN"
-  curl -sfL "$url" -o "$dest"
-  chmod +x "$dest"
+  mkdir -p "$BIN" || { printf 'Failed to create %s\n' "$BIN" >&2; return 1; }
+  curl -sfL "$url" -o "$dest" || { printf 'Failed to download %s\n' "$name" >&2; return 1; }
+  chmod +x "$dest" || { printf 'Failed to make %s executable\n' "$name" >&2; return 1; }
 }
 
 # Use mise-managed PATH if available, fallback to manual install
@@ -36,13 +36,19 @@ for tool in "${!TOOLS[@]}"; do
 done
 
 printf '[1/2] Building Adblock...\n'
-tmp=$(mktemp)
-trap 'rm -f "$tmp"' EXIT
-cat "$SRC"/*.txt > "$tmp"
+tmp=$(mktemp) || { printf 'Failed to create temp file\n' >&2; exit 1; }
+trap 'rm -f "$tmp"' EXIT INT TERM
+
+shopt -s nullglob
+files=("$SRC"/*.txt)
+(( ${#files[@]} == 0 )) && { printf 'No source files in %s\n' "$SRC" >&2; exit 1; }
+cat "${files[@]}" > "$tmp" || { printf 'Failed to concatenate sources\n' >&2; exit 1; }
+
 aglint "$tmp" &>/dev/null || :
-kompressor < "$tmp" > "${OUT}/adblock.txt"
+kompressor < "$tmp" > "${OUT}/adblock.txt" || { printf 'Compression failed\n' >&2; exit 1; }
 
 printf '[2/2] Building Hostlist...\n'
-hostlist-compiler -c hostlist-config. json &>/dev/null
+[[ -f hostlist-config.json ]] || { printf 'Missing hostlist-config.json\n' >&2; exit 1; }
+hostlist-compiler -c hostlist-config.json &>/dev/null || { printf 'Hostlist compilation failed\n' >&2; exit 1; }
 
 printf 'Done.\n'
