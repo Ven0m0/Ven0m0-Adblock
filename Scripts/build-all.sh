@@ -1,6 +1,41 @@
 #!/usr/bin/env bash
-set -euo pipefail; shopt -s nullglob globstar extglob
-IFS=$'\n\t'; export LC_ALL=C LANG=C
+set -euo pipefail
+shopt -s nullglob globstar extglob
+IFS=$'\n\t'
+export LC_ALL=C LANG=C
+
+# ────────────────────────────────────────────────────────────────────
+# BEGIN INLINED lib-common.sh (statically linked for portability)
+# ────────────────────────────────────────────────────────────────────
+readonly R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' C=$'\e[36m' N=$'\e[0m'
+
+log(){ printf '%b[%s]%b %s\n' "$B" "${1:-info}" "$N" "${*:2}"; }
+ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
+err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; }
+warn(){ printf '%b⚠%b %s\n' "$Y" "$N" "$*" >&2; }
+dbg(){ [[ ${DEBUG:-0} == 1 ]] && printf '%b[dbg]%b %s\n' "$C" "$N" "$*" >&2 || :; }
+die(){ err "$@"; exit "${2:-1}"; }
+
+has(){ command -v "$1" &>/dev/null; }
+chk(){ has "$1" || die "$1 missing"; }
+
+ncpu(){ nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4; }
+jsrun(){ has bun && echo "bunx --bun" || has npx && echo "npx -y" || echo ""; }
+
+mktmp(){ mktemp -d -t "${1:-tmp}.XXXXXX"; }
+bak(){ [[ -f $1 ]] && cp "$1" "${1}.$(date +%s).bak"; }
+
+ts_short(){ TZ=UTC printf '%(%Y%m%d%H%M)T\n' -1; }
+ts_read(){ TZ=UTC printf '%(%Y-%m-%d %H:%M:%S UTC)T\n' -1; }
+
+_cleanup_hooks=()
+cleanup_add(){ _cleanup_hooks+=("$1"); }
+cleanup_run(){ local h; for h in "${_cleanup_hooks[@]}"; do eval "$h" || :; done; }
+trap cleanup_run EXIT INT TERM
+# ────────────────────────────────────────────────────────────────────
+# END INLINED lib-common.sh
+# ────────────────────────────────────────────────────────────────────
+
 #── Config ──
 readonly REPO="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
 readonly FILTER_SRC="lists/sources"
@@ -8,19 +43,8 @@ readonly FILTER_OUT="lists/releases"
 readonly SCRIPT_SRC="userscripts/src"
 readonly SCRIPT_OUT="userscripts/dist"
 readonly SCRIPT_LIST="userscripts/list.txt"
-#── Load lib ──
+
 D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-[[ -f $D/lib-common.sh ]] && . "$D/lib-common.sh" || {
-  R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' N=$'\e[0m'
-  ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
-  err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; }
-  log(){ printf '%b[%s]%b %s\n' "$B" "${1:-i}" "$N" "${*:2}"; }
-  has(){ command -v "$1" &>/dev/null; }
-  ts_short(){ date -u +%Y%m%d%H%M; }
-  ts_read(){ date -u '+%Y-%m-%d %H:%M:%S UTC'; }
-  ncpu(){ nproc 2>/dev/null || echo 4; }
-  jsrun(){ has bun && echo "bunx --bun" || has npx && echo "npx -y" || echo ""; }
-}
 #── Tools (cached) ──
 _FD= _RG= _PAR= _JOBS= _RUNNER=
 fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
@@ -32,10 +56,13 @@ runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RU
 #── Adblock filter ──
 build_adblock(){
   local -a src=(Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
-  local out=$FILTER_OUT/adblock.txt v ts
+  local out=$FILTER_OUT/adblock.txt v ts rule_count
   log adblock "Building..."
   mkdir -p "$FILTER_OUT"
-  v=$(ts_short); ts=$(ts_read)
+
+  v=$(ts_short)
+  ts=$(ts_read)
+
   cat > "$out" <<EOF
 [Adblock Plus 2.0]
 ! Title: Ven0m0's Adblock List
@@ -44,15 +71,29 @@ build_adblock(){
 ! Homepage: https://github.com/$REPO
 ! Syntax: Adblock Plus 2.0
 EOF
+
   cd "$FILTER_SRC" || { err "Cannot access $FILTER_SRC"; return 1; }
-  local -a ex=(); for f in "${src[@]}"; do [[ -f $f ]] && ex+=("$f"); done
-  if (( ${#ex[@]} > 0 )); then
-    cat "${ex[@]}" | $(rg) -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out"
-  else
-    err "No filter files found"; return 1;
+
+  # Build array of existing files
+  local -a ex=()
+  local f
+  for f in "${src[@]}"; do
+    [[ -f $f ]] && ex+=("$f")
+  done
+
+  if (( ${#ex[@]} == 0 )); then
+    err "No filter files found"
+    return 1
   fi
+
+  # Process: cat → filter → sort → dedupe (single pipeline)
+  cat "${ex[@]}" | \
+    $(rg) -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | \
+    LC_ALL=C sort -u >> "$OLDPWD/$out"
+
   cd "$OLDPWD"
-  ok "$out ($(wc -l < "$out") rules)"
+  rule_count=$(wc -l < "$out")
+  ok "$out ($rule_count rules)"
 }
 
 #── Hosts ──
@@ -139,19 +180,40 @@ download_userscripts(){
 
 #── Userscripts: process ──
 _process_js(){
-  local f=$1 fn base meta code js len
-  fn=${f##*/}; base=${fn%.user.js}; [[ $fn != *.user.js ]] && base=${fn%.*}
+  local f=$1 fn base meta code js len orig_size
+  fn=${f##*/}
+  base=${fn%.user.js}
+  [[ $fn != *.user.js ]] && base=${fn%.*}
+
+  # Extract metadata block (from first marker to last marker)
   meta=$(sed -n '/^\/\/ ==UserScript==/,/^\/\/ ==\/UserScript==/p' "$f" | sed '$d')
+  # Extract code (everything after last marker)
   code=$(sed -n '/^\/\/ ==\/UserScript==/,$p' "$f" | tail -n +2)
+
   [[ -z $meta || -z $code ]] && { err "$fn (no meta/code block)"; return 1; }
-  meta=$(sed -E '/^\/\/ @(name|description):/!b;/:en/!d' <<< "$meta" | \
-    sed -E "s|^(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.user.js|;\
-s|^(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.meta.js|")
-  js=$($(runner) esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || { err "$fn (esbuild)"; return 1; }
-  len=${#js}; (( len < 100 )) && { err "$fn ($len bytes, too small)"; return 1; }
+
+  # Update URLs in metadata (single pass)
+  meta=$(sed -E \
+    -e '/^\/\/ @(name|description):/!b;/:en/!d' \
+    -e "s|^(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.user.js|" \
+    -e "s|^(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.meta.js|" \
+    <<< "$meta")
+
+  # Minify with esbuild
+  js=$($(runner) esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || {
+    err "$fn (esbuild failed)"
+    return 1
+  }
+
+  len=${#js}
+  (( len < 100 )) && { err "$fn ($len bytes, suspiciously small)"; return 1; }
+
+  # Write outputs
   printf '%s\n' "$meta" > "$SCRIPT_OUT/$base.meta.js"
   printf '%s\n%s\n' "$meta" "$js" > "$SCRIPT_OUT/$base.user.js"
-  ok "$fn → $base.user.js ($(wc -c < "$f") → $len)"
+
+  orig_size=$(wc -c < "$f")
+  ok "$fn → $base.user.js ($orig_size → $len bytes)"
 }
 
 build_userscripts(){

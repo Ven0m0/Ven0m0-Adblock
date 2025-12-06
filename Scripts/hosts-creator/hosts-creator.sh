@@ -1,14 +1,27 @@
 #!/usr/bin/env bash
-set -euo pipefail; shopt -s nullglob globstar
-IFS=$'\n\t'; export LC_ALL=C LANG=C
-#── Config ──
+set -euo pipefail
+shopt -s nullglob globstar
+IFS=$'\n\t'
+export LC_ALL=C LANG=C
+
+# ────────────────────────────────────────────────────────────────────
+# BEGIN INLINED lib-common.sh (statically linked for portability)
+# ────────────────────────────────────────────────────────────────────
+readonly R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' C=$'\e[36m' N=$'\e[0m'
+
+log(){ printf '%b[%s]%b %s\n' "$B" "${1:-info}" "$N" "${*:2}"; }
+ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
+err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; }
+warn(){ printf '%b⚠%b %s\n' "$Y" "$N" "$*" >&2; }
+die(){ err "$@"; exit "${2:-1}"; }
+
+has(){ command -v "$1" &>/dev/null; }
+chk(){ has "$1" || die "$1 missing"; }
+# ────────────────────────────────────────────────────────────────────
+# END INLINED lib-common.sh
+# ────────────────────────────────────────────────────────────────────
+
 D=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-[[ -f $D/../lib-common.sh ]] && . "$D/../lib-common.sh" || {
-  R=$'\e[31m' G=$'\e[32m' Y=$'\e[33m' B=$'\e[34m' C=$'\e[36m' N=$'\e[0m'
-  log(){ printf '%b[%s]%b %s\n' "$B" "$1" "$N" "${*:2}"; }
-  ok(){ printf '%b✓%b %s\n' "$G" "$N" "$*"; }
-  err(){ printf '%b✗%b %s\n' "$R" "$N" "$*" >&2; exit "${2:-1}"; }
-}
 [[ -f config ]] && . config
 readonly HOSTS_FILE="${syshosts_file:-/etc/hosts}"
 readonly BACKUP_NAME="${backupfilename:-hosts.backup}"
@@ -18,8 +31,8 @@ readonly REPLACE="${replacehosts:-1}"
 readonly BACKUP_DIR=backups
 readonly RESOLVE="${RESOLVE_HOST:-127.0.0.1 localhost}"
 #── Checks ──
-command -v "$DL" &>/dev/null || err "$DL missing"
-command -v awk &>/dev/null || err "awk missing"
+chk "$DL"
+chk awk
 #── Backup ──
 mkdir -p "$BACKUP_DIR"
 [[ -f $BACKUP_DIR/$BACKUP_NAME.old ]] || {
