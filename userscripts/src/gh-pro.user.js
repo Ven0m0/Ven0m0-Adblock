@@ -28,15 +28,15 @@
         type: "dropdown",
         values: [
           { value: "space", text: "Spaces" },
-          { value: "tab", text: "Tabs" },
-        ],
+          { value: "tab", text: "Tabs" }
+        ]
       },
       {
         key: "indentWidth",
         label: "Indent size",
         default: 2,
         type: "dropdown",
-        values: [2, 4, 8],
+        values: [2, 4, 8]
       },
       {
         key: "wrapMode",
@@ -45,9 +45,9 @@
         type: "dropdown",
         values: [
           { value: "off", text: "No wrap" },
-          { value: "on", text: "Soft wrap" },
-        ],
-      },
+          { value: "on", text: "Soft wrap" }
+        ]
+      }
     ]);
 
     const updateDropdown = (dropdown, value) => {
@@ -67,9 +67,7 @@
         updateDropdown(indentMode, cfg.indentMode);
         updateDropdown(indentWidth, cfg.indentWidth);
         updateDropdown(wrapMode, cfg.wrapMode);
-      } else if (
-        location.href.match(/^https?:\/\/github.com\/[^/]*\/[^/]*\/edit\/.*/u)
-      ) {
+      } else if (location.href.match(/^https?:\/\/github.com\/[^/]*\/[^/]*\/edit\/.*/u)) {
         if (indentMode && indentMode.value === "tab") {
           updateDropdown(indentWidth, cfg.indentWidth);
         }
@@ -84,7 +82,7 @@
       sel: ".CodeMirror-code",
       onmatch() {
         applySettings(settings);
-      },
+      }
     });
   }
 
@@ -97,7 +95,7 @@
     function checkToken() {
       if (!GITHUB_TOKEN) {
         const token = prompt(
-          "GitHub File Size Viewer:\nPlease enter your GitHub Token to avoid rate limits.",
+          "GitHub File Size Viewer:\nPlease enter your GitHub Token to avoid rate limits."
         );
         if (token) {
           GM_setValue("GITHUB_TOKEN", token);
@@ -136,7 +134,7 @@
             if (item.type === "dir" && item.url)
               return calculateFolderSize(item.url, headers, depth + 1);
             return { size: 0, fileCount: 0 };
-          }),
+          })
         );
         const totalSize = results.reduce((sum, r) => sum + r.size, 0);
         const fileCount = results.reduce((sum, r) => sum + r.fileCount, 0);
@@ -155,11 +153,7 @@
       try {
         const response = await fetch(apiUrl, { headers });
         if (!response.ok) {
-          console.error(
-            "GitHub API responded with error:",
-            response.status,
-            response.statusText,
-          );
+          console.error("GitHub API responded with error:", response.status, response.statusText);
           return "N/A";
         }
         const data = await response.json();
@@ -221,7 +215,7 @@
             const filePath = urlParts.slice(branchIndex + 2).join("/");
             if (!branch) return;
             const apiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${encodeURIComponent(
-              filePath,
+              filePath
             )}?ref=${encodeURIComponent(branch)}`;
             const infoText = await fetchFileSize(apiUrl);
             if (infoText && infoText !== "N/A") insertSizeAfterLink(link, infoText);

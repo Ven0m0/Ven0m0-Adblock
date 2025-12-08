@@ -16,10 +16,16 @@ readonly PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 readonly FILE_EXTENSIONS=(-e js -e jsx -e ts -e tsx -e mjs -e cjs)
 readonly EXCLUDE_DIRS=(-E node_modules -E .git -E dist -E build -E coverage)
 
+# Determine fd binary (fallback to find if not available)
+_FD_BIN="${FD_BIN:-fd}"
+if ! command -v fd &> /dev/null && ! command -v fdfind &> /dev/null; then
+  _FD_BIN="find"
+fi
+
 # Tool binaries
-readonly BIOME_BIN="${BIOME_BIN:-biome}"
-readonly OXLINT_BIN="${OXLINT_BIN:-oxlint}"
-readonly FD_BIN="${FD_BIN:-fd}"
+readonly BIOME_BIN="${BIOME_BIN:-bunx biome}"
+readonly OXLINT_BIN="${OXLINT_BIN:-bunx oxlint}"
+readonly FD_BIN="$_FD_BIN"
 
 # Output control
 readonly RED='\033[0;31m'
@@ -65,11 +71,27 @@ check_command() {
   local cmd="$1"
   local install_hint="$2"
 
-  if ! command -v "$cmd" &> /dev/null; then
-    log_error "Required tool '$cmd' not found"
+  # Handle multi-word commands (e.g., "bunx biome")
+  local first_word="${cmd%% *}"
+
+  if ! command -v "$first_word" &> /dev/null; then
+    log_error "Required tool '$cmd' not found (runner '$first_word' missing)"
     log_info "Install hint: $install_hint"
     return 1
   fi
+
+  # For bunx commands, verify the package works
+  if [[ "$cmd" == bunx* ]]; then
+    if ! $cmd --version &> /dev/null 2>&1; then
+      log_error "Required tool '$cmd' not found (package may not be installed)"
+      log_info "Install hint: $install_hint"
+      return 1
+    fi
+    log_success "$cmd found: $($cmd --version 2>&1 | head -n1)"
+  else
+    log_success "$cmd found: $(command -v "$cmd")"
+  fi
+
   return 0
 }
 
@@ -82,25 +104,21 @@ verify_tools() {
 
   local all_ok=true
 
-  # Check fd
-  if ! check_command "$FD_BIN" "mise install fd@latest OR cargo install fd-find"; then
+  # Check fd (or find fallback)
+  if [ "$FD_BIN" = "find" ]; then
+    log_success "Using find as fallback (fd not found)"
+  elif ! check_command "$FD_BIN" "mise install fd@latest OR cargo install fd-find"; then
     all_ok=false
-  else
-    log_success "fd found: $(command -v "$FD_BIN")"
   fi
 
   # Check biome
-  if ! check_command "$BIOME_BIN" "npm install -g @biomejs/biome OR mise install biome@latest"; then
+  if ! check_command "$BIOME_BIN" "bun add -D @biomejs/biome OR npm install -g @biomejs/biome"; then
     all_ok=false
-  else
-    log_success "biome found: $(command -v "$BIOME_BIN") ($(biome --version 2>&1 | head -n1))"
   fi
 
   # Check oxlint
-  if ! check_command "$OXLINT_BIN" "npm install -g oxlint OR cargo install oxc"; then
+  if ! check_command "$OXLINT_BIN" "bun add -D oxlint OR npm install -g oxlint"; then
     all_ok=false
-  else
-    log_success "oxlint found: $(command -v "$OXLINT_BIN") ($(oxlint --version 2>&1 || echo 'version unknown'))"
   fi
 
   if [ "$all_ok" = false ]; then
@@ -120,13 +138,26 @@ discover_files() {
 
   cd "$PROJECT_ROOT" || return 1
 
-  # Use fd for fast file discovery
-  mapfile -t SCANNED_FILES < <(
-    "$FD_BIN" -tf \
-      "${FILE_EXTENSIONS[@]}" \
-      "${EXCLUDE_DIRS[@]}" \
-      . 2>/dev/null || true
-  )
+  # Use fd for fast file discovery, fallback to find
+  if [ "$FD_BIN" = "find" ]; then
+    mapfile -t SCANNED_FILES < <(
+      find . -type f \
+        \( -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" -o -name "*.mjs" -o -name "*.cjs" \) \
+        ! -path "*/node_modules/*" \
+        ! -path "*/.git/*" \
+        ! -path "*/dist/*" \
+        ! -path "*/build/*" \
+        ! -path "*/coverage/*" \
+        2>/dev/null || true
+    )
+  else
+    mapfile -t SCANNED_FILES < <(
+      "$FD_BIN" -tf \
+        "${FILE_EXTENSIONS[@]}" \
+        "${EXCLUDE_DIRS[@]}" \
+        . 2>/dev/null || true
+    )
+  fi
 
   TOTAL_FILES=${#SCANNED_FILES[@]}
 
@@ -168,7 +199,7 @@ run_biome_format() {
   local format_exit=0
 
   # Biome can handle multiple files efficiently
-  format_output=$("$BIOME_BIN" format --write "${SCANNED_FILES[@]}" 2>&1) || format_exit=$?
+  format_output=$($BIOME_BIN format --write "${SCANNED_FILES[@]}" 2>&1) || format_exit=$?
 
   if [ "$format_exit" -eq 0 ]; then
     log_success "Formatting completed successfully"
@@ -198,7 +229,7 @@ run_biome_lint() {
   local lint_exit=0
 
   # Run biome check with auto-fix (safe fixes only)
-  lint_output=$("$BIOME_BIN" check --write --unsafe=false "${SCANNED_FILES[@]}" 2>&1) || lint_exit=$?
+  lint_output=$($BIOME_BIN check --write "${SCANNED_FILES[@]}" 2>&1) || lint_exit=$?
 
   if [ "$lint_exit" -eq 0 ]; then
     log_success "Linting completed with no errors"
@@ -244,7 +275,7 @@ run_oxlint() {
 
   # Run oxlint with all rules and treat warnings as errors for CI
   oxlint_output=$(
-    "$OXLINT_BIN" \
+    $OXLINT_BIN \
       -D all \
       --deny-warnings \
       "${SCANNED_FILES[@]}" \

@@ -1,8 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
@@ -13,14 +11,14 @@
         "useExhaustiveDependencies": "warn"
       },
       "style": {
-        "noVar": "error",
         "useConst": "error",
         "useTemplate": "warn"
       },
       "suspicious": {
         "noExplicitAny": "warn",
         "noDoubleEquals": "error",
-        "noConsoleLog": "off"
+        "noVar": "error",
+        "noConsole": { "level": "off", "options": { "allow": ["log"] } }
       },
       "security": {
         "noDangerouslySetInnerHtml": "error"
@@ -59,43 +57,41 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      "coverage",
-      ".git",
-      "*.min.js",
-      "*.bundle.js",
-      ".eslintcache"
-    ],
-    "include": [
+    "includes": [
       "**/*.js",
       "**/*.jsx",
       "**/*.ts",
       "**/*.tsx",
       "**/*.mjs",
       "**/*.cjs",
-      "**/*.json"
+      "**/*.json",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/build",
+      "!**/coverage",
+      "!**/.git",
+      "!**/*.min.js",
+      "!**/*.bundle.js",
+      "!**/.eslintcache"
     ]
   },
   "overrides": [
     {
-      "include": ["*.user.js", "userscripts/**/*.js"],
+      "includes": ["**/*.user.js", "**/userscripts/**/*.js"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
+            "noConsole": { "level": "off", "options": { "allow": ["log"] } }
           }
         }
       }
     },
     {
-      "include": ["Scripts/**/*.sh", "*.config.js", "*.config.mjs"],
+      "includes": ["**/Scripts/**/*.sh", "**/*.config.js", "**/*.config.mjs"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
+            "noConsole": { "level": "off", "options": { "allow": ["log"] } }
           }
         }
       }
