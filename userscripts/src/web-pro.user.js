@@ -34,7 +34,7 @@ const defaults = {
   caching: 1,
   minTimeout: 15,
   minInterval: 20,
-  showUI: 1,
+  showUI: 1
 };
 const cfg = (() => {
   try {
@@ -47,9 +47,7 @@ const _save = () => localStorage.setItem(KEY, JSON.stringify(cfg));
 const L = (...a) => cfg.log && console.debug("webpro:", ...a);
 
 const idle = (fn, timeout = 1500) =>
-  window.requestIdleCallback
-    ? requestIdleCallback(fn, { timeout })
-    : setTimeout(fn, 300);
+  window.requestIdleCallback ? requestIdleCallback(fn, { timeout }) : setTimeout(fn, 300);
 
 const mark = (e, k = "data-wp") => e?.setAttribute(k, "1");
 const _marked = (e, k = "data-wp") => e?.getAttribute(k) === "1";
@@ -82,7 +80,7 @@ if (cfg.cpuTamer || cfg.rafTamer) {
     requestAnimationFrame,
     clearTimeout,
     clearInterval,
-    cancelAnimationFrame,
+    cancelAnimationFrame
   ];
   const microtask = queueMicrotask;
   let resolveFn = () => {},
@@ -251,7 +249,7 @@ if (cfg.caching) {
             return new Response(text, {
               status: res.status,
               statusText: res.statusText,
-              headers: res.headers,
+              headers: res.headers
             });
           })
           .catch(() => res);
@@ -296,7 +294,7 @@ const trackParams = [
   "traffic_source",
   "sprefix",
   "rowan_id1",
-  "rowan_msg_id",
+  "rowan_msg_id"
 ];
 const cleanHashes = ["intcid", "back-url", "back_url", "src"];
 
@@ -310,8 +308,7 @@ function cleanURL() {
         url.searchParams.delete(param);
         clean = 1;
       }
-    for (const hash of cleanHashes)
-      if (url.hash.startsWith(`#${hash}`)) clean = 1;
+    for (const hash of cleanHashes) if (url.hash.startsWith(`#${hash}`)) clean = 1;
     if (clean) {
       window.history.replaceState(null, "", url.origin + url.pathname + url.search);
       L("URL clean");
@@ -372,11 +369,7 @@ const cleanLinks = (() => {
 function applyBypass() {
   if (!cfg.bypass) return;
   if (cfg.rightClick)
-    window.addEventListener(
-      "contextmenu",
-      (e) => e.stopImmediatePropagation(),
-      { capture: true },
-    );
+    window.addEventListener("contextmenu", (e) => e.stopImmediatePropagation(), { capture: true });
   if (cfg.copy) {
     ["copy", "paste", "cut"].forEach((ev) => {
       document.addEventListener(
@@ -386,15 +379,14 @@ function applyBypass() {
           if (["INPUT", "TEXTAREA", "DIV"].includes(t.tagName) && t.isContentEditable)
             e.stopImmediatePropagation();
         },
-        { capture: true },
+        { capture: true }
       );
     });
   }
   if (cfg.select && !document.getElementById("wp-style")) {
     const s = document.createElement("style");
     s.id = "wp-style";
-    s.textContent =
-      "*{user-select:text!important}::selection{background:#b3d4fc;color:#000}";
+    s.textContent = "*{user-select:text!important}::selection{background:#b3d4fc;color:#000}";
     document.head.appendChild(s);
   }
 }
@@ -413,8 +405,7 @@ function acceptCookies() {
 // ---- GPU/mem tweaks ----
 const forceGPU = (() => {
   if (!cfg.gpu) return () => {};
-  const gpuCSS =
-    "transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden";
+  const gpuCSS = "transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden";
   return () => {
     const selectors =
       'video:not([data-wp-gpu]),canvas:not([data-wp-gpu]),img[loading="eager"]:not([data-wp-gpu])';
@@ -438,9 +429,7 @@ function optimizeMem() {
 function preloadRes() {
   if (!cfg.preload) return;
   document
-    .querySelectorAll(
-      'img:not([data-wp-pre]), video:not([data-wp-pre]), audio:not([data-wp-pre])',
-    )
+    .querySelectorAll("img:not([data-wp-pre]), video:not([data-wp-pre]), audio:not([data-wp-pre])")
     .forEach((r) => {
       const u = r.src || r.href;
       if (u) {
@@ -501,13 +490,11 @@ function lazyVideos() {
           }
         });
       },
-      { rootMargin: "300px" },
+      { rootMargin: "300px" }
     );
-    document
-      .querySelectorAll("video[data-src], video:has(source[data-src])")
-      .forEach((v) => {
-        observer.observe(v);
-      });
+    document.querySelectorAll("video[data-src], video:has(source[data-src])").forEach((v) => {
+      observer.observe(v);
+    });
   }
 }
 
@@ -549,51 +536,49 @@ function deferScripts() {
 }
 
 function restoreScripts() {
-  document
-    .querySelectorAll('script[type="text/wp-blocked"][data-wp-id]')
-    .forEach((s) => {
-      const token = s.getAttribute("data-wp-id");
-      if (!token) return;
-      const src = deferredScripts.get(token);
-      if (!src) return;
-      const isDangerous =
-        src.startsWith("javascript:") ||
-        src.startsWith("data:") ||
-        src.startsWith("vbscript:") ||
-        src.startsWith("//") ||
-        src.includes("<") ||
-        src.includes(">") ||
-        src.includes('"') ||
-        src.includes("'");
-      if (isDangerous) {
-        deferredScripts.delete(token);
-        return;
-      }
-      const isHttps = src.startsWith("https://");
-      const isRootRelative = src.startsWith("/") && !src.startsWith("//");
-      if (!isHttps && !isRootRelative) {
-        deferredScripts.delete(token);
-        return;
-      }
-      if (isHttps) {
-        try {
-          const url = new URL(src);
-          if (url.protocol !== "https:") {
-            deferredScripts.delete(token);
-            return;
-          }
-        } catch {
+  document.querySelectorAll('script[type="text/wp-blocked"][data-wp-id]').forEach((s) => {
+    const token = s.getAttribute("data-wp-id");
+    if (!token) return;
+    const src = deferredScripts.get(token);
+    if (!src) return;
+    const isDangerous =
+      src.startsWith("javascript:") ||
+      src.startsWith("data:") ||
+      src.startsWith("vbscript:") ||
+      src.startsWith("//") ||
+      src.includes("<") ||
+      src.includes(">") ||
+      src.includes('"') ||
+      src.includes("'");
+    if (isDangerous) {
+      deferredScripts.delete(token);
+      return;
+    }
+    const isHttps = src.startsWith("https://");
+    const isRootRelative = src.startsWith("/") && !src.startsWith("//");
+    if (!isHttps && !isRootRelative) {
+      deferredScripts.delete(token);
+      return;
+    }
+    if (isHttps) {
+      try {
+        const url = new URL(src);
+        if (url.protocol !== "https:") {
           deferredScripts.delete(token);
           return;
         }
+      } catch {
+        deferredScripts.delete(token);
+        return;
       }
-      deferredScripts.delete(token);
-      const n = document.createElement("script");
-      n.src = src;
-      n.async = 1;
-      n.setAttribute("data-restored", "1");
-      s.parentNode?.replaceChild(n, s);
-    });
+    }
+    deferredScripts.delete(token);
+    const n = document.createElement("script");
+    n.src = src;
+    n.async = 1;
+    n.setAttribute("data-restored", "1");
+    s.parentNode?.replaceChild(n, s);
+  });
 }
 
 const userEvents = ["click", "keydown", "touchstart", "pointerdown"];
@@ -603,14 +588,10 @@ function bindRestore() {
   if (interactionBound) return;
   const cb = () => {
     idle(() => restoreScripts(), 500);
-    userEvents.forEach((e) =>
-      window.removeEventListener(e, cb, { passive: true }),
-    );
+    userEvents.forEach((e) => window.removeEventListener(e, cb, { passive: true }));
     interactionBound = 0;
   };
-  userEvents.forEach((e) =>
-    window.addEventListener(e, cb, { passive: true, once: true }),
-  );
+  userEvents.forEach((e) => window.addEventListener(e, cb, { passive: true, once: true }));
   interactionBound = 1;
 }
 
@@ -632,7 +613,7 @@ const origins = new Set();
 function extractOrigins() {
   if (!cfg.preconnect) return;
   const elements = document.querySelectorAll(
-    "img[src], script[src], link[href], iframe[src], video[src], source[src]",
+    "img[src], script[src], link[href], iframe[src], video[src], source[src]"
   );
   for (const e of elements) {
     const u = e.src || e.href;
@@ -649,8 +630,7 @@ function extractOrigins() {
 
 function preloadCritical() {
   if (!cfg.preconnect) return;
-  const selectors =
-    'link[rel="stylesheet"], link[rel="preload"], img[loading="eager"]';
+  const selectors = 'link[rel="stylesheet"], link[rel="preload"], img[loading="eager"]';
   document.querySelectorAll(selectors).forEach((el) => {
     if (el.href) addHint("preload", el.href, "style");
     else if (el.src) addHint("preload", el.src, "image");
@@ -698,7 +678,7 @@ if (cfg.mem) {
     "visibilitychange",
     throttle(() => {
       if (document.visibilityState === "hidden") optimizeMem();
-    }, 5000),
+    }, 5000)
   );
 }
 L("Web Pro Enhanced (Compact) loaded");

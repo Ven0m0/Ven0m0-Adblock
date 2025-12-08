@@ -2,6 +2,9 @@
 "npm:@adguard/aglint" = "latest"
 "npm:@adguard/dead-domains-linter" = "latest"
 "npm:@adguard/hostlist-compiler" = "latest"
+"npm:@biomejs/biome" = "latest"
+"npm:oxlint" = "latest"
+fd = "latest"
 
 [env]
 NODE_ENV = "development"
@@ -40,3 +43,14 @@ run = "mise outdated"
 [tasks.upgrade]
 description = "Upgrade all tools"
 run = "mise upgrade"
+
+[tasks.quality]
+description = "Run JS/TS quality checks (Biome + Oxlint)"
+run = "./Scripts/quality-check.sh"
+depends = ["install"]
+
+[tasks."quality:ci"]
+description = "Run quality checks in CI mode"
+env = { CI = "true" }
+run = "./Scripts/quality-check.sh"
+depends = ["install"]

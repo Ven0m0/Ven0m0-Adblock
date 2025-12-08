@@ -58,7 +58,7 @@
                 id: "client-created-root",
                 message: null,
                 parent: null,
-                children: [m.id],
+                children: [m.id]
               });
               break;
             }
@@ -70,7 +70,7 @@
           return new Response(JSON.stringify(d), {
             status: r.status,
             statusText: r.statusText,
-            headers: r.headers,
+            headers: r.headers
           });
         } catch {
           return r;
@@ -112,14 +112,12 @@
       }, 200);
     };
     new MutationObserver((ms) => {
-      if (ms.some((m) => m.type === "childList" && m.addedNodes.length > 0))
-        throttledApply();
+      if (ms.some((m) => m.type === "childList" && m.addedNodes.length > 0)) throttledApply();
     }).observe(document.documentElement, { childList: true, subtree: true });
   };
 
   if (isCGPT) {
-    const gf = () =>
-      document.querySelectorAll(".text-base, .text-base > div:first-child");
+    const gf = () => document.querySelectorAll(".text-base, .text-base > div:first-child");
     runReady(".text-base", () => {
       applyW(gf);
       observeW(gf);
@@ -158,7 +156,7 @@
     const intervals = [
       { delay: 8e3, interval: 1500 },
       { delay: 12e3, interval: 2500 },
-      { delay: 8e3, interval: 4000 },
+      { delay: 8e3, interval: 4000 }
     ];
     let currentInterval = null,
       _currentTimeout = null;
@@ -188,26 +186,20 @@
       lastInvalidate = now;
       txCache = stopBtnCache = submitCache = null;
     };
-    new MutationObserver(invalidateCache).observe(
-      document.body || document.documentElement,
-      {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["data-testid"],
-      },
-    );
+    new MutationObserver(invalidateCache).observe(document.body || document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-testid"]
+    });
 
     const getTx = () => txCache || (txCache = document.querySelector("form textarea"));
     const getStopBtn = () =>
-      stopBtnCache ||
-      (stopBtnCache = document.querySelector('button[data-testid$="stop-button"]'));
+      stopBtnCache || (stopBtnCache = document.querySelector('button[data-testid$="stop-button"]'));
     const getSubmit = () =>
-      submitCache ||
-      (submitCache = document.querySelector('button[data-testid$="send-button"]'));
+      submitCache || (submitCache = document.querySelector('button[data-testid$="send-button"]'));
 
-    const isGen = () =>
-      getStopBtn() || getSubmit()?.firstElementChild?.childElementCount === 3;
+    const isGen = () => getStopBtn() || getSubmit()?.firstElementChild?.childElementCount === 3;
 
     const getContBtn = () => {
       const buttons = document.querySelectorAll('button[as="button"]');
@@ -216,8 +208,7 @@
     };
     const getRegenBtn = () => {
       const buttons = document.querySelectorAll("button");
-      for (const b of buttons)
-        if (/^Regenerate$/i.test(b.textContent?.trim() || "")) return b;
+      for (const b of buttons) if (/^Regenerate$/i.test(b.textContent?.trim() || "")) return b;
       return null;
     };
     let retries = 0,
