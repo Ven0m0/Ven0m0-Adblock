@@ -20,6 +20,8 @@
 		"lint:aglint": "bunx aglint",
 		"lint:fix": "eslint . --fix && bunx aglint --fix",
 		"lint:fix:all": "bun run lint:fix && bun run format",
+		"quality:check": "./Scripts/quality-check.sh",
+		"quality:ci": "CI=true ./Scripts/quality-check.sh",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"format:js": "prettier --write '**/*.{js,mjs,cjs}'",

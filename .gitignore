@@ -41,6 +41,10 @@ coverage/
 htmlcov/
 .coverage
 
+# Quality reports
+quality-report.json
+.eslintcache
+
 # Compressed files
 *.zip
 *.gz
