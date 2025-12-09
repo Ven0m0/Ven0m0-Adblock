@@ -4,7 +4,7 @@
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // @version      2025.12.04.1
 // @description  Merges "GitHub File Size Viewer" and "GitHub Editor - Change Default Settings". Displays file sizes in repo listings and configures default editor settings (indent, wrap).
-// @auth or       Abhay, People's Servant, aspen138, Adrien Pyke
+// @auth         Ven0m0
 // @match        https://github.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
