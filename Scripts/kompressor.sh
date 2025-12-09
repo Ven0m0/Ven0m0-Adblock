@@ -30,8 +30,8 @@ dedupe_files(){
   printf "Scanning for file duplicates in '%s'...\n" "$DIR"
   local -A seen; local hash file
   # Stream md5sum output: "hash  filename"
-  while read -r line; do
-    hash="${line%%  *}"; file="${line#* }"
+  # [FIX] Use 'read' to safely parse hash and filename, ignoring variable whitespace
+  while read -r hash file; do
     if [[ -n "${seen[$hash]:-}" ]]; then
       printf "rm duplicate: %s (keeps %s)\n" "$file" "${seen[$hash]}"
       rm -f "$file"
