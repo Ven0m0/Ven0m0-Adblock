@@ -17,7 +17,8 @@ chk(){ has "$1" || die "$1 missing"; }
 ncpu(){ nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4; }
 jsrun(){ has bun && echo "bunx --bun" || has npx && echo "npx -y" || echo ""; }
 #── Files ──
-mktmp(){ mktemp -d -t "${1:-tmp}.XXXXXX"; }
+# [FIX] More portable mktemp usage
+mktmp(){ mktemp -d "${TMPDIR:-/tmp}/${1:-tmp}.XXXXXX"; }
 bak(){ [[ -f $1 ]] && cp "$1" "${1}.$(date +%s).bak"; }
 #── Time ──
 ts_short(){ TZ=UTC printf '%(%Y%m%d%H%M)T\n' -1; }
