@@ -16,6 +16,7 @@
 // @license      GPL-3.0
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // ==/UserScript==
+"use strict";
 (() => {
     const GUARD = "__yt_unified_optimizer__";
     if (window[GUARD]) return;
