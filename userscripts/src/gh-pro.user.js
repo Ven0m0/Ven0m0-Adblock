@@ -15,6 +15,7 @@
 // @icon         https://github.githubassets.com/favicons/favicon.svg
 // ==/UserScript==
 
+"use strict";
 (() => {
     // PART 1: Editor settings
     function initEditorSettings() {
