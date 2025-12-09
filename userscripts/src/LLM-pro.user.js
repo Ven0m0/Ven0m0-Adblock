@@ -10,6 +10,7 @@
 // @match        https://claude.ai/*
 // @run-at       document-start
 // ==/UserScript==
+"use strict";
 (() => {
     const h = location.hostname;
     const isCGPT = h === "chat.openai.com" || h === "chatgpt.com";
