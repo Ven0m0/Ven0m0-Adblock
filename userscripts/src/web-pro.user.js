@@ -5,7 +5,7 @@
 // @match       *://*/*
 // @run-at      document-start
 // ==/UserScript==
-
+"use strict";
 const KEY = "ven0m0.webpro.v4.optimized";
 const defaults = {
     log: 0,
