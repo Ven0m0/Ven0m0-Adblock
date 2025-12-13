@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-set -Eeuo pipefail
+set -euo pipefail
 shopt -s nullglob globstar
 IFS=$'\n\t'
-export LC_ALL=C LANG=C
+export LC_ALL=C
 
 readonly BIN="${HOME}/.local/bin"
 readonly SRC="lists/sources"
