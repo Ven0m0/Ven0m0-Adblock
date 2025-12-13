@@ -16,13 +16,50 @@
 // @license      GPL-3.0
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // ==/UserScript==
+
 "use strict";
 (() => {
-    const GUARD = "__yt_unified_optimizer__";
-    if (window[GUARD]) return;
-    window[GUARD] = 1;
+  // ═══════════════════════════════════════════════════════════════
+  // GUARD & INITIALIZATION
+  // ═══════════════════════════════════════════════════════════════
 
-    const CFG = {
+  const GUARD = "__yt_unified_optimizer__";
+  if (window[GUARD]) return;
+  window[GUARD] = 1;
+
+  // ═══════════════════════════════════════════════════════════════
+  // CONFIGURATION
+  // ═══════════════════════════════════════════════════════════════
+
+  const CONSTANTS = {
+    RAF_BASE_ID: 1e9,
+    RAF_BATCH_SIZE: 10,
+    INDEXEDDB_CLEANUP_DELAY: 20000,
+    PREFETCH_TIMEOUT: 30000,
+    TIMER_CHECK_INTERVAL: 10,
+    TIMER_REPATCH_DELAY: 800,
+    TIMER_NAVIGATE_DEBOUNCE: 500,
+    IDLE_CHECK_INTERVAL: 2000,
+    IDLE_THROTTLE: 100,
+    IDLE_MIN_DELAY_ACTIVE: 150,
+    ACTIVITY_THROTTLE: 100,
+    FLAG_UPDATE_THROTTLE: 1000,
+    VISIBILITY_THROTTLE: 1000,
+    LAZY_LOAD_THROTTLE: 500,
+    LAZY_LOAD_INITIAL_DELAY: 100,
+    AMBIENT_CHECK_DELAY: 500,
+    AMBIENT_THROTTLE: 1000,
+    QUALITY_INIT_DELAY: 100,
+    QUALITY_RETRY_DELAY: 100,
+    QUALITY_STORAGE_EXPIRY: 2592000000,
+    INSTANT_NAV_THROTTLE: 200,
+    LAZY_THUMB_ROOT_MARGIN: "1000px",
+    SCROLL_DEBOUNCE: 60,
+    WHEEL_DEBOUNCE: 60,
+    RESIZE_DEBOUNCE: 120
+  };
+
+  const CFG = {
         debug: 0,
         cpu: {
             eventThrottle: 1,
@@ -73,152 +110,191 @@
         }
     };
 
-    const RESOLUTIONS = [
-        "highres",
-        "hd2880",
-        "hd2160",
-        "hd1440",
-        "hd1080",
-        "hd720",
-        "large",
-        "medium",
-        "small",
-        "tiny"
-    ];
-    const HEIGHTS = [4320, 2880, 2160, 1440, 1080, 720, 480, 360, 240, 144];
-    const log = (...a) => CFG.debug && console.log("[YT Unified]", ...a);
-    const isShorts = () => location.pathname.startsWith("/shorts");
-    const IDLE_ATTR = "data-yt-idle";
-    const CV_OFF_ATTR = "data-yt-cv-off";
+  const RESOLUTIONS = [
+    "highres",
+    "hd2880",
+    "hd2160",
+    "hd1440",
+    "hd1080",
+    "hd720",
+    "large",
+    "medium",
+    "small",
+    "tiny"
+  ];
 
-    const throttle = (fn, ms) => {
-        let last = 0;
-        return function(...a) {
-            const now = Date.now();
-            if (now - last >= ms) {
-                fn.apply(this, a);
-                last = now;
-            }
-        };
+  const HEIGHTS = [4320, 2880, 2160, 1440, 1080, 720, 480, 360, 240, 144];
+
+  const IDLE_ATTR = "data-yt-idle";
+  const CV_OFF_ATTR = "data-yt-cv-off";
+
+  // ═══════════════════════════════════════════════════════════════
+  // UTILITY FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  const log = (...a) => CFG.debug && console.log("[YT Unified]", ...a);
+  const isShorts = () => location.pathname.startsWith("/shorts");
+
+  const throttle = (fn, ms) => {
+    let last = 0;
+    return function (...a) {
+      const now = Date.now();
+      if (now - last >= ms) {
+        fn.apply(this, a);
+        last = now;
+      }
     };
+  };
 
-    const debounce = (fn, delay) => {
-        let t;
-        return function(...a) {
-            clearTimeout(t);
-            t = setTimeout(() => fn.apply(this, a), delay);
-        };
+  const debounce = (fn, delay) => {
+    let t;
+    return function (...a) {
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(this, a), delay);
     };
+  };
 
-    const rafThrottle = (fn) => {
-        let q = 0;
-        return function(...a) {
-            if (!q) {
-                q = 1;
-                requestAnimationFrame(() => {
-                    fn.apply(this, a);
-                    q = 0;
-                });
-            }
-        };
+  const rafThrottle = (fn) => {
+    let q = 0;
+    return function (...a) {
+      if (!q) {
+        q = 1;
+        requestAnimationFrame(() => {
+          fn.apply(this, a);
+          q = 0;
+        });
+      }
     };
+  };
 
-    const GM = window.GM || {
-        getValue: GM_getValue,
-        setValue: GM_setValue
-    };
-    const getStoredValue = async (key, def) => {
-        try {
-            if (GM.getValue) return await GM.getValue(`yt_opt_${key}`, def);
-            return def;
-        } catch {
-            return def;
-        }
-    };
-    const setStoredValue = async (key, val) => {
-        try {
-            if (GM.setValue) await GM.setValue(`yt_opt_${key}`, val);
-        } catch {
-            /* ignore */
-        }
-    };
+  // ═══════════════════════════════════════════════════════════════
+  // STORAGE FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════
 
-    let recentVideo = "",
-        foundHFR = 0;
+  const GM = window.GM || {
+    getValue: GM_getValue,
+    setValue: GM_setValue
+  };
 
-    (() => {
-        const win = window;
-        if (typeof win?.navigator?.locks?.request === "function") {
-            win.navigator.locks.query = () => Promise.resolve({});
-            win.navigator.locks.request = () => new(async () => {}).constructor();
-        }
-        if (win?.indexedDB?.constructor?.name === "IDBFactory") {
-            const origOpen = win.indexedDB.constructor.prototype.open;
-            const openDBs = new Set(),
-                closedDBs = new Map();
-            let cleanupTimer = 0;
-            const cleanup = () => {
-                for (const req of openDBs) {
-                    try {
-                        req.result?.close();
-                    } catch {
-                        /* noop */
-                    }
-                }
-                openDBs.clear();
-                for (const [db] of closedDBs) {
-                    try {
-                        db?.close();
-                    } catch {
-                        /* noop */
-                    }
-                }
-                closedDBs.clear();
-            };
-            const dbCloseMap = new WeakMap();
-            const scheduleClose = (db) => {
-                clearTimeout(cleanupTimer);
-                closedDBs.set(db, Date.now());
-                cleanupTimer = setTimeout(cleanup, 20e3);
-            };
-            win.indexedDB.constructor.prototype.open = function(name, ver) {
-                const req = origOpen.call(this, name, ver);
-                req.onsuccess = (e) => {
-                    const db = e.target.result;
-                    dbCloseMap.set(db, {
-                        name,
-                        openTime: Date.now()
-                    });
-                    scheduleClose(db, name);
-                };
-                openDBs.add(req);
-                return req;
-            };
-        }
-    })();
+  const getStoredValue = async (key, def) => {
+    try {
+      if (GM.getValue) return await GM.getValue(`yt_opt_${key}`, def);
+      return def;
+    } catch {
+      return def;
+    }
+  };
 
-    if (CFG.gpu.blockAV1) {
-        const cp = HTMLMediaElement.prototype.canPlayType;
-        HTMLMediaElement.prototype.canPlayType = function(type) {
-            if (type && /av01/i.test(type)) return "";
-            return cp.call(this, type);
-        };
-        if (navigator.mediaCapabilities?.decodingInfo) {
-            const origDecode = navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
-            navigator.mediaCapabilities.decodingInfo = async (config) => {
-                if (/av01/i.test(config?.video?.contentType || ""))
-                    return {
-                        supported: 0,
-                        powerEfficient: 0,
-                        smooth: 0
-                    };
-                return origDecode(config);
-            };
-        }
-        log("AV1 blocked");
+  const setStoredValue = async (key, val) => {
+    try {
+      if (GM.setValue) await GM.setValue(`yt_opt_${key}`, val);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // STATE
+  // ═══════════════════════════════════════════════════════════════
+
+  let recentVideo = "";
+  let foundHFR = 0;
+
+  // ═══════════════════════════════════════════════════════════════
+  // NAVIGATOR LOCKS & INDEXEDDB CLEANUP
+  // ═══════════════════════════════════════════════════════════════
+
+  (() => {
+    const win = window;
+    if (typeof win?.navigator?.locks?.request === "function") {
+      win.navigator.locks.query = () => Promise.resolve({});
+      win.navigator.locks.request = () => new (async () => {})().constructor();
     }
 
-    (() => {
+    if (win?.indexedDB?.constructor?.name === "IDBFactory") {
+      const origOpen = win.indexedDB.constructor.prototype.open;
+      const openDBs = new Set();
+      const closedDBs = new Map();
+      let cleanupTimer = 0;
+
+      const cleanup = () => {
+        for (const req of openDBs) {
+          try {
+            req.result?.close();
+          } catch {
+            /* noop */
+          }
+        }
+        openDBs.clear();
+
+        for (const [db] of closedDBs) {
+          try {
+            db?.close();
+          } catch {
+            /* noop */
+          }
+        }
+        closedDBs.clear();
+      };
+
+      const dbCloseMap = new WeakMap();
+
+      const scheduleClose = (db) => {
+        clearTimeout(cleanupTimer);
+        closedDBs.set(db, Date.now());
+        cleanupTimer = setTimeout(cleanup, CONSTANTS.INDEXEDDB_CLEANUP_DELAY);
+      };
+
+      win.indexedDB.constructor.prototype.open = function (name, ver) {
+        const req = origOpen.call(this, name, ver);
+        req.onsuccess = (e) => {
+          const db = e.target.result;
+          dbCloseMap.set(db, {
+            name,
+            openTime: Date.now()
+          });
+          scheduleClose(db, name);
+        };
+        openDBs.add(req);
+        return req;
+      };
+    }
+  })();
+
+  // ═══════════════════════════════════════════════════════════════
+  // GPU OPTIMIZATIONS: AV1 BLOCKING
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.gpu.blockAV1) {
+    const cp = HTMLMediaElement.prototype.canPlayType;
+    HTMLMediaElement.prototype.canPlayType = function (type) {
+      if (type && /av01/i.test(type)) return "";
+      return cp.call(this, type);
+    };
+
+    if (navigator.mediaCapabilities?.decodingInfo) {
+      const origDecode = navigator.mediaCapabilities.decodingInfo.bind(
+        navigator.mediaCapabilities
+      );
+      navigator.mediaCapabilities.decodingInfo = async (config) => {
+        if (/av01/i.test(config?.video?.contentType || "")) {
+          return {
+            supported: 0,
+            powerEfficient: 0,
+            smooth: 0
+          };
+        }
+        return origDecode(config);
+      };
+    }
+    log("AV1 blocked");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CSS INJECTION
+  // ═══════════════════════════════════════════════════════════════
+
+  (() => {
         let css = "";
         if (CFG.ui.disableAnimations)
             css +=
@@ -238,19 +314,23 @@
             const s = document.createElement("style");
             s.textContent = css;
             (document.head || document.documentElement).appendChild(s);
-        }
-    })();
+    }
+  })();
 
-    if (CFG.cpu.eventThrottle) {
-        const origAdd = EventTarget.prototype.addEventListener;
-        const origRem = EventTarget.prototype.removeEventListener;
-        const wrapMap = new WeakMap();
-        const throttleEvents = new Set(["mousemove", "pointermove", "touchmove"]);
-        const debounceEvents = new Map([
-            ["scroll", 60],
-            ["wheel", 60],
-            ["resize", 120]
-        ]);
+  // ═══════════════════════════════════════════════════════════════
+  // CPU OPTIMIZATION: EVENT THROTTLING
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.cpu.eventThrottle) {
+    const origAdd = EventTarget.prototype.addEventListener;
+    const origRem = EventTarget.prototype.removeEventListener;
+    const wrapMap = new WeakMap();
+    const throttleEvents = new Set(["mousemove", "pointermove", "touchmove"]);
+    const debounceEvents = new Map([
+      ["scroll", CONSTANTS.SCROLL_DEBOUNCE],
+      ["wheel", CONSTANTS.WHEEL_DEBOUNCE],
+      ["resize", CONSTANTS.RESIZE_DEBOUNCE]
+    ]);
         const isPlayer = (el) =>
             el instanceof HTMLVideoElement ||
             el.closest?.(".ytp-chrome-bottom,.ytp-volume-panel,.ytp-progress-bar");
@@ -276,28 +356,33 @@
             const wrapped = wrapMap.get(fn) || fn;
             return origRem.call(this, type, wrapped, opt);
         };
-        log("Event throttle ok");
-    }
+    log("Event throttle ok");
+  }
 
-    if (CFG.cpu.rafDecimation) {
-        const origRAF = window.requestAnimationFrame.bind(window),
-            origCAF = window.cancelAnimationFrame.bind(window),
-            BASE_ID = 1e9;
-        let idc = 1;
-        const rafQ = new Map();
-        let rafSch = 0,
-            nextFrm = performance.now();
-        const getInterval = () =>
-            document.visibilityState === "visible" ?
-            1e3 / CFG.cpu.rafFpsVisible :
-            1e3 / CFG.cpu.rafFpsHidden;
-        const processQueue = () => {
-            const now = performance.now();
-            if (now >= nextFrm) {
-                nextFrm = now + getInterval();
-                const cbs = Array.from(rafQ.values());
-                rafQ.clear();
-                const bs = Math.min(cbs.length, 10);
+  // ═══════════════════════════════════════════════════════════════
+  // CPU OPTIMIZATION: RAF DECIMATION
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.cpu.rafDecimation) {
+    const origRAF = window.requestAnimationFrame.bind(window);
+    const origCAF = window.cancelAnimationFrame.bind(window);
+    let idc = 1;
+    const rafQ = new Map();
+    let rafSch = 0;
+    let nextFrm = performance.now();
+
+    const getInterval = () =>
+      document.visibilityState === "visible"
+        ? 1e3 / CFG.cpu.rafFpsVisible
+        : 1e3 / CFG.cpu.rafFpsHidden;
+
+    const processQueue = () => {
+      const now = performance.now();
+      if (now >= nextFrm) {
+        nextFrm = now + getInterval();
+        const cbs = Array.from(rafQ.values());
+        rafQ.clear();
+        const bs = Math.min(cbs.length, CONSTANTS.RAF_BATCH_SIZE);
                 for (let i = 0; i < bs; i++) {
                     try {
                         cbs[i](now);
@@ -313,34 +398,45 @@
                             /* noop */
                         }
                     });
-            }
-            origRAF(processQueue);
-        };
-        window.requestAnimationFrame = (cb) => {
-            if (!CFG.cpu.rafDecimation) return origRAF(cb);
-            const id = BASE_ID + idc++;
-            rafQ.set(id, cb);
-            if (!rafSch) {
-                rafSch = 1;
-                nextFrm = performance.now();
-                origRAF(processQueue);
-            }
-            return id;
-        };
-        window.cancelAnimationFrame = (id) => {
-            typeof id === "number" && id >= BASE_ID ? rafQ.delete(id) : origCAF(id);
-        };
-        document.addEventListener(
-            "visibilitychange",
-            throttle(() => {
-                nextFrm = performance.now();
-            }, 1e3)
-        );
-        log("RAF decimation ok");
-    }
+      }
+      origRAF(processQueue);
+    };
 
-    (async () => {
-        if (!CFG.cpu.timerPatch) return;
+    window.requestAnimationFrame = (cb) => {
+      if (!CFG.cpu.rafDecimation) return origRAF(cb);
+      const id = CONSTANTS.RAF_BASE_ID + idc++;
+      rafQ.set(id, cb);
+      if (!rafSch) {
+        rafSch = 1;
+        nextFrm = performance.now();
+        origRAF(processQueue);
+      }
+      return id;
+    };
+
+    window.cancelAnimationFrame = (id) => {
+      typeof id === "number" && id >= CONSTANTS.RAF_BASE_ID
+        ? rafQ.delete(id)
+        : origCAF(id);
+    };
+
+    document.addEventListener(
+      "visibilitychange",
+      throttle(() => {
+        nextFrm = performance.now();
+      }, CONSTANTS.VISIBILITY_THROTTLE)
+    );
+    log("RAF decimation ok");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // CPU OPTIMIZATION: TIMER PATCHING
+  // ═══════════════════════════════════════════════════════════════
+  // NOTE: This section uses eval() for string-based setTimeout callbacks
+  // (legacy compatibility). Consider removing eval() in future refactoring.
+
+  (async () => {
+    if (!CFG.cpu.timerPatch) return;
         const natv = {
             setTimeout: window.setTimeout.bind(window),
             clearTimeout: window.clearTimeout.bind(window),
@@ -362,12 +458,14 @@
             iframe.sandbox = "allow-same-origin allow-scripts";
             iframe.srcdoc = "<!doctype html><title>timer</title>";
             document.documentElement.appendChild(iframe);
-            await new Promise((r) => {
-                const check = () => {
-                    iframe.contentWindow?.setTimeout ? r() : setTimeout(check, 10);
-                };
-                check();
-            });
+      await new Promise((r) => {
+        const check = () => {
+          iframe.contentWindow?.setTimeout
+            ? r()
+            : setTimeout(check, CONSTANTS.TIMER_CHECK_INTERVAL);
+        };
+        check();
+      });
             iframeTimers = {
                 setTimeout: iframe.contentWindow.setTimeout.bind(iframe.contentWindow),
                 clearTimeout: iframe.contentWindow.clearTimeout.bind(iframe.contentWindow),
@@ -433,124 +531,162 @@
             Object.assign(window, natv);
             log("Timer patch removed");
         };
-        patchTimers();
-        if (CFG.cpu.idleBoost) {
-            const activityEv = [
-                "mousemove",
-                "mousedown",
-                "keydown",
-                "wheel",
-                "touchstart",
-                "pointerdown",
-                "focusin"
-            ];
-            const thAct = throttle(() => {
-                lastActive = performance.now();
-                if (document.documentElement.hasAttribute(IDLE_ATTR)) {
-                    document.documentElement.removeAttribute(IDLE_ATTR);
-                    throttleTimers = 1;
-                    minDelay = CFG.cpu.minDelayBase;
-                    log("Idle OFF");
-                }
-            }, 100);
-            activityEv.forEach((evt) =>
-                window.addEventListener(evt, thAct, {
-                    capture: true,
-                    passive: true
-                })
-            );
-            setInterval(() => {
-                if (document.visibilityState !== "visible") return;
-                const now = performance.now(),
-                    idl = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
-                if (now - lastActive >= idl) {
-                    if (!document.documentElement.hasAttribute(IDLE_ATTR)) {
-                        document.documentElement.setAttribute(IDLE_ATTR, "1");
-                        const hv = document.querySelector("video.video-stream")?.paused === false;
-                        throttleTimers = !(hv || isShorts());
-                        minDelay = hv || isShorts() ? 150 : CFG.cpu.minDelayIdle;
-                        log("Idle ON");
-                    }
-                }
-            }, 2e3);
+    patchTimers();
+
+    if (CFG.cpu.idleBoost) {
+      const activityEv = [
+        "mousemove",
+        "mousedown",
+        "keydown",
+        "wheel",
+        "touchstart",
+        "pointerdown",
+        "focusin"
+      ];
+
+      const thAct = throttle(() => {
+        lastActive = performance.now();
+        if (document.documentElement.hasAttribute(IDLE_ATTR)) {
+          document.documentElement.removeAttribute(IDLE_ATTR);
+          throttleTimers = 1;
+          minDelay = CFG.cpu.minDelayBase;
+          log("Idle OFF");
         }
-        const throttledNavigate = debounce(() => {
-            unpatchTimers();
-            setTimeout(patchTimers, 800);
-        }, 500);
-        window.addEventListener("yt-navigate-finish", throttledNavigate);
-    })();
+      }, CONSTANTS.ACTIVITY_THROTTLE);
 
-    const updateFlags = () => {
-        const flags = window.yt?.config_?.EXPERIMENT_FLAGS;
-        if (flags) Object.assign(flags, CFG.flags);
+      activityEv.forEach((evt) =>
+        window.addEventListener(evt, thAct, {
+          capture: true,
+          passive: true
+        })
+      );
+
+      setInterval(() => {
+        if (document.visibilityState !== "visible") return;
+        const now = performance.now();
+        const idl = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
+        if (now - lastActive >= idl) {
+          if (!document.documentElement.hasAttribute(IDLE_ATTR)) {
+            document.documentElement.setAttribute(IDLE_ATTR, "1");
+            const hv = document.querySelector("video.video-stream")?.paused === false;
+            throttleTimers = !(hv || isShorts());
+            minDelay = hv || isShorts() ? CONSTANTS.IDLE_MIN_DELAY_ACTIVE : CFG.cpu.minDelayIdle;
+            log("Idle ON");
+          }
+        }
+      }, CONSTANTS.IDLE_CHECK_INTERVAL);
+    }
+
+    const throttledNavigate = debounce(() => {
+      unpatchTimers();
+      setTimeout(patchTimers, CONSTANTS.TIMER_REPATCH_DELAY);
+    }, CONSTANTS.TIMER_NAVIGATE_DEBOUNCE);
+
+    window.addEventListener("yt-navigate-finish", throttledNavigate);
+  })();
+
+  // ═══════════════════════════════════════════════════════════════
+  // FLAG UPDATES
+  // ═══════════════════════════════════════════════════════════════
+
+  const updateFlags = () => {
+    const flags = window.yt?.config_?.EXPERIMENT_FLAGS;
+    if (flags) Object.assign(flags, CFG.flags);
+  };
+
+  const throttledFlagUpdate = throttle(updateFlags, CONSTANTS.FLAG_UPDATE_THROTTLE);
+
+  if (document.head) {
+    const flagObs = new MutationObserver(throttledFlagUpdate);
+    flagObs.observe(document.head, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  window.addEventListener("yt-navigate-finish", throttledFlagUpdate);
+  updateFlags();
+
+  // ═══════════════════════════════════════════════════════════════
+  // UI OPTIMIZATION: INSTANT NAVIGATION
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.ui.instantNav) {
+    const throttledMouseover = throttle((e) => {
+      const link = e.target.closest('a[href^="/watch"]');
+      if (link) {
+        const prefetch = document.createElement("link");
+        prefetch.rel = "prefetch";
+        prefetch.href = link.href;
+        prefetch.fetchPriority = "low";
+        document.head.appendChild(prefetch);
+        setTimeout(() => {
+          prefetch.parentNode?.removeChild(prefetch);
+        }, CONSTANTS.PREFETCH_TIMEOUT);
+      }
+    }, CONSTANTS.INSTANT_NAV_THROTTLE);
+
+    document.addEventListener("mouseover", throttledMouseover, {
+      passive: true
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // GPU OPTIMIZATION: LAZY THUMBNAILS
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.gpu.lazyThumbs) {
+    const thumbObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (entry.target.style.display === "none") {
+              entry.target.style.display = "";
+            }
+            thumbObserver.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: CONSTANTS.LAZY_THUMB_ROOT_MARGIN
+      }
+    );
+
+    const lazyLoad = () => {
+      const el = document.querySelectorAll(
+        "ytd-rich-item-renderer:not([data-lazy-opt])," +
+          "ytd-compact-video-renderer:not([data-lazy-opt])," +
+          "ytd-thumbnail:not([data-lazy-opt])"
+      );
+      el.forEach((e) => {
+        e.dataset.lazyOpt = "1";
+        e.style.display = "none";
+        thumbObserver.observe(e);
+      });
     };
-    const throttledFlagUpdate = throttle(updateFlags, 1e3);
-    if (document.head) {
-        const flagObs = new MutationObserver(throttledFlagUpdate);
-        flagObs.observe(document.head, {
-            childList: true,
-            subtree: true
-        });
-    }
-    window.addEventListener("yt-navigate-finish", throttledFlagUpdate);
-    updateFlags();
 
-    if (CFG.ui.instantNav) {
-        const throttledMouseover = throttle((e) => {
-            const link = e.target.closest('a[href^="/watch"]');
-            if (link) {
-                const prefetch = document.createElement("link");
-                prefetch.rel = "prefetch";
-                prefetch.href = link.href;
-                prefetch.fetchPriority = "low";
-                document.head.appendChild(prefetch);
-                setTimeout(() => {
-                    prefetch.parentNode?.removeChild(prefetch);
-                }, 3e4);
-            }
-        }, 200);
-        document.addEventListener("mouseover", throttledMouseover, {
-            passive: true
-        });
+    const throttledLazyLoad = throttle(lazyLoad, CONSTANTS.LAZY_LOAD_THROTTLE);
+    const lazyObs = new MutationObserver(throttledLazyLoad);
+
+    if (document.body) {
+      lazyObs.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
     }
 
-    if (CFG.gpu.lazyThumbs) {
-        const thumbObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        if (entry.target.style.display === "none") entry.target.style.display = "";
-                        thumbObserver.unobserve(entry.target);
-                    }
-                });
-            }, {
-                rootMargin: "1000px"
-            }
-        );
-        const lazyLoad = () => {
-            const el = document.querySelectorAll(
-                "ytd-rich-item-renderer:not([data-lazy-opt])," +
-                "ytd-compact-video-renderer:not([data-lazy-opt])," +
-                "ytd-thumbnail:not([data-lazy-opt])"
-            );
-            el.forEach((e) => {
-                e.dataset.lazyOpt = "1";
-                e.style.display = "none";
-                thumbObserver.observe(e);
-            });
-        };
-        const throttledLazyLoad = throttle(lazyLoad, 500);
-        const lazyObs = new MutationObserver(throttledLazyLoad);
-        if (document.body) lazyObs.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", lazyLoad);
-        else setTimeout(lazyLoad, 100);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", lazyLoad);
+    } else {
+      setTimeout(lazyLoad, CONSTANTS.LAZY_LOAD_INITIAL_DELAY);
     }
+  }
 
-    if (CFG.gpu.disableAmbient) {
+  // ═══════════════════════════════════════════════════════════════
+  // GPU OPTIMIZATION: DISABLE AMBIENT MODE
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.gpu.disableAmbient) {
         const disableAmbient = () => {
             const flexy = document.querySelector("ytd-watch-flexy");
             if (!flexy || flexy.dataset.ambientDis) return;
@@ -568,16 +704,24 @@
             ambientObs.observe(flexy, {
                 attributes: true,
                 attributeFilter: ["ambient-mode-enabled"]
-            });
-        };
-        if (document.readyState === "loading")
-            document.addEventListener("DOMContentLoaded", disableAmbient);
-        else setTimeout(disableAmbient, 500);
-        const throttledAmbient = throttle(disableAmbient, 1e3);
-        window.addEventListener("yt-navigate-finish", throttledAmbient);
+      });
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", disableAmbient);
+    } else {
+      setTimeout(disableAmbient, CONSTANTS.AMBIENT_CHECK_DELAY);
     }
 
-    if (CFG.quality.enabled) {
+    const throttledAmbient = throttle(disableAmbient, CONSTANTS.AMBIENT_THROTTLE);
+    window.addEventListener("yt-navigate-finish", throttledAmbient);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // QUALITY CONTROL
+  // ═══════════════════════════════════════════════════════════════
+
+  if (CFG.quality.enabled) {
         const unwrapElement = (el) => (el?.wrappedJSObject ? el.wrappedJSObject : el);
         const getVideoIDFromURL = (ytPlayer) => {
             const idMatch = /(?:v=)([\w-]+)/;
@@ -666,10 +810,15 @@
             }
         };
 
-        const setResOnReady = (ytPlayer, resolutions) => {
-            if (CFG.quality.useAPI && ytPlayer.getPlaybackQuality === undefined) {
-                window.setTimeout(setResOnReady, 100, ytPlayer, resolutions);
-            } else {
+    const setResOnReady = (ytPlayer, resolutions) => {
+      if (CFG.quality.useAPI && ytPlayer.getPlaybackQuality === undefined) {
+        window.setTimeout(
+          setResOnReady,
+          CONSTANTS.QUALITY_RETRY_DELAY,
+          ytPlayer,
+          resolutions
+        );
+      } else {
                 let framerateUpdate = 0;
                 if (CFG.quality.highFramerateTargetRes) {
                     const features = ytPlayer.getVideoData().video_quality_features;
@@ -683,15 +832,15 @@
                 if (curVid !== recentVideo || framerateUpdate) {
                     recentVideo = curVid;
                     setResolution(ytPlayer, resolutions);
-                    const storedQuality = localStorage.getItem("yt-player-quality");
-                    if (!storedQuality || storedQuality.indexOf(CFG.quality.targetRes) === -1) {
-                        const tc = Date.now(),
-                            te = tc + 2592000000;
-                        localStorage.setItem(
-                            "yt-player-quality",
-                            `{"data":"${CFG.quality.targetRes}","expiration":${te},"creation":${tc}}`
-                        );
-                    }
+        const storedQuality = localStorage.getItem("yt-player-quality");
+        if (!storedQuality || storedQuality.indexOf(CFG.quality.targetRes) === -1) {
+          const tc = Date.now();
+          const te = tc + CONSTANTS.QUALITY_STORAGE_EXPIRY;
+          localStorage.setItem(
+            "yt-player-quality",
+            `{"data":"${CFG.quality.targetRes}","expiration":${te},"creation":${tc}}`
+          );
+        }
                 }
             }
         };
@@ -720,16 +869,30 @@
             true
         );
 
-        window.addEventListener("yt-navigate-finish", initQuality, true);
-        if (document.readyState === "loading")
-            document.addEventListener("DOMContentLoaded", initQuality);
-        else setTimeout(initQuality, 100);
+    window.addEventListener("yt-navigate-finish", initQuality, true);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initQuality);
+    } else {
+      setTimeout(initQuality, CONSTANTS.QUALITY_INIT_DELAY);
     }
+  }
 
-    if (CFG.ui.disableAnimations) document.documentElement.setAttribute("no-anim", "");
-    if (CFG.ui.hideShorts) document.documentElement.setAttribute("hide-shorts", "");
+  // ═══════════════════════════════════════════════════════════════
+  // UI ATTRIBUTE SETUP
+  // ═══════════════════════════════════════════════════════════════
 
-    (async () => {
+  if (CFG.ui.disableAnimations) {
+    document.documentElement.setAttribute("no-anim", "");
+  }
+  if (CFG.ui.hideShorts) {
+    document.documentElement.setAttribute("hide-shorts", "");
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SETTINGS PERSISTENCE
+  // ═══════════════════════════════════════════════════════════════
+
+  (async () => {
         if (!GM.getValue) return;
         try {
             const settingsSaved = await getStoredValue("settingsSaved", false);
