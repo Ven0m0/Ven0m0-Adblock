@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload artifacts
         if: steps.compile.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: adguard-filters
           path: Filters/*.txt
@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload artifacts
         if: steps.compile.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ragibkl-filters
           path: Filters/Ragibkl-Combined.txt
@@ -185,7 +185,7 @@ jobs:
           mise exec -- ./build-lists.sh
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: custom-filters
           path: lists/releases/*.txt
