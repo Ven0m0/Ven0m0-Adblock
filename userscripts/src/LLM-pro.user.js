@@ -11,8 +11,6 @@
 // @run-at       document-start
 // ==/UserScript==
 
-"use strict";
-
 (() => {
   // ═══════════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -85,7 +83,7 @@
 
   if (isCGPT) {
     const origFetch = window.fetch;
-    window.fetch = function (input, init) {
+    window.fetch = function (input, _init) {
       const url = typeof input === "string" ? input : input.url;
       if (!CONFIG.CHATGPT.API_REGEX.test(url)) {
         return origFetch.apply(this, arguments);
@@ -171,7 +169,7 @@
       } else if (++attempts < CONFIG.WIDTH.MAX_ATTEMPTS) {
         setTimeout(
           check,
-          CONFIG.WIDTH.RETRY_BASE_DELAY * Math.pow(CONFIG.WIDTH.RETRY_MULTIPLIER, attempts)
+          CONFIG.WIDTH.RETRY_BASE_DELAY * CONFIG.WIDTH.RETRY_MULTIPLIER ** attempts
         );
       }
     };
@@ -256,12 +254,12 @@
     };
 
     let currentInterval = null;
-    let currentTimeout = null;
+    let _currentTimeout = null;
 
     const scheduleIntervals = (idx) => {
       if (idx < CONFIG.CHATGPT.CLEANUP_INTERVALS.length) {
         const { delay, interval } = CONFIG.CHATGPT.CLEANUP_INTERVALS[idx];
-        currentTimeout = setTimeout(() => {
+        _currentTimeout = setTimeout(() => {
           currentInterval = setInterval(cleanup, interval);
           setTimeout(() => {
             if (currentInterval) clearInterval(currentInterval);
@@ -288,19 +286,19 @@
       txCache = stopBtnCache = submitCache = null;
     };
 
-    new MutationObserver(invalidateCache).observe(
-      document.body || document.documentElement,
-      {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["data-testid"]
-      }
-    );
+    new MutationObserver(invalidateCache).observe(document.body || document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-testid"]
+    });
 
-    const getTextarea = () => txCache || (txCache = document.querySelector(SELECTORS.CHATGPT.FORM_TEXTAREA));
-    const getStopBtn = () => stopBtnCache || (stopBtnCache = document.querySelector(SELECTORS.CHATGPT.STOP_BUTTON));
-    const getSubmitBtn = () => submitCache || (submitCache = document.querySelector(SELECTORS.CHATGPT.SEND_BUTTON));
+    const getTextarea = () =>
+      txCache || (txCache = document.querySelector(SELECTORS.CHATGPT.FORM_TEXTAREA));
+    const getStopBtn = () =>
+      stopBtnCache || (stopBtnCache = document.querySelector(SELECTORS.CHATGPT.STOP_BUTTON));
+    const getSubmitBtn = () =>
+      submitCache || (submitCache = document.querySelector(SELECTORS.CHATGPT.SEND_BUTTON));
 
     const isGenerating = () => {
       const stopBtn = getStopBtn();

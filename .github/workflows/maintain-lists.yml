@@ -1,0 +1,131 @@
+name: Maintain & Release Lists
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *" # Daily at 3 AM UTC
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets. GITHUB_TOKEN }}
+      - name: Update submodules
+        run: |
+          git submodule update --init --recursive --remote
+          if git diff --submodule=diff --quiet; then
+            echo "submodules_updated=false" >> "$GITHUB_ENV"
+          else
+            echo "submodules_updated=true" >> "$GITHUB_ENV"
+            git add . gitmodules *
+            git config user.name "github-actions[bot]"
+            git config user. email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: update submodules" || true
+          fi
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install tools
+        run: |
+          bun i -g @adguard/hostlist-compiler @adguard/dead-domains-linter
+          echo "✓ Installed hostlist-compiler & dead-domains-linter"
+      - name: Remove dead domains
+        continue-on-error: true
+        run: |
+          dead-domains-linter -a -i "*. txt" --exclude "Lists-todo.txt" || :
+      - name: Deduplicate files
+        run: |
+          export LC_ALL=C LANG=C
+          find .  -type f -name '*.txt' !  -path '*/\.*' !  -name 'Lists-todo.txt' -print0 | while IFS= read -r -d '' f; do
+            tmp=$(mktemp)
+            sed -E '/^@@|^#|^[[:space:]]*$/d; s/^0\. 0\.0\.0[[:space:]]+//; s/^[[:space:]]+//; s/[[:space:]]+$//' "$f" | \
+              awk 'NF && ! seen[$0]++' | \
+              sort -u > "$tmp"
+            [[ -s "$tmp" ]] && mv "$tmp" "$f" || rm -f "$tmp"
+          done
+          echo "✓ Deduplicated all lists"
+      - name: Build blocklist
+        run: |
+          bun i -g @adguard/hostlist-compiler
+          if [[ -f hostlist-compiler-config.json ]]; then
+            hostlist-compiler -v -c hostlist-compiler-config.json -o blocklist
+          fi
+      - name: Validate domains
+        run: |
+          invalid=0
+          for f in $(find . -type f -name '*. txt' ! -path '*/\.*' ! -name 'Lists-todo.txt'); do
+            if grep -Ev '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\. )+[a-zA-Z]{2,}$|^$' "$f" >/dev/null 2>&1; then
+              echo "⚠️ Invalid entries in: $f"
+              ((invalid++))
+            fi
+          done
+          [[ $invalid -eq 0 ]] && echo "✓ All domains valid"
+      - name: Generate changelog
+        id: changelog
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            files=$(git diff --cached --numstat | wc -l)
+            adds=$(git diff --cached --numstat | awk '{sum+=$1} END {print sum+0}')
+            dels=$(git diff --cached --numstat | awk '{sum+=$2} END {print sum+0}')
+            echo "files=$files" >> "$GITHUB_OUTPUT"
+            echo "adds=$adds" >> "$GITHUB_OUTPUT"
+            echo "dels=$dels" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit & push
+        if: steps.changelog.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github. com"
+          printf -v date '%(%Y-%m-%d)T' -1
+          git commit -m "chore: maintain lists ${date}
+
+          - Removed ${{ steps.changelog.outputs.dels }} dead/duplicate domains
+          - Added ${{ steps.changelog.outputs. adds }} new entries
+          - Processed ${{ steps.changelog.outputs. files }} files"
+          git push
+
+      - name: Create release
+        if: steps.changelog. outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets. GITHUB_TOKEN }}
+        run: |
+          printf -v tag 'v%(%Y. %m.%d-%H%M)T' -1
+          printf -v date '%(%Y-%m-%d)T' -1
+
+          gh release create "$tag" \
+            --title "Lists Update ${date}" \
+            --notes "## 📊 Automated Maintenance
+
+          - **Files:** ${{ steps.changelog.outputs. files }} updated
+          - **Added:** ${{ steps.changelog.outputs.adds }} entries
+          - **Removed:** ${{ steps.changelog.outputs.dels }} entries
+          - **Dead domains:** Removed via linter
+          - **Duplicates:** Eliminated
+          - **Submodules:** Updated to latest
+
+          ### Files
+          - \`blocklist\` — Compiled master list" \
+            blocklist || echo "Release exists or failed"
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🎯 Maintenance Report" >> "$GITHUB_STEP_SUMMARY"
+          if [[ "${{ steps.changelog.outputs.changed }}" == "true" ]]; then
+            echo "✅ **Updated** ${{ steps.changelog.outputs. files }} files" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Added: ${{ steps.changelog.outputs. adds }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Removed: ${{ steps. changelog.outputs.dels }}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "ℹ️ No changes required" >> "$GITHUB_STEP_SUMMARY"
+          fi

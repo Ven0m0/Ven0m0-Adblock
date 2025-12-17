@@ -6,8 +6,6 @@
 // @run-at      document-start
 // ==/UserScript==
 
-"use strict";
-
 // ═══════════════════════════════════════════════════════════════
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
@@ -33,7 +31,8 @@ const CONFIG = {
     DEBOUNCE_IDLE: 500
   },
   SCRIPT: {
-    DENY_REGEX: /ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo|tealium|pardot|hubspot|hotjar|intercom|criteo|quantc/i
+    DENY_REGEX:
+      /ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo|tealium|pardot|hubspot|hotjar|intercom|criteo|quantc/i
   },
   INTERSECTION: {
     VIDEO_ROOT_MARGIN: "300px",
@@ -42,13 +41,40 @@ const CONFIG = {
 };
 
 const TRACKING_PARAMS = [
-  "fbclid", "gclid", "utm_source", "utm_medium", "utm_campaign",
-  "utm_content", "utm_term", "utm_id", "mc_cid", "mc_eid",
-  "_ga", "pk_campaign", "scid", "src", "ref", "aff",
-  "affiliate", "campaign", "ad_id", "ad_name", "tracking",
-  "partner", "promo", "promoid", "clickid", "irclickid",
-  "spm", "smid", "pvid", "qid", "traffic_source",
-  "sprefix", "rowan_id1", "rowan_msg_id"
+  "fbclid",
+  "gclid",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "utm_id",
+  "mc_cid",
+  "mc_eid",
+  "_ga",
+  "pk_campaign",
+  "scid",
+  "src",
+  "ref",
+  "aff",
+  "affiliate",
+  "campaign",
+  "ad_id",
+  "ad_name",
+  "tracking",
+  "partner",
+  "promo",
+  "promoid",
+  "clickid",
+  "irclickid",
+  "spm",
+  "smid",
+  "pvid",
+  "qid",
+  "traffic_source",
+  "sprefix",
+  "rowan_id1",
+  "rowan_msg_id"
 ];
 
 const CLEAN_HASHES = ["intcid", "back-url", "back_url", "src"];
@@ -110,7 +136,7 @@ const state = {
 // UTILITIES
 // ═══════════════════════════════════════════════════════════════
 
-const save = () => localStorage.setItem(CONFIG.KEY, JSON.stringify(cfg));
+const _save = () => localStorage.setItem(CONFIG.KEY, JSON.stringify(cfg));
 const log = (...args) => cfg.log && console.debug("[WebPro]", ...args);
 
 const idle = (fn, timeout = CONFIG.TIMING.IDLE_CALLBACK) =>
@@ -148,7 +174,7 @@ if (cfg.cpuTamer || cfg.rafTamer) {
   const microtask = queueMicrotask;
   let resolveFn = () => {};
   let promise;
-  let newPromise = () => (promise = new AsyncFn((r) => (resolveFn = r)));
+  const newPromise = () => (promise = new AsyncFn((r) => (resolveFn = r)));
   newPromise();
 
   const marker = document.createComment("--CPUTamer--");
@@ -188,14 +214,20 @@ if (cfg.cpuTamer || cfg.rafTamer) {
     return 1;
   };
 
-  const throwErr = (e) => microtask(() => { throw e; });
+  const throwErr = (e) =>
+    microtask(() => {
+      throw e;
+    });
 
   if (cfg.cpuTamer) {
     window.setTimeout = (fn, delay = 0, ...args) => {
       let id;
       const wrapped =
         typeof fn === "function"
-          ? (...a) => awaitTimeout(id).then((v) => v && fn(...a)).catch(throwErr)
+          ? (...a) =>
+              awaitTimeout(id)
+                .then((v) => v && fn(...a))
+                .catch(throwErr)
           : fn;
       delay = Math.max(delay, cfg.minTimeout);
       id = nTO(wrapped, delay, ...args);
@@ -205,7 +237,10 @@ if (cfg.cpuTamer || cfg.rafTamer) {
       let id;
       const wrapped =
         typeof fn === "function"
-          ? (...a) => awaitTimeout(id).then((v) => v && fn(...a)).catch(throwErr)
+          ? (...a) =>
+              awaitTimeout(id)
+                .then((v) => v && fn(...a))
+                .catch(throwErr)
           : fn;
       delay = Math.max(delay, cfg.minInterval);
       id = nSI(wrapped, delay, ...args);
@@ -434,8 +469,7 @@ function applyBypass() {
   if (cfg.select && !document.getElementById("wp-style")) {
     const s = document.createElement("style");
     s.id = "wp-style";
-    s.textContent =
-      "*{user-select:text!important}::selection{background:#b3d4fc;color:#000}";
+    s.textContent = "*{user-select:text!important}::selection{background:#b3d4fc;color:#000}";
     document.head.appendChild(s);
   }
 }
@@ -457,8 +491,7 @@ function acceptCookies() {
 
 const forceGPU = (() => {
   if (!cfg.gpu) return () => {};
-  const gpuCSS =
-    "transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden";
+  const gpuCSS = "transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden";
   return () => {
     const selectors =
       'video:not([data-wp-gpu]),canvas:not([data-wp-gpu]),img[loading="eager"]:not([data-wp-gpu])';
@@ -487,9 +520,7 @@ function optimizeMem() {
 function preloadRes() {
   if (!cfg.preload) return;
   document
-    .querySelectorAll(
-      "img:not([data-wp-pre]), video:not([data-wp-pre]), audio:not([data-wp-pre])"
-    )
+    .querySelectorAll("img:not([data-wp-pre]), video:not([data-wp-pre]), audio:not([data-wp-pre])")
     .forEach((r) => {
       const u = r.src || r.href;
       if (u) {
@@ -550,11 +581,9 @@ function lazyVideos() {
       },
       { rootMargin: CONFIG.INTERSECTION.VIDEO_ROOT_MARGIN }
     );
-    document
-      .querySelectorAll("video[data-src], video:has(source[data-src])")
-      .forEach((v) => {
-        observer.observe(v);
-      });
+    document.querySelectorAll("video[data-src], video:has(source[data-src])").forEach((v) => {
+      observer.observe(v);
+    });
   }
 }
 
@@ -648,14 +677,10 @@ function bindRestore() {
   if (state.interactionBound) return;
   const cb = () => {
     idle(() => restoreScripts(), 500);
-    USER_EVENTS.forEach((e) =>
-      window.removeEventListener(e, cb, { passive: true })
-    );
+    USER_EVENTS.forEach((e) => window.removeEventListener(e, cb, { passive: true }));
     state.interactionBound = 0;
   };
-  USER_EVENTS.forEach((e) =>
-    window.addEventListener(e, cb, { passive: true, once: true })
-  );
+  USER_EVENTS.forEach((e) => window.addEventListener(e, cb, { passive: true, once: true }));
   state.interactionBound = 1;
 }
 

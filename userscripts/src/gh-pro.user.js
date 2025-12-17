@@ -15,7 +15,6 @@
 // @icon         https://github.githubassets.com/favicons/favicon.svg
 // ==/UserScript==
 
-"use strict";
 (() => {
   // ═══════════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -223,11 +222,7 @@
       try {
         const response = await fetch(apiUrl, { headers });
         if (!response.ok) {
-          console.error(
-            "GitHub API responded with error:",
-            response.status,
-            response.statusText
-          );
+          console.error("GitHub API responded with error:", response.status, response.statusText);
           return "N/A";
         }
 
