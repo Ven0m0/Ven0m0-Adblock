@@ -2,95 +2,117 @@
 ! Title: Youtube Tweaks
 ! Description: This list makes Youtube much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
-! https://github.com/easylist/easylist
-! https://pastebin.com/0Qtubr5M
-! https://pastebin.com/5L2wahXV
 
-youtube.com###.yt-lockup-view-model-wiz--horizontal .yt-lockup-view-model-wiz__content-image:style(max-width: 360px !important)
-youtube.com###chat-container
-youtube.com###clarify-box > .ytd-watch-flexy.style-scope
-youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
-youtube.com###flexible-item-buttons > yt-button-view-model.ytd-menu-renderer:nth-of-type(1)
-youtube.com###panels-full-bleed-container.ytd-watch-flexy.style-scope
-youtube.com###sponsor-button
-youtube.com###voice-search-button
-youtube.com###ytd-watch-flexy[live-chat-present-and-expanded] #panels-full-bleed-container
-youtube.com##+js(trusted-json-edit-xhr-request, ..playbackContext[?.contentPlaybackContext]+={"adPlaybackContext":{"adType":"AD_TYPE_INSTREAM"}}, propsToMatch, /\/(player|get_watch)/)
-youtube.com##+js(trusted-json-edit-xhr-response, '..playerConfig.granularVariableSpeedConfig+={"minimumPlaybackRate":25,"maximumPlaybackRate":200}', propsToMatch, /\/(player|get_watch)/)
-youtube.com##.ytd-rich-shelf-renderer:has-text(Primetime movies for you)
 youtube.com##.ytp-paid-content-overlay-link
+youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
+youtube.com###sponsor-button
+youtube.com###clarify-box > .ytd-watch-flexy.style-scope
+
+! YT - Remove unwanted popups and annoyances
+youtube.com##ytd-popup-container > tp-yt-paper-dialog > ytd-mealbar-promo-renderer, ytd-popup-container > tp-yt-paper-dialog > yt-mealbar-promo-renderer:has-text(/Claim Offer|Join now|Not Now|No thanks|YouTube TV|live TV|Live TV|movies|sports|Try it free|unlimited DVR|watch NFL/)
+youtube.com##ytd-video-quality-promo-renderer
+youtube.com###cinematics.ytd-watch-flexy:remove()
+youtube.com##ytd-clarification-renderer.style-scope.ytd-watch-flexy
+
+! Thanks button
+youtube.com###flexible-item-buttons > yt-button-view-model.ytd-menu-renderer:nth-of-type(1)
+! Clip button
+youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
+! Voice search button
+youtube.com###voice-search-button
+
+! Inspected ad content
+youtube.com##ytd-ad-slot-renderer
+youtube.com##ytd-ad-hover-text-button-renderer
+youtube.com##ytd-ad-inline-playback-meta-block
+youtube.com##ytd-ad-engagement-panel-banner-renderer
+youtube.com##ytd-ad-feedback-renderer
+youtube.com##ytd-ad-info-dialog-renderer
+youtube.com##ytp-ad-image-overlay
+youtube.com##video-ads
+youtube.com##ad-interrupting
+youtube.com##ytp-ad-text
+youtube.com##ytp-ad-module
+youtube.com##ytp-ad-player-overlay
+
+! Collecting Youtube Banner Ads #1353
+youtube.com#@#.sparkles-light-cta
+youtube.com#@#ytd-promoted-sparkles-web-renderer
+youtube.com##ytd-promoted-sparkles-web-renderer #sparkles-container:style(height: 0px !important; opacity: 0 !important;) 
+
+! https://pastebin.com/5L2wahXV
+youtube.com##.YtdTalkToRecsFlowRendererHost:has-text(What hobbies are you interested in developing?)
+youtube.com##tp-yt-paper-dialog.ytd-popup-container:has-text(/following Premium|Choose all that apply|Become a member|Free trial|How are your|How interested|Live TV|Wish videos|background play|better TV|cable box|cable reimagined|hidden fees|of YouTube TV|on YouTube TV|unlimited DVR|with YouTube TV|without the ads|try this feature|Terms apply/)
+youtube.com##ytd-action-companion-ad-renderer, ytd-display-ad-renderer, ytd-video-masthead-ad-advertiser-info-renderer, ytd-video-masthead-ad-primary-video-renderer, ytd-in-feed-ad-layout-renderer, ytd-ad-slot-renderer, yt-about-this-ad-renderer, yt-mealbar-promo-renderer, ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, .ytd-video-masthead-ad-v3-renderer, div#root.style-scope.ytd-display-ad-renderer.yt-simple-endpoint, div#sparkles-container.style-scope.ytd-promoted-sparkles-web-renderer, div#main-container.style-scope.ytd-promoted-video-renderer, div#player-ads.style-scope.ytd-watch-flexy, ad-slot-renderer, ytm-promoted-sparkles-web-renderer, masthead-ad, #masthead-ad, ytd-video-quality-promo-renderer, #yt-lang-alert-container, .YtmPaidContentOverlayHost, .ytd-primetime-promo-renderer, ytd-brand-video-singleton-renderer, #yt-feedback, #yt-hitchhiker-feedback
+youtube.com###upsell-dialog-text > a[href*="sign"]:upward(body > * > *)
+youtube.com##.opened:not(.ytcp-bulk-actions):remove()
+youtube.com##.ytp-inline-preview-mode
+youtube.com##.ytp-inline-preview-mode .ytp-paid-content-overlay, #endorsement.ytd-video-preview
+youtube.com###hover-overlays
+
+! save more bandwidth
+||i.ytimg.com/vi_webp/*/maxresdefault.webp
+||i.ytimg.com/vi/*/maxresdefault.jpg
+||i.ytimg.com/sb/*
 youtube.com##div.ytp-tooltip-bg
 youtube.com##div.ytp-tooltip-image
 youtube.com##div.ytp-tooltip:style(border-radius:0px;!important)
-youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
-youtube.com##ytd-watch-flexy[live-chat-present-and-expanded] #columns:style(padding-right: 0 !important;)
-youtube.com#?#.YtdTalkToRecsFlowRendererHost:-abp-contains(Ask for videos)
-youtube.com#?#.YtdTalkToRecsFlowRendererHost:-abp-contains(What do you like)
-youtube.com#?#.style-scope.ytd-rich-shelf-renderer:-abp-contains(YouTube Playables)
-youtube.com#?#.ytdTalkToRecsFlowRendererHost:-abp-contains(Help us improve)
-youtube.com###cinematics.ytd-watch-flexy:remove()
-youtube.com###hover-overlays
-youtube.com###offer-module:has-text(Watch on YouTube)
-youtube.com###related ytd-compact-movie-renderer
+
+! https://pastebin.com/0Qtubr5M
 youtube.com###related ytd-compact-radio-renderer
-youtube.com###upsell-dialog-text > a[href*="sign"]:upward(body > * > *)
-youtube.com##.YtdTalkToRecsFlowRendererHost:has-text(What hobbies are you interested in developing?)
-youtube.com##.YtmPaidContentOverlayHost
-youtube.com##.opened:not(.ytcp-bulk-actions):remove()
-youtube.com##.yt-lockup-view-model-wiz--horizontal.yt-lockup-view-model-wiz:has-text(Auto-dubbed)
-youtube.com##.yt-lockup-view-model-wiz--horizontal.yt-lockup-view-model-wiz:has-text(Members only)
-youtube.com##.ytd-feed-nudge-renderer:has-text(Looking for something different?)
-youtube.com##.ytp-inline-preview-mode
-youtube.com##.ytp-inline-preview-mode .ytp-paid-content-overlay, #endorsement.ytd-video-preview
-youtube.com##ad-interrupting
-youtube.com##tp-yt-paper-dialog.ytd-popup-container:has-text(/following Premium|Choose all that apply|Become a member|Free trial|How are your|How interested|Live TV|Wish videos|background play|better TV|cable box|cable reimagined|hidden fees|of YouTube TV|on YouTube TV|unlimited DVR|with YouTube TV|without the ads|try this feature|Terms apply/)
-youtube.com##video-ads
-youtube.com##ytd-action-companion-ad-renderer, ytd-display-ad-renderer, ytd-video-masthead-ad-advertiser-info-renderer, ytd-video-masthead-ad-primary-video-renderer, ytd-in-feed-ad-layout-renderer, ytd-ad-slot-renderer, yt-about-this-ad-renderer, yt-mealbar-promo-renderer, ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, .ytd-video-masthead-ad-v3-renderer, div#root.style-scope.ytd-display-ad-renderer.yt-simple-endpoint, div#sparkles-container.style-scope.ytd-promoted-sparkles-web-renderer, div#main-container.style-scope.ytd-promoted-video-renderer, div#player-ads.style-scope.ytd-watch-flexy, ad-slot-renderer, ytm-promoted-sparkles-web-renderer, masthead-ad, #masthead-ad, ytd-video-quality-promo-renderer, #yt-lang-alert-container, .YtmPaidContentOverlayHost, .ytd-primetime-promo-renderer, ytd-brand-video-singleton-renderer, #yt-feedback, #yt-hitchhiker-feedback
-youtube.com##ytd-ad-engagement-panel-banner-renderer
-youtube.com##ytd-ad-feedback-renderer
-youtube.com##ytd-ad-hover-text-button-renderer
-youtube.com##ytd-ad-info-dialog-renderer
-youtube.com##ytd-ad-inline-playback-meta-block
-youtube.com##ytd-ad-slot-renderer
-youtube.com##ytd-channel-renderer[use-bigger-thumbs][bigger-thumb-style=BIG] #avatar-section.ytd-channel-renderer, ytd-channel-renderer[use-bigger-thumbs] #avatar-section.ytd-channel-renderer:style(max-width: 360px !important)
-youtube.com##ytd-clarification-renderer.style-scope.ytd-watch-flexy
+youtube.com###related ytd-compact-movie-renderer
 youtube.com##ytd-download-button-renderer
-youtube.com##ytd-feed-nudge-renderer.ytd-item-section-renderer:has-text(recommendations)
-youtube.com##ytd-movie-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] .thumbnail-container.ytd-movie-renderer, ytd-movie-renderer[use-bigger-thumbs] .thumbnail-container.ytd-movie-renderer:style(max-width: 360px !important)
-youtube.com##ytd-popup-container > tp-yt-paper-dialog > ytd-mealbar-promo-renderer, ytd-popup-container > tp-yt-paper-dialog > yt-mealbar-promo-renderer:has-text(/Claim Offer|Join now|Not Now|No thanks|YouTube TV|live TV|Live TV|movies|sports|Try it free|unlimited DVR|watch NFL/)
-youtube.com##ytd-promoted-sparkles-web-renderer #sparkles-container:style(height: 0px !important; opacity: 0 !important;)
-youtube.com##ytd-promoted-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-promoted-video-renderer, ytd-promoted-sparkles-web-renderer[web-search-layout][use-bigger-thumbs][bigger-thumbs-style=BIG] #thumbnail-container.ytd-promoted-sparkles-web-renderer, ytd-text-image-no-button-layout-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #text-image-container.ytd-text-image-no-button-layout-renderer:style(max-width: 360px !important)
-youtube.com##ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-playlist-thumbnail.ytd-radio-renderer:style(max-width: 360px !important)
-youtube.com##ytd-rich-grid-renderer > #contents.ytd-rich-grid-renderer > :not(ytd-rich-item-renderer):not(ytd-rich-grid-row):not(ytd-continuation-item-renderer)
-youtube.com##ytd-rich-item-renderer.ytd-rich-grid-renderer.style-scope:has-text(Auto-dubbed)
-youtube.com##ytd-rich-item-renderer.ytd-rich-grid-renderer.style-scope:has-text(Members only)
+
+! YT - Revert giant search thumbnails to normal https://pastebin.com/keJAfsv9
 youtube.com##ytd-two-column-search-results-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #primary.ytd-two-column-search-results-renderer, ytd-search[has-search-header][has-bigger-thumbs] #header.ytd-search:style(max-width: 1096px !important)
-youtube.com##ytd-video-quality-promo-renderer
+youtube.com##ytd-channel-renderer[use-bigger-thumbs][bigger-thumb-style=BIG] #avatar-section.ytd-channel-renderer, ytd-channel-renderer[use-bigger-thumbs] #avatar-section.ytd-channel-renderer:style(max-width: 360px !important)
 youtube.com##ytd-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-video-renderer, ytd-video-renderer[use-search-ui] ytd-thumbnail.ytd-video-rendererytd-playlist-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-playlist-thumbnail.ytd-playlist-renderer, ytd-playlist-renderer[use-bigger-thumbs] ytd-playlist-thumbnail.ytd-playlist-renderer:style(max-width: 360px !important)
-youtube.com##ytp-ad-image-overlay
-youtube.com##ytp-ad-module
-youtube.com##ytp-ad-player-overlay
-youtube.com##ytp-ad-text
-youtube.com#@#.sparkles-light-cta
-youtube.com#@#ytd-promoted-sparkles-web-renderer
-||i.ytimg.com/sb/*
-||i.ytimg.com/vi/*/maxresdefault.jpg
-||i.ytimg.com/vi_webp/*/maxresdefault.webp
+youtube.com##ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs] ytd-thumbnail.ytd-radio-renderer, ytd-radio-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-playlist-thumbnail.ytd-radio-renderer:style(max-width: 360px !important)
+youtube.com##ytd-movie-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] .thumbnail-container.ytd-movie-renderer, ytd-movie-renderer[use-bigger-thumbs] .thumbnail-container.ytd-movie-renderer:style(max-width: 360px !important)
+youtube.com##ytd-promoted-video-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] ytd-thumbnail.ytd-promoted-video-renderer, ytd-promoted-sparkles-web-renderer[web-search-layout][use-bigger-thumbs][bigger-thumbs-style=BIG] #thumbnail-container.ytd-promoted-sparkles-web-renderer, ytd-text-image-no-button-layout-renderer[use-bigger-thumbs][bigger-thumbs-style=BIG] #text-image-container.ytd-text-image-no-button-layout-renderer:style(max-width: 360px !important)
+.yt-lockup-view-model-wiz--horizontal .yt-lockup-view-model-wiz__content-image:style(max-width: 360px !important)
+
+! Empty ad space
+youtube.com##ytd-rich-grid-renderer > #contents.ytd-rich-grid-renderer > :not(ytd-rich-item-renderer):not(ytd-rich-grid-row):not(ytd-continuation-item-renderer)
 
 ! fake buffering on the initial load
+! quick fix
 youtube.com#@#+js(trusted-rpnt, script, (function serverContract(), (()=>{if("YOUTUBE_PREMIUM_LOGO"===ytInitialData?.topbar?.desktopTopbarRenderer?.logo?.topbarLogoRenderer?.iconImage?.iconType||location.href.startsWith("https://youtube.com/tv#/")||location.href.startsWith("https://youtube.com/embed/"))return;document.addEventListener("DOMContentLoaded"\,(function(){const t=()=>{const t=document.getElementById("movie_player");if(!t)return;if(!t.getStatsForNerds?.()?.debug_info?.startsWith?.("SSAP\, AD"))return;const e=t.getProgressState?.();e&&e.duration>0&&(e.loaded<e.duration||e.duration-e.current>1)&&t.seekTo?.(e.duration)};t()\,new MutationObserver((()=>{t()})).observe(document\,{childList:!0\,subtree:!0})}));const t={apply:(t\,e\,o)=>{const n=o[0];return"function"==typeof n&&n.toString().includes("onAbnormalityDetected")&&(o[0]=function(){})\,Reflect.apply(t\,e\,o)}};window.Promise.prototype.then=new Proxy(window.Promise.prototype.then\,t)})();(function serverContract(), sedCount, 1)
 youtube.com##+js(trusted-rpnt, script, (function serverContract(), '(()=>{if("YOUTUBE_PREMIUM_LOGO"===ytInitialData?.topbar?.desktopTopbarRenderer?.logo?.topbarLogoRenderer?.iconImage?.iconType||location.href.startsWith("https://youtube.com/tv#/")||location.href.startsWith("https://youtube.com/embed/"))return;window.ytInitialPlayerResponse=window.ytInitialPlayerResponse||{},document.addEventListener("DOMContentLoaded",(function(){const e=()=>{const e=document.getElementById("movie_player");if(!e)return;const t=e.getProgressState?.();if(t&&t.duration>0&&(t.loaded<t.duration||t.duration-t.current>1)){if(!e.getStatsForNerds?.()?.debug_info?.startsWith?.("SSAP, AD")){const t=e.getPlayerResponse?.();if("no_ads"in t||"adPlacements"in t||"adSlots"in t||"playerAds"in t){const o=t.videoDetails?.videoId;window.ytInitialPlayerResponse?.videoDetails?.videoId!==o&&(window.ytInitialPlayerResponse.storyboards=t.storyboards,e.loadVideoById(o,t.playerConfig?.playbackStartConfig?.startSeconds??0))}return}e.seekTo?.(t.duration)}};e(),new MutationObserver((()=>{e()})).observe(document,{childList:!0,subtree:!0})}));const e={apply:(e,t,o)=>{const n=o[0];return"function"==typeof n&&n.toString().includes("onAbnormalityDetected")&&(o[0]=function(){}),Reflect.apply(e,t,o)}};window.Promise.prototype.then=new Proxy(window.Promise.prototype.then,e);const t={apply:(e,t,o)=>{let n=Reflect.apply(e,t,o);const a=n?.videoDetails?.videoId;return a&&location.search.includes(a)&&window.ytInitialPlayerResponse?.storyboards?.playerStoryboardSpecRenderer&&(n.storyboards=window.ytInitialPlayerResponse.storyboards,window.ytInitialPlayerResponse.storyboards={}),n}};window.JSON.parse=new Proxy(window.JSON.parse,t),window.location.href.includes("/watch?")&&"BADGE_STYLE_TYPE_MEMBERS_ONLY"!==ytInitialData?.contents?.twoColumnWatchNextResults?.results?.results?.contents?.[0]?.videoPrimaryInfoRenderer?.badges?.[0]?.metadataBadgeRenderer?.style&&"CONTENT_CHECK_REQUIRED"!==window.ytInitialPlayerResponse?.playabilityStatus?.status&&window.addEventListener("load",(()=>{const e=async function(e){let t=document.getElementById(e);for(;!t;)t=await new Promise((t=>setTimeout((()=>t(document.getElementById(e))),500)));return t}("movie_player"),t=window.location.search,o=new URLSearchParams(t).get("v"),n=new URLSearchParams(t).get("t")??0;if(!e||!o)return;const a=parseInt(n,10);e.then((function(e){e.loadVideoById(o,a)}))}))})();(function serverContract()', sedCount, 1)
 youtube.com##+js(trusted-json-edit-xhr-request, [?..context.client.originalUrl^="https://youtube.com/watch"]..playbackContext[?.contentPlaybackContext]+={"adPlaybackContext":{"adType":"AD_TYPE_INSTREAM"}}, propsToMatch, /\/(player|get_watch)/)
 youtube.com##+js(trusted-json-edit-xhr-response, '..playerConfig.granularVariableSpeedConfig+={"minimumPlaybackRate":25,"maximumPlaybackRate":200}', propsToMatch, /\/(player|get_watch)/)
+
 !#if cap_html_filtering
 ! www.twitch.tv/esl_dota2
 ||ttvnw.net/v1/playlist$xhr,3p,replace=/#EXT-X-DATERANGE:ID="(stitched-ad|maf-ad|source|trigger)"\S+\n|#EXT-X-DATERANGE:ID=\S+?CLASS="twitch-(?:stream-source|trigger|maf-ad)"\S+\n|#EXT-X-DATERANGE:\S+?CLASS="twitch-ad-quartile".+?(?=(#EXT-X-DATERANGE|$))|(\n#EXT-X-DISCONTINUITY\s|#EXT-X-TWITCH-PREFETCH\S+)//gs
-twitch.tv##[data-a-target="video-ad-label"]
-twitch.tv##[data-a-target="video-ad-countdown"]
-twitch.tv##button[aria-label="Leave feedback for this Ad"]
-twitch.tv##button[aria-label="Learn more about this ad"]
-twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .video-player__overlay > .follow-panel-overlay.tw-transition[aria-hidden="false"]
-twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .top-bar--pointer-enabled > div > .tw-media-card-stat
-twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) [data-a-target="video-ref"]:has(.video-player__overlay > .follow-panel-overlay.tw-transition[aria-hidden="false"]) + div[class^="Layout-sc-"][hidden=""]:style(display:block !important;)
-twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) div.video-player__overlay > div[class*="InjectLayout-sc-"] > div.player-overlay-background--darkness-3
+www.twitch.tv##[data-a-target="video-ad-label"]
+www.twitch.tv##[data-a-target="video-ad-countdown"]
+www.twitch.tv##button[aria-label="Leave feedback for this Ad"]
+www.twitch.tv##button[aria-label="Learn more about this ad"]
+www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .video-player__overlay > .follow-panel-overlay.tw-transition[aria-hidden="false"]
+www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .top-bar--pointer-enabled > div > .tw-media-card-stat
+www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) [data-a-target="video-ref"]:has(.video-player__overlay > .follow-panel-overlay.tw-transition[aria-hidden="false"]) + div[class^="Layout-sc-"][hidden=""]:style(display:block !important;)
+www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) div.video-player__overlay > div[class*="InjectLayout-sc-"] > div.player-overlay-background--darkness-3
 !#endif
+
+! from: https://github.com/easylist/easylist
+youtube.com##.YtmPaidContentOverlayHost
+youtube.com###offer-module:has-text(Watch on YouTube)
+youtube.com#?#.style-scope.ytd-rich-shelf-renderer:-abp-contains(YouTube Playables)
+youtube.com##.ytd-rich-shelf-renderer:has-text(Primetime movies for you)
+youtube.com##.ytd-feed-nudge-renderer:has-text(Looking for something different?)
+youtube.com##ytd-feed-nudge-renderer.ytd-item-section-renderer:has-text(recommendations)
+youtube.com#?#.YtdTalkToRecsFlowRendererHost:-abp-contains(Ask for videos)
+youtube.com#?#.YtdTalkToRecsFlowRendererHost:-abp-contains(What do you like)
+youtube.com#?#.ytdTalkToRecsFlowRendererHost:-abp-contains(Help us improve)
+youtube.com##.yt-lockup-view-model-wiz--horizontal.yt-lockup-view-model-wiz:has-text(Members only)
+youtube.com##ytd-rich-item-renderer.ytd-rich-grid-renderer.style-scope:has-text(Members only)
+youtube.com##.yt-lockup-view-model-wiz--horizontal.yt-lockup-view-model-wiz:has-text(Auto-dubbed)
+youtube.com##ytd-rich-item-renderer.ytd-rich-grid-renderer.style-scope:has-text(Auto-dubbed)
+
+! Youtube Nochat
+youtube.com###chat-container
+youtube.com###ytd-watch-flexy[live-chat-present-and-expanded] #panels-full-bleed-container
+youtube.com##ytd-watch-flexy[live-chat-present-and-expanded] #columns:style(padding-right: 0 !important;)
+! black left over
+youtube.com###panels-full-bleed-container.ytd-watch-flexy.style-scope
