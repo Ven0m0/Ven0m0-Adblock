@@ -9,6 +9,11 @@ git add -A
 if has oxlint; then
   oxlint --fix --fix-suggestions
 fi
+if has bunx; then
+  bunx oxfmt@latest
+elif has npx; then
+  npx oxfmt@latest
+fi
 if has biome; then
   biome check --fix --unsafe --skip-parse-errors --no-errors-on-unmatched --html-formatter-line-width=120 --css-formatter-line-width=120 --json-formatter-line-width=120 \
   --use-editorconfig=true --indent-style=space --format-with-errors=true --files-ignore-unknown=true --vcs-use-ignore-file=false "$PWD"
