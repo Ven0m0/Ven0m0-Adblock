@@ -1,9 +1,8 @@
 // ==UserScript==
 // @name         YouTube Unified Optimizer
 // @namespace    http://tampermonkey.net/
-// @version      4.3.0
-// @description  Unified YouTube optimizer: CPU/GPU/UI optimizations + quality control + premium playback + experiment flags + JS engine taming
-// @author       Ven0m0 (optimizer), adisib/Fznhq (quality control), CY Fung (flags/engine)
+// @version      4.3.1
+// @description  Lightweight YouTube optimizer: CPU/GPU/UI tweaks, quality lock, flags, engine tame
 // @match        https://youtube.com/*
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
@@ -16,62 +15,18 @@
 // @license      GPL-3.0
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // ==/UserScript==
-
 (() => {
   "use strict";
-
   const GUARD = "__yt_unified_optimizer__";
   if (window[GUARD]) return;
   window[GUARD] = 1;
-
-  // ───────────────────────────────── CONFIG ─────────────────────────────────
-  const CONSTANTS = {
-    RAF_BASE_ID: 1e9,
-    RAF_BATCH_SIZE: 10,
-    PREFETCH_TIMEOUT: 3e4,
-    TIMER_CHECK_INTERVAL: 10,
-    TIMER_REPATCH_DELAY: 800,
-    TIMER_NAVIGATE_DEBOUNCE: 500,
-    IDLE_CHECK_INTERVAL: 2e3,
-    IDLE_THROTTLE: 100,
-    IDLE_MIN_DELAY_ACTIVE: 150,
-    LAZY_THUMB_ROOT_MARGIN: "1000px",
-    SCROLL_DEBOUNCE: 60,
-    WHEEL_DEBOUNCE: 60,
-    RESIZE_DEBOUNCE: 120
-  };
-
+  const K = { RAF_BASE: 1e9, RAF_BATCH: 8, PREFETCH_TO: 3e4, TIMER_CHECK: 10, TIMER_REPATCH: 800, TIMER_NAV_DEB: 500, IDLE_CHECK: 2e3, IDLE_THROTTLE: 120, IDLE_MIN_ACTIVE: 150, LAZY_THUMB_MARGIN: "1000px", SCROLL_DB: 60, WHEEL_DB: 60, RESIZE_DB: 120, INSTANT_NAV_TH: 200, QUALITY_INIT: 120, QUALITY_RETRY: 120, QUALITY_EXP: 2592e6 };
   const CFG = {
     debug: 0,
-    cpu: {
-      eventThrottle: 1,
-      rafDecimation: 1,
-      timerPatch: 1,
-      idleBoost: 1,
-      idleDelayNormal: 8e3,
-      idleDelayShorts: 15e3,
-      rafFpsVisible: 20,
-      rafFpsHidden: 3,
-      minDelayIdle: 200,
-      minDelayBase: 75
-    },
+    cpu: { eventThrottle: 1, rafDecimation: 1, timerPatch: 1, idleBoost: 1, idleDelayNormal: 8e3, idleDelayShorts: 15e3, rafFpsVisible: 20, rafFpsHidden: 3, minDelayIdle: 200, minDelayBase: 75 },
     gpu: { blockAV1: 1, disableAmbient: 1, lazyThumbs: 1 },
-    ui: {
-      hideSpinner: 1,
-      hideShorts: 0,
-      disableAnimations: 1,
-      contentVisibility: 1,
-      instantNav: 1
-    },
-    quality: {
-      enabled: 1,
-      targetRes: "hd1080",
-      highFramerateTargetRes: null,
-      preferPremium: 0,
-      flushBuffer: 1,
-      useAPI: 1,
-      overwriteStoredSettings: 0
-    },
+    ui: { hideSpinner: 1, hideShorts: 0, disableAnimations: 1, contentVisibility: 1, instantNav: 1 },
+    quality: { enabled: 1, targetRes: "hd1080", highFramerateTargetRes: null, preferPremium: 0, flushBuffer: 1, useAPI: 1, overwriteStoredSettings: 0 },
     flags: {
       IS_TABLET: 1,
       DISABLE_YT_IMG_DELAY_LOADING: 1,
@@ -102,445 +57,314 @@
       web_cinematic_fullscreen: 0
     }
   };
-
-  const RESOLUTIONS = [
-    "highres",
-    "hd2880",
-    "hd2160",
-    "hd1440",
-    "hd1080",
-    "hd720",
-    "large",
-    "medium",
-    "small",
-    "tiny"
-  ];
-  const HEIGHTS = [4320, 2880, 2160, 1440, 1080, 720, 480, 360, 240, 144];
+  const RES = ["highres", "hd2880", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
+  const H = [4320, 2880, 2160, 1440, 1080, 720, 480, 360, 240, 144];
   const IDLE_ATTR = "data-yt-idle";
-
-  // ──────────────────────────────── UTILS ──────────────────────────────────
   const log = (...a) => CFG.debug && console.log("[YT Unified]", ...a);
   const isShorts = () => location.pathname.startsWith("/shorts");
   const throttle = (fn, ms) => {
-    let last = 0;
-    return function (...a) {
-      const now = Date.now();
-      if (now - last >= ms) {
-        last = now;
-        return fn.apply(this, a);
+    let l = 0;
+    return (...a) => {
+      const n = Date.now();
+      if (n - l >= ms) {
+        l = n;
+        fn(...a);
       }
     };
   };
-  const debounce = (fn, delay) => {
+  const debounce = (fn, d) => {
     let t;
-    return function (...a) {
+    return (...a) => {
       clearTimeout(t);
-      t = setTimeout(() => fn.apply(this, a), delay);
+      t = setTimeout(() => fn(...a), d);
     };
   };
   const rafThrottle = (fn) => {
     let q = 0;
-    return function (...a) {
+    return (...a) => {
       if (!q) {
         q = 1;
         requestAnimationFrame(() => {
           q = 0;
-          fn.apply(this, a);
+          fn(...a);
         });
       }
     };
   };
   const GM = window.GM || { getValue: GM_getValue, setValue: GM_setValue };
-  const getStoredValue = async (k, d) => {
+  const getStored = async (k, d) => {
     try {
       return GM.getValue ? await GM.getValue(`yt_opt_${k}`, d) : d;
     } catch {
       return d;
     }
   };
-  const setStoredValue = async (k, v) => {
+  const setStored = async (k, v) => {
     try {
       if (GM.setValue) await GM.setValue(`yt_opt_${k}`, v);
     } catch {}
   };
-
-  // ───────────────────────────── JS ENGINE TAMER ───────────────────────────
-  // perf.now monotonic tweak (addresses back nav issues)
   (() => {
-    if (typeof performance?.now !== "function") return;
-    const orig = performance.now.bind(performance);
+    const o = performance.now.bind(performance);
     let last = 0;
-    performance.now = function () {
-      const v = orig();
-      const next = v <= last ? last + 0.001 : v;
-      last = next;
-      return next;
+    performance.now = () => {
+      const v = o();
+      const n = v <= last ? last + 0.001 : v;
+      last = n;
+      return n;
     };
   })();
-
-  // Remove requestStorageAccess (privacy)
   (() => {
-    if (typeof Document !== "undefined") {
-      if (Document.prototype.requestStorageAccess) {
-        Document.prototype.requestStorageAccess = undefined;
-      }
-      if (Document.prototype.requestStorageAccessFor) {
-        Document.prototype.requestStorageAccessFor = undefined;
-      }
-    }
+    if (Document?.prototype?.requestStorageAccess) Document.prototype.requestStorageAccess = undefined;
+    if (Document?.prototype?.requestStorageAccessFor) Document.prototype.requestStorageAccessFor = undefined;
   })();
-
-  // Block AV1 aggressively
   if (CFG.gpu.blockAV1) {
     const cp = HTMLMediaElement.prototype.canPlayType;
-    HTMLMediaElement.prototype.canPlayType = function (type) {
-      if (type && /av01/i.test(type)) return "";
-      return cp.call(this, type);
+    HTMLMediaElement.prototype.canPlayType = function (t) {
+      if (t && /av01/i.test(t)) return "";
+      return cp.call(this, t);
     };
     if (navigator.mediaCapabilities?.decodingInfo) {
-      const origDecode = navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
-      navigator.mediaCapabilities.decodingInfo = async (config) => {
-        if (/av01/i.test(config?.video?.contentType || "")) {
-          return { supported: false, powerEfficient: false, smooth: false };
-        }
-        return origDecode(config);
-      };
+      const od = navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
+      navigator.mediaCapabilities.decodingInfo = async (c) => (/av01/i.test(c?.video?.contentType || "") ? { supported: 0, powerEfficient: 0, smooth: 0 } : od(c));
     }
     log("AV1 blocked");
   }
-
-  // ───────────────────────────── CPU: EVENTS/RAF/TIMERS ────────────────────
   if (CFG.cpu.eventThrottle) {
-    const origAdd = EventTarget.prototype.addEventListener;
-    const origRem = EventTarget.prototype.removeEventListener;
-    const wrapMap = new WeakMap();
-    const throttleEvents = new Set(["mousemove", "pointermove", "touchmove"]);
-    const debounceEvents = new Map([
-      ["scroll", CONSTANTS.SCROLL_DEBOUNCE],
-      ["wheel", CONSTANTS.WHEEL_DEBOUNCE],
-      ["resize", CONSTANTS.RESIZE_DEBOUNCE]
-    ]);
-    const isPlayer = (el) =>
-      el instanceof HTMLVideoElement ||
-      el.closest?.(".ytp-chrome-bottom,.ytp-volume-panel,.ytp-progress-bar");
-    const isGlobal = (el) =>
-      el === window || el === document || el === document.documentElement || el === document.body;
-    EventTarget.prototype.addEventListener = function (type, fn, opt) {
-      if (
-        isShorts() ||
-        !CFG.cpu.eventThrottle ||
-        typeof fn !== "function" ||
-        isPlayer(this) ||
-        (isGlobal(this) && (type === "wheel" || type === "scroll" || type === "resize"))
-      )
-        return origAdd.call(this, type, fn, opt);
-      let wrapped = fn;
-      if (throttleEvents.has(type)) wrapped = rafThrottle(fn);
-      else if (debounceEvents.has(type)) wrapped = debounce(fn, debounceEvents.get(type));
-      if (wrapped !== fn) wrapMap.set(fn, wrapped);
-      return origAdd.call(this, type, wrapped, opt);
+    const oa = EventTarget.prototype.addEventListener;
+    const or = EventTarget.prototype.removeEventListener;
+    const wrap = new WeakMap();
+    const thEv = new Set(["mousemove", "pointermove", "touchmove"]);
+    const dbEv = new Map([["scroll", K.SCROLL_DB], ["wheel", K.WHEEL_DB], ["resize", K.RESIZE_DB]]);
+    const isP = (e) => e instanceof HTMLVideoElement || e.closest?.(".ytp-chrome-bottom,.ytp-volume-panel,.ytp-progress-bar");
+    const isG = (e) => e === window || e === document || e === document.documentElement || e === document.body;
+    EventTarget.prototype.addEventListener = function (t, f, o) {
+      if (isShorts() || !CFG.cpu.eventThrottle || typeof f !== "function" || isP(this) || (isG(this) && (t === "wheel" || t === "scroll" || t === "resize"))) return oa.call(this, t, f, o);
+      let w = f;
+      if (thEv.has(t)) w = rafThrottle(f);
+      else if (dbEv.has(t)) w = debounce(f, dbEv.get(t));
+      if (w !== f) wrap.set(f, w);
+      return oa.call(this, t, w, o);
     };
-    EventTarget.prototype.removeEventListener = function (type, fn, opt) {
-      const wrapped = wrapMap.get(fn) || fn;
-      return origRem.call(this, type, wrapped, opt);
+    EventTarget.prototype.removeEventListener = function (t, f, o) {
+      return or.call(this, t, wrap.get(f) || f, o);
     };
     log("Event throttle ok");
   }
-
   if (CFG.cpu.rafDecimation) {
-    const origRAF = window.requestAnimationFrame.bind(window);
-    const origCAF = window.cancelAnimationFrame.bind(window);
+    const oRAF = requestAnimationFrame.bind(window);
+    const oCAF = cancelAnimationFrame.bind(window);
     let idc = 1;
     const rafQ = new Map();
-    let rafSch = 0,
-      nextFrm = performance.now();
-    const getInterval = () =>
-      document.visibilityState === "visible"
-        ? 1000 / CFG.cpu.rafFpsVisible
-        : 1000 / CFG.cpu.rafFpsHidden;
-    const processQueue = () => {
+    let sch = 0;
+    let next = performance.now();
+    const iv = () => (document.visibilityState === "visible" ? 1000 / CFG.cpu.rafFpsVisible : 1000 / CFG.cpu.rafFpsHidden);
+    const loop = () => {
       const now = performance.now();
-      if (now >= nextFrm) {
-        nextFrm = now + getInterval();
-        const cbs = Array.from(rafQ.values());
+      if (now >= next) {
+        next = now + iv();
+        const c = [...rafQ.values()];
         rafQ.clear();
-        const bs = Math.min(cbs.length, CONSTANTS.RAF_BATCH_SIZE);
-        for (let i = 0; i < bs; i++) {
-          try {
-            cbs[i](now);
-          } catch {}
-        }
-        for (let i = bs; i < cbs.length; i++) origRAF(() => cbs[i](now));
+        const b = Math.min(c.length, K.RAF_BATCH);
+        for (let i = 0; i < b; i++) try {
+          c[i](now);
+        } catch {}
+        for (let i = b; i < c.length; i++) oRAF(() => c[i](now));
       }
-      origRAF(processQueue);
+      oRAF(loop);
     };
     window.requestAnimationFrame = (cb) => {
-      if (!CFG.cpu.rafDecimation) return origRAF(cb);
-      const id = CONSTANTS.RAF_BASE_ID + idc++;
+      if (!CFG.cpu.rafDecimation) return oRAF(cb);
+      const id = K.RAF_BASE + idc++;
       rafQ.set(id, cb);
-      if (!rafSch) {
-        rafSch = 1;
-        nextFrm = performance.now();
-        origRAF(processQueue);
+      if (!sch) {
+        sch = 1;
+        next = performance.now();
+        oRAF(loop);
       }
       return id;
     };
     window.cancelAnimationFrame = (id) => {
-      if (typeof id === "number" && id >= CONSTANTS.RAF_BASE_ID) rafQ.delete(id);
-      else origCAF(id);
+      if (typeof id === "number" && id >= K.RAF_BASE) rafQ.delete(id);
+      else oCAF(id);
     };
-    document.addEventListener(
-      "visibilitychange",
-      throttle(() => {
-        nextFrm = performance.now();
-      }, 1000)
-    );
+    document.addEventListener("visibilitychange", throttle(() => {
+      next = performance.now();
+    }, 1000));
     log("RAF decimation ok");
   }
-
   if (CFG.cpu.timerPatch) {
     (async () => {
-      const natv = {
-        setTimeout: window.setTimeout.bind(window),
-        clearTimeout: window.clearTimeout.bind(window),
-        setInterval: window.setInterval.bind(window),
-        clearInterval: window.clearInterval.bind(window)
-      };
-      if (!document.documentElement)
-        await new Promise((r) => {
-          if (document.documentElement) r();
-          else document.addEventListener("DOMContentLoaded", r, { once: true });
-        });
-
-      let iframeTimers = natv;
+      const nat = { setTimeout: window.setTimeout.bind(window), clearTimeout: window.clearTimeout.bind(window), setInterval: window.setInterval.bind(window), clearInterval: window.clearInterval.bind(window) };
+      if (!document.documentElement) await new Promise((r) => { document.addEventListener("DOMContentLoaded", r, { once: true }); });
+      let timers = nat;
       if (document.visibilityState === "visible") {
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.sandbox = "allow-same-origin allow-scripts";
-        iframe.srcdoc = "<!doctype html><title>timer</title>";
-        document.documentElement.appendChild(iframe);
+        const f = document.createElement("iframe");
+        f.style.display = "none";
+        f.sandbox = "allow-same-origin allow-scripts";
+        f.srcdoc = "<!doctype html><title>t</title>";
+        document.documentElement.appendChild(f);
         await new Promise((r) => {
-          const check = () => {
-            iframe.contentWindow?.setTimeout ? r() : setTimeout(check, CONSTANTS.TIMER_CHECK_INTERVAL);
-          };
-          check();
+          const ck = () => (f.contentWindow?.setTimeout ? r() : setTimeout(ck, K.TIMER_CHECK));
+          ck();
         });
-        iframeTimers = {
-          setTimeout: iframe.contentWindow.setTimeout.bind(iframe.contentWindow),
-          clearTimeout: iframe.contentWindow.clearTimeout.bind(iframe.contentWindow),
-          setInterval: iframe.contentWindow.setInterval.bind(iframe.contentWindow),
-          clearInterval: iframe.contentWindow.clearInterval.bind(iframe.contentWindow)
+        timers = {
+          setTimeout: f.contentWindow.setTimeout.bind(f.contentWindow),
+          clearTimeout: f.contentWindow.clearTimeout.bind(f.contentWindow),
+          setInterval: f.contentWindow.setInterval.bind(f.contentWindow),
+          clearInterval: f.contentWindow.clearInterval.bind(f.contentWindow)
         };
       }
-
-      const wrapTimeout = (impl) => (fn, delay = 0, ...a) => {
-        if (typeof fn !== "function" || isShorts() || delay < CFG.cpu.minDelayBase) {
-          return natv.setTimeout(fn, delay, ...a);
-        }
-        return impl(() => fn.apply(window, a), delay);
+      const wrapTO = (impl) => (fn, d = 0, ...a) => {
+        if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
+        return impl(() => fn(...a), d);
       };
-      const wrapInterval = (impl) => (fn, delay = 0, ...a) => {
-        if (typeof fn !== "function" || isShorts() || delay < CFG.cpu.minDelayBase) {
-          return natv.setInterval(fn, delay, ...a);
-        }
-        return impl(() => fn.apply(window, a), delay);
+      const wrapIV = (impl) => (fn, d = 0, ...a) => {
+        if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
+        return impl(() => fn(...a), d);
       };
-
-      window.setTimeout = wrapTimeout(iframeTimers.setTimeout);
-      window.clearTimeout = iframeTimers.clearTimeout;
-      window.setInterval = wrapInterval(iframeTimers.setInterval);
-      window.clearInterval = iframeTimers.clearInterval;
-
+      window.setTimeout = wrapTO(timers.setTimeout);
+      window.clearTimeout = timers.clearTimeout;
+      window.setInterval = wrapIV(timers.setInterval);
+      window.clearInterval = timers.clearInterval;
       if (CFG.cpu.idleBoost) {
-        let lastActive = performance.now();
+        let last = performance.now();
         let throttleTimers = 1;
         let minDelay = CFG.cpu.minDelayBase;
-        const activityEv = [
-          "mousemove",
-          "mousedown",
-          "keydown",
-          "wheel",
-          "touchstart",
-          "pointerdown",
-          "focusin"
-        ];
+        const actEv = ["mousemove", "mousedown", "keydown", "wheel", "touchstart", "pointerdown", "focusin"];
         const thAct = throttle(() => {
-          lastActive = performance.now();
+          last = performance.now();
           if (document.documentElement.hasAttribute(IDLE_ATTR)) {
             document.documentElement.removeAttribute(IDLE_ATTR);
             throttleTimers = 1;
             minDelay = CFG.cpu.minDelayBase;
             log("Idle OFF");
           }
-        }, CONSTANTS.IDLE_THROTTLE);
-        activityEv.forEach((evt) => window.addEventListener(evt, thAct, { capture: true, passive: true }));
+        }, K.IDLE_THROTTLE);
+        actEv.forEach((ev) => window.addEventListener(ev, thAct, { capture: true, passive: true }));
         setInterval(() => {
           if (document.visibilityState !== "visible") return;
           const now = performance.now();
-          const idleDelay = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
-          if (now - lastActive >= idleDelay) {
-            if (!document.documentElement.hasAttribute(IDLE_ATTR)) {
-              document.documentElement.setAttribute(IDLE_ATTR, "1");
-              const hv = document.querySelector("video.video-stream")?.paused === false;
-              throttleTimers = !(hv || isShorts());
-              minDelay = hv || isShorts() ? CONSTANTS.IDLE_MIN_DELAY_ACTIVE : CFG.cpu.minDelayIdle;
-              log("Idle ON");
-            }
+          const idle = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
+          if (now - last >= idle && !document.documentElement.hasAttribute(IDLE_ATTR)) {
+            document.documentElement.setAttribute(IDLE_ATTR, "1");
+            const hv = document.querySelector("video.video-stream")?.paused === false;
+            throttleTimers = !(hv || isShorts());
+            minDelay = hv || isShorts() ? K.IDLE_MIN_ACTIVE : CFG.cpu.minDelayIdle;
+            log("Idle ON");
           }
-        }, CONSTANTS.IDLE_CHECK_INTERVAL);
+        }, K.IDLE_CHECK);
         window.__YT_TIMER_STATE__ = { get throttleTimers() { return throttleTimers; }, get minDelay() { return minDelay; } };
       }
+      const reapply = debounce(() => {
+        window.setTimeout = wrapTO(timers.setTimeout);
+        window.setInterval = wrapIV(timers.setInterval);
+        window.clearTimeout = timers.clearTimeout;
+        window.clearInterval = timers.clearInterval;
+      }, K.TIMER_REPATCH);
+      window.addEventListener("yt-navigate-finish", reapply);
     })();
   }
-
-  // ───────────────────────────── GPU / UI TWEAKS ───────────────────────────
   (() => {
     let css = "";
-    if (CFG.ui.disableAnimations)
-      css +=
-        "[no-anim] *{transition:none!important;animation:none!important}html{scroll-behavior:auto!important}.ytd-ghost-grid-renderer *,.ytd-continuation-item-renderer *{animation:none!important}";
-    if (CFG.ui.contentVisibility)
-      css += `html:not([data-yt-cv-off]) #comments,html:not([data-yt-cv-off]) #related,html:not([data-yt-cv-off]) ytd-watch-next-secondary-results-renderer{content-visibility:auto;contain-intrinsic-size:1px 1000px}`;
-    if (CFG.ui.hideSpinner)
-      css +=
-        ".ytp-spinner,.ytp-spinner *{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}";
-    if (CFG.gpu.disableAmbient)
-      css +=
-        ".ytp-ambient-light,ytd-watch-flexy[ambient-mode-enabled] .ytp-ambient-light{display:none!important}ytd-app,ytd-watch-flexy,#content,#page-manager{backdrop-filter:none!important}";
-    if (CFG.ui.hideShorts)
-      css +=
-        '[hide-shorts] ytd-rich-section-renderer,ytd-reel-shelf-renderer,#endpoint[title="Shorts"],a[title="Shorts"]{display:none!important}';
+    if (CFG.ui.disableAnimations) css += "[no-anim] *{transition:none!important;animation:none!important}html{scroll-behavior:auto!important}.ytd-ghost-grid-renderer *,.ytd-continuation-item-renderer *{animation:none!important}";
+    if (CFG.ui.contentVisibility) css += `html:not([data-yt-cv-off]) #comments,html:not([data-yt-cv-off]) #related,html:not([data-yt-cv-off]) ytd-watch-next-secondary-results-renderer{content-visibility:auto;contain-intrinsic-size:1px 1000px}`;
+    if (CFG.ui.hideSpinner) css += ".ytp-spinner,.ytp-spinner *{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}";
+    if (CFG.gpu.disableAmbient) css += ".ytp-ambient-light,ytd-watch-flexy[ambient-mode-enabled] .ytp-ambient-light{display:none!important}ytd-app,ytd-watch-flexy,#content,#page-manager{backdrop-filter:none!important}";
+    if (CFG.ui.hideShorts) css += '[hide-shorts] ytd-rich-section-renderer,ytd-reel-shelf-renderer,#endpoint[title="Shorts"],a[title="Shorts"]{display:none!important}';
     if (css) {
       const s = document.createElement("style");
       s.textContent = css;
       (document.head || document.documentElement).appendChild(s);
     }
   })();
-
   if (CFG.gpu.disableAmbient) {
-    const disableAmbient = () => {
-      const flexy = document.querySelector("ytd-watch-flexy");
-      if (!flexy || flexy.dataset.ambientDis) return;
-      flexy.dataset.ambientDis = "1";
-      const ambientObs = new MutationObserver(() => {
-        if (flexy.hasAttribute("ambient-mode-enabled")) flexy.removeAttribute("ambient-mode-enabled");
-      });
-      ambientObs.observe(flexy, { attributes: true, attributeFilter: ["ambient-mode-enabled"] });
+    const dis = () => {
+      const f = document.querySelector("ytd-watch-flexy");
+      if (!f || f.dataset.ambientDis) return;
+      f.dataset.ambientDis = "1";
+      new MutationObserver(() => {
+        if (f.hasAttribute("ambient-mode-enabled")) f.removeAttribute("ambient-mode-enabled");
+      }).observe(f, { attributes: true, attributeFilter: ["ambient-mode-enabled"] });
     };
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", disableAmbient);
-    else setTimeout(disableAmbient, 500);
-    const throttledAmbient = throttle(disableAmbient, 1000);
-    window.addEventListener("yt-navigate-finish", throttledAmbient);
+    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", dis) : setTimeout(dis, 400);
+    window.addEventListener("yt-navigate-finish", throttle(dis, 1000));
   }
-
   if (CFG.gpu.lazyThumbs) {
-    const thumbObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (entry.target.style.display === "none") entry.target.style.display = "";
-            thumbObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { rootMargin: CONSTANTS.LAZY_THUMB_ROOT_MARGIN }
-    );
-    const lazyLoad = () => {
-      const el = document.querySelectorAll(
-        "ytd-rich-item-renderer:not([data-lazy-opt]),ytd-compact-video-renderer:not([data-lazy-opt]),ytd-thumbnail:not([data-lazy-opt])"
-      );
-      el.forEach((e) => {
+    const obs = new IntersectionObserver((es) => {
+      es.forEach((e) => {
+        if (e.isIntersecting) {
+          if (e.target.style.display === "none") e.target.style.display = "";
+          obs.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: K.LAZY_THUMB_MARGIN });
+    const lazy = () => {
+      document.querySelectorAll("ytd-rich-item-renderer:not([data-lazy-opt]),ytd-compact-video-renderer:not([data-lazy-opt]),ytd-thumbnail:not([data-lazy-opt])").forEach((e) => {
         e.dataset.lazyOpt = "1";
         e.style.display = "none";
-        thumbObserver.observe(e);
+        obs.observe(e);
       });
     };
-    const throttledLazyLoad = throttle(lazyLoad, 500);
-    const lazyObs = new MutationObserver(throttledLazyLoad);
-    if (document.body) lazyObs.observe(document.body, { childList: true, subtree: true });
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", lazyLoad);
-    else setTimeout(lazyLoad, 100);
+    const tl = throttle(lazy, 500);
+    new MutationObserver(tl).observe(document.body || document.documentElement, { childList: true, subtree: true });
+    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", lazy) : setTimeout(lazy, 120);
   }
-
   if (CFG.ui.instantNav) {
-    const throttledMouseover = throttle((e) => {
+    const hov = throttle((e) => {
       const link = e.target.closest('a[href^="/watch"]');
       if (link) {
-        const prefetch = document.createElement("link");
-        prefetch.rel = "prefetch";
-        prefetch.href = link.href;
-        prefetch.fetchPriority = "low";
-        document.head.appendChild(prefetch);
-        setTimeout(() => {
-          prefetch.parentNode?.removeChild(prefetch);
-        }, CONSTANTS.PREFETCH_TIMEOUT);
+        const p = document.createElement("link");
+        p.rel = "prefetch";
+        p.href = link.href;
+        p.fetchPriority = "low";
+        document.head.appendChild(p);
+        setTimeout(() => p.remove(), K.PREFETCH_TO);
       }
-    }, 200);
-    document.addEventListener("mouseover", throttledMouseover, { passive: true });
+    }, K.INSTANT_NAV_TH);
+    document.addEventListener("mouseover", hov, { passive: true });
   }
-
-  // ───────────────────────────── QUALITY CONTROL ───────────────────────────
-  let recentVideo = "";
+  let recent = "";
   let foundHFR = 0;
   if (CFG.quality.enabled) {
-    const unwrap = (el) => (el?.wrappedJSObject ? el.wrappedJSObject : el);
-    const getVideoID = (ytPlayer) => {
-      const m = /(?:v=)([\w-]+)/.exec(ytPlayer.getVideoUrl());
-      return m ? m[1] : "";
-    };
-    const setResolution = (ytPlayer, resolutions) => {
-      if (!ytPlayer || !ytPlayer.getPlaybackQuality) return;
-      const current = ytPlayer.getPlaybackQuality();
+    const unwrap = (e) => e?.wrappedJSObject || e;
+    const getVid = (y) => /(?:v=)([\w-]+)/.exec(y.getVideoUrl())?.[1] || "";
+    const setRes = (y, rs) => {
+      if (!y?.getPlaybackQuality) return;
+      const cur = y.getPlaybackQuality();
       let res = CFG.quality.targetRes;
       if (CFG.quality.highFramerateTargetRes && foundHFR) res = CFG.quality.highFramerateTargetRes;
-      const shouldPremium =
-        CFG.quality.preferPremium &&
-        [...ytPlayer.getAvailableQualityData()].some(
-          (q) => q.quality === res && q.qualityLabel.includes("Premium") && q.isPlayable
-        );
-      const useButtons = !CFG.quality.useAPI || shouldPremium;
-      if (resolutions.indexOf(res) < resolutions.indexOf(current)) {
-        const end = resolutions.length - 1;
-        let nextBest = Math.max(resolutions.indexOf(res), 0);
-        const avail = ytPlayer.getAvailableQualityLevels();
-        while (avail.indexOf(resolutions[nextBest]) === -1 && nextBest < end) ++nextBest;
-        if (!useButtons && CFG.quality.flushBuffer && current !== resolutions[nextBest]) {
-          const id = getVideoID(ytPlayer);
+      const prem = CFG.quality.preferPremium && [...y.getAvailableQualityData()].some((q) => q.quality === res && q.qualityLabel.includes("Premium") && q.isPlayable);
+      const useBtn = !CFG.quality.useAPI || prem;
+      if (rs.indexOf(res) < rs.indexOf(cur)) {
+        let nb = Math.max(rs.indexOf(res), 0);
+        const av = y.getAvailableQualityLevels();
+        while (av.indexOf(rs[nb]) === -1 && nb < rs.length - 1) ++nb;
+        if (!useBtn && CFG.quality.flushBuffer && cur !== rs[nb]) {
+          const id = getVid(y);
           if (id && !id.includes("ERROR")) {
-            const pos = ytPlayer.getCurrentTime();
-            ytPlayer.loadVideoById(id, pos, resolutions[nextBest]);
+            const pos = y.getCurrentTime();
+            y.loadVideoById(id, pos, rs[nb]);
           }
         }
-        res = resolutions[nextBest];
+        res = rs[nb];
       }
       if (CFG.quality.useAPI) {
-        ytPlayer.setPlaybackQualityRange?.(res);
-        ytPlayer.setPlaybackQuality(res);
+        y.setPlaybackQualityRange?.(res);
+        y.setPlaybackQuality(res);
         log("Quality (API):", res);
       }
-      if (useButtons) {
+      if (useBtn) {
         try {
-          const settingsButton = document.querySelector(".ytp-settings-button:not(#ScaleBtn)");
-          if (settingsButton) {
-            unwrap(settingsButton).click();
-            const qualityMenuButton = document.evaluate(
-              './/*[contains(text(),"Quality")]/ancestor-or-self::*[@class="ytp-menuitem-label"]',
-              ytPlayer,
-              null,
-              XPathResult.FIRST_ORDERED_NODE_TYPE,
-              null
-            ).singleNodeValue;
-            if (qualityMenuButton) {
-              unwrap(qualityMenuButton).click();
-              const qualityButton = document.evaluate(
-                `.//*[contains(text(),"${HEIGHTS[resolutions.indexOf(res)]}") and not(@class)]/ancestor::*[@class="ytp-menuitem"]`,
-                ytPlayer,
-                null,
-                XPathResult.FIRST_ORDERED_NODE_TYPE,
-                null
-              ).singleNodeValue;
-              if (qualityButton) {
-                unwrap(qualityButton).click();
+          const btn = document.querySelector(".ytp-settings-button:not(#ScaleBtn)");
+          if (btn) {
+            unwrap(btn).click();
+            const qm = document.evaluate('.//*[contains(text(),"Quality")]/ancestor-or-self::*[@class="ytp-menuitem-label"]', y, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            if (qm) {
+              unwrap(qm).click();
+              const qb = document.evaluate(`.//*[contains(text(),"${H[rs.indexOf(res)]}") and not(@class)]/ancestor::*[@class="ytp-menuitem"]`, y, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+              if (qb) {
+                unwrap(qb).click();
                 log("Quality (Buttons):", res);
               }
             }
@@ -550,84 +374,70 @@
         }
       }
     };
-    const setResOnReady = (ytPlayer, resolutions) => {
-      if (CFG.quality.useAPI && ytPlayer.getPlaybackQuality === undefined) {
-        window.setTimeout(setResOnReady, 100, ytPlayer, resolutions);
+    const setResReady = (y, rs) => {
+      if (CFG.quality.useAPI && y.getPlaybackQuality === undefined) {
+        window.setTimeout(setResReady, K.QUALITY_RETRY, y, rs);
         return;
       }
-      let framerateUpdate = 0;
+      let fr = 0;
       if (CFG.quality.highFramerateTargetRes) {
-        const features = ytPlayer.getVideoData().video_quality_features;
-        if (features) {
-          const isHFR = features.includes("hfr");
-          framerateUpdate = isHFR && !foundHFR;
-          foundHFR = isHFR;
+        const f = y.getVideoData().video_quality_features;
+        if (f) {
+          const h = f.includes("hfr");
+          fr = h && !foundHFR;
+          foundHFR = h;
         }
       }
-      const curVid = getVideoID(ytPlayer);
-      if (curVid !== recentVideo || framerateUpdate) {
-        recentVideo = curVid;
-        setResolution(ytPlayer, resolutions);
-        const storedQuality = localStorage.getItem("yt-player-quality");
-        if (!storedQuality || !storedQuality.includes(CFG.quality.targetRes)) {
+      const vid = getVid(y);
+      if (vid !== recent || fr) {
+        recent = vid;
+        setRes(y, rs);
+        const stored = localStorage.getItem("yt-player-quality");
+        if (!stored || !stored.includes(CFG.quality.targetRes)) {
           const tc = Date.now();
-          const te = tc + 2592e6;
-          localStorage.setItem(
-            "yt-player-quality",
-            `{"data":"${CFG.quality.targetRes}","expiration":${te},"creation":${tc}}`
-          );
+          const te = tc + K.QUALITY_EXP;
+          localStorage.setItem("yt-player-quality", `{"data":"${CFG.quality.targetRes}","expiration":${te},"creation":${tc}}`);
         }
       }
     };
-    const initQuality = () => {
-      const ytPlayer = document.getElementById("movie_player") || document.getElementsByClassName("html5-video-player")[0];
-      const unwrapped = unwrap(ytPlayer);
-      if (unwrapped) setResOnReady(unwrapped, RESOLUTIONS);
+    const initQ = () => {
+      const y = document.getElementById("movie_player") || document.getElementsByClassName("html5-video-player")[0];
+      const u = unwrap(y);
+      if (u) setResReady(u, RES);
     };
-    window.addEventListener(
-      "loadstart",
-      (e) => {
-        if (!(e.target instanceof window.HTMLMediaElement)) return;
-        const ytPlayer =
-          document.getElementById("movie_player") || document.getElementsByClassName("html5-video-player")[0];
-        const unwrapped = unwrap(ytPlayer);
-        if (unwrapped) {
-          log("Loaded new video");
-          setResOnReady(unwrapped, RESOLUTIONS);
-        }
-      },
-      true
-    );
-    window.addEventListener("yt-navigate-finish", initQuality, true);
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initQuality);
-    else setTimeout(initQuality, 100);
+    window.addEventListener("loadstart", (e) => {
+      if (!(e.target instanceof window.HTMLMediaElement)) return;
+      const y = document.getElementById("movie_player") || document.getElementsByClassName("html5-video-player")[0];
+      const u = unwrap(y);
+      if (u) {
+        log("Loaded new video");
+        setResReady(u, RES);
+      }
+    }, true);
+    window.addEventListener("yt-navigate-finish", initQ, true);
+    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", initQ) : setTimeout(initQ, K.QUALITY_INIT);
   }
-
-  // ───────────────────────────── FLAGS ─────────────────────────────────────
   const updateFlags = () => {
-    const flags = window.yt?.config_?.EXPERIMENT_FLAGS;
-    if (flags) Object.assign(flags, CFG.flags);
+    const f = window.yt?.config_?.EXPERIMENT_FLAGS;
+    if (f) Object.assign(f, CFG.flags);
   };
-  const throttledFlagUpdate = throttle(updateFlags, 1000);
-  if (document.head) {
-    const flagObs = new MutationObserver(throttledFlagUpdate);
-    flagObs.observe(document.head, { childList: true, subtree: true });
-  }
-  window.addEventListener("yt-navigate-finish", throttledFlagUpdate);
+  const upF = throttle(updateFlags, 1000);
+  if (document.head) new MutationObserver(upF).observe(document.head, { childList: true, subtree: true });
+  window.addEventListener("yt-navigate-finish", upF);
   updateFlags();
-
-  // ───────────────────────────── SETTINGS PERSIST ──────────────────────────
+  if (CFG.ui.disableAnimations) document.documentElement.setAttribute("no-anim", "");
+  if (CFG.ui.hideShorts) document.documentElement.setAttribute("hide-shorts", "");
   (async () => {
     if (!GM.getValue) return;
     try {
-      const settingsSaved = await getStoredValue("settingsSaved", false);
-      if (CFG.quality.overwriteStoredSettings || !settingsSaved) {
-        for (const [k, v] of Object.entries(CFG.quality)) await setStoredValue(`quality_${k}`, v);
-        await setStoredValue("settingsSaved", true);
+      const saved = await getStored("settingsSaved", false);
+      if (CFG.quality.overwriteStoredSettings || !saved) {
+        for (const [k, v] of Object.entries(CFG.quality)) await setStored(`quality_${k}`, v);
+        await setStored("settingsSaved", true);
         log("Settings saved");
       } else {
         for (const k of Object.keys(CFG.quality)) {
-          const nv = await getStoredValue(`quality_${k}`, CFG.quality[k]);
+          const nv = await getStored(`quality_${k}`, CFG.quality[k]);
           if (k !== "overwriteStoredSettings") CFG.quality[k] = nv;
         }
         log("Settings loaded");
@@ -636,12 +446,6 @@
       log("Settings error:", e);
     }
   })();
-
-  // ───────────────────────────── MISC GUARDS ───────────────────────────────
-  if (CFG.ui.disableAnimations) document.documentElement.setAttribute("no-anim", "");
-  if (CFG.ui.hideShorts) document.documentElement.setAttribute("hide-shorts", "");
-
-  // JS engine tame: drop MediaSession locks (avoid stalls)
   (() => {
     const win = window;
     if (typeof win?.navigator?.locks?.request === "function") {
@@ -649,7 +453,5 @@
       win.navigator.locks.request = () => new (async () => {})().constructor();
     }
   })();
-
-  // ───────────────────────────── LOG ───────────────────────────────────────
-  log("YouTube Unified Optimizer v4.3.0 loaded");
+  log("YouTube Unified Optimizer v4.3.1 loaded");
 })();
