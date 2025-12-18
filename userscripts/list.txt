@@ -1,4 +1,4 @@
 https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/LLM-optimizer-optimized.user.js
+https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/gh-pro.user.js
 https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/tweak-optimized.user.js
 https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/youtube-optimized.user.js
-https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/gh-pro.user.js
