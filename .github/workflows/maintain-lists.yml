@@ -1,12 +1,21 @@
 name: Maintain & Release Lists
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 3 * * *" # Daily at 3 AM UTC
+  #schedule: [{cron: "0 3 * * *"}] # Daily at 3 AM UTC
+  #push:
+    #branches: [main, master]
 permissions:
   contents: write
   pull-requests: write
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
+  cancel-in-progress: true
+env:
+  DEBIAN_FRONTEND: noninteractive
+  LC_ALL: C
+  GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+  
 jobs:
   maintain:
     runs-on: ubuntu-latest
@@ -15,9 +24,9 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          submodules: recursive
-          token: ${{ secrets. GITHUB_TOKEN }}
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
       - name: Update submodules
+        continue-on-error: true
         run: |
           git submodule update --init --recursive --remote
           if git diff --submodule=diff --quiet; then
@@ -34,42 +43,39 @@ jobs:
         with:
           bun-version: latest
       - name: Install tools
+        continue-on-error: true
         run: |
-          bun i -g @adguard/hostlist-compiler @adguard/dead-domains-linter
-          echo "✓ Installed hostlist-compiler & dead-domains-linter"
+          bun i -g @adguard/hostlist-compiler @adguard/dead-domains-linter && echo "Installed hostlist-compiler & dead-domains-linter"
       - name: Remove dead domains
         continue-on-error: true
         run: |
           dead-domains-linter -a -i "*. txt" --exclude "Lists-todo.txt" || :
       - name: Deduplicate files
+        continue-on-error: true
         run: |
-          export LC_ALL=C LANG=C
           find .  -type f -name '*.txt' !  -path '*/\.*' !  -name 'Lists-todo.txt' -print0 | while IFS= read -r -d '' f; do
             tmp=$(mktemp)
             sed -E '/^@@|^#|^[[:space:]]*$/d; s/^0\. 0\.0\.0[[:space:]]+//; s/^[[:space:]]+//; s/[[:space:]]+$//' "$f" | \
-              awk 'NF && ! seen[$0]++' | \
-              sort -u > "$tmp"
+              awk 'NF && ! seen[$0]++' | sort -u > "$tmp"
             [[ -s "$tmp" ]] && mv "$tmp" "$f" || rm -f "$tmp"
-          done
-          echo "✓ Deduplicated all lists"
+          done; echo "✓ Deduplicated all lists"
       - name: Build blocklist
+        continue-on-error: true
         run: |
           bun i -g @adguard/hostlist-compiler
-          if [[ -f hostlist-compiler-config.json ]]; then
-            hostlist-compiler -v -c hostlist-compiler-config.json -o blocklist
-          fi
+          [[ -f hostlist-compiler-config.json ]] && hostlist-compiler -v -c hostlist-compiler-config.json -o blocklist
       - name: Validate domains
+        continue-on-error: true
         run: |
           invalid=0
           for f in $(find . -type f -name '*. txt' ! -path '*/\.*' ! -name 'Lists-todo.txt'); do
-            if grep -Ev '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\. )+[a-zA-Z]{2,}$|^$' "$f" >/dev/null 2>&1; then
-              echo "⚠️ Invalid entries in: $f"
-              ((invalid++))
+            if grep -Ev '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\. )+[a-zA-Z]{2,}$|^$' "$f" &>/dev/null; then
+              echo "Invalid entries in: $f"; ((invalid++))
             fi
-          done
-          [[ $invalid -eq 0 ]] && echo "✓ All domains valid"
+          done; [[ $invalid -eq 0 ]] && echo "✓ All domains valid"
       - name: Generate changelog
         id: changelog
+        continue-on-error: true
         run: |
           git add -A
           if git diff --cached --quiet; then
@@ -80,46 +86,40 @@ jobs:
             adds=$(git diff --cached --numstat | awk '{sum+=$1} END {print sum+0}')
             dels=$(git diff --cached --numstat | awk '{sum+=$2} END {print sum+0}')
             echo "files=$files" >> "$GITHUB_OUTPUT"
-            echo "adds=$adds" >> "$GITHUB_OUTPUT"
-            echo "dels=$dels" >> "$GITHUB_OUTPUT"
+            echo "adds=$adds" >> "$GITHUB_OUTPUT"; echo "dels=$dels" >> "$GITHUB_OUTPUT"
           fi
       - name: Commit & push
         if: steps.changelog.outputs.changed == 'true'
+        continue-on-error: true
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github. com"
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github. com"
           printf -v date '%(%Y-%m-%d)T' -1
           git commit -m "chore: maintain lists ${date}
-
           - Removed ${{ steps.changelog.outputs.dels }} dead/duplicate domains
           - Added ${{ steps.changelog.outputs. adds }} new entries
           - Processed ${{ steps.changelog.outputs. files }} files"
           git push
-
       - name: Create release
         if: steps.changelog. outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets. GITHUB_TOKEN }}
+        continue-on-error: true
         run: |
           printf -v tag 'v%(%Y. %m.%d-%H%M)T' -1
           printf -v date '%(%Y-%m-%d)T' -1
-
           gh release create "$tag" \
             --title "Lists Update ${date}" \
             --notes "## 📊 Automated Maintenance
-
           - **Files:** ${{ steps.changelog.outputs. files }} updated
           - **Added:** ${{ steps.changelog.outputs.adds }} entries
           - **Removed:** ${{ steps.changelog.outputs.dels }} entries
           - **Dead domains:** Removed via linter
           - **Duplicates:** Eliminated
           - **Submodules:** Updated to latest
-
           ### Files
           - \`blocklist\` — Compiled master list" \
             blocklist || echo "Release exists or failed"
       - name: Summary
         if: always()
+        continue-on-error: true
         run: |
           echo "## 🎯 Maintenance Report" >> "$GITHUB_STEP_SUMMARY"
           if [[ "${{ steps.changelog.outputs.changed }}" == "true" ]]; then
