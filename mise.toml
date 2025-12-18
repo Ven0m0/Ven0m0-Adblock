@@ -1,14 +1,47 @@
+[settings]
+experimental = true
+color = false
+yes = true
+auto_install = true
+quiet = true
+go_skip_checksum = true
+
+[settings.npm]
+bun = true
+
+[settings.pipx]
+uvx = true
+
+[settings.python]
+uv_venv_auto = true
+
+[settings.cargo]
+binstall = true
+
 [tools]
 "npm:@adguard/aglint" = "latest"
 "npm:@adguard/dead-domains-linter" = "latest"
 "npm:@adguard/hostlist-compiler" = "latest"
-"npm:@biomejs/biome" = "latest"
-"npm:oxlint" = "latest"
+biome = "latest"
+oxlint = "latest"
+minify = "latest"
+lefthook = "latest"
 fd = "latest"
 
 [env]
 NODE_ENV = "development"
+NODE_SKIP_PLATFORM_CHECK = "1"
+NODE_NO_WARNINGS = "1"
 MISE_NPM_BUN = "1"
+_.python.venv = { path = ".venv" }
+PYTHONOPTIMIZE = "2"
+PYTHON_JIT = "1"
+UV_LINK_MODE = "hardlink"
+UV_COMPILE_BYTECODE = "1"
+DO_NOT_TRACK = "1"
+CARGO_NET_GIT_FETCH_WITH_CLI = "true"
+CARGO_HTTP_MULTIPLEXING = "true"
+BINSTALL_DISABLE_TELEMETRY = "true"
 
 [tasks. install]
 description = "Install all dependencies"
@@ -42,7 +75,7 @@ run = "mise outdated"
 
 [tasks.upgrade]
 description = "Upgrade all tools"
-run = "mise upgrade"
+run = "mise up -y || :; mise prune -y || :"
 
 [tasks.quality]
 description = "Run JS/TS quality checks (Biome + Oxlint)"
@@ -54,3 +87,13 @@ description = "Run quality checks in CI mode"
 env = { CI = "true" }
 run = "./Scripts/quality-check.sh"
 depends = ["install"]
+
+[tasks.cleancache]
+description = "Clean system cache"
+run = "rm -rf ~/.cache/* || :"
+hide = true
+
+[tasks.clean]
+description = "Clean cargo and cache directories"
+depends = ["cleancache"]
+run = "cargo cache -efg || :; cargo clean || :"
