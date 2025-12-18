@@ -1,50 +1,65 @@
-! Aims to remove mass spamming of "!play" on streams of 'Marbles on Stream'
-! Aims to remove that one RPG-loot-game embed window that is on some Twitch channels
-! Aims to remove the spacing between Twitch emotes, for the sake of multi-part emotes
-! Broadens the chat textbox
-! Description: This list makes Twitch much more enjoyable
-! Get bits button
-! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
-! Makes avatars square again without having to use FrankerFaceZ
-! Maximises the size of the clip viewer pages
-! Misc
-! Narrows the spacing between the chat comments
-! Narrows the spacing between the chat comments in mobile browser mode
-! Reduces the size of the "Hosting [channel]" header
-! Reduces the size of the chat header
-! Removed a seemingly blank community message floaty on top of chat
-! Title: Twitch Tweaks
-! Twitch adblock: https://github.com/pixeltris/TwitchAdSolutions
-! www.twitch.tv/esl_dota2
-!#endif
-!#if cap_html_filtering
 [Adblock Plus 3.6]
-clips.twitch.tv#?#.clips-chat-replay > .tw-mg-b-1:style(margin-bottom: 2px !important)
-clips.twitch.tv#?#.clips-watch.tw-lg-pd-b-5.tw-pd-b-2.tw-sm-pd-b-3:style(max-width: none)
-clips.twitch.tv#?#span.text-fragment:not(:-abp-contains(/\S/))
-m.twitch.tv#?#li.chat-message:style(padding: 2px !important)
+! Title: Twitch Tweaks
+! Description: This list makes Twitch much more enjoyable
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+
+! Twitch adblock: https://github.com/pixeltris/TwitchAdSolutions
 twitch.tv##+js(twitch-videoad)
-twitch.tv#?#.channel-panels-container div[style^=position]:-abp-has(a[href^="/ext/ro13roxp88918kulntih9uzm7vs9jr"])
-twitch.tv#?#.chat-line__message:style(padding: 2px 4px !important)
+
+! Aims to remove the spacing between Twitch emotes, for the sake of multi-part emotes
 twitch.tv#?#.message > span:-abp-contains(/^ $/)
-twitch.tv#?#.tw-align-items-center.tw-flex.tw-flex-nowrap.tw-justify-content-between.tw-pd-1:style(padding-top: 0 !important; padding-bottom: 0 !important)
-twitch.tv#?#.tw-avatar > img.tw-border-radius-rounded:style(border-radius: unset !important)
-twitch.tv#?#.tw-full-width.tw-pd-l-05.tw-pd-y-05.vod-message:style(padding: 2px 4px !important)
+clips.twitch.tv#?#span.text-fragment:not(:-abp-contains(/\S/))
+
+! Aims to remove mass spamming of "!play" on streams of 'Marbles on Stream'
 twitch.tv#?#div[class$=message]:not(.tw-inline):-abp-has(.message:-abp-contains(/^!play$/))
+
+! Aims to remove that one RPG-loot-game embed window that is on some Twitch channels
+twitch.tv#?#.channel-panels-container div[style^=position]:-abp-has(a[href^="/ext/ro13roxp88918kulntih9uzm7vs9jr"])
+
+! Removed a seemingly blank community message floaty on top of chat
 www.twitch.tv##.community-highlight-stack__backlog-card
-www.twitch.tv##.jyFZFI.jGqsfG.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
+
+! Reduces the size of the chat header
+www.twitch.tv#?#.video-chat__header:style(height: 20px !important)
+www.twitch.tv#?#.tw-pd-r-1.tw-pd-l-2.tw-justify-content-between.tw-full-width:style(height: 2rem)
+
+! Broadens the chat textbox
+www.twitch.tv#?#.tw-flex-shrink-0.tw-full-width.tw-pd-b-2.tw-pd-t-1.tw-pd-x-2.video-chat__input:style(padding: 4px 1px 1px !important)
+www.twitch.tv#?#.tw-textarea.tw-textarea--no-resize:style(padding: 1px 35px !important; height: 55px !important)
+www.twitch.tv#?#.chat-input.tw-block:style(padding: 0 3px 2px !important)
+
+! Reduces the size of the "Hosting [channel]" header
+twitch.tv#?#.tw-align-items-center.tw-flex.tw-flex-nowrap.tw-justify-content-between.tw-pd-1:style(padding-top: 0 !important; padding-bottom: 0 !important)
+
+! Narrows the spacing between the chat comments
+twitch.tv#?#.chat-line__message:style(padding: 2px 4px !important)
+twitch.tv#?#.tw-full-width.tw-pd-l-05.tw-pd-y-05.vod-message:style(padding: 2px 4px !important)
+clips.twitch.tv#?#.clips-chat-replay > .tw-mg-b-1:style(margin-bottom: 2px !important)
+
+! Narrows the spacing between the chat comments in mobile browser mode
+m.twitch.tv#?#li.chat-message:style(padding: 2px !important)
+
+! Maximises the size of the clip viewer pages
+clips.twitch.tv#?#.clips-watch.tw-lg-pd-b-5.tw-pd-b-2.tw-sm-pd-b-3:style(max-width: none)
+
+! Makes avatars square again without having to use FrankerFaceZ
+twitch.tv#?#.tw-avatar > img.tw-border-radius-rounded:style(border-radius: unset !important)
+
+! Get bits button
 www.twitch.tv##.kgzEiA.ffyxRu.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
-www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .top-bar--pointer-enabled > div > .tw-media-card-stat
+
+! Misc
+www.twitch.tv##.jyFZFI.jGqsfG.ScCoreButtonSecondary-sc-1qn4ixc-2.ScCoreButton-sc-1qn4ixc-0
+
+!#if cap_html_filtering
+! www.twitch.tv/esl_dota2
+||ttvnw.net/v1/playlist$xhr,3p,replace=/#EXT-X-DATERANGE:ID="(stitched-ad|maf-ad|source|trigger)"\S+\n|#EXT-X-DATERANGE:ID=\S+?CLASS="twitch-(?:stream-source|trigger|maf-ad)"\S+\n|#EXT-X-DATERANGE:\S+?CLASS="twitch-ad-quartile".+?(?=(#EXT-X-DATERANGE|$))|(\n#EXT-X-DISCONTINUITY\s|#EXT-X-TWITCH-PREFETCH\S+)//gs
+www.twitch.tv##[data-a-target="video-ad-label"]
+www.twitch.tv##[data-a-target="video-ad-countdown"]
+www.twitch.tv##button[aria-label="Leave feedback for this Ad"]
+www.twitch.tv##button[aria-label="Learn more about this ad"]
 www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .video-player__overlay > .follow-panel-overlay.tw-transition[aria-hidden="false"]
+www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) .top-bar--pointer-enabled > div > .tw-media-card-stat
 www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) [data-a-target="video-ref"]:has(.video-player__overlay > .follow-panel-overlay.tw-transition[aria-hidden="false"]) + div[class^="Layout-sc-"][hidden=""]:style(display:block !important;)
 www.twitch.tv##:matches-path(/^\/[0-9_a-z]+$/) div.video-player__overlay > div[class*="InjectLayout-sc-"] > div.player-overlay-background--darkness-3
-www.twitch.tv##[data-a-target="video-ad-countdown"]
-www.twitch.tv##[data-a-target="video-ad-label"]
-www.twitch.tv##button[aria-label="Learn more about this ad"]
-www.twitch.tv##button[aria-label="Leave feedback for this Ad"]
-www.twitch.tv#?#.chat-input.tw-block:style(padding: 0 3px 2px !important)
-www.twitch.tv#?#.tw-flex-shrink-0.tw-full-width.tw-pd-b-2.tw-pd-t-1.tw-pd-x-2.video-chat__input:style(padding: 4px 1px 1px !important)
-www.twitch.tv#?#.tw-pd-r-1.tw-pd-l-2.tw-justify-content-between.tw-full-width:style(height: 2rem)
-www.twitch.tv#?#.tw-textarea.tw-textarea--no-resize:style(padding: 1px 35px !important; height: 55px !important)
-www.twitch.tv#?#.video-chat__header:style(height: 20px !important)
-||ttvnw.net/v1/playlist$xhr,3p,replace=/#EXT-X-DATERANGE:ID="(stitched-ad|maf-ad|source|trigger)"\S+\n|#EXT-X-DATERANGE:ID=\S+?CLASS="twitch-(?:stream-source|trigger|maf-ad)"\S+\n|#EXT-X-DATERANGE:\S+?CLASS="twitch-ad-quartile".+?(?=(#EXT-X-DATERANGE|$))|(\n#EXT-X-DISCONTINUITY\s|#EXT-X-TWITCH-PREFETCH\S+)//gs
+!#endif
