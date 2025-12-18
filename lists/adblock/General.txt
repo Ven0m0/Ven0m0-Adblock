@@ -1,43 +1,69 @@
-! Adb track
-! Allow doc/clients exceptions for YouTube etc
-! Block telemetry/analytics/metrics/diagnostics/crash/error-report
-! Cloudflare challenge
-! Extra recaptcha safety for site breakage
-! GitHub and browser error noise
-! Google & Firebase (sorted, deduped, key exceptions up top)
-! Google Custom Search fixes
-! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
-! Major social trackers (sorted, deduped)
-! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
-! Remove common tracking params (dedupe, sort)
+[Adblock Plus 3.6]
 ! Title: General rules (Optimized)
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
+
 !! Smartblock Embed Placeholders
+@@||smartblock.firefox.etp^
+
+! Remove common tracking params (dedupe, sort)
 $removeparam=utm_campaign
 $removeparam=utm_content
 $removeparam=utm_medium
 $removeparam=utm_source
 $removeparam=utm_term
-://yandex.*/images/_$xhr,method=post
-[Adblock Plus 3.6]
+
+! Block telemetry/analytics/metrics/diagnostics/crash/error-report
 ||*/analytics/*$all
 ||*/crash/*$all
 ||*/diagnostics/*$all
 ||*/error-report/*$all
 ||*/metrics/*$all
 ||*/telemetry/*$all
-||accounts.google.com^$3p
-||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
-||api.github.com/_private/browser/errors^
-||challenges.cloudflare.com^$3p
-||doubleclick.net^$3p,important
+
+! Adb track
+://yandex.*/images/_$xhr,method=post
+
+! Major social trackers (sorted, deduped)
 ||facebook.com^$important,3p
 ||facebook.net^$important,3p
-||firebase.com^$3p,important
-||google-analytics.com^$3p,important
-||google.com/cse/cse.js^
 ||instagram.com^$important,3p
 ||linkedin.com^$important,3p
 ||tiktok.com^$important,3p
 ||twitter.com^$3p
-||www.google.com^$3p,subdocument
 ||x.com^$3p
+
+! Google & Firebase (sorted, deduped, key exceptions up top)
+||accounts.google.com^$3p
+||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
+@@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
+@@||accounts.google.*/ServiceLogin$subdocument
+@@||apis.google.com^
+@@||consent.google.com^$subdocument
+@@||google.com^$script,domain=youtube.com
+@@||google.com/recaptcha
+@@||google.com/uds/*visualization$script,stylesheet
+@@||google*.^$domain=youtube.com|youtube-nocookie.com
+@@||gemini.google.com,domain=gstatic.com
+||doubleclick.net^$3p,important
+||firebase.com^$3p,important
+||google-analytics.com^$3p,important
+||google.com/cse/cse.js^
+
+! Google Custom Search fixes
+@@||google.com/cse/static^
+@@||cse.google.com/cse^
+
+! Cloudflare challenge
+||challenges.cloudflare.com^$3p
+@@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
+
+! GitHub and browser error noise
+||api.github.com/_private/browser/errors^
+
+! Extra recaptcha safety for site breakage
+@@||www.google.com/recaptcha/$3p,subdocument
+
+! Allow doc/clients exceptions for YouTube etc
+@@||clients1.google.com^
+||www.google.com^$3p,subdocument
