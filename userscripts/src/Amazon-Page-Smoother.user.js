@@ -13,6 +13,7 @@
 // ==/UserScript==
 (() => {
   "use strict";
+  // prettier-ignore
   const CFG = { HIGH: 4, DEBOUNCE: 240 };
   const sens = /(checkout|signin|payment|addressselect|huc)/i;
   if (sens.test(location.pathname)) return;
@@ -62,8 +63,19 @@ img.s-image{transform:translateZ(0);will-change:opacity;}
     new MutationObserver((m) => {
       if (!m.some((x) => x.addedNodes.length)) return;
       clearTimeout(t);
-      t = setTimeout(() => ("requestIdleCallback" in window ? requestIdleCallback(() => opt(document.body)) : opt(document.body)), CFG.DEBOUNCE);
-    }).observe(document.body || document.documentElement, { childList: true, subtree: true });
+      t = setTimeout(
+        () =>
+          "requestIdleCallback" in window
+            ? requestIdleCallback(() => opt(document.body))
+            : opt(document.body),
+        CFG.DEBOUNCE,
+      );
+    }).observe(document.body || document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
   };
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", main, { once: true }) : main();
+  document.readyState === "loading"
+    ? document.addEventListener("DOMContentLoaded", main, { once: true })
+    : main();
 })();

@@ -15,18 +15,8 @@
 // ==/UserScript==
 (() => {
   "use strict";
-  const CFG = {
-    EDITOR: { indentMode: "space", indentWidth: 2, wrapMode: "on" },
-    SIZE: {
-      DEPTH: 4,
-      INIT_DELAY: 1200,
-      URL_DELAY: 1200,
-      THR: 800,
-      KB: 1024 * 1024,
-      MB: 1024 * 1024 * 1024,
-      API: "https://api.github.com/repos",
-    },
-  };
+  // prettier-ignore
+  const CFG = { EDITOR: { indentMode: "space", indentWidth: 2, wrapMode: "on" }, SIZE: { DEPTH: 4, INIT_DELAY: 1200, URL_DELAY: 1200, THR: 800, KB: 1024 * 1024, MB: 1024 * 1024 * 1024, API: "https://api.github.com/repos" } };
   const SEL = {
     CODE: ".CodeMirror-code",
     MODE: ".js-code-indent-mode",
@@ -48,35 +38,8 @@
     };
   };
   function initEditor() {
-    const Config = GM_config([
-      {
-        key: "indentMode",
-        label: "Indent mode",
-        default: CFG.EDITOR.indentMode,
-        type: "dropdown",
-        values: [
-          { value: "space", text: "Spaces" },
-          { value: "tab", text: "Tabs" },
-        ],
-      },
-      {
-        key: "indentWidth",
-        label: "Indent size",
-        default: CFG.EDITOR.indentWidth,
-        type: "dropdown",
-        values: [2, 4, 8],
-      },
-      {
-        key: "wrapMode",
-        label: "Line wrap",
-        default: CFG.EDITOR.wrapMode,
-        type: "dropdown",
-        values: [
-          { value: "off", text: "No wrap" },
-          { value: "on", text: "Soft wrap" },
-        ],
-      },
-    ]);
+    // prettier-ignore
+    const Config = GM_config([{ key: "indentMode", label: "Indent mode", default: CFG.EDITOR.indentMode, type: "dropdown", values: [{ value: "space", text: "Spaces" }, { value: "tab", text: "Tabs" }] }, { key: "indentWidth", label: "Indent size", default: CFG.EDITOR.indentWidth, type: "dropdown", values: [2, 4, 8] }, { key: "wrapMode", label: "Line wrap", default: CFG.EDITOR.wrapMode, type: "dropdown", values: [{ value: "off", text: "No wrap" }, { value: "on", text: "Soft wrap" }] }]);
     GM_registerMenuCommand("GitHub Editor Settings", Config.setup);
     const st = Config.load();
     const set = (el, v) => {
