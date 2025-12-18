@@ -371,10 +371,37 @@ if (cfg.caching) {
 // URL & LINK CLEANING
 // ═══════════════════════════════════════════════════════════════
 
+function canonicalizeAmazonURL(url) {
+  if (!/\.amazon\./i.test(url.hostname)) return 0;
+  const path = url.pathname;
+  const asinFromPath =
+    path.match(/\/dp\/([A-Z0-9]{8,16})/i)?.[1] ||
+    path.match(/\/gp\/product\/([A-Z0-9]{8,16})/i)?.[1] ||
+    path.match(/\/exec\/obidos\/ASIN\/([A-Z0-9]{8,16})/i)?.[1] ||
+    path.match(/\/o\/ASIN\/([A-Z0-9]{8,16})/i)?.[1];
+  let asin =
+    asinFromPath ||
+    url.searchParams.get("ASIN") ||
+    url.searchParams.get("ASIN.0") ||
+    (() => {
+      if (document.readyState === "loading") return "";
+      const el = document.getElementById("ASIN") || document.querySelector("[name='ASIN.0']");
+      return el?.value || "";
+    })();
+  if (!asin) return 0;
+  asin = asin.toUpperCase();
+  const canonical = `${url.origin}/dp/${asin}/`;
+  if (url.href === canonical) return 0;
+  history.replaceState(null, "", canonical);
+  log("Amazon URL canonicalized");
+  return 1;
+}
+
 function cleanURL() {
   if (!cfg.cleanURL) return;
   try {
     const url = new URL(location.href.replace("/ref=", "?ref="));
+    if (canonicalizeAmazonURL(url)) return;
     let clean = 0;
     for (const param of TRACKING_PARAMS) {
       if (url.searchParams.has(param)) {
