@@ -199,7 +199,6 @@ towardsdatascience.com##.ws.wr.ot.iw.wq.wp.wo.wn.wm.wl.wk.wj.wi.wh.wg.wf.we.aq.a
 ! Devianart cookie banner
 www.deviantart.com##._1VuFx
 
-! 2022-07-12 https://www.deviantart.com
 ! Devianart upgrade to core button
 www.deviantart.com##._3I-fJ.bf6hc._16RrG._1jkTN.-n4aD._2pFrH._1FMli
 
@@ -230,7 +229,6 @@ medium.com##.xh.xg.oe.il.xf.xe.xd.xc.xb.xa.wz.wy.wx.ww.wv.wu.wt.aq.ap
 ! Medium unnecessary button
 medium.com##.c.ao.o.pm.pl.pk.eb.pj
 
-! Microsoft 365 ad
 answers.microsoft.com##.ucsRailContainer
 
 ! Black bar at bottom
