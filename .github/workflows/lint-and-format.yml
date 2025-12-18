@@ -1,21 +1,21 @@
 name: 🔍 Lint & Format
-
 on:
   push:
-    branches:
-      - main
+    branches: [main, master]
   pull_request:
-    branches:
-      - main
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
-
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
   cancel-in-progress: true
+env:
+  DEBIAN_FRONTEND: noninteractive
+  LC_ALL: C
+  GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
 jobs:
   lint:
@@ -39,14 +39,13 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
           install: true
           cache: true
           experimental: true
-
       - name: Check for modified files
         id: check-files
         run: |
@@ -56,15 +55,12 @@ jobs:
             printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
           fi
         continue-on-error: true
-
       - name: Run ${{ matrix.linter.name }}
         if: steps.check-files.outputs.has_changes == 'true' || github.event_name == 'workflow_dispatch'
         run: ${{ matrix.linter.command }}
-
       - name: Annotate results
         if: failure()
         run: printf '::error::%s found issues\n' "${{ matrix.linter.name }}"
-
   format:
     name: Auto-Format & Fix
     runs-on: ubuntu-latest
@@ -76,23 +72,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
           install: true
           cache: true
           experimental: true
-
       - name: Run auto-fix
         run: |
           mise exec -- bun run lint:fix
           mise exec -- bun run format
           mise exec -- bunx aglint --fix
         continue-on-error: true
-
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
@@ -109,38 +102,35 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
           install: true
           cache: true
-
       - name: Run yamllint
         run: mise exec -- yamllint -c .yamllint.yml .github/workflows/
         continue-on-error: true
-
   shellcheck:
     name: Lint Shell Scripts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
       - name: Setup mise
         uses: jdx/mise-action@v3
         with:
           install: true
           cache: true
-
       - name: Run ShellCheck
         run: mise exec -- shellcheck Scripts/*.sh build-lists.sh
         continue-on-error: true
-
       - name: Run shfmt
-        run: mise exec -- shfmt -d -i 2 -ci Scripts/*.sh build-lists.sh
+        run: mise exec -- shfmt -d -i2 -bn -s -ln bash *.sh
         continue-on-error: true
-
   summary:
     name: Lint Summary
     runs-on: ubuntu-latest
@@ -153,8 +143,7 @@ jobs:
              [[ ${{ needs.format.result }} == failure ]] || \
              [[ ${{ needs.yamllint.result }} == failure ]] || \
              [[ ${{ needs.shellcheck.result }} == failure ]]; then
-            printf '::warning::Some linters found issues. Review logs.\n'
-            exit 1
+            printf '::warning::Some linters found issues. Review logs.\n'; exit 1
           else
             printf '::notice::All linting checks passed!\n'
           fi
