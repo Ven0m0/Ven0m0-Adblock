@@ -15,8 +15,17 @@
 // ==/UserScript==
 (() => {
   "use strict";
+  // prettier-ignore
   const CFG = { EDITOR: { indentMode: "space", indentWidth: 2, wrapMode: "on" }, SIZE: { DEPTH: 4, INIT_DELAY: 1200, URL_DELAY: 1200, THR: 800, KB: 1024 * 1024, MB: 1024 * 1024 * 1024, API: "https://api.github.com/repos" } };
-  const SEL = { CODE: ".CodeMirror-code", MODE: ".js-code-indent-mode", WIDTH: ".js-code-indent-width", WRAP: ".js-code-wrap-mode", TABLE: "table tbody", LINKS: 'a[href*="/blob/"], a[href*="/tree/"]', TAG: "gh-size-viewer" };
+  const SEL = {
+    CODE: ".CodeMirror-code",
+    MODE: ".js-code-indent-mode",
+    WIDTH: ".js-code-indent-width",
+    WRAP: ".js-code-wrap-mode",
+    TABLE: "table tbody",
+    LINKS: 'a[href*="/blob/"], a[href*="/tree/"]',
+    TAG: "gh-size-viewer",
+  };
   const PAT = { NEW: /\/new\//, EDIT: /\/edit\// };
   const throttle = (fn, ms) => {
     let t = 0;
@@ -29,11 +38,8 @@
     };
   };
   function initEditor() {
-    const Config = GM_config([
-      { key: "indentMode", label: "Indent mode", default: CFG.EDITOR.indentMode, type: "dropdown", values: [{ value: "space", text: "Spaces" }, { value: "tab", text: "Tabs" }] },
-      { key: "indentWidth", label: "Indent size", default: CFG.EDITOR.indentWidth, type: "dropdown", values: [2, 4, 8] },
-      { key: "wrapMode", label: "Line wrap", default: CFG.EDITOR.wrapMode, type: "dropdown", values: [{ value: "off", text: "No wrap" }, { value: "on", text: "Soft wrap" }] }
-    ]);
+    // prettier-ignore
+    const Config = GM_config([{ key: "indentMode", label: "Indent mode", default: CFG.EDITOR.indentMode, type: "dropdown", values: [{ value: "space", text: "Spaces" }, { value: "tab", text: "Tabs" }] }, { key: "indentWidth", label: "Indent size", default: CFG.EDITOR.indentWidth, type: "dropdown", values: [2, 4, 8] }, { key: "wrapMode", label: "Line wrap", default: CFG.EDITOR.wrapMode, type: "dropdown", values: [{ value: "off", text: "No wrap" }, { value: "on", text: "Soft wrap" }] }]);
     GM_registerMenuCommand("GitHub Editor Settings", Config.setup);
     const st = Config.load();
     const set = (el, v) => {
@@ -56,21 +62,36 @@
         set(wr, cfg.wrapMode);
       }
     };
-    waitForElems({ sel: SEL.CODE, onmatch() { apply(st); } });
+    waitForElems({
+      sel: SEL.CODE,
+      onmatch() {
+        apply(st);
+      },
+    });
   }
-  const fmt = (b) => (b < CFG.SIZE.KB ? `${(b / 1024).toFixed(2)} KB` : b < CFG.SIZE.MB ? `${(b / 1048576).toFixed(2)} MB` : `${(b / 1073741824).toFixed(2)} GB`);
+  const fmt = (b) =>
+    b < CFG.SIZE.KB
+      ? `${(b / 1024).toFixed(2)} KB`
+      : b < CFG.SIZE.MB
+        ? `${(b / 1048576).toFixed(2)} MB`
+        : `${(b / 1073741824).toFixed(2)} GB`;
   const calcDir = async (url, h, depth) => {
     if (depth > CFG.SIZE.DEPTH) return { size: 0, cnt: 0 };
     const r = await fetch(url, { headers: h });
     if (!r.ok) return { size: 0, cnt: 0 };
     const d = await r.json();
     if (!Array.isArray(d)) return { size: 0, cnt: 0 };
-    const res = await Promise.all(d.map(async (it) => {
-      if (it.type === "file") return { size: it.size || 0, cnt: 1 };
-      if (it.type === "dir" && it.url) return calcDir(it.url, h, depth + 1);
-      return { size: 0, cnt: 0 };
-    }));
-    return { size: res.reduce((s, x) => s + x.size, 0), cnt: res.reduce((s, x) => s + x.cnt, 0) };
+    const res = await Promise.all(
+      d.map(async (it) => {
+        if (it.type === "file") return { size: it.size || 0, cnt: 1 };
+        if (it.type === "dir" && it.url) return calcDir(it.url, h, depth + 1);
+        return { size: 0, cnt: 0 };
+      }),
+    );
+    return {
+      size: res.reduce((s, x) => s + x.size, 0),
+      cnt: res.reduce((s, x) => s + x.cnt, 0),
+    };
   };
   const fetchSize = async (url) => {
     const tok = GM_getValue("GITHUB_TOKEN", "");
@@ -81,9 +102,12 @@
     const d = await r.json();
     if (Array.isArray(d)) {
       const { size, cnt } = await calcDir(url, h, 0);
-      return size ? `${fmt(size)} (${cnt} ${cnt === 1 ? "file" : "files"})` : `Folder (${cnt} ${cnt === 1 ? "file" : "files"})`;
+      return size
+        ? `${fmt(size)} (${cnt} ${cnt === 1 ? "file" : "files"})`
+        : `Folder (${cnt} ${cnt === 1 ? "file" : "files"})`;
     }
-    if (d?.type === "file" && typeof d.size === "number") return `${fmt(d.size)} (1 file)`;
+    if (d?.type === "file" && typeof d.size === "number")
+      return `${fmt(d.size)} (1 file)`;
     return null;
   };
   const insert = (link, text) => {
@@ -99,37 +123,52 @@
   const showSizes = async () => {
     const tbody = document.querySelector(SEL.TABLE);
     if (!tbody) return;
-    const links = [...tbody.querySelectorAll(SEL.LINKS)].filter((l) => !(l.nextSibling?.classList?.contains(SEL.TAG)));
+    const links = [...tbody.querySelectorAll(SEL.LINKS)].filter(
+      (l) => !l.nextSibling?.classList?.contains(SEL.TAG),
+    );
     if (!links.length) return;
-    await Promise.all(links.map(async (l) => {
-      const parts = l.href.split("/");
-      const idx = parts.indexOf(parts.includes("blob") ? "blob" : "tree");
-      if (idx < 0) return;
-      const user = parts[3];
-      const repo = parts[4];
-      const branch = parts[idx + 1];
-      const path = parts.slice(idx + 2).join("/");
-      if (!user || !repo || !branch) return;
-      const api = `${CFG.SIZE.API}/${user}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
-      const v = await fetchSize(api);
-      if (!v) return;
-      insert(l, v);
-    }));
+    await Promise.all(
+      links.map(async (l) => {
+        const parts = l.href.split("/");
+        const idx = parts.indexOf(parts.includes("blob") ? "blob" : "tree");
+        if (idx < 0) return;
+        const user = parts[3];
+        const repo = parts[4];
+        const branch = parts[idx + 1];
+        const path = parts.slice(idx + 2).join("/");
+        if (!user || !repo || !branch) return;
+        const api = `${CFG.SIZE.API}/${user}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+        const v = await fetchSize(api);
+        if (!v) return;
+        insert(l, v);
+      }),
+    );
   };
   const watchURL = (cb, delay) => {
     let last = location.href;
+    let pending = 0;
+    const run = () => {
+      pending = 0;
+      cb();
+    };
     new MutationObserver(() => {
       const u = location.href;
       if (u !== last) {
         last = u;
-        setTimeout(cb, delay);
+        if (!pending) {
+          pending = 1;
+          setTimeout(run, delay);
+        }
       }
     }).observe(document, { childList: true, subtree: true });
   };
   function initSize() {
     setTimeout(showSizes, CFG.SIZE.INIT_DELAY);
     watchURL(showSizes, CFG.SIZE.URL_DELAY);
-    new MutationObserver(throttle(showSizes, CFG.SIZE.THR)).observe(document, { childList: true, subtree: true });
+    new MutationObserver(throttle(showSizes, CFG.SIZE.THR)).observe(document, {
+      childList: true,
+      subtree: true,
+    });
   }
   initEditor();
   window.addEventListener("load", initSize);

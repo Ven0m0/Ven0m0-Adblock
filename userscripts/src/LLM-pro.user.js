@@ -12,15 +12,23 @@
 // ==/UserScript==
 (() => {
   "use strict";
-  const CFG = {
-    CHATGPT: { MAX: 15, INIT: 10, MAX_ITER: 400, API: /^https:\/\/chatgpt\.com\/backend-api\/conversation\/[a-f0-9-]{36}$/i, INIT_DELAY: 800, LOOP_FOCUS: 1500, LOOP_BLUR: 12000, REGEN_DELAY: 1200, MAX_RETRIES: 2, RETRY_RESET: 3e5, CLEAN: [{ delay: 7000, interval: 1200 }, { delay: 10000, interval: 1800 }], FINAL: 16000, CACHE_WAIT: 400 },
-    CLAUDE: { MAX: 20, CLEAN: 25000 },
-    WIDTH: { MAX: "98%", TH: 180, ATTEMPTS: 20, BASE: 200, MUL: 1.08 }
-  };
+  // prettier-ignore
+  const CFG = { CHATGPT: { MAX: 15, INIT: 10, MAX_ITER: 400, API: /^https:\/\/chatgpt\.com\/backend-api\/conversation\/[a-f0-9-]{36}$/i, INIT_DELAY: 800, LOOP_FOCUS: 1500, LOOP_BLUR: 12000, REGEN_DELAY: 1200, MAX_RETRIES: 2, RETRY_RESET: 3e5, CLEAN: [{ delay: 7000, interval: 1200 }, { delay: 10000, interval: 1800 }], FINAL: 16000, CACHE_WAIT: 400 }, CLAUDE: { MAX: 20, CLEAN: 25000 }, WIDTH: { MAX: "98%", TH: 180, ATTEMPTS: 20, BASE: 200, MUL: 1.08 } };
   const SEL = {
-    CGPT: { TEXT: ".text-base, .text-base > div:first-child", TX: "form textarea", STOP: 'button[data-testid$="stop-button"]', SEND: 'button[data-testid$="send-button"]', CONT: 'button[as="button"]', REGEN: "button", TURN: '[data-testid^="conversation-turn"]' },
+    CGPT: {
+      TEXT: ".text-base, .text-base > div:first-child",
+      TX: "form textarea",
+      STOP: 'button[data-testid$="stop-button"]',
+      SEND: 'button[data-testid$="send-button"]',
+      CONT: 'button[as="button"]',
+      REGEN: "button",
+      TURN: '[data-testid^="conversation-turn"]',
+    },
     GEMINI: { BOX: ".conversation-container" },
-    CLAUDE: { STREAM: "div[data-is-streaming]", RENDER: "div[data-test-render-count"] }
+    CLAUDE: {
+      STREAM: "div[data-is-streaming]",
+      RENDER: "div[data-test-render-count]",
+    },
   };
   const h = location.hostname;
   const isCGPT = h === "chat.openai.com" || h === "chatgpt.com";
@@ -41,7 +49,8 @@
     const go = () => {
       const el = document.querySelector(sel);
       if (el) cb(el);
-      else if (++a < CFG.WIDTH.ATTEMPTS) setTimeout(go, CFG.WIDTH.BASE * CFG.WIDTH.MUL ** a);
+      else if (++a < CFG.WIDTH.ATTEMPTS)
+        setTimeout(go, CFG.WIDTH.BASE * CFG.WIDTH.MUL ** a);
     };
     go();
   };
@@ -49,7 +58,8 @@
     const els = get();
     if (!els.length) return;
     els.forEach((el) => {
-      if (el.style.maxWidth !== CFG.WIDTH.MAX) el.style.cssText += `;max-width:${CFG.WIDTH.MAX}!important`;
+      if (el.style.maxWidth !== CFG.WIDTH.MAX)
+        el.style.cssText += `;max-width:${CFG.WIDTH.MAX}!important`;
     });
   };
   const obsW = (get) => {
@@ -102,7 +112,12 @@
             if (v < CFG.CHATGPT.INIT && d.mapping[m.parent]) nm.push(m);
             else {
               nm.push({ ...m, parent: "client-created-root" });
-              nm.push({ id: "client-created-root", message: null, parent: null, children: [m.id] });
+              nm.push({
+                id: "client-created-root",
+                message: null,
+                parent: null,
+                children: [m.id],
+              });
               break;
             }
             id = m.parent;
@@ -110,7 +125,11 @@
           }
           if (nm.length === Object.keys(d.mapping).length) return r;
           d.mapping = Object.fromEntries(nm.map((m) => [m.id, m]));
-          return new Response(JSON.stringify(d), { status: r.status, statusText: r.statusText, headers: r.headers });
+          return new Response(JSON.stringify(d), {
+            status: r.status,
+            statusText: r.statusText,
+            headers: r.headers,
+          });
         } catch {
           return r;
         }
@@ -118,11 +137,17 @@
     };
   }
   if (isCGPT || isGem || isCl) {
-    const getEls = isCGPT ? () => document.querySelectorAll(SEL.CGPT.TEXT) : isGem ? () => document.querySelectorAll(SEL.GEMINI.BOX) : () => {
-      const el = document.querySelector(SEL.CLAUDE.RENDER);
-      if (!el) return [];
-      return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
-    };
+    const getEls = isCGPT
+      ? () => document.querySelectorAll(SEL.CGPT.TEXT)
+      : isGem
+        ? () => document.querySelectorAll(SEL.GEMINI.BOX)
+        : () => {
+            const el = document.querySelector(SEL.CLAUDE.RENDER);
+            if (!el) return [];
+            return [el.parentElement, el.parentElement?.parentElement].filter(
+              Boolean,
+            );
+          };
     runReady((isCGPT ? SEL.CGPT.TEXT : SEL.GEMINI.BOX).split(",")[0], () => {
       applyW(getEls);
       obsW(getEls);
@@ -132,7 +157,10 @@
     const cleanup = () => {
       if (document.visibilityState !== "visible") return;
       const msgs = document.querySelectorAll(SEL.CGPT.TURN);
-      if (msgs.length > CFG.CHATGPT.MAX) msgs.forEach((el, i) => i < msgs.length - CFG.CHATGPT.MAX && el.remove());
+      if (msgs.length > CFG.CHATGPT.MAX)
+        msgs.forEach(
+          (el, i) => i < msgs.length - CFG.CHATGPT.MAX && el.remove(),
+        );
     };
     let int = null;
     let tm = null;
@@ -159,13 +187,30 @@
       lastInv = n;
       tx = stop = send = null;
     };
-    new MutationObserver(inv).observe(document.body || document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-testid"] });
+    new MutationObserver(inv).observe(
+      document.body || document.documentElement,
+      {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["data-testid"],
+      },
+    );
     const getTx = () => tx || (tx = document.querySelector(SEL.CGPT.TX));
-    const getStop = () => stop || (stop = document.querySelector(SEL.CGPT.STOP));
-    const getSend = () => send || (send = document.querySelector(SEL.CGPT.SEND));
-    const isGen = () => getStop() || getSend()?.firstElementChild?.childElementCount === 3;
-    const getCont = () => [...document.querySelectorAll(SEL.CGPT.CONT)].find((b) => b.textContent?.includes("Continue"));
-    const getRegen = () => [...document.querySelectorAll(SEL.CGPT.REGEN)].find((b) => /^Regenerate$/i.test(b.textContent?.trim() || ""));
+    const getStop = () =>
+      stop || (stop = document.querySelector(SEL.CGPT.STOP));
+    const getSend = () =>
+      send || (send = document.querySelector(SEL.CGPT.SEND));
+    const isGen = () =>
+      getStop() || getSend()?.firstElementChild?.childElementCount === 3;
+    const getCont = () =>
+      [...document.querySelectorAll(SEL.CGPT.CONT)].find((b) =>
+        b.textContent?.includes("Continue"),
+      );
+    const getRegen = () =>
+      [...document.querySelectorAll(SEL.CGPT.REGEN)].find((b) =>
+        /^Regenerate$/i.test(b.textContent?.trim() || ""),
+      );
     let retries = 0;
     let lastRetry = null;
     const init = async () => {
@@ -179,10 +224,18 @@
         run = 1;
         try {
           const now = Date.now();
-          if (lastRetry && now - lastRetry >= CFG.CHATGPT.RETRY_RESET) retries = 0;
+          if (lastRetry && now - lastRetry >= CFG.CHATGPT.RETRY_RESET)
+            retries = 0;
           let first = true;
           while (true) {
-            await new Promise((r) => setTimeout(r, document.hasFocus() ? CFG.CHATGPT.LOOP_FOCUS : CFG.CHATGPT.LOOP_BLUR));
+            await new Promise((r) =>
+              setTimeout(
+                r,
+                document.hasFocus()
+                  ? CFG.CHATGPT.LOOP_FOCUS
+                  : CFG.CHATGPT.LOOP_BLUR,
+              ),
+            );
             if (!first && isGen()) continue;
             const c = getCont();
             if (c) {
@@ -192,7 +245,9 @@
             const rg = getRegen();
             if (rg && !getTx()) {
               if (retries < CFG.CHATGPT.MAX_RETRIES) {
-                await new Promise((r) => setTimeout(r, CFG.CHATGPT.REGEN_DELAY));
+                await new Promise((r) =>
+                  setTimeout(r, CFG.CHATGPT.REGEN_DELAY),
+                );
                 rg.click();
                 retries++;
                 lastRetry = Date.now();
@@ -214,7 +269,8 @@
     const clean = () => {
       if (document.visibilityState !== "visible") return;
       const m = document.querySelectorAll(SEL.CLAUDE.RENDER);
-      if (m.length > CFG.CLAUDE.MAX) m.forEach((el, i) => i < m.length - CFG.CLAUDE.MAX && el.remove());
+      if (m.length > CFG.CLAUDE.MAX)
+        m.forEach((el, i) => i < m.length - CFG.CLAUDE.MAX && el.remove());
     };
     setInterval(clean, CFG.CLAUDE.CLEAN);
   }
