@@ -1,10 +1,9 @@
 // ==UserScript==
-// @name         GitHub Enhanced: File Size Viewer & Editor Settings
+// @name         GitHub Enhanced: Size & Editor (Lean)
 // @namespace    Ven0m0
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
-// @version      2025.12.04.1
-// @description  Merges "GitHub File Size Viewer" and "GitHub Editor - Change Default Settings". Displays file sizes in repo listings and configures default editor settings (indent, wrap).
-// @auth         Ven0m0
+// @version      2025.12.04.2
+// @description  Show GitHub file/folder sizes + set editor defaults with minimal overhead.
 // @match        https://github.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -12,356 +11,126 @@
 // @require      https://cdn.jsdelivr.net/gh/kufii/My-UserScripts@22210afba13acf7303fc91590b8265faf3c7eda7/libs/gm_config.js
 // @require      https://cdn.jsdelivr.net/gh/fuzetsu/userscripts@ec863aa92cea78a20431f92e80ac0e93262136df/wait-for-elements/wait-for-elements.js
 // @license      MIT
-// @icon         https://github.githubassets.com/favicons/favicon.svg
+// @run-at       document-idle
 // ==/UserScript==
-
 (() => {
-  // ═══════════════════════════════════════════════════════════════
-  // CONFIGURATION
-  // ═══════════════════════════════════════════════════════════════
-
-  const CONFIG = {
-    EDITOR: {
-      DEFAULT_INDENT_MODE: "space",
-      DEFAULT_INDENT_WIDTH: 2,
-      DEFAULT_WRAP_MODE: "on"
-    },
-    FILE_SIZE: {
-      MAX_FOLDER_DEPTH: 5,
-      INITIAL_DISPLAY_DELAY: 2000,
-      URL_CHANGE_DETECT_DELAY: 2000,
-      OBSERVER_THROTTLE: 1000
-    },
-    FORMATTING: {
-      KB_THRESHOLD: 1024 * 1024,
-      MB_THRESHOLD: 1024 * 1024 * 1024
-    },
-    URLS: {
-      GITHUB_API: "https://api.github.com/repos"
-    }
+  "use strict";
+  const CFG = { EDITOR: { indentMode: "space", indentWidth: 2, wrapMode: "on" }, SIZE: { DEPTH: 4, INIT_DELAY: 1200, URL_DELAY: 1200, THR: 800, KB: 1024 * 1024, MB: 1024 * 1024 * 1024, API: "https://api.github.com/repos" } };
+  const SEL = { CODE: ".CodeMirror-code", MODE: ".js-code-indent-mode", WIDTH: ".js-code-indent-width", WRAP: ".js-code-wrap-mode", TABLE: "table tbody", LINKS: 'a[href*="/blob/"], a[href*="/tree/"]', TAG: "gh-size-viewer" };
+  const PAT = { NEW: /\/new\//, EDIT: /\/edit\// };
+  const throttle = (fn, ms) => {
+    let t = 0;
+    return () => {
+      const n = Date.now();
+      if (n - t >= ms) {
+        t = n;
+        fn();
+      }
+    };
   };
-
-  const SELECTORS = {
-    EDITOR: {
-      CODEMIRROR: ".CodeMirror-code",
-      INDENT_MODE: ".js-code-indent-mode",
-      INDENT_WIDTH: ".js-code-indent-width",
-      WRAP_MODE: ".js-code-wrap-mode"
-    },
-    FILE_SIZE: {
-      TABLE_BODY: "table tbody",
-      BLOB_LINKS: 'a[href*="/blob/"], a[href*="/tree/"]',
-      SIZE_VIEWER_CLASS: "gh-size-viewer"
-    }
-  };
-
-  const URL_PATTERNS = {
-    NEW_FILE: /^https?:\/\/github.com\/[^/]*\/[^/]*\/new\/.*/u,
-    EDIT_FILE: /^https?:\/\/github.com\/[^/]*\/[^/]*\/edit\/.*/u
-  };
-
-  // ═══════════════════════════════════════════════════════════════
-  // PART 1: EDITOR SETTINGS
-  // ═══════════════════════════════════════════════════════════════
-
-  function initEditorSettings() {
-    console.log("[MergedScript] Initializing Editor Settings...");
-
+  function initEditor() {
     const Config = GM_config([
-      {
-        key: "indentMode",
-        label: "Indent mode",
-        default: CONFIG.EDITOR.DEFAULT_INDENT_MODE,
-        type: "dropdown",
-        values: [
-          { value: "space", text: "Spaces" },
-          { value: "tab", text: "Tabs" }
-        ]
-      },
-      {
-        key: "indentWidth",
-        label: "Indent size",
-        default: CONFIG.EDITOR.DEFAULT_INDENT_WIDTH,
-        type: "dropdown",
-        values: [2, 4, 8]
-      },
-      {
-        key: "wrapMode",
-        label: "Line wrap mode",
-        default: CONFIG.EDITOR.DEFAULT_WRAP_MODE,
-        type: "dropdown",
-        values: [
-          { value: "off", text: "No wrap" },
-          { value: "on", text: "Soft wrap" }
-        ]
-      }
+      { key: "indentMode", label: "Indent mode", default: CFG.EDITOR.indentMode, type: "dropdown", values: [{ value: "space", text: "Spaces" }, { value: "tab", text: "Tabs" }] },
+      { key: "indentWidth", label: "Indent size", default: CFG.EDITOR.indentWidth, type: "dropdown", values: [2, 4, 8] },
+      { key: "wrapMode", label: "Line wrap", default: CFG.EDITOR.wrapMode, type: "dropdown", values: [{ value: "off", text: "No wrap" }, { value: "on", text: "Soft wrap" }] }
     ]);
-
-    const updateDropdown = (dropdown, value) => {
-      if (!dropdown) {
-        return;
-      }
-      dropdown.value = value;
-      const evt = document.createEvent("HTMLEvents");
-      evt.initEvent("change", false, true);
-      dropdown.dispatchEvent(evt);
-    };
-
-    const applySettings = (cfg) => {
-      const indentMode = document.querySelector(SELECTORS.EDITOR.INDENT_MODE);
-      const indentWidth = document.querySelector(SELECTORS.EDITOR.INDENT_WIDTH);
-      const wrapMode = document.querySelector(SELECTORS.EDITOR.WRAP_MODE);
-
-      if (location.href.match(URL_PATTERNS.NEW_FILE)) {
-        updateDropdown(indentMode, cfg.indentMode);
-        updateDropdown(indentWidth, cfg.indentWidth);
-        updateDropdown(wrapMode, cfg.wrapMode);
-      } else if (location.href.match(URL_PATTERNS.EDIT_FILE)) {
-        if (indentMode && indentMode.value === "tab") {
-          updateDropdown(indentWidth, cfg.indentWidth);
-        }
-        updateDropdown(wrapMode, cfg.wrapMode);
-      }
-    };
-
     GM_registerMenuCommand("GitHub Editor Settings", Config.setup);
-    const settings = Config.load();
-
-    waitForElems({
-      sel: SELECTORS.EDITOR.CODEMIRROR,
-      onmatch() {
-        applySettings(settings);
+    const st = Config.load();
+    const set = (el, v) => {
+      if (!el) return;
+      el.value = v;
+      const e = document.createEvent("HTMLEvents");
+      e.initEvent("change", false, true);
+      el.dispatchEvent(e);
+    };
+    const apply = (cfg) => {
+      const m = document.querySelector(SEL.MODE);
+      const w = document.querySelector(SEL.WIDTH);
+      const wr = document.querySelector(SEL.WRAP);
+      if (PAT.NEW.test(location.href)) {
+        set(m, cfg.indentMode);
+        set(w, cfg.indentWidth);
+        set(wr, cfg.wrapMode);
+      } else if (PAT.EDIT.test(location.href)) {
+        if (m && m.value === "tab") set(w, cfg.indentWidth);
+        set(wr, cfg.wrapMode);
       }
-    });
+    };
+    waitForElems({ sel: SEL.CODE, onmatch() { apply(st); } });
   }
-
-  // ═══════════════════════════════════════════════════════════════
-  // PART 2: FILE SIZE VIEWER
-  // ═══════════════════════════════════════════════════════════════
-
-  function initFileSizeViewer() {
-    console.log("[MergedScript] Initializing File Size Viewer...");
-
-    let GITHUB_TOKEN = GM_getValue("GITHUB_TOKEN", "");
-
-    function checkToken() {
-      if (!GITHUB_TOKEN) {
-        const token = prompt(
-          "GitHub File Size Viewer:\nPlease enter your GitHub Token to avoid rate limits."
-        );
-        if (token) {
-          GM_setValue("GITHUB_TOKEN", token);
-          GITHUB_TOKEN = token;
-        }
-      }
-      return GITHUB_TOKEN;
+  const fmt = (b) => (b < CFG.SIZE.KB ? `${(b / 1024).toFixed(2)} KB` : b < CFG.SIZE.MB ? `${(b / 1048576).toFixed(2)} MB` : `${(b / 1073741824).toFixed(2)} GB`);
+  const calcDir = async (url, h, depth) => {
+    if (depth > CFG.SIZE.DEPTH) return { size: 0, cnt: 0 };
+    const r = await fetch(url, { headers: h });
+    if (!r.ok) return { size: 0, cnt: 0 };
+    const d = await r.json();
+    if (!Array.isArray(d)) return { size: 0, cnt: 0 };
+    const res = await Promise.all(d.map(async (it) => {
+      if (it.type === "file") return { size: it.size || 0, cnt: 1 };
+      if (it.type === "dir" && it.url) return calcDir(it.url, h, depth + 1);
+      return { size: 0, cnt: 0 };
+    }));
+    return { size: res.reduce((s, x) => s + x.size, 0), cnt: res.reduce((s, x) => s + x.cnt, 0) };
+  };
+  const fetchSize = async (url) => {
+    const tok = GM_getValue("GITHUB_TOKEN", "");
+    const h = { Accept: "application/vnd.github.v3+json" };
+    if (tok) h.Authorization = `token ${tok}`;
+    const r = await fetch(url, { headers: h });
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (Array.isArray(d)) {
+      const { size, cnt } = await calcDir(url, h, 0);
+      return size ? `${fmt(size)} (${cnt} ${cnt === 1 ? "file" : "files"})` : `Folder (${cnt} ${cnt === 1 ? "file" : "files"})`;
     }
-
-    const formatSize = (bytes) => {
-      if (bytes < CONFIG.FORMATTING.KB_THRESHOLD) {
-        return `${(bytes / 1024).toFixed(2)} KB`;
+    if (d?.type === "file" && typeof d.size === "number") return `${fmt(d.size)} (1 file)`;
+    return null;
+  };
+  const insert = (link, text) => {
+    if (link.nextSibling?.classList?.contains(SEL.TAG)) return;
+    const span = document.createElement("span");
+    span.className = SEL.TAG;
+    span.style.marginLeft = "8px";
+    span.style.fontSize = "smaller";
+    span.style.color = "#6a737d";
+    span.textContent = `(${text})`;
+    link.insertAdjacentElement("afterend", span);
+  };
+  const showSizes = async () => {
+    const tbody = document.querySelector(SEL.TABLE);
+    if (!tbody) return;
+    const links = [...tbody.querySelectorAll(SEL.LINKS)].filter((l) => !(l.nextSibling?.classList?.contains(SEL.TAG)));
+    if (!links.length) return;
+    await Promise.all(links.map(async (l) => {
+      const parts = l.href.split("/");
+      const idx = parts.indexOf(parts.includes("blob") ? "blob" : "tree");
+      if (idx < 0) return;
+      const user = parts[3];
+      const repo = parts[4];
+      const branch = parts[idx + 1];
+      const path = parts.slice(idx + 2).join("/");
+      if (!user || !repo || !branch) return;
+      const api = `${CFG.SIZE.API}/${user}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+      const v = await fetchSize(api);
+      if (!v) return;
+      insert(l, v);
+    }));
+  };
+  const watchURL = (cb, delay) => {
+    let last = location.href;
+    new MutationObserver(() => {
+      const u = location.href;
+      if (u !== last) {
+        last = u;
+        setTimeout(cb, delay);
       }
-      if (bytes < CONFIG.FORMATTING.MB_THRESHOLD) {
-        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-      }
-      return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-    };
-
-    const calculateFolderSize = async (apiUrl, headers, depth = 0) => {
-      if (depth > CONFIG.FILE_SIZE.MAX_FOLDER_DEPTH) {
-        console.warn("Max folder depth reached:", apiUrl);
-        return { size: 0, fileCount: 0 };
-      }
-      try {
-        const response = await fetch(apiUrl, { headers });
-        if (!response.ok) {
-          if (response.status === 404) {
-            return { size: 0, fileCount: 0 };
-          }
-          console.error("Folder API error:", response.status, response.statusText);
-          return { size: 0, fileCount: 0 };
-        }
-
-        const data = await response.json();
-        if (!Array.isArray(data)) {
-          return { size: 0, fileCount: 0 };
-        }
-
-        const results = await Promise.all(
-          data.map(async (item) => {
-            if (!item || !item.type) {
-              return { size: 0, fileCount: 0 };
-            }
-            if (item.type === "file" && typeof item.size === "number") {
-              return { size: item.size, fileCount: 1 };
-            }
-            if (item.type === "dir" && item.url) {
-              return calculateFolderSize(item.url, headers, depth + 1);
-            }
-            return { size: 0, fileCount: 0 };
-          })
-        );
-
-        const totalSize = results.reduce((sum, r) => sum + r.size, 0);
-        const fileCount = results.reduce((sum, r) => sum + r.fileCount, 0);
-        return { size: totalSize, fileCount };
-      } catch (error) {
-        console.error("Error calculating folder size:", error.message || error);
-        return { size: 0, fileCount: 0 };
-      }
-    };
-
-    const fetchFileSize = async (apiUrl) => {
-      checkToken();
-      const token = GITHUB_TOKEN;
-      const headers = { Accept: "application/vnd.github.v3+json" };
-      if (token) {
-        headers.Authorization = `token ${token}`;
-      }
-
-      try {
-        const response = await fetch(apiUrl, { headers });
-        if (!response.ok) {
-          console.error("GitHub API responded with error:", response.status, response.statusText);
-          return "N/A";
-        }
-
-        const data = await response.json();
-        if (data?.message) {
-          console.error("GitHub API error message:", data.message);
-          return "N/A";
-        }
-
-        if (data && !Array.isArray(data) && data.type === "file") {
-          if (typeof data.size === "number") {
-            return `${formatSize(data.size)} (1 file)`;
-          }
-          return "N/A";
-        } else if (Array.isArray(data)) {
-          const { size, fileCount } = await calculateFolderSize(apiUrl, headers);
-          return size > 0
-            ? `${formatSize(size)} (${fileCount} ${fileCount === 1 ? "file" : "files"})`
-            : `Folder (${fileCount} ${fileCount === 1 ? "file" : "files"})`;
-        }
-        return "N/A";
-      } catch (error) {
-        console.error("Error fetching file size:", error);
-        return "N/A";
-      }
-    };
-
-    const insertSizeAfterLink = (link, infoText) => {
-      if (link.nextSibling?.classList?.contains(SELECTORS.FILE_SIZE.SIZE_VIEWER_CLASS)) {
-        return;
-      }
-      const infoSpan = document.createElement("span");
-      infoSpan.className = SELECTORS.FILE_SIZE.SIZE_VIEWER_CLASS;
-      infoSpan.style.marginLeft = "10px";
-      infoSpan.style.fontSize = "smaller";
-      infoSpan.style.color = "#6a737d";
-      infoSpan.textContent = `(${infoText})`;
-      link.insertAdjacentElement("afterend", infoSpan);
-    };
-
-    const displayFileSizes = async () => {
-      try {
-        const tableBody = document.querySelector(SELECTORS.FILE_SIZE.TABLE_BODY);
-        if (!tableBody) {
-          return;
-        }
-
-        const links = tableBody.querySelectorAll(SELECTORS.FILE_SIZE.BLOB_LINKS);
-        if (!links.length) {
-          return;
-        }
-
-        const unprocessedLinks = Array.from(links).filter((link) => {
-          const next = link.nextSibling;
-          return !next?.classList?.contains(SELECTORS.FILE_SIZE.SIZE_VIEWER_CLASS);
-        });
-
-        if (!unprocessedLinks.length) {
-          return;
-        }
-
-        console.log("[GH-Tweaks] Processing", unprocessedLinks.length, "file/folder links");
-
-        const promises = unprocessedLinks.map(async (link) => {
-          try {
-            if (!link.href) {
-              return;
-            }
-            const urlParts = link.href.split("/");
-            if (urlParts.length < 7) {
-              return;
-            }
-
-            const user = urlParts[3];
-            const repo = urlParts[4];
-            if (!user || !repo) {
-              return;
-            }
-
-            const typeSegment = link.href.includes("/blob/") ? "blob" : "tree";
-            const branchIndex = urlParts.indexOf(typeSegment);
-            if (branchIndex === -1 || branchIndex + 1 >= urlParts.length) {
-              return;
-            }
-
-            const branch = urlParts[branchIndex + 1];
-            const filePath = urlParts.slice(branchIndex + 2).join("/");
-            if (!branch) {
-              return;
-            }
-
-            const apiUrl = `${CONFIG.URLS.GITHUB_API}/${user}/${repo}/contents/${encodeURIComponent(
-              filePath
-            )}?ref=${encodeURIComponent(branch)}`;
-
-            const infoText = await fetchFileSize(apiUrl);
-            if (infoText && infoText !== "N/A") {
-              insertSizeAfterLink(link, infoText);
-            }
-          } catch (e) {
-            console.error("[GH-Tweaks] Error parsing link:", link.href, e.message || e);
-          }
-        });
-
-        await Promise.all(promises);
-      } catch (e) {
-        console.error("[GH-Tweaks] Error in displayFileSizes:", e.message || e);
-      }
-    };
-
-    setTimeout(displayFileSizes, CONFIG.FILE_SIZE.INITIAL_DISPLAY_DELAY);
-
-    const observeUrlChanges = (callback, delay = CONFIG.FILE_SIZE.OBSERVER_THROTTLE) => {
-      let lastUrl = location.href;
-      const observer = new MutationObserver(() => {
-        const url = location.href;
-        if (url !== lastUrl) {
-          lastUrl = url;
-          setTimeout(() => {
-            callback();
-          }, delay);
-        }
-      });
-      observer.observe(document, {
-        subtree: true,
-        childList: true
-      });
-      return observer;
-    };
-
-    observeUrlChanges(displayFileSizes, CONFIG.FILE_SIZE.URL_CHANGE_DETECT_DELAY);
+    }).observe(document, { childList: true, subtree: true });
+  };
+  function initSize() {
+    setTimeout(showSizes, CFG.SIZE.INIT_DELAY);
+    watchURL(showSizes, CFG.SIZE.URL_DELAY);
+    new MutationObserver(throttle(showSizes, CFG.SIZE.THR)).observe(document, { childList: true, subtree: true });
   }
-
-  // ═══════════════════════════════════════════════════════════════
-  // INITIALIZATION
-  // ═══════════════════════════════════════════════════════════════
-
-  initEditorSettings();
-  window.addEventListener("load", () => {
-    initFileSizeViewer();
-  });
+  initEditor();
+  window.addEventListener("load", initSize);
 })();
