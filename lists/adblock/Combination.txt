@@ -1,13 +1,13 @@
 [Adblock Plus 3.6]
+! Title: Ven0m0's Adblocking Filter
 ! Description: Combination List of multiple filters to make the internet comfortable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Combination.txt
-! Title: Ven0m0's Adblocking Filter
 !#include General.txt
 !#include Other.txt
+!#include Youtube.txt
 !#include Reddit.txt
-!#include Search-Engines.txt
-!#include Spotify.txt
 !#include Twitch.txt
 !#include Twitter.txt
-!#include Youtube.txt
+!#include Spotify.txt
+!#include Search-Engines.txt
