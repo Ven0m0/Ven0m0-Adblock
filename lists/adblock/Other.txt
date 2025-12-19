@@ -151,9 +151,7 @@ gbatemp.net##.uix_noticeInner
 ! Ad banners
 calculateaspectratio.com##.right.rio
 calculateaspectratio.com##.left.rio
-
-! Appuals notification
-appuals.com##.wp-timed-p-content
+fmovies-hd.to##.cky-consent-bar
 
 ! Google drive
 ||ogs.google.com/u/0/widget/callout/sid?prid=19016403&pgid=19010599&puid=1b10da64bfa91688&dc=1&origin=https%3A%2F%2Fdrive.google.com&cn=callout&pid=25&spid=25&hl=en-GB$subdocument
