@@ -1,0 +1,175 @@
+name: 📜 Build Userscripts
+on:
+  workflow_call:
+  push:
+    branches:
+      - main
+    paths:
+      - "userscripts/src/**/*.js"
+      - "userscripts/src/**/*.user.js"
+      - "Scripts/build.sh"
+      - "Scripts/minify-js.sh"
+      - "List"
+      - "mise.toml"
+  pull_request:
+    paths:
+      - "userscripts/src/**/*.js"
+      - "userscripts/src/**/*.user.js"
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: "Force rebuild all scripts"
+        required: false
+        type: boolean
+        default: false
+      fetch_updates:
+        description: "Fetch updates from external sources"
+        required: false
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    name: Build & Optimize
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Setup mise
+        uses: jdx/mise-action@v3
+        with:
+          install: true
+          cache: true
+          experimental: true
+      - name: Verify mise environment
+        run: |
+          mise doctor; mise list
+      - name: Detect changes
+        id: detect
+        run: |
+          mkdir -p userscripts/dist dist
+          has_changes=false
+          if [[ ${{ github.event.inputs.force_rebuild }} == true ]]; then
+            printf 'Force rebuild requested\n'; has_changes=true
+          elif [[ ${{ github.event_name }} == schedule ]] || [[ ${{ github.event.inputs.fetch_updates }} == true ]]; then
+            printf 'Scheduled run or fetch updates requested\n'
+            has_changes=true
+          else
+            for file in userscripts/src/**/*.js; do
+              [[ -f $file ]] || continue
+              filename=$(basename "$file")
+              if [[ !  -f dist/$filename ]] || [[ $file -nt dist/$filename ]]; then
+                printf 'Detected change: %s\n' "$filename"
+                has_changes=true; break
+              fi
+            done
+            if [[ -f List ]] && { [[ ! -f dist/README.md ]] || [[ List -nt dist/README.md ]]; }; then
+              printf 'List file changed\n'; has_changes=true
+            fi
+          fi
+          printf 'has_changes=%s\n' "$has_changes" >> "$GITHUB_OUTPUT"
+      - name: Fetch external scripts
+        if: |
+          steps.detect.outputs.has_changes == 'true' &&
+          (github.event_name == 'schedule' || github.event.inputs.fetch_updates == 'true')
+        run: |
+          if [[ -f List ]]; then
+            mkdir -p userscripts/src
+            grep -oP 'https? ://[^\s"]+\.user\.js' List | while IFS= read -r url; do
+              filename=$(basename "$url" | tr -cd '[:alnum:]._-')
+              printf 'Fetching: %s from %s\n' "$filename" "$url"
+              curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/src/$filename" "$url" || printf 'Failed to fetch %s\n' "$url"
+            done
+          fi
+      - name: Build userscripts
+        if: steps.detect.outputs.has_changes == 'true'
+        run: |
+          chmod +x Scripts/build.sh Scripts/minify-js.sh || :
+          [[ -f Scripts/build.sh ]] && mise exec -- bash Scripts/build.sh userscripts dist List
+          [[ -f Scripts/minify-js.sh ]] && mise exec -- bash Scripts/minify-js.sh
+          mkdir -p dist userscripts/dist
+          for file in userscripts/src/**/*.js; do
+            [[ -f $file ]] || continue
+            filename=$(basename "$file")
+            output="dist/$filename"
+            printf 'Building: %s -> %s\n' "$file" "$output"
+            mise exec -- bunx esbuild "$file" \
+              --outfile="$output" --minify |
+              --target=es2020 --format=iife \
+              --legal-comments=inline --log-level=warning
+          done
+
+      - name: Optimize with Terser
+        if: steps.detect.outputs.has_changes == 'true'
+        run: |
+          for file in dist/*.js; do
+            [[ -f $file ]] || continue
+            printf 'Optimizing: %s\n' "$file"
+            mise exec -- bunx terser "$file" \
+              --compress \
+              --mangle \
+              --output "$file" \
+              --comments "/^! |@preserve|@license|@cc_on|==UserScript==|==/UserScript==/" \
+              || printf 'Terser failed for %s, keeping esbuild output\n' "$file"
+          done
+
+      - name: Generate README
+        if: steps.detect.outputs.has_changes == 'true' && hashFiles('List') != ''
+        run: |
+          cat > dist/README.md << 'EOF'
+          # Userscripts
+
+          This directory contains optimized and minified userscripts.
+
+          ## Scripts
+          EOF
+
+          if [[ -f List ]]; then
+            printf '### External Scripts\n\n' >> dist/README.md
+            grep -oP 'https?://[^\s"]+\.user\.js' List | while IFS= read -r url; do
+              filename=$(basename "$url")
+              printf -- '- [%s](%s)\n' "$filename" "$url" >> dist/README.md
+            done
+          fi
+          printf '\n### Local Scripts\n\n' >> dist/README.md
+          for file in userscripts/src/Mine/*.js; do
+            [[ -f $file ]] || continue
+            filename=$(basename "$file")
+            printf -- '- %s\n' "$filename" >> dist/README.md
+          done
+          printf '\n---\n*Built on %s*\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> dist/README.md
+
+      - name: autofix.ci
+        uses: autofix-ci/action@v1.3.2
+        with:
+          fail-fast: true
+
+      - name: Commit and push changes
+        if: |
+          steps.detect.outputs.has_changes == 'true' &&
+          github.event_name != 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "ci: build and optimize userscripts [skip ci]"
+          file_pattern: "dist/*.js dist/README.md userscripts/dist/*.js"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          skip_dirty_check: false
+
+      - name: Upload artifacts
+        if: steps.detect.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: userscripts-${{ github.sha }}
+          path: |
+            dist/*.js
+            dist/README.md
+          retention-days: 30
