@@ -72,12 +72,6 @@
 ##.blogroll-wrapper8
 ##.blogroll-wrapper9
 ##.blogroll_wrapper
-##.blogroll_wrapper2
-##.blogroll_wrapper3
-##.blogroll_wrapper4
-##.blogroll_wrapper_2
-##.blogroll_wrapper_3
-##.blogroll_wrapper_4
 ##.blogroll_wrapper_honbun
 ##.elogch_blogparts_iframe
 
@@ -86,21 +80,21 @@
 duckduckgo.com##.WktWJWUFfihMbuzAEqk2.hUUdRtuaOUx7mcSwc56s.ffON2NH02oMAcqyoh2UU
 
 ! Nexusmods
-www.nexusmods.com##.background-2.premium-block--upgrade.premium-block
-www.nexusmods.com##.css-u1qlwc.qc-cmp-cleanslate
-www.nexusmods.com###mainContent > div.clearfix.agroup > .ads > .ad-unit.demo-billboard.ad
-www.nexusmods.com##div.clearfix.agroup:nth-of-type(1)
-www.nexusmods.com###rj-vortex
-www.nexusmods.com##.rj-standard-button
-www.nexusmods.com##.rj-supporter-wrapper > h3
+nexusmods.com##.background-2.premium-block--upgrade.premium-block
+nexusmods.com##.css-u1qlwc.qc-cmp-cleanslate
+nexusmods.com###mainContent > div.clearfix.agroup > .ads > .ad-unit.demo-billboard.ad
+nexusmods.com##div.clearfix.agroup:nth-of-type(1)
+nexusmods.com###rj-vortex
+nexusmods.com##.rj-standard-button
+nexusmods.com##.rj-supporter-wrapper > h3
 
 ! Removes "Downloads for non-premium members are capped at 2MB/s" banner
-www.nexusmods.com##.container.premium-banner
-www.nexusmods.com##.areplacer
+nexusmods.com##.container.premium-banner
+nexusmods.com##.areplacer
 
 ! Playstation
-www.playstation.com##.evidon-banner-message
-www.playstation.com###_evidon_banner
+playstation.com##.evidon-banner-message
+playstation.com###_evidon_banner
 
 ! Sony
 my.account.sony.com###js-SIEWS1lib-header-Base
@@ -136,7 +130,7 @@ teams.microsoft.com##.app-notification-container
 teams.microsoft.com##.engagement-surface.button-banner.accent-banner.promo-banner.banner-show.app-notification-banner
 
 ! Help us improve Google notification
-www.google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
+google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
 
 ! Push notifications
 gbatemp.net##.notice-content
@@ -153,9 +147,6 @@ calculateaspectratio.com##.right.rio
 calculateaspectratio.com##.left.rio
 fmovies-hd.to##.cky-consent-bar
 
-! Google drive
-||ogs.google.com/u/0/widget/callout/sid?prid=19016403&pgid=19010599&puid=1b10da64bfa91688&dc=1&origin=https%3A%2F%2Fdrive.google.com&cn=callout&pid=25&spid=25&hl=en-GB$subdocument
-
 ! Imgur Go ad free button
 imgur.com##.Button.EmeraldButton
 
@@ -169,51 +160,13 @@ github.com##.mr-1.btn-sm.btn
 ! Main Press Plus Paywall
 
 ! Google search rating
-www.google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
+google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
 
 ! Microsoft 365 ad
 support.microsoft.com###rail-banner-button
 support.microsoft.com##.ghcMtE.sc-bYoBSM
 
-www.schulministerium.nrw##.eu-cookie-compliance-banner--categories.eu-cookie-compliance-banner-info.eu-cookie-compliance-banner
-
-christitus.com##div.widget:nth-of-type(3)
-
-yuzu-emu.org##.is-centered.columns > div.column:nth-of-type(2)
-
-www.techradar.com##.region_redirect_banner
-
-www.lifewire.com##.ot-sdk-row
-
-medium.com##.tr.tq.tp.ht.to.tn.tm.tl.tk.tj.ti.th.tg.tf.te.td.tc.aq.ap
-
-www.vidmore.com##.usernotice_pop
-
-||ogs.google.com/u/0/widget/callout/sid?prid=19018054&pgid=19008535&puid=a87840e5a60f1228&dc=1&origin=https%3A%2F%2Fwww.google.com&cn=callout&pid=1&spid=113&hl=en$subdocument
-
-towardsdatascience.com##.ws.wr.ot.iw.wq.wp.wo.wn.wm.wl.wk.wj.wi.wh.wg.wf.we.aq.ap
-
-! 2022-07-12 https://www.deviantart.com
-! Devianart cookie banner
-www.deviantart.com##._1VuFx
-
-! Devianart upgrade to core button
-www.deviantart.com##._3I-fJ.bf6hc._16RrG._1jkTN.-n4aD._2pFrH._1FMli
-
-! Tech-latest emtpy space
-tech-latest.com###lates-1263607438 > div
-tech-latest.com###lates-1561389064
-tech-latest.com###lates-778902724 > div
-tech-latest.com###lates-1209363602 > div
-tech-latest.com###lates-1385581263 > div
-tech-latest.com###lates-1549445617 > div
-tech-latest.com###lates-740248231 > div
-tech-latest.com###lates-1443932345 > div
-tech-latest.com###lates-1979837024
-tech-latest.com##.td-container > .td-pb-row
-
-! Shopping banner
-www.makeuseof.com##.w-pencil-banner
+||ogs.google.com/u/0/widget/callout/sid?prid=19018054&pgid=19008535&puid=a87840e5a60f1228&dc=1&origin=https%3A%2F%2Fgoogle.com&cn=callout&pid=1&spid=113&hl=en$subdocument
 
 ! Empty ad banner
 ||cdn.browserhow.com/wp-content/uploads/sites/3/Ad-Removed-in-Edge-browser-after-enabling-flag*.png$image
@@ -221,25 +174,10 @@ www.makeuseof.com##.w-pencil-banner
 ! Patreon banner
 blocklistproject.github.io##p:nth-of-type(4)
 
-! Medium cookie banner
-medium.com##.xh.xg.oe.il.xf.xe.xd.xc.xb.xa.wz.wy.wx.ww.wv.wu.wt.aq.ap
-
-! Medium unnecessary button
-medium.com##.c.ao.o.pm.pl.pk.eb.pj
-
 answers.microsoft.com##.ucsRailContainer
 
-! Black bar at bottom
-www.minitool.com##.page-bottom-fixed-ads
-
-! Blank space
-community.spiceworks.com###gsidebar
-
 ! Google Chrome recommendation
-||ogs.google.de/u/0/widget/callout/sid?prid=19026802&pgid=19026797&puid=63a1a1689acd7948&dc=1&origin=https%3A%2F%2Fwww.google.de&cn=callout&pid=1&spid=538&hl=en$subdocument
-
-! Ad
-www.carlcare.com##.native-dark-inline-style-6309942.native-dark-inline-style-2022746.tpl
+||ogs.google.de/u/0/widget/callout/sid?prid=19026802&pgid=19026797&puid=63a1a1689acd7948&dc=1&origin=https%3A%2F%2Fgoogle.de&cn=callout&pid=1&spid=538&hl=en$subdocument
 
 ! Help tranlate NextDNS banner
 my.nextdns.io##.text-center.px-3
@@ -251,20 +189,15 @@ p.ahkscript.org##footer
 ||accounts.google.com/gsi/*$xhr,script,3p
 
 ! Google consent, "before you continue"
-www.google.*##^script:has-text(consentCookiePayload)
-www.google.*##+js(acis, document.cookie, YES+)
+google.*##^script:has-text(consentCookiePayload)
+google.*##+js(acis, document.cookie, YES+)
 google.*##+js(aeld, DOMContentLoaded, CONSENT)
 ||consent.google.com^
 
-! Editpad
-editpad.org##.top_ad_box
-
 ! Cloudflare subscription popup
-www.cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-row-ns.flex-column.flex.z-5.bottom-0.fixed
+cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-row-ns.flex-column.flex.z-5.bottom-0.fixed
 
 askubuntu.com###credential_picker_container
-
-gitlab.freedesktop.org##.light-red.js-broadcast-notification-10.banner.gl-broadcast-message
 
 ! Proton lumo
 lumo.proton.me##.md\:block.hidden.my-2.text-xs.color-weak.relative.text-center
@@ -276,6 +209,10 @@ lumo.proton.me##.text-no-decoration.color-weak.p-3.inline-flex
 
 ! https://code.visualstudio.com/docs/configure/settings
 code.visualstudio.com###cookie-banner
+
+# Gitlab
+gitlab.archlinux.org##.broadcast-wrapper
+gitlab.freedesktop.org##.light-red.js-broadcast-notification-10.banner.gl-broadcast-message
 
 ! Github
 -push-notification.$domain=~github.com
@@ -314,7 +251,7 @@ gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.announcement-banner-co
 ! For when one really doesn't want to have a harder time with uBO's log error checker.
 /^172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])\$/$network
 
-! Very experimental entry; see https://github.com/DandelionSprout/adfilt/issues/950 and https://www.techspot.com/news/77949-ccleaner-could-install-avast-anti-virus-without-permission.html
+! Very experimental entry; see https://github.com/DandelionSprout/adfilt/issues/950 and https://techspot.com/news/77949-ccleaner-could-install-avast-anti-virus-without-permission.html
 ||avast.$app=CCleaner.exe|CCleaner64.exe|CCleanerCloudAgent.exe|ccsetup617.exe|ccsetup618.exe|ccsetup619.exe|ccsetup620.exe|ccsetup621.exe|ccsetup622.exe|ccsetup623.exe|ccsetup624.exe|ccsetup625.exe|ccsetup70.exe
 
 ! Notifications
@@ -678,8 +615,8 @@ gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.announcement-banner-co
 ##.z-bit-smartbanner
 ##[class^="adjust-smart-banner"]
 ##[data-testid="app-install-container"]
-##a[href^="http://www.mobi24.net/"]
-##a[href^="https://www.mobi24.net/"]
+##a[href^="http://mobi24.net/"]
+##a[href^="https://mobi24.net/"]
 ##amp-app-banner
 ! substack
 ##.subscription-widget-wrap > .show-subscribe
