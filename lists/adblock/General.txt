@@ -1,7 +1,7 @@
 [Adblock Plus 3.6]
 ! Title: General rules (Optimized)
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
-! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/General.txt
+! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/General.txt
 
 !! Smartblock Embed Placeholders
 @@||smartblock.firefox.etp^
