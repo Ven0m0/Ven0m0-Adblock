@@ -3,6 +3,7 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/General.txt
 ! Last modified: %timestamp%
+! License: https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE
 
 !! Smartblock Embed Placeholders
 @@||smartblock.firefox.etp^
