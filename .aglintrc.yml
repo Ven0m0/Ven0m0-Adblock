@@ -1,9 +1,9 @@
 # AGLint config file
 # Documentation: https://github.com/AdguardTeam/AGLint#configuration
 root: true
-allowInlineConfig: true
 extends: [aglint:recommended]
-syntax: [Common]
+syntax: [UblockOrigin]
+#platforms: [adg_any]
 rules:
   no-excluded-rules:
     - error
