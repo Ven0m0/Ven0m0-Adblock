@@ -1,0 +1,53 @@
+# lefthook.yml — Git hooks config (Lefthook)
+# https://lefthook.dev/configuration/index.html
+pre-commit:
+  # stop on first failure
+  fail_fast: true
+
+  # jobs run in parallel by default
+  jobs:
+    - name: json-lint
+      # validate JSON files
+      run: |
+        # find all staged JSON files
+        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.json$' || :)
+        [[ -z "$files" ]] && exit 0
+        for f in $files; do
+          # builtin JSON parse check
+          jq -e . "$f" &>/dev/null || exit 1
+        done
+
+    - name: js-lint
+      run: |
+        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|mjs|cjs)$' || :)
+        [[ -z "$files" ]] && exit 0
+        # use biome or eslint if installed
+        biome check $files || npx eslint $files
+
+    - name: md-lint
+      run: |
+        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(md|markdown)$' || :)
+        [[ -z "$files" ]] && exit 0
+        npx markdownlint $files
+
+    - name: shellcheck
+      run: |
+        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.sh$' || :)
+        [[ -z "$files" ]] && exit 0
+        shellcheck $files
+
+    - name: built-scripts
+      run: |
+        # optional: test build processes if defined
+        # example: build/compile user scripts or lists
+        # adjust to your actual build command
+        [ -f package.json ] && npm run build:userscripts || :
+
+commit-msg:
+  scripts:
+    # enforce conventional commit (example using commitlint)
+    commitlint:
+      runner: bash
+      run: |
+        # $1 is the path to the temporary commit message file
+        npx commitlint --edit "$1"
