@@ -84,15 +84,17 @@ Ven0m0-Adblock/
 │   └── hosts-creator/        # Hosts file generator
 ├── Filters/                   # Compiled AdGuard filters (generated)
 ├── dist/                      # Built userscripts (generated)
-├── build-lists.sh            # Main build script (executable)
 ├── hostlist-config.json      # Hostlist compiler configuration
 ├── mise.toml                 # Mise tool version manager config
 ├── package.json              # NPM/Bun package configuration
 ├── eslint.config.mjs         # ESLint configuration (flat config)
 ├── .prettierrc.json          # Prettier code formatter config
 ├── .aglintrc.yml             # AGLint filter list linter config
-├── .markdownlint.json        # Markdown linter config
+├── .markdownlint-cli2.jsonc  # Markdownlint-cli2 config
 ├── .yamllint.yml             # YAML linter config
+├── .lefthook.yml             # Lefthook git hooks config
+├── biome.json                # Biome linter/formatter config
+├── .oxlintrc.json            # Oxlint configuration
 ├── .editorconfig             # Editor configuration
 ├── esbuild.config.js         # ESBuild bundler config
 ├── README.md                 # Project documentation
@@ -169,11 +171,14 @@ mise run install
 #### Linting & Formatting
 
 - **ESLint** - JavaScript linter (flat config format)
+- **Biome** - Fast Rust-based JavaScript/TypeScript linter and formatter
+- **Oxlint** - Rust-based fast linter for JavaScript/TypeScript
 - **Prettier** - Code formatter (JS, JSON, YAML, Markdown)
 - **markdownlint-cli2** - Markdown linter
 - **yamllint** - YAML linter
 - **shellcheck** - Shell script linter
 - **shfmt** - Shell script formatter
+- **Lefthook** - Fast git hooks manager
 
 #### Build Tools
 
@@ -193,9 +198,9 @@ mise run install
 
 ### Build Scripts
 
-#### Primary Build Script: `build-lists.sh`
+#### Primary Build Script: `Scripts/build-lists.sh`
 
-Located at root, this is the main entry point for building filter lists.
+Located in `Scripts/`, this is the main entry point for building filter lists.
 
 **Process:**
 1. Ensures required tools are installed (aglint, hostlist-compiler, kompressor)
@@ -207,7 +212,7 @@ Located at root, this is the main entry point for building filter lists.
 
 **Usage:**
 ```bash
-./build-lists.sh
+./Scripts/build-lists.sh
 # Or via npm/bun script:
 bun run build
 ```
@@ -397,13 +402,43 @@ bun run format:yaml       # YAML only
 bun run format:md         # Markdown only
 ```
 
+### Biome (Fast Linter & Formatter)
+
+**Config:** `biome.json`
+
+Biome is a fast, Rust-based toolchain for JavaScript/TypeScript that combines linting and formatting. It provides excellent performance and is configured to work alongside ESLint and Prettier.
+
+**Commands:**
+```bash
+biome check --write .            # Lint and format with auto-fix
+biome check .                    # Check only
+biome format --write .           # Format only
+```
+
+**Integration:** Runs in Lefthook pre-commit hooks for staged files.
+
+### Oxlint (Fast JavaScript Linter)
+
+**Config:** `.oxlintrc.json`
+
+Oxlint is a high-performance Rust-based linter for JavaScript and TypeScript, offering faster linting than traditional tools.
+
+**Commands:**
+```bash
+oxlint .                         # Lint all files
+mise exec -- oxlint .            # Lint via mise
+```
+
+**Integration:** Can be integrated into quality checks for additional validation.
+
 ### Markdown Linting
 
-**Config:** `.markdownlint.json`
+**Config:** `.markdownlint-cli2.jsonc`
 
 **Command:**
 ```bash
 bun run lint:md
+bunx markdownlint-cli2 --fix     # Auto-fix
 ```
 
 ### YAML Linting
@@ -442,9 +477,38 @@ bun run validate          # Test + build
 
 ### Pre-commit Testing
 
-The project uses Husky for git hooks (configured via `prepare` script).
+The project uses **Lefthook** for git hooks management.
 
-**Pre-commit:** Runs `bun run precommit` which executes `lint:fix:all`
+**Config:** `.lefthook.yml`
+
+**Pre-commit hooks include:**
+- Shell script formatting (shfmt, shellcheck, shellharden)
+- YAML linting (yamlfmt, yamllint)
+- TOML linting (taplo)
+- JSON validation (jq/jaq)
+- AGLint for filter lists
+- Biome for JavaScript/TypeScript
+- Markdown linting
+- File normalization (whitespace, encoding)
+- Security scanning (secrets detection, merge conflicts)
+- GitHub Actions linting (actionlint)
+- Branch protection (blocks direct commits to main/master)
+
+**Commit message hooks:**
+- Conventional Commits validation
+- Subject length check (max 72 chars)
+- WIP/TODO detection
+
+**Pre-push hooks:**
+- Automated testing
+- Branch naming validation (git-flow patterns)
+- Security audits
+
+**Installation:**
+```bash
+lefthook install               # Install git hooks
+lefthook run pre-commit        # Run pre-commit hooks manually
+```
 
 ### Manual Validation
 
@@ -720,10 +784,13 @@ Trigger workflows manually from GitHub Actions UI:
 | `package.json` | NPM/Bun package config, scripts | JSON |
 | `mise.toml` | Tool version management | TOML |
 | `eslint.config.mjs` | JavaScript linting rules | ES Module |
+| `biome.json` | Biome linter/formatter config | JSON |
+| `.oxlintrc.json` | Oxlint configuration | JSON |
 | `.prettierrc.json` | Code formatting rules | JSON |
 | `.aglintrc.yml` | Filter list linting rules | YAML |
-| `.markdownlint.json` | Markdown linting rules | JSON |
+| `.markdownlint-cli2.jsonc` | Markdownlint-cli2 config | JSONC |
 | `.yamllint.yml` | YAML linting rules | YAML |
+| `.lefthook.yml` | Git hooks configuration | YAML |
 | `.editorconfig` | Editor behavior | INI-like |
 | `esbuild.config.js` | Bundler configuration | CommonJS |
 | `hostlist-config.json` | Filter compilation config | JSON |
@@ -732,7 +799,7 @@ Trigger workflows manually from GitHub Actions UI:
 
 | Script | Purpose |
 |--------|---------|
-| `build-lists.sh` | Main filter list builder |
+| `Scripts/build-lists.sh` | Main filter list builder |
 | `Scripts/build-all.sh` | Master build orchestrator |
 | `Scripts/aglint.sh` | AGLint wrapper |
 | `Scripts/hostlist-build.sh` | Hostlist compilation |

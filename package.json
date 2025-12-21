@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "./build-lists.sh",
+    "build": "./Scripts/build-lists.sh",
     "build:all": "./Scripts/build-all.sh adblock hosts userscripts",
     "build:adblock": "./Scripts/build-all.sh adblock",
     "build:hosts": "./Scripts/build-all.sh hosts",
@@ -78,7 +78,7 @@
     "web-enhancement"
   ],
   "author": "Ven0m0",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
   "peerDependencies": {
     "typescript": "^5"
   }

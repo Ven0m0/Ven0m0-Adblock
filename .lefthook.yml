@@ -66,16 +66,16 @@ pre-commit:
       glob: "*.txt"
       run: |
         command -v bunx &>/dev/null || { printf "bun not installed, skipping AGLint\n" >&2; exit 0; }
-        [[ -f .aglintrc.yml ]] || { printf ". aglintrc.yml not found, skipping AGLint\n" >&2; exit 0; }
+        [[ -f .aglintrc.yml ]] || { printf ".aglintrc.yml not found, skipping AGLint\n" >&2; exit 0; }
         bunx @adguard/aglint {staged_files}
       fail_text: "AGLint validation failed"
 
     biome:
       priority: 6
-      glob: "*.{js,ts,cjs,mjs,d.cts,d. mts,jsx,tsx,json,jsonc}"
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
       run: |
         command -v biome &>/dev/null || { printf "biome not installed, skipping\n" >&2; exit 0; }
-        cfg="${HOME}/.config/biome. json"
+        cfg="${HOME}/.config/biome.json"
         [[ -r "$cfg" ]] || cfg="${HOME}/biome.json"
         BIOME_CONFIG_PATH="$cfg" biome check --write --skip-parse-errors --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files} || :
         git add {staged_files}
@@ -125,7 +125,7 @@ pre-commit:
 
     gha-lint:
       priority: 10
-      glob: ". github/workflows/*.{yml,yaml}"
+      glob: ".github/workflows/*.{yml,yaml}"
       run:  |
         command -v actionlint &>/dev/null || { printf "actionlint not installed, skipping\n" >&2; exit 0; }
         actionlint {staged_files}
@@ -134,7 +134,7 @@ pre-commit:
     build-userscripts:
       priority: 11
       run: |
-        [[ -f package. json ]] && grep -q '"build: userscripts"' package.json || exit 0
+        [[ -f package.json ]] && grep -q '"build: userscripts"' package.json || exit 0
         bun run build:userscripts || : 
       fail_text: "Build userscripts failed"
 
@@ -165,7 +165,7 @@ pre-push:
       priority: 1
       run: |
         [[ -f Makefile ]] && { make test &>/dev/null; exit 0; }
-        [[ -f package. json ]] && { bun test &>/dev/null; exit 0; }
+        [[ -f package.json ]] && { bun test &>/dev/null; exit 0; }
         [[ -f Cargo.toml ]] && { cargo test -q &>/dev/null; exit 0; }
         exit 0
       fail_text:  "Tests failed"
@@ -209,7 +209,7 @@ post-checkout:
       priority: 2
       run: |
         changed=$(git diff HEAD@{1} HEAD --name-only)
-        grep -qE '^(package. json|bun\. lockb|.*lock\. json)$' <<< "$changed" && {
+        grep -qE '^(package.json|bun\.lockb|.*lock\.json)$' <<< "$changed" && {
           printf "Dependencies changed.  Run: bun install\n" >&2
         } || :
       fail_text: "Dep check failed"
