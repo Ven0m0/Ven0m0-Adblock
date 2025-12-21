@@ -545,6 +545,7 @@ gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.announcement-banner-co
 ##amp-web-push-widget
 ##div[class^="container_NotificationsBanner_"]
 ##pwa-install
+
 ! Mobile Notifications
 ###SmarterBannerContainer
 ###appInstallNotification
@@ -624,3 +625,10 @@ gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.announcement-banner-co
 ##[class*="NotificationsBell__notificationsWrapper-"]
 ! International
 ###uutiskirje-nosto
+
+! aternos anti adb
+@@||hb.vntsm.com/v4/live/vms/sites/aternos.org/index.js$script,domain=aternos.org
+aternos.org##.header-center:style(margin-top:-5000px !important;)
+aternos.org##.sidebar:style(width: 1.745px !important; padding: 1px !important)
+aternos.org##.ad-dfp:style(min-height: 0.1485mm !important; height: 0.1485mm !important;)
+aternos.org###placement-takeover
