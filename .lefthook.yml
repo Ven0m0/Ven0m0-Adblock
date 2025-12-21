@@ -1,3 +1,5 @@
+assert_lefthook_installed: true
+skip_lfs: true
 skip_output:  [meta, execution]
 output:  [summary, skips]
 colors: true
@@ -69,6 +71,13 @@ pre-commit:
         command -v bunx &>/dev/null || { printf "bun not installed, skipping\n" >&2; exit 0; }
         bunx markdownlint {staged_files}
       fail_text: "Markdown lint failed"
+
+    - name: check links
+      tags: docs
+      run: lychee --max-concurrency 3 {staged_files}
+      glob: '*.md'
+      exclude:
+        - CHANGELOG.md
 
     normalize: 
       priority: 7
