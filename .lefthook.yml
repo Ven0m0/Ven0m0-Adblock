@@ -1,53 +1,203 @@
-# lefthook.yml — Git hooks config (Lefthook)
-# https://lefthook.dev/configuration/index.html
+skip_output:  [meta, execution]
+output:  [summary, skips]
+colors: true
+no_tty: false
+min_version: 1.5.0
+
 pre-commit:
-  # stop on first failure
-  fail_fast: true
-
-  # jobs run in parallel by default
-  jobs:
-    - name: json-lint
-      # validate JSON files
+  parallel: true
+  commands: 
+    shell-format:
+      priority: 1
+      glob: "*.{sh,bash,zsh}"
       run: |
-        # find all staged JSON files
-        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.json$' || :)
-        [[ -z "$files" ]] && exit 0
-        for f in $files; do
-          # builtin JSON parse check
-          jq -e . "$f" &>/dev/null || exit 1
+        command -v shfmt &>/dev/null || { printf "shfmt not installed, skipping format\n" >&2; exit 0; }
+        command -v shellcheck &>/dev/null || { printf "shellcheck not installed, skipping lint\n" >&2; exit 0; }
+        shfmt -w -i 2 -bn -ci -sr {staged_files}
+        shellcheck -S style {staged_files}
+        command -v shellharden &>/dev/null && shellharden --replace {staged_files} || :
+        git add {staged_files}
+      stage_fixed: true
+      fail_text: "Shell format failed"
+
+    yaml-lint:
+      priority: 2
+      glob: "*.{yml,yaml}"
+      run: |
+        command -v yamlfmt &>/dev/null || { printf "yamlfmt not installed, skipping format\n" >&2; exit 0; }
+        command -v yamllint &>/dev/null || { printf "yamllint not installed, skipping lint\n" >&2; exit 0; }
+        yamlfmt {staged_files} && yamllint -s {staged_files}
+        git add {staged_files}
+      stage_fixed: true
+      fail_text: "YAML lint failed"
+
+    json-validate:
+      priority: 3
+      glob: "*.{json,jsonc,json5}"
+      run: |
+        command -v jq &>/dev/null || { printf "jq not installed, skipping validation\n" >&2; exit 0; }
+        for f in {staged_files}; do
+          jq -e . "$f" &>/dev/null || { printf "Invalid: %s\n" "$f" >&2; exit 1; }
         done
+      fail_text: "JSON invalid"
 
-    - name: js-lint
+    aglint:
+      priority: 4
+      glob: "*.txt"
       run: |
-        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|mjs|cjs)$' || :)
+        command -v bunx &>/dev/null || { printf "bun not installed, skipping AGLint\n" >&2; exit 0; }
+        [[ -f .aglintrc.yml ]] || { printf ".aglintrc. yml not found, skipping AGLint\n" >&2; exit 0; }
+        bunx @adguard/aglint {staged_files}
+      fail_text: "AGLint validation failed"
+
+    biome:
+      priority: 5
+      glob: "*.{js,ts,cjs,mjs,d. cts,d.mts,jsx,tsx,json,jsonc}"
+      run: |
+        command -v biome &>/dev/null || { printf "biome not installed, skipping\n" >&2; exit 0; }
+        cfg="${HOME}/.config/biome.json"
+        [[ -r "$cfg" ]] || cfg="${HOME}/biome.json"
+        BIOME_CONFIG_PATH="$cfg" biome check --write --skip-parse-errors --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files} || :
+        git add {staged_files}
+      stage_fixed: true
+      fail_text:  "Biome failed"
+
+    markdown-lint:
+      priority: 6
+      glob: "*.{md,markdown}"
+      run: |
+        command -v bunx &>/dev/null || { printf "bun not installed, skipping\n" >&2; exit 0; }
+        bunx markdownlint {staged_files}
+      fail_text: "Markdown lint failed"
+
+    normalize: 
+      priority: 7
+      glob: "*"
+      exclude:  "\\.(png|jpe?g|gif|webp|ico|svg|woff2? |ttf|eot|otf|mp[34]|webm|ogg|wav|flac|pdf|zip|tar|gz|xz|zst|bz2|7z|rar)$"
+      run: |
+        for f in {staged_files}; do
+          sed -i. bak 's/[[:space:]]*$//; s/\xE2\x80\x8B//g; s/\xE2\x80\x8C//g; s/\xE2\x80\x8D//g; s/\xE2\x80\xAF//g; s/\xC2\xAD//g; s/\xEF\xBB\xBF//g; s/\r$//' "$f"
+          rm -f "${f}.bak"
+        done
+        command -v dos2unix &>/dev/null && dos2unix -q {staged_files} 2>/dev/null || : 
+        git add {staged_files}
+      stage_fixed: true
+      fail_text: "Normalize failed"
+
+    security: 
+      priority: 8
+      run: |
+        command -v rg &>/dev/null || { printf "ripgrep not installed, skipping security scan\n" >&2; exit 0; }
+        files=$(printf '%s\n' {staged_files} | grep -vE '(test|spec|fixture|mock|example|sample|__tests__|\. test\.|\.spec\.|/tests? /)' || :)
         [[ -z "$files" ]] && exit 0
-        # use biome or eslint if installed
-        biome check $files || bunx eslint $files
+        echo "$files" | xargs -r rg -iNn \
+          -e 'AKIA[0-9A-Z]{16}' \
+          -e 'ghp_[0-9a-zA-Z]{36}' \
+          -e 'glpat-[0-9a-zA-Z_-]{20,}' \
+          -e 'xox[baprs]-[0-9]{10,13}-[0-9]{10,13}-[0-9a-zA-Z]{24,}' \
+          -e '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----' \
+          -e '^(<{7}|={7}|>{7})[^<>=]' \
+          && { printf "Security issue detected (secrets/merge conflicts)\n" >&2; exit 1; } || :
+      fail_text: "Security check failed"
 
-    - name: md-lint
-      run: |
-        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(md|markdown)$' || :)
-        [[ -z "$files" ]] && exit 0
-        bunx markdownlint $files
+    gha-lint:
+      priority: 9
+      glob: ". github/workflows/*.{yml,yaml}"
+      run:  |
+        command -v actionlint &>/dev/null || { printf "actionlint not installed, skipping\n" >&2; exit 0; }
+        actionlint {staged_files}
+      fail_text: "GHA lint failed"
 
-    - name: shellcheck
+    build-userscripts:
+      priority: 10
       run: |
-        files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.sh$' || :)
-        [[ -z "$files" ]] && exit 0
-        shellcheck $files
+        [[ -f package.json ]] && grep -q '"build: userscripts"' package.json || exit 0
+        bun run build: userscripts || : 
+      fail_text: "Build userscripts failed"
 
-    - name: built-scripts
+    branch-protect:
+      priority: 11
       run: |
-        # optional: test build processes if defined
-        # example: build/compile user scripts or lists
-        # adjust to your actual build command
-        [ -f package.json ] && npm run build:userscripts || :
+        branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        [[ "$branch" =~ ^(main|master)$ ]] && { printf "Direct commits to %s blocked\n" "$branch" >&2; exit 1; } || :
+      fail_text: "Protected branch"
 
 commit-msg:
-  scripts:
-    # enforce conventional commit (example using commitlint)
-    commitlint:
-      runner: bash
+  commands: 
+    conventional: 
+      priority: 1
       run: |
-        # $1 is the path to the temporary commit message file
-        bunx commitlint --edit "$1"
+        grep -qE '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .{1,}' {1} || {
+          printf "Use Conventional Commits:  type(scope? ): subject\n" >&2; exit 1
+        }
+        subject=$(head -n1 {1})
+        (( ${#subject} > 72 )) && { printf "Subject >72 chars (%d)\n" "${#subject}" >&2; exit 1; } || :
+        grep -qEi '\b(wip|todo|fixme|hack)\b' {1} && { printf "Remove WIP/TODO\n" >&2; exit 1; } || :
+      fail_text: "Commit format invalid"
+
+pre-push:
+  parallel: true
+  commands:
+    test:
+      priority: 1
+      run: |
+        [[ -f Makefile ]] && { make test &>/dev/null; exit 0; }
+        [[ -f package.json ]] && { bun test &>/dev/null; exit 0; }
+        [[ -f Cargo.toml ]] && { cargo test -q &>/dev/null; exit 0; }
+        exit 0
+      fail_text:  "Tests failed"
+
+    branch: 
+      priority: 2
+      run: |
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        [[ "$branch" =~ ^(main|master|production)$ ]] && { printf "Direct push to %s blocked\n" "$branch" >&2; exit 1; }
+        [[ "$branch" =~ ^(develop|staging|release/. +|hotfix/.+|feature/.+|(bug)?fix/.+|beta|alpha|next)$ ]] || {
+          printf "Use git-flow: feature/*, fix/*, release/*, hotfix/*\n" >&2
+        }; exit 0
+      fail_text: "Branch naming violation"
+
+    audit:
+      priority: 3
+      run: |
+        [[ -f package.json ]] && { bun audit || bun x npm audit --production --audit-level=high; } || :
+        [[ -f Cargo.toml ]] && command -v cargo-audit &>/dev/null && cargo audit || :
+        exit 0
+      fail_text: "Audit failed"
+
+post-merge:
+  commands:
+    deps:
+      priority: 1
+      run: |
+        [[ -f bun.lockb || -f package-lock.json ]] && bun install --frozen-lockfile --production 2>/dev/null || : 
+        [[ -f Cargo.lock ]] && cargo fetch &>/dev/null || :
+        exit 0
+      fail_text: "Deps update failed"
+
+post-checkout:
+  commands: 
+    submodules:
+      priority: 1
+      run: "git submodule update --init --recursive &>/dev/null || :"
+      fail_text:  "Submodule update failed"
+    notify:
+      priority: 2
+      run:  |
+        changed=$(git diff HEAD@{1} HEAD --name-only)
+        grep -qE '^(package. json|bun\. lockb|.*lock\. json)$' <<< "$changed" && {
+          printf "Dependencies changed.  Run:  bun install\n" >&2
+        } || :
+      fail_text: "Dep check failed"
+
+prepare-commit-msg:
+  commands:
+    ticket:
+      priority: 1
+      run: |
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        [[ "$branch" =~ ^(feature|bugfix|hotfix|fix)/([A-Z]+-[0-9]+) ]] && {
+          ticket="${BASH_REMATCH[2]}"
+          grep -qF "$ticket" {1} || sed -i. bak "1s/^/$ticket: /" {1} && rm -f {1}.bak
+        } || :
+      fail_text: "Ticket insert failed"
