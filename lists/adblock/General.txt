@@ -2,6 +2,7 @@
 ! Title: General rules (Optimized)
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/General.txt
+! Last modified: %timestamp%
 
 !! Smartblock Embed Placeholders
 @@||smartblock.firefox.etp^
