@@ -24,12 +24,12 @@ binstall = true
 "npm:@adguard/hostlist-compiler" = "latest"
 biome = "latest"
 oxlint = "latest"
-"npm:oxc-minify"  = "latest"
-"npm:oxc-transform" = "latest"
-"npm:oxfmt" = "latest"
+#"npm:oxc-minify"  = "latest"
+#"npm:oxc-transform" = "latest"
+#"npm:oxfmt" = "latest"
 minify = "latest"
 lefthook = "latest"
-fd = "latest"
+#fd = "latest"
 
 [env]
 NODE_ENV = "development"
