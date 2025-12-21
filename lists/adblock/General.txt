@@ -23,6 +23,9 @@ $removeparam=utm_term
 ||*/metrics/*$all
 ||*/telemetry/*$all
 
+! https://github.com/AdguardTeam/AdguardFilters/issues/204150
+||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$xhr,redirect=googlesyndication_adsbygoogle.js,script
+
 ! Adb track
 ://yandex.*/images/_$xhr,method=post
 
@@ -69,3 +72,8 @@ $removeparam=utm_term
 ! Allow doc/clients exceptions for YouTube etc
 @@||clients1.google.com^
 ||www.google.com^$3p,subdocument
+
+!--- Prevent AdFender detection ---
+@@||webfail.com/image
+@@||pons.com/p/files/*$image
+@@||reutersmedia.net/resources^
