@@ -88,7 +88,7 @@ EOF
 
   # Process: cat → filter → sort → dedupe (single pipeline)
   cat "${ex[@]}" | \
-    $(rg) -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | \
+    "$(rg)" -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | \
     LC_ALL=C sort -u >> "$OLDPWD/$out"
 
   cd "$OLDPWD"
@@ -110,7 +110,7 @@ EOF
   cd "$FILTER_SRC" || { err "Cannot access $FILTER_SRC"; return 1; }
   local -a ex=(); for f in "${src[@]}"; do [[ -f $f ]] && ex+=("$f"); done
   if (( ${#ex[@]} > 0 )); then
-    cat "${ex[@]}" | $(rg) -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
+    cat "${ex[@]}" | "$(rg)" -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
       awk '{print "0.0.0.0",tolower($1)}' | LC_ALL=C sort -u >> "$OLDPWD/$out"
   else
     err "No host source files found"; return 1;
@@ -156,7 +156,7 @@ download_userscripts(){
   local line url fn base suffix
   while IFS= read -r line; do
     [[ -z $line || $line == \#* ]] && continue
-    url=$($(rg) -o 'https://[^[:space:]]+\.user\.js' <<< "$line" | head -n1)
+    url=$("$(rg)" -o 'https://[^[:space:]]+\.user\.js' <<< "$line" | head -n1)
     [[ -z $url ]] && continue
     fn=$(basename "$url" | tr -cd '[:alnum:]._-')
     [[ $fn != *.user.js ]] && fn="${fn}.user.js"
@@ -200,7 +200,7 @@ _process_js(){
     <<< "$meta")
 
   # Minify with esbuild
-  js=$($(runner) esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || {
+  js=$("$(runner)" esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || {
     err "$fn (esbuild failed)"
     return 1
   }
@@ -220,14 +220,14 @@ build_userscripts(){
   [[ -z $(runner) ]] && { err "No JS runtime (bun/npx)"; return 1; }
   mkdir -p "$SCRIPT_SRC" "$SCRIPT_OUT"
   local -a files=()
-  [[ $(fd) == *fd* ]] && mapfile -t files < <($(fd) -e js -t f . "$SCRIPT_SRC" 2>/dev/null) || \
+  [[ $(fd) == *fd* ]] && mapfile -t files < <("$(fd)" -e js -t f . "$SCRIPT_SRC" 2>/dev/null) || \
     mapfile -t files < <(find "$SCRIPT_SRC" -type f -name "*.js" 2>/dev/null)
   (( ${#files[@]} == 0 )) && { log userscripts "No files in $SCRIPT_SRC"; return 0; }
   log userscripts "Processing ${#files[@]} files..."
   has eslint && eslint --fix --quiet --no-warn-ignored "${files[@]}" 2>/dev/null || :
   export -f _process_js ok err; export REPO SCRIPT_OUT R G N
   local rn; rn=$(runner); export RUNNER=$rn
-  [[ -n $(par) ]] && (( ${#files[@]} > 1 )) && printf '%s\n' "${files[@]}" | $(par) -j "$(jobs)" --bar _process_js {} 2>/dev/null || \
+  [[ -n $(par) ]] && (( ${#files[@]} > 1 )) && printf '%s\n' "${files[@]}" | "$(par)" -j "$(jobs)" --bar _process_js {} 2>/dev/null || \
     { for f in "${files[@]}"; do _process_js "$f" || :; done; }
   [[ -f $SCRIPT_LIST ]] && cp "$SCRIPT_LIST" "$SCRIPT_OUT/README.md"
   ok "$(find "$SCRIPT_OUT" -name "*.user.js" -type f 2>/dev/null | wc -l) scripts → $SCRIPT_OUT/"

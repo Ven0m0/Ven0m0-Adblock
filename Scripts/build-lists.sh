@@ -15,7 +15,7 @@ declare -rA TOOLS=(
 )
 
 ensure_tool(){
-  local -r name=$1 url=$2 dest="${BIN}/${name}"
+  local -r name="$1" url="$2" dest="${BIN}/${name}"
   [[ -x $dest ]] && return 0
   printf '  -> Installing %s\n' "$name" >&2
   mkdir -p "$BIN" || { printf 'Failed to create %s\n' "$BIN" >&2; return 1; }

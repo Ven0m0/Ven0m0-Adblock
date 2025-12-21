@@ -82,12 +82,12 @@ check_command() {
 
   # For bunx commands, verify the package works
   if [[ "$cmd" == bunx* ]]; then
-    if ! $cmd --version &> /dev/null 2>&1; then
+    if ! "$cmd" --version &> /dev/null 2>&1; then
       log_error "Required tool '$cmd' not found (package may not be installed)"
       log_info "Install hint: $install_hint"
       return 1
     fi
-    log_success "$cmd found: $($cmd --version 2>&1 | head -n1)"
+    log_success "$cmd found: $("$cmd" --version 2>&1 | head -n1)"
   else
     log_success "$cmd found: $(command -v "$cmd")"
   fi
@@ -199,7 +199,7 @@ run_biome_format() {
   local format_exit=0
 
   # Biome can handle multiple files efficiently
-  format_output=$($BIOME_BIN format --write "${SCANNED_FILES[@]}" 2>&1) || format_exit=$?
+  format_output=$("$BIOME_BIN" format --write "${SCANNED_FILES[@]}" 2>&1) || format_exit=$?
 
   if [ "$format_exit" -eq 0 ]; then
     log_success "Formatting completed successfully"
@@ -229,7 +229,7 @@ run_biome_lint() {
   local lint_exit=0
 
   # Run biome check with auto-fix (safe fixes only)
-  lint_output=$($BIOME_BIN check --write "${SCANNED_FILES[@]}" 2>&1) || lint_exit=$?
+  lint_output=$("$BIOME_BIN" check --write "${SCANNED_FILES[@]}" 2>&1) || lint_exit=$?
 
   if [ "$lint_exit" -eq 0 ]; then
     log_success "Linting completed with no errors"
@@ -275,7 +275,7 @@ run_oxlint() {
 
   # Run oxlint with all rules and treat warnings as errors for CI
   oxlint_output=$(
-    $OXLINT_BIN \
+    "$OXLINT_BIN" \
       -D all \
       --deny-warnings \
       "${SCANNED_FILES[@]}" \

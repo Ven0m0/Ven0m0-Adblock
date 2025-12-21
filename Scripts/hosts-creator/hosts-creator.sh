@@ -45,10 +45,10 @@ mkdir -p "$BACKUP_DIR"
 log info "Downloading hosts"
 printf '%s\n' "$RESOLVE" > "$NEW_NAME"
 n=0
-for url in $HOSTS; do
+for url in "${HOSTS[@]}"; do
   n=$((n+1))
   printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
-  $DL "$url" >> "$NEW_NAME" 2>/dev/null || :
+  "$DL" "$url" >> "$NEW_NAME" 2>/dev/null || :
 done
 #── Process ──
 awk_cmd=""
@@ -68,5 +68,5 @@ ok "$NEW_NAME ($size)"
 [[ $REPLACE == 1 ]] || exit 0
 sudo=sudo; command -v doas &>/dev/null && sudo=doas; command -v rdo &>/dev/null && sudo=rdo
 log info "Replacing $HOSTS_FILE"
-$sudo mv -iv "$NEW_NAME" "$HOSTS_FILE" || err "Replace failed"
+"$sudo" mv -iv "$NEW_NAME" "$HOSTS_FILE" || err "Replace failed"
 ok "Complete"

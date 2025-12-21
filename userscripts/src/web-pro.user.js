@@ -6,13 +6,12 @@
 // @run-at      document-start
 // ==/UserScript==
 (() => {
-  "use strict";
   const C = {
     KEY: "ven0m0.webpro.v4.optimized",
     CACHE: {
       MAX: 32 * 1024 * 1024,
       TTL: 180000,
-      RX: /\.(css|woff2?|ttf|eot|js)$/i,
+      RX: /\.(css|woff2?|ttf|eot|js)$/i
     },
     TIME: {
       IDLE: 1500,
@@ -23,12 +22,12 @@
       THR_RUN: 300,
       THR_MUT: 500,
       THR_COOKIE: 1000,
-      THR_MEM: 5000,
+      THR_MEM: 5000
     },
     SCRIPT_DENY:
       /ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo|tealium|pardot|hubspot|hotjar|intercom|criteo|quantc/i,
     IO_MARGIN: "300px",
-    BATCH: 30,
+    BATCH: 30
   };
   const TRACK = [
     "fbclid",
@@ -64,7 +63,7 @@
     "traffic_source",
     "sprefix",
     "rowan_id1",
-    "rowan_msg_id",
+    "rowan_msg_id"
   ];
   const HASH = ["intcid", "back-url", "back_url", "src"];
   const UE = ["click", "keydown", "touchstart", "pointerdown"];
@@ -95,7 +94,7 @@
     caching: 1,
     minTimeout: C.TIME.MIN_TO,
     minInterval: C.TIME.MIN_IV,
-    showUI: 1,
+    showUI: 1
   };
   const cfg = (() => {
     try {
@@ -110,12 +109,10 @@
     loaded: new WeakSet(),
     deferredScripts: new Map(),
     origins: new Set(),
-    interactionBound: 0,
+    interactionBound: 0
   };
   const idle = (fn, to = C.TIME.IDLE) =>
-    "requestIdleCallback" in window
-      ? requestIdleCallback(fn, { timeout: to })
-      : setTimeout(fn, C.TIME.FALLBACK);
+    "requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: to }) : setTimeout(fn, C.TIME.FALLBACK);
   const mark = (el, a = "data-wp") => el?.setAttribute(a, "1");
   const throttle = (fn, ms) => {
     let l = 0;
@@ -136,7 +133,7 @@
       requestAnimationFrame,
       clearTimeout,
       clearInterval,
-      cancelAnimationFrame,
+      cancelAnimationFrame
     ];
     const micro = queueMicrotask;
     let res = () => {};
@@ -253,8 +250,7 @@
   }
   if (cfg.tabSave) {
     document.addEventListener("visibilitychange", () => {
-      document.documentElement.style.cssText =
-        document.visibilityState === "hidden" ? "display:none!important" : "";
+      document.documentElement.style.cssText = document.visibilityState === "hidden" ? "display:none!important" : "";
     });
   }
   if (cfg.caching) {
@@ -294,7 +290,7 @@
               return new Response(t, {
                 status: r.status,
                 statusText: r.statusText,
-                headers: r.headers,
+                headers: r.headers
               });
             })
             .catch(() => r);
@@ -318,9 +314,7 @@
   };
   const extractASIN = () => {
     if (document.readyState === "loading") return "";
-    const el =
-      document.getElementById("ASIN") ||
-      document.querySelector("[name='ASIN.0']");
+    const el = document.getElementById("ASIN") || document.querySelector("[name='ASIN.0']");
     return el?.value || "";
   };
   function canonicalAmazon(url) {
@@ -393,33 +387,23 @@
   })();
   function applyBypass() {
     if (!cfg.bypass) return;
-    if (cfg.rightClick)
-      window.addEventListener(
-        "contextmenu",
-        (e) => e.stopImmediatePropagation(),
-        { capture: true },
-      );
+    if (cfg.rightClick) window.addEventListener("contextmenu", (e) => e.stopImmediatePropagation(), { capture: true });
     if (cfg.copy) {
       for (const ev of ["copy", "paste", "cut"]) {
         document.addEventListener(
           ev,
           (e) => {
             const t = e.target;
-            if (
-              ["INPUT", "TEXTAREA", "DIV"].includes(t.tagName) &&
-              t.isContentEditable
-            )
-              e.stopImmediatePropagation();
+            if (["INPUT", "TEXTAREA", "DIV"].includes(t.tagName) && t.isContentEditable) e.stopImmediatePropagation();
           },
-          { capture: true },
+          { capture: true }
         );
       }
     }
     if (cfg.select && !document.getElementById("wp-style")) {
       const s = document.createElement("style");
       s.id = "wp-style";
-      s.textContent =
-        "*{user-select:text!important}::selection{background:#b3d4fc;color:#000}";
+      s.textContent = "*{user-select:text!important}::selection{background:#b3d4fc;color:#000}";
       document.head.appendChild(s);
     }
   }
@@ -434,13 +418,10 @@
   }
   const forceGPU = (() => {
     if (!cfg.gpu) return () => {};
-    const css =
-      "transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden";
+    const css = "transform:translate3d(0,0,0);will-change:transform;backface-visibility:hidden";
     return () => {
       document
-        .querySelectorAll(
-          'video:not([data-wp-gpu]),canvas:not([data-wp-gpu]),img[loading="eager"]:not([data-wp-gpu])',
-        )
+        .querySelectorAll('video:not([data-wp-gpu]),canvas:not([data-wp-gpu]),img[loading="eager"]:not([data-wp-gpu])')
         .forEach((el) => {
           el.style.cssText += `;${css}`;
           mark(el, "data-wp-gpu");
@@ -456,9 +437,7 @@
   function preloadRes() {
     if (!cfg.preload) return;
     document
-      .querySelectorAll(
-        "img:not([data-wp-pre]),video:not([data-wp-pre]),audio:not([data-wp-pre])",
-      )
+      .querySelectorAll("img:not([data-wp-pre]),video:not([data-wp-pre]),audio:not([data-wp-pre])")
       .forEach((r) => {
         const u = r.src || r.href;
         if (u) {
@@ -513,11 +492,9 @@
           }
         });
       },
-      { rootMargin: C.IO_MARGIN },
+      { rootMargin: C.IO_MARGIN }
     );
-    document
-      .querySelectorAll("video[data-src],video:has(source[data-src])")
-      .forEach((v) => obs.observe(v));
+    document.querySelectorAll("video[data-src],video:has(source[data-src])").forEach((v) => obs.observe(v));
   }
   function optimizeVids() {
     if (!cfg.videos) return;
@@ -549,51 +526,49 @@
     });
   }
   function restoreScripts() {
-    document
-      .querySelectorAll('script[type="text/wp-blocked"][data-wp-id]')
-      .forEach((s) => {
-        const id = s.getAttribute("data-wp-id");
-        if (!id) return;
-        const src = state.deferredScripts.get(id);
-        if (!src) return;
-        const danger =
-          src.startsWith("javascript:") ||
-          src.startsWith("data:") ||
-          src.startsWith("vbscript:") ||
-          src.startsWith("//") ||
-          src.includes("<") ||
-          src.includes(">") ||
-          src.includes('"') ||
-          src.includes("'");
-        if (danger) {
-          state.deferredScripts.delete(id);
-          return;
-        }
-        const https = src.startsWith("https://");
-        const root = src.startsWith("/") && !src.startsWith("//");
-        if (!https && !root) {
-          state.deferredScripts.delete(id);
-          return;
-        }
-        if (https) {
-          try {
-            const u = new URL(src);
-            if (u.protocol !== "https:") {
-              state.deferredScripts.delete(id);
-              return;
-            }
-          } catch {
+    document.querySelectorAll('script[type="text/wp-blocked"][data-wp-id]').forEach((s) => {
+      const id = s.getAttribute("data-wp-id");
+      if (!id) return;
+      const src = state.deferredScripts.get(id);
+      if (!src) return;
+      const danger =
+        src.startsWith("javascript:") ||
+        src.startsWith("data:") ||
+        src.startsWith("vbscript:") ||
+        src.startsWith("//") ||
+        src.includes("<") ||
+        src.includes(">") ||
+        src.includes('"') ||
+        src.includes("'");
+      if (danger) {
+        state.deferredScripts.delete(id);
+        return;
+      }
+      const https = src.startsWith("https://");
+      const root = src.startsWith("/") && !src.startsWith("//");
+      if (!https && !root) {
+        state.deferredScripts.delete(id);
+        return;
+      }
+      if (https) {
+        try {
+          const u = new URL(src);
+          if (u.protocol !== "https:") {
             state.deferredScripts.delete(id);
             return;
           }
+        } catch {
+          state.deferredScripts.delete(id);
+          return;
         }
-        state.deferredScripts.delete(id);
-        const n = document.createElement("script");
-        n.src = src;
-        n.async = 1;
-        n.setAttribute("data-restored", "1");
-        s.parentNode?.replaceChild(n, s);
-      });
+      }
+      state.deferredScripts.delete(id);
+      const n = document.createElement("script");
+      n.src = src;
+      n.async = 1;
+      n.setAttribute("data-restored", "1");
+      s.parentNode?.replaceChild(n, s);
+    });
   }
   function bindRestore() {
     if (state.interactionBound) return;
@@ -602,9 +577,7 @@
       UE.forEach((e) => window.removeEventListener(e, cb, { passive: true }));
       state.interactionBound = 0;
     };
-    UE.forEach((e) =>
-      window.addEventListener(e, cb, { passive: true, once: true }),
-    );
+    UE.forEach((e) => window.addEventListener(e, cb, { passive: true, once: true }));
     state.interactionBound = 1;
   }
   function addHint(rel, href, as, cors) {
@@ -620,32 +593,24 @@
   }
   function extractOrigins() {
     if (!cfg.preconnect) return;
-    document
-      .querySelectorAll(
-        "img[src],script[src],link[href],iframe[src],video[src],source[src]",
-      )
-      .forEach((e) => {
-        const u = e.src || e.href;
-        if (!u || !/^\s*https?:/i.test(u)) return;
-        try {
-          const url = new URL(u);
-          if (url.origin !== location.origin) state.origins.add(url.origin);
-        } catch (e) {
-          cfg.log && console.error("[WebPro] Origin extract error:", e);
-        }
-      });
+    document.querySelectorAll("img[src],script[src],link[href],iframe[src],video[src],source[src]").forEach((e) => {
+      const u = e.src || e.href;
+      if (!u || !/^\s*https?:/i.test(u)) return;
+      try {
+        const url = new URL(u);
+        if (url.origin !== location.origin) state.origins.add(url.origin);
+      } catch (e) {
+        cfg.log && console.error("[WebPro] Origin extract error:", e);
+      }
+    });
     for (const o of state.origins) addHint("preconnect", o);
   }
   function preloadCritical() {
     if (!cfg.preconnect) return;
-    document
-      .querySelectorAll(
-        'link[rel="stylesheet"],link[rel="preload"],img[loading="eager"]',
-      )
-      .forEach((el) => {
-        if (el.href) addHint("preload", el.href, "style");
-        else if (el.src) addHint("preload", el.src, "image");
-      });
+    document.querySelectorAll('link[rel="stylesheet"],link[rel="preload"],img[loading="eager"]').forEach((el) => {
+      if (el.href) addHint("preload", el.href, "style");
+      else if (el.src) addHint("preload", el.src, "image");
+    });
   }
   const run = throttle(() => {
     cleanURL();
@@ -662,9 +627,7 @@
     extractOrigins();
     preloadCritical();
   }, C.TIME.THR_RUN);
-  document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", run)
-    : setTimeout(run, 100);
+  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", run) : setTimeout(run, 100);
   if (cfg.defer) bindRestore();
   if (cfg.observe) {
     const mut = throttle(() => {
@@ -677,7 +640,7 @@
     }, C.TIME.THR_MUT);
     new MutationObserver(() => mut()).observe(document.documentElement, {
       childList: true,
-      subtree: true,
+      subtree: true
     });
   }
   if (cfg.mem) {
@@ -685,7 +648,7 @@
       "visibilitychange",
       throttle(() => {
         if (document.visibilityState === "hidden") optimizeMem();
-      }, C.TIME.THR_MEM),
+      }, C.TIME.THR_MEM)
     );
   }
   log("Web Pro Enhanced (Compact) v4+ loaded");
