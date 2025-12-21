@@ -22,13 +22,13 @@ pre-commit:
         files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|mjs|cjs)$' || :)
         [[ -z "$files" ]] && exit 0
         # use biome or eslint if installed
-        biome check $files || npx eslint $files
+        biome check $files || bunx eslint $files
 
     - name: md-lint
       run: |
         files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(md|markdown)$' || :)
         [[ -z "$files" ]] && exit 0
-        npx markdownlint $files
+        bunx markdownlint $files
 
     - name: shellcheck
       run: |
@@ -50,4 +50,4 @@ commit-msg:
       runner: bash
       run: |
         # $1 is the path to the temporary commit message file
-        npx commitlint --edit "$1"
+        bunx commitlint --edit "$1"
