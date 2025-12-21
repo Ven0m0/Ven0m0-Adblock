@@ -190,10 +190,10 @@ jobs:
           name: custom-filters
           path: lists/releases/*.txt
           retention-days: 30
-
+s
   commit:
     name: Commit Changes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [build-adguard, build-ragibkl, build-custom]
     if: |
       always() &&
@@ -276,7 +276,7 @@ jobs:
 
   cleanup:
     name: Cleanup
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [commit, convert]
     if: always() && github.event_name == 'schedule'
     steps:
