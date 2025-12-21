@@ -3,7 +3,6 @@
 root: true
 extends: [aglint:recommended]
 syntax: [UblockOrigin]
-#platforms: [adg_any]
 rules:
   no-excluded-rules:
     - error
