@@ -1,4 +1,19 @@
-node_modules
-.git
-Submodules
-lists/*.txt
+# Build outputs
+dist/
+build/
+Filters/
+lists/releases/
+lists/mirror/
+
+# Dependencies
+node_modules/
+bun.lockb
+
+# Filter lists (AGLint handles these)
+*.txt
+!README.txt
+!LICENSE.txt
+
+# Minified
+*.min.js
+*.bundle.js
