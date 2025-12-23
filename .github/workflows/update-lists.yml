@@ -1,0 +1,89 @@
+name: 🔄 Update AdLists Mirror
+on:
+  # TODO: switch to once a week, inlined
+  #schedule: [{cron: "15,45 * * * *"}] # Every hour at : 15 and :45
+  workflow_dispatch: 
+    inputs:
+      force_update:
+        description: "Force update all lists"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
+  cancel-in-progress: true
+env:
+  DEBIAN_FRONTEND: noninteractive
+  PYTHONOPTIMIZE: 2
+  PYTHON_COLORS: 0
+  LC_ALL: C
+  GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+jobs: 
+  update-mirror:
+    name: Download & Mirror AdLists
+    runs-on:  ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          enable-cache: true
+          github-token: ${{ github.token || secrets.PAT }}
+      - run: |
+          uv pip install --system -r requirements.txt
+      - name: Run update script
+        id: update
+        run: |
+          set -e; mkdir -p lists/mirror
+          python3 -OO Scripts/update-adlists.py --output-dir lists/mirror --max-concurrent 8
+      - name: Run dead domains linter
+        if: success()
+        continue-on-error: true
+        run: |
+          if command -v bunx &>/dev/null; then
+            bunx dead-domains-linter -i "lists/mirror/*.txt" || :
+          elif command -v npx &>/dev/null; then
+            npx dead-domains-linter -i "lists/mirror/*.txt" || :
+          fi
+      - name:  Setup Git branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply. github.com"
+          git remote set-branches origin adlists-mirror || : 
+          git fetch --depth=1 -nq origin adlists-mirror || git checkout -b adlists-mirror
+      - name: Commit changes
+        id: commit
+        run: |
+          git switch adlists-mirror 2>/dev/null || git checkout -b adlists-mirror
+          git add lists/mirror
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected"
+          else
+            git commit -m "chore: update mirrored adlists [$(date -u +%Y-%m-%d\ %H:%M\ UTC)]"
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Push changes
+        if: steps.commit.outputs.has_changes == 'true'
+        run: |
+          git push -u origin adlists-mirror --force-with-lease
+  trigger-build:
+    name: Trigger Filter Build
+    needs: update-mirror
+    runs-on: ubuntu-latest
+    if: needs.update-mirror.result == 'success'
+    steps:
+      - name: Trigger build workflow
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          event-type: adlists-updated
