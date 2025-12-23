@@ -90,12 +90,17 @@ env = { CI = "true" }
 run = "./Scripts/quality-check.sh"
 depends = ["install"]
 
-[tasks.cleancache]
-description = "Clean system cache"
-run = "rm -rf ~/.cache/* || :"
+[tasks.uvcache]
+description = "Clean cargo and cache directories"
+run = "uv cache clear -q || :"
+hide = true
+
+[tasks.misecache]
+description = "Clean mise cache"
+run = "mise cache c -yq || :; mise prune -yq || :"
 hide = true
 
 [tasks.clean]
-description = "Clean cargo and cache directories"
-depends = ["cleancache"]
-run = "cargo cache -efg || :; cargo clean || :"
+description = "Clean cache"
+depends = ["uvcache", "misecache"]
+run = "rm -rf ~/.cache/* || :"
