@@ -1,70 +1,41 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
+# Build outputs
 dist/
 build/
-target/
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
 lists/releases/
+Filters/
+*.min.js
 
-# Dependencies
-node_modules/
+# Python
+*.pyc
+__pycache__/
 venv/
-.venv/
-.env
-.env.local
-.env.*
+. venv/
 
-# Logs and temp files
+# Node/Bun
+node_modules/
+. env
+.env.local
+
+# Logs
 *.log
-*.tmp
-*.swp
-*.swo
+*. tmp
 
 # Editors
 .vscode/
 .idea/
 
-# System files
+# System
 .DS_Store
 Thumbs.db
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Quality reports
-quality-report.json
+# Quality
 .eslintcache
+. coverage
+coverage/
 
-# Compressed files
+# Compressed
 *.zip
 *.gz
 *.tar
 *.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
 *.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
