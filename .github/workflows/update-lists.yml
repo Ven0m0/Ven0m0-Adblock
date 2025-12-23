@@ -1,8 +1,7 @@
 name: 🔄 Update AdLists Mirror
 on:
-  # TODO: switch to once a week, inlined
-  #schedule: [{cron: "15,45 * * * *"}] # Every hour at : 15 and :45
-  workflow_dispatch: 
+  schedule: [{cron: "0 23 * * 0"}] # Once a week at midnight UTC+1
+  workflow_dispatch:
     inputs:
       force_update:
         description: "Force update all lists"
