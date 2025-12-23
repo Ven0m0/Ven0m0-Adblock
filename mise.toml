@@ -14,6 +14,7 @@ uvx = true
 
 [settings.python]
 uv_venv_auto = true
+uv_venv_create_args = ["--system-site-packages", "--seed"]
 
 [settings.cargo]
 binstall = true
@@ -24,23 +25,21 @@ binstall = true
 "npm:@adguard/hostlist-compiler" = "latest"
 biome = "latest"
 oxlint = "latest"
-#"npm:oxc-minify"  = "latest"
-#"npm:oxc-transform" = "latest"
-#"npm:oxfmt" = "latest"
 minify = "latest"
 lefthook = "latest"
-#fd = "latest"
 
 [env]
 NODE_ENV = "development"
 NODE_SKIP_PLATFORM_CHECK = "1"
 NODE_NO_WARNINGS = "1"
 MISE_NPM_BUN = "1"
-_.python.venv = { path = ".venv" }
+_.python.venv = { path = ".venv", create = true }
 PYTHONOPTIMIZE = "2"
-PYTHON_JIT = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+PYTHONNODEBUGRANGES = "1"
+PYTHONUTF8 = "1"
+PYTHONIOENCODING = "UTF-8" 
 UV_LINK_MODE = "hardlink"
-UV_COMPILE_BYTECODE = "1"
 DO_NOT_TRACK = "1"
 CARGO_NET_GIT_FETCH_WITH_CLI = "true"
 CARGO_HTTP_MULTIPLEXING = "true"
