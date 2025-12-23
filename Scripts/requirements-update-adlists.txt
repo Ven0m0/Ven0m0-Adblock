@@ -1,0 +1,3 @@
+# Dependencies for Scripts/update-adlists.py
+# Install with: uv pip install -r Scripts/requirements-update-adlists.txt
+aiohttp==3.13.2
