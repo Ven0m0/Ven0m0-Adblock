@@ -46,13 +46,13 @@ CARGO_NET_GIT_FETCH_WITH_CLI = "true"
 CARGO_HTTP_MULTIPLEXING = "true"
 BINSTALL_DISABLE_TELEMETRY = "true"
 
-[tasks. install]
+[tasks.install]
 description = "Install all dependencies"
 run = "mise install && bun install"
 
 [tasks.build]
 description = "Build all lists"
-run = "./build-lists.sh"
+run = "./Scripts/build-lists.sh"
 depends = ["install"]
 
 [tasks."build:all"]
@@ -68,7 +68,7 @@ run = "bun run lint"
 description = "Format all files"
 run = "bun run format"
 
-[tasks. validate]
+[tasks.validate]
 description = "Validate everything"
 run = "bun run validate"
 

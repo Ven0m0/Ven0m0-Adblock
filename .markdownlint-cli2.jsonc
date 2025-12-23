@@ -9,7 +9,7 @@
     "MD041": false
   },
   "globs": [
-    "**/*. {md,markdown}"
+    "**/*.{md,markdown}"
   ],
   "ignores": [
     "**/node_modules/**",
