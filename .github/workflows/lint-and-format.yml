@@ -98,7 +98,7 @@ jobs:
 
   yamllint:
     name: Lint YAML
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -114,7 +114,7 @@ jobs:
         continue-on-error: true
   shellcheck:
     name: Lint Shell Scripts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -133,7 +133,7 @@ jobs:
         continue-on-error: true
   summary:
     name: Lint Summary
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: [lint, format, yamllint, shellcheck]
     if: always()
     steps:
