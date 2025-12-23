@@ -4,9 +4,8 @@
   "useTabs": false,
   "semi": true,
   "singleQuote": false,
-  "quoteProps": "as-needed",
   "trailingComma": "none",
-  "bracketSpacing": true,
+  "bracketSpacing":  true,
   "arrowParens": "always",
   "endOfLine": "lf",
   "proseWrap": "preserve",
@@ -14,7 +13,14 @@
     {
       "files": "*.md",
       "options": {
-        "proseWrap": "always"
+        "proseWrap": "always",
+        "printWidth": 100
+      }
+    },
+    {
+      "files":  ["*.user.js", "userscripts/**/*.js"],
+      "options": {
+        "printWidth": 120
       }
     }
   ]
