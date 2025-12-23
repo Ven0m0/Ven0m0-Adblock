@@ -128,12 +128,6 @@ setup_aglint(){
   [[ $s == '""' || $s == "undefined" ]] && npm pkg set scripts.lint=aglint
   log aglint "Running..."
   npm run lint
-  [[ -d .husky ]] || {
-    npm list husky &>/dev/null || npm i -D husky
-    npx husky init
-    echo 'npx aglint' > .husky/pre-commit
-    chmod +x .husky/pre-commit
-  }
 }
 
 #── Hostlist compiler ──

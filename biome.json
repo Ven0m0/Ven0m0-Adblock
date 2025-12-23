@@ -1,23 +1,14 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
   "files": {
-    "include": [
-      "**/*.js",
-      "**/*.mjs",
-      "**/*.cjs",
-      "**/*.json"
-    ],
-    "ignore": [
-      "node_modules",
-      "dist",
-      "build",
-      "Filters",
-      "lists/releases",
-      "lists/mirror",
-      "*.min.js",
-      "*.bundle.js",
-      "bun.lockb"
-    ]
+    "includes": ["**/*.js", "**/*.mjs", "**/*.cjs", "**/*.json"],
+    "ignoreUnknown": true
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
   },
   "formatter": {
     "enabled": true,
@@ -36,7 +27,7 @@
     }
   },
   "linter": {
-    "enabled":  true,
+    "enabled": true,
     "rules": {
       "recommended": true,
       "correctness": {
@@ -59,14 +50,14 @@
   },
   "overrides": [
     {
-      "include": ["**/*.user.js", "userscripts/**/*.js"],
+      "includes": ["**/*.user.js", "userscripts/**/*.js"],
       "javascript": {
         "formatter": {
           "lineWidth": 120
         }
       },
       "linter": {
-        "rules":  {
+        "rules": {
           "suspicious": {
             "noConsole": "off"
           }

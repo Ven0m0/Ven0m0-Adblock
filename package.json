@@ -22,18 +22,13 @@
     "lint:fix:all": "bun run lint:fix && bun run format",
     "quality:check": "./Scripts/quality-check.sh",
     "quality:ci": "CI=true ./Scripts/quality-check.sh",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "format:js": "prettier --write '**/*.{js,mjs,cjs}'",
-    "format:json": "prettier --write '**/*.json'",
-    "format:yaml": "prettier --write '**/*.{yml,yaml}'",
-    "format:md": "prettier --write '**/*.md'",
+    "format": "biome format --write .",
+    "format:check": "biome check .",
     "test": "bun run lint && bun run format:check",
     "test:ci": "bun run lint && bun run format:check",
     "clean": "rm -rf node_modules dist lists/releases userscripts/dist Filters",
     "clean:cache": "rm -rf node_modules/.cache .eslintcache",
     "clean:all": "bun run clean && bun run clean:cache",
-    "prepare": "command -v husky >/dev/null && husky || true",
     "precommit": "bun run lint:fix:all",
     "validate": "bun run test && bun run build"
   },
@@ -48,8 +43,6 @@
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "markdownlint-cli2": "^0.20.0",
-    "oxlint": "^1.35.0",
-    "prettier": "^3.7.4",
     "terser": "^5.44.1"
   },
   "engines": {
@@ -78,8 +71,5 @@
     "web-enhancement"
   ],
   "author": "Ven0m0",
-  "license": "GPL-3.0",
-  "peerDependencies": {
-    "typescript": "^5.9.3"
-  }
+  "license": "GPL-3.0"
 }

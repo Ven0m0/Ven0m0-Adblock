@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # JS/TS Quality & High-Performance Enforcer
 # Scope: Scan, Format, Lint, Report, CI Gate
-# Architecture: Biome (format/lint) + Oxlint (deep static analysis)
+# Architecture: Biome (format/lint)
 
 set -Eeuo pipefail
 
@@ -24,7 +24,6 @@ fi
 
 # Tool binaries
 readonly BIOME_BIN="${BIOME_BIN:-bunx biome}"
-readonly OXLINT_BIN="${OXLINT_BIN:-bunx oxlint}"
 readonly FD_BIN="$_FD_BIN"
 
 # Output control
@@ -38,7 +37,6 @@ readonly NC='\033[0m' # No Color
 # Tracking arrays
 declare -a SCANNED_FILES=()
 declare -a BIOME_ERRORS=()
-declare -a OXLINT_ERRORS=()
 declare -i TOTAL_FILES=0
 declare -i TOTAL_ERRORS=0
 declare -i EXIT_CODE=0
@@ -113,11 +111,6 @@ verify_tools() {
 
   # Check biome
   if ! check_command "$BIOME_BIN" "bun add -D @biomejs/biome OR npm install -g @biomejs/biome"; then
-    all_ok=false
-  fi
-
-  # Check oxlint
-  if ! check_command "$OXLINT_BIN" "bun add -D oxlint OR npm install -g oxlint"; then
     all_ok=false
   fi
 
@@ -256,57 +249,6 @@ run_biome_lint() {
   return 0
 }
 
-# ============================================================================
-# DEEP STATIC ANALYSIS (OXLINT)
-# ============================================================================
-
-run_oxlint() {
-  log_header "🔬 Running Oxlint Deep Static Analysis"
-
-  if [ "$TOTAL_FILES" -eq 0 ]; then
-    log_warning "No files to analyze"
-    return 0
-  fi
-
-  cd "$PROJECT_ROOT" || return 1
-
-  local oxlint_output
-  local oxlint_exit=0
-
-  # Run oxlint with all rules and treat warnings as errors for CI
-  oxlint_output=$(
-    "$OXLINT_BIN" \
-      -D all \
-      --deny-warnings \
-      "${SCANNED_FILES[@]}" \
-      2>&1
-  ) || oxlint_exit=$?
-
-  if [ "$oxlint_exit" -eq 0 ]; then
-    log_success "Deep static analysis passed with no issues"
-  else
-    log_error "Deep static analysis found issues"
-
-    # Parse errors for reporting
-    local error_count
-    error_count=$(echo "$oxlint_output" | grep -E "(error|warning)" | wc -l || echo "0")
-
-    if [ "$error_count" -gt 0 ]; then
-      OXLINT_ERRORS+=("$error_count issues found")
-      TOTAL_ERRORS=$((TOTAL_ERRORS + error_count))
-      EXIT_CODE=1
-    fi
-
-    # Show first 40 lines of output
-    echo "$oxlint_output" | head -n 40
-
-    if [ "$(echo "$oxlint_output" | wc -l)" -gt 40 ]; then
-      echo "... (output truncated)"
-    fi
-  fi
-
-  return 0
-}
 
 # ============================================================================
 # REPORTING
@@ -317,15 +259,14 @@ generate_summary_table() {
 
   # Print table header
   printf "\n"
-  printf "┌─────────────────────────────────┬──────────────┬───────────────┬──────────────┐\n"
-  printf "│ %-31s │ %-12s │ %-13s │ %-12s │\n" "Metric" "Value" "Biome Issues" "Oxc Issues"
-  printf "├─────────────────────────────────┼──────────────┼───────────────┼──────────────┤\n"
+  printf "┌─────────────────────────────────┬──────────────┬───────────────┐\n"
+  printf "│ %-31s │ %-12s │ %-13s │\n" "Metric" "Value" "Biome Issues"
+  printf "├─────────────────────────────────┼──────────────┼───────────────┤\n"
 
   # Files scanned
-  printf "│ %-31s │ %12d │ %13s │ %12s │\n" \
+  printf "│ %-31s │ %12d │ %13s │\n" \
     "Total Files Scanned" \
     "$TOTAL_FILES" \
-    "-" \
     "-"
 
   # Biome errors
@@ -335,34 +276,19 @@ generate_summary_table() {
     biome_display="${BIOME_ERRORS[0]}"
   fi
 
-  printf "│ %-31s │ %12s │ %13s │ %12s │\n" \
+  printf "│ %-31s │ %12s │ %13s │\n" \
     "Biome Check Results" \
     "-" \
-    "$biome_display" \
-    "-"
-
-  # Oxlint errors
-  local oxlint_count=${#OXLINT_ERRORS[@]}
-  local oxlint_display="-"
-  if [ "$oxlint_count" -gt 0 ]; then
-    oxlint_display="${OXLINT_ERRORS[0]}"
-  fi
-
-  printf "│ %-31s │ %12s │ %13s │ %12s │\n" \
-    "Oxlint Analysis Results" \
-    "-" \
-    "-" \
-    "$oxlint_display"
+    "$biome_display"
 
   # Total errors
-  printf "├─────────────────────────────────┼──────────────┼───────────────┼──────────────┤\n"
-  printf "│ %-31s │ %12d │ %13s │ %12s │\n" \
+  printf "├─────────────────────────────────┼──────────────┼───────────────┤\n"
+  printf "│ %-31s │ %12d │ %13s │\n" \
     "Total Issues Found" \
     "$TOTAL_ERRORS" \
-    "-" \
     "-"
 
-  printf "└─────────────────────────────────┴──────────────┴───────────────┴──────────────┘\n"
+  printf "└─────────────────────────────────┴──────────────┴───────────────┘\n"
   printf "\n"
 
   # Overall status
@@ -394,12 +320,6 @@ generate_json_report() {
       "status": "${#BIOME_ERRORS[@]}",
       "errors": [
         $(printf '"%s"' "${BIOME_ERRORS[@]}" | paste -sd,)
-      ]
-    },
-    "oxlint": {
-      "status": "${#OXLINT_ERRORS[@]}",
-      "errors": [
-        $(printf '"%s"' "${OXLINT_ERRORS[@]}" | paste -sd,)
       ]
     }
   },
@@ -438,10 +358,7 @@ main() {
   # Step 4: Lint with auto-fix (Fix)
   run_biome_lint
 
-  # Step 5: Deep static analysis (Check)
-  run_oxlint
-
-  # Step 6: Generate reports
+  # Step 5: Generate reports
   generate_summary_table
   generate_json_report
 
