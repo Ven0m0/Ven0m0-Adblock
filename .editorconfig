@@ -33,5 +33,5 @@ trim_trailing_whitespace = false
 insert_final_newline = true
 
 # Minified files
-[*.min.{js,css}]
+[*.min.{js,css,txt}]
 insert_final_newline = false
