@@ -68,12 +68,16 @@ Ven0m0-Adblock/
 │   │   └── Combination-Minimal.txt
 │   └── releases/               # Built/compiled filter lists
 ├── userscripts/
-│   ├── src/
-│   │   └── Mine/              # Custom userscripts
-│   │       ├── youtube-optimized.user.js
-│   │       ├── tweak-optimized.user.js
-│   │       └── LLM-optimizer-optimized.user.js
-│   └── dist/                  # Built userscripts
+│   ├── src/                   # Source userscripts (.user.js or .user.ts)
+│   │   ├── yt-pro.user.js     # YouTube optimizer
+│   │   ├── web-pro.user.js    # Web global enhancements
+│   │   ├── gh-pro.user.js     # GitHub enhancements
+│   │   ├── LLM-pro.user.js    # LLM optimizer
+│   │   └── Amazon-Page-Smoother.user.js
+│   ├── dist/                  # Built userscripts (generated)
+│   ├── build.ts               # TypeScript build script
+│   ├── README.md              # Userscripts documentation
+│   └── list.txt               # External scripts to download
 ├── Scripts/                   # Build and utility scripts
 │   ├── build-all.sh          # Master build orchestrator
 │   ├── aglint.sh             # AGLint wrapper
@@ -87,6 +91,7 @@ Ven0m0-Adblock/
 ├── hostlist-config.json      # Hostlist compiler configuration
 ├── mise.toml                 # Mise tool version manager config
 ├── package.json              # NPM/Bun package configuration
+├── tsconfig.json             # TypeScript configuration
 ├── eslint.config.mjs         # ESLint configuration (flat config)
 ├── .prettierrc.json          # Prettier code formatter config
 ├── .aglintrc.yml             # AGLint filter list linter config
@@ -96,7 +101,7 @@ Ven0m0-Adblock/
 ├── biome.json                # Biome linter/formatter config
 ├── .oxlintrc.json            # Oxlint configuration
 ├── .editorconfig             # Editor configuration
-├── esbuild.config.js         # ESBuild bundler config
+├── esbuild.config.js         # ESBuild bundler config (legacy)
 ├── README.md                 # Project documentation
 ├── SECURITY.md               # Security policy
 └── LICENSE                   # GPL-3.0 license
@@ -161,6 +166,7 @@ mise run install
 - **Node.js** (LTS) - JavaScript runtime
 - **Bun** (latest) - Fast JS runtime and package manager
 - **Python** (3.13) - For Python-based tools
+- **TypeScript** (^5.7.2) - TypeScript compiler for type-safe development
 
 #### AdBlock Tooling
 
@@ -182,9 +188,11 @@ mise run install
 
 #### Build Tools
 
-- **esbuild** - Fast JavaScript bundler
+- **esbuild** - Fast JavaScript/TypeScript bundler
 - **terser** - JavaScript minifier
 - **minify** - General minification tool
+- **yargs** - Command-line argument parser (for build scripts)
+- **glob** - File pattern matching utility
 
 #### Utilities
 
@@ -237,22 +245,79 @@ bun run build:all          # Everything
 
 ### Userscript Build Process
 
-**Pipeline:**
-1. Source files in `userscripts/src/Mine/*.user.js`
-2. Bundle and minify with esbuild (ES2020, IIFE format)
-3. Further optimize with Terser (preserve userscript headers)
-4. Output to `dist/*.js`
+The repository supports **two build systems** for userscripts:
 
-**Build command:**
+#### Modern TypeScript Build System (Recommended)
+
+**File:** `userscripts/build.ts`
+
+**Features:**
+- Full TypeScript support for `.user.ts` files
+- JavaScript support for `.user.js` files
+- Development mode with watch and hot reload
+- Automatic metadata URL updates
+- Inline source maps in dev mode
+- Modern ES2023 compilation with Bun
+
+**Commands:**
+```bash
+# Development mode with watch (recommended)
+bun run dev:userscripts
+
+# Production build (minified)
+bun run build:userscripts:new
+
+# Development build (no watch)
+bun run build:userscripts:dev
+```
+
+**Pipeline:**
+1. Scan `userscripts/src/` for `*.user.js` and `*.user.ts` files
+2. Extract userscript metadata headers
+3. Compile TypeScript (if needed) with Bun.build
+4. Bundle imports and dependencies
+5. Minify in production mode
+6. Update `@updateURL` and `@downloadURL` in metadata
+7. Generate two files per script:
+   - `{name}.user.js` - Full userscript (header + code)
+   - `{name}.meta.js` - Metadata only (for update checks)
+8. Output to `userscripts/dist/`
+
+**Key Settings:**
+- Target: ES2023 (modern browsers)
+- Format: IIFE (Immediately Invoked Function Expression)
+- Tree Shaking: Enabled
+- Minification: Production only
+- Source Maps: Inline in dev, none in production
+
+#### Legacy Bash Build System
+
+**File:** `Scripts/build-all.sh userscripts`
+
+**Command:**
 ```bash
 bun run build:userscripts
 ```
 
-**Key settings:**
-- Target: ES2020
-- Format: IIFE (Immediately Invoked Function Expression)
+**Pipeline:**
+1. Download external scripts from `userscripts/list.txt`
+2. Run ESLint with auto-fix
+3. Extract metadata headers
+4. Minify with esbuild (ES2022, IIFE)
+5. Update metadata URLs
+6. Generate `.user.js` and `.meta.js` files
+7. Parallel processing with GNU `parallel`
+
+**When to use:**
+- CI/CD workflows (already configured)
+- Batch processing of external scripts
+- Backward compatibility
+
+**Key Settings:**
+- Target: ES2022
+- Format: IIFE
 - Comments preserved: UserScript headers, licenses
-- Minification: Enabled with Terser
+- Minification: Always enabled
 
 ### HostlistCompiler Configuration
 
@@ -598,9 +663,11 @@ These are created by CI workflows for:
 - Use `.txt` extension
 
 **Userscripts:**
-- kebab-case with `-optimized.user.js` suffix
-- Example: `youtube-optimized.user.js`
-- Must have `.user.js` extension for Greasemonkey compatibility
+- kebab-case with `.user.js` or `.user.ts` extension
+- JavaScript: `youtube-pro.user.js`
+- TypeScript: `youtube-pro.user.ts`
+- Must have `.user.js` or `.user.ts` extension for build system
+- Output will always be `.user.js` for Greasemonkey compatibility
 
 **Scripts:**
 - kebab-case with `.sh` extension
@@ -616,6 +683,15 @@ These are created by CI workflows for:
 - Prefer `const` over `let`, avoid `var`
 - Use descriptive variable names
 - Document complex logic with comments
+
+**TypeScript:**
+- All JavaScript conventions apply
+- Use explicit types for function parameters and return values
+- Prefer interfaces over type aliases for object shapes
+- Enable strict mode in tsconfig.json
+- Use `unknown` instead of `any` when type is truly unknown
+- Leverage type inference where obvious (no redundant types)
+- Document public APIs with JSDoc comments
 
 **Shell Scripts:**
 - Bash strict mode: `set -Eeuo pipefail`
@@ -782,6 +858,7 @@ Trigger workflows manually from GitHub Actions UI:
 | File | Purpose | Format |
 |------|---------|--------|
 | `package.json` | NPM/Bun package config, scripts | JSON |
+| `tsconfig.json` | TypeScript compiler configuration | JSON |
 | `mise.toml` | Tool version management | TOML |
 | `eslint.config.mjs` | JavaScript linting rules | ES Module |
 | `biome.json` | Biome linter/formatter config | JSON |
@@ -792,7 +869,7 @@ Trigger workflows manually from GitHub Actions UI:
 | `.yamllint.yml` | YAML linting rules | YAML |
 | `.lefthook.yml` | Git hooks configuration | YAML |
 | `.editorconfig` | Editor behavior | INI-like |
-| `esbuild.config.js` | Bundler configuration | CommonJS |
+| `esbuild.config.js` | Bundler configuration (legacy) | CommonJS |
 | `hostlist-config.json` | Filter compilation config | JSON |
 
 ### Build Scripts
@@ -801,6 +878,7 @@ Trigger workflows manually from GitHub Actions UI:
 |--------|---------|
 | `Scripts/build-lists.sh` | Main filter list builder |
 | `Scripts/build-all.sh` | Master build orchestrator |
+| `userscripts/build.ts` | TypeScript userscript build system |
 | `Scripts/aglint.sh` | AGLint wrapper |
 | `Scripts/hostlist-build.sh` | Hostlist compilation |
 | `Scripts/kompressor.sh` | Compression utility |

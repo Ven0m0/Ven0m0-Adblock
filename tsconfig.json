@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    // Language & Target Settings
+    "lib": ["ESNext", "DOM"],
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+
+    // Module Resolution (Bundler Mode)
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "resolveJsonModule": true,
+
+    // Type Checking & Quality Standards
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Additional Type Safety (can be enabled for stricter checks)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
+
+    // Bun-specific
+    "types": ["bun-types"],
+
+    // Paths
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./userscripts/src/*"]
+    }
+  },
+  "include": [
+    "userscripts/src/**/*",
+    "userscripts/build.ts",
+    "Scripts/**/*.ts",
+    "*.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "userscripts/dist",
+    "lists/releases",
+    "Filters"
+  ]
+}
