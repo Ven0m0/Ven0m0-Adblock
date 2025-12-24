@@ -16,25 +16,25 @@ export default [
     ]
   },
   {
-    files: ["**/*. js", "**/*.mjs", "**/*.cjs"],
+    files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
       globals: {
-        ... globals.browser,
+        ...globals.browser,
         ...globals.es2021,
         ...globals.node
       }
     },
     rules: {
       "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-      "eqeqeq": ["error", "always"],
+      eqeqeq: ["error", "always"],
       "no-eval": "error",
       "prefer-const": "error",
       "no-var": "warn",
-      "semi": ["error", "always"],
-      "quotes": ["error", "double", { avoidEscape: true }],
-      "indent": ["error", 2],
+      semi: ["error", "always"],
+      quotes: ["error", "double", { avoidEscape: true }],
+      indent: ["error", 2],
       "comma-dangle": ["error", "never"],
       "no-console": "off"
     }
@@ -44,13 +44,16 @@ export default [
     languageOptions: {
       sourceType: "script",
       globals: {
+        ...globals.browser,
         ...globals.greasemonkey,
         GM_getValue: "readonly",
         GM_setValue: "readonly",
         GM_addStyle: "readonly",
         GM_xmlhttpRequest: "readonly",
         GM_info: "readonly",
-        unsafeWindow: "readonly"
+        GM_config: "readonly",
+        unsafeWindow: "readonly",
+        waitForElems: "readonly"
       }
     }
   }

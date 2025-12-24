@@ -5,7 +5,7 @@
   "semi": true,
   "singleQuote": false,
   "trailingComma": "none",
-  "bracketSpacing":  true,
+  "bracketSpacing": true,
   "arrowParens": "always",
   "endOfLine": "lf",
   "proseWrap": "preserve",
@@ -18,7 +18,7 @@
       }
     },
     {
-      "files":  ["*.user.js", "userscripts/**/*.js"],
+      "files": ["*.user.js", "userscripts/**/*.js"],
       "options": {
         "printWidth": 120
       }
