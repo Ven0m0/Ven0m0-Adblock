@@ -19,3 +19,14 @@
 - https://github.com/AdguardTeam/HostlistCompiler
 - https://github.com/AdguardTeam/AGLint
 - https://github.com/AdguardTeam/DeadDomainsLinter
+
+
+
+### TODO: userscripts
+
+Use bun for building/bundling
+
+```bash
+bun build --compile --bytecode --minify --sourcemap --outdir=./dist --target=bun ./src/index.ts
+bun build ./index.ts --production --outfile=out.js
+```
