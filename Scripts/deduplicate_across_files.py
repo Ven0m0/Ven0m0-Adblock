@@ -15,8 +15,8 @@ def find_cross_file_duplicates(lists_dir):
   # Dictionary to track which files contain each entry
   entry_locations = defaultdict(list)
 
-  # Read all files
-  txt_files = sorted(lists_dir.glob('*.txt'))
+  # Read all files in lists directory and subdirectories
+  txt_files = sorted(lists_dir.glob('**/*.txt'))
 
   print(f"Scanning {len(txt_files)} files for cross-file duplicates...\n")
 

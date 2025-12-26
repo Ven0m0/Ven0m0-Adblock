@@ -139,7 +139,9 @@
   const setStored = async (k, v) => {
     try {
       if (GM.setValue) await GM.setValue(`yt_opt_${k}`, v);
-    } catch {}
+    } catch {
+      // Ignore storage errors
+    }
   };
   (() => {
     const o = performance.now.bind(performance);
@@ -220,7 +222,9 @@
         for (let i = 0; i < b; i++)
           try {
             c[i](now);
-          } catch {}
+          } catch {
+            // Ignore callback errors
+          }
         for (let i = b; i < c.length; i++) oRAF(() => c[i](now));
       }
       oRAF(loop);
@@ -280,16 +284,16 @@
       }
       const wrapTO =
         (impl) =>
-        (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
-          return impl(() => fn(...a), d);
-        };
+          (fn, d = 0, ...a) => {
+            if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
+            return impl(() => fn(...a), d);
+          };
       const wrapIV =
         (impl) =>
-        (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
-          return impl(() => fn(...a), d);
-        };
+          (fn, d = 0, ...a) => {
+            if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
+            return impl(() => fn(...a), d);
+          };
       window.setTimeout = wrapTO(timers.setTimeout);
       window.clearTimeout = timers.clearTimeout;
       window.setInterval = wrapIV(timers.setInterval);
@@ -345,7 +349,7 @@
       css +=
         "[no-anim] *{transition:none!important;animation:none!important}html{scroll-behavior:auto!important}.ytd-ghost-grid-renderer *,.ytd-continuation-item-renderer *{animation:none!important}";
     if (CFG.ui.contentVisibility)
-      css += `html:not([data-yt-cv-off]) #comments,html:not([data-yt-cv-off]) #related,html:not([data-yt-cv-off]) ytd-watch-next-secondary-results-renderer{content-visibility:auto;contain-intrinsic-size:1px 1000px}`;
+      css += "html:not([data-yt-cv-off]) #comments,html:not([data-yt-cv-off]) #related,html:not([data-yt-cv-off]) ytd-watch-next-secondary-results-renderer{content-visibility:auto;contain-intrinsic-size:1px 1000px}";
     if (CFG.ui.hideSpinner)
       css +=
         ".ytp-spinner,.ytp-spinner *{display:none!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important}";

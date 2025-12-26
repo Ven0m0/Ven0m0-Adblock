@@ -54,16 +54,6 @@
   const isCGPT = h === "chat.openai.com" || h === "chatgpt.com";
   const isGem = h === "gemini.google.com";
   const isCl = h === "claude.ai";
-  const throttle = (fn, ms) => {
-    let l = 0;
-    return (...a) => {
-      const n = Date.now();
-      if (n - l >= ms) {
-        l = n;
-        fn(...a);
-      }
-    };
-  };
   const runReady = (sel, cb) => {
     let a = 0;
     const go = () => {
@@ -98,7 +88,7 @@
   };
   if (isCGPT) {
     const of = window.fetch;
-    window.fetch = function (i, n) {
+    window.fetch = function (i, _n) {
       const u = typeof i === "string" ? i : i.url;
       if (!CFG.CHATGPT.API.test(u)) return of.apply(this, arguments);
       return of.apply(this, arguments).then(async (r) => {
@@ -160,10 +150,10 @@
       : isGem
         ? () => document.querySelectorAll(SEL.GEMINI.BOX)
         : () => {
-            const el = document.querySelector(SEL.CLAUDE.RENDER);
-            if (!el) return [];
-            return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
-          };
+          const el = document.querySelector(SEL.CLAUDE.RENDER);
+          if (!el) return [];
+          return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
+        };
     runReady((isCGPT ? SEL.CGPT.TEXT : SEL.GEMINI.BOX).split(",")[0], () => {
       applyW(getEls);
       obsW(getEls);
@@ -176,11 +166,10 @@
       if (msgs.length > CFG.CHATGPT.MAX) msgs.forEach((el, i) => i < msgs.length - CFG.CHATGPT.MAX && el.remove());
     };
     let int = null;
-    let tm = null;
     const sched = (i) => {
       if (i < CFG.CHATGPT.CLEAN.length) {
         const { delay, interval } = CFG.CHATGPT.CLEAN[i];
-        tm = setTimeout(() => {
+        setTimeout(() => {
           int = setInterval(cleanup, interval);
           setTimeout(() => {
             clearInterval(int);

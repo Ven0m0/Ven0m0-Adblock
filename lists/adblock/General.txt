@@ -6,74 +6,62 @@
 ! License: https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE
 
 !! Smartblock Embed Placeholders
-@@||smartblock.firefox.etp^
-
 ! Remove common tracking params (dedupe, sort)
+! Block telemetry/analytics/metrics/diagnostics/crash/error-report
+! https://github.com/AdguardTeam/AdguardFilters/issues/204150
+! Adb track
+! Major social trackers (sorted, deduped)
+! Google & Firebase (sorted, deduped, key exceptions up top)
+! Google Custom Search fixes
+! Cloudflare challenge
+! GitHub and browser error noise
+! Extra recaptcha safety for site breakage
+! Allow doc/clients exceptions for YouTube etc
+!--- Prevent AdFender detection ---
 $removeparam=utm_campaign
 $removeparam=utm_content
 $removeparam=utm_medium
 $removeparam=utm_source
 $removeparam=utm_term
-
-! Block telemetry/analytics/metrics/diagnostics/crash/error-report
+://yandex.*/images/_$xhr,method=post
+@@||accounts.google.*/ServiceLogin$subdocument
+@@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
+@@||apis.google.com^
+@@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
+@@||clients1.google.com^
+@@||consent.google.com^$subdocument
+@@||cse.google.com/cse^
+@@||gemini.google.com,domain=gstatic.com
+@@||google*.^$domain=youtube.com|youtube-nocookie.com
+@@||google.com/cse/static^
+@@||google.com/recaptcha
+@@||google.com/uds/*visualization$script,stylesheet
+@@||google.com^$script,domain=youtube.com
+@@||pons.com/p/files/*$image
+@@||reutersmedia.net/resources^
+@@||smartblock.firefox.etp^
+@@||webfail.com/image
+@@||www.google.com/recaptcha/$3p,subdocument
 ||*/analytics/*$all
 ||*/crash/*$all
 ||*/diagnostics/*$all
 ||*/error-report/*$all
 ||*/metrics/*$all
 ||*/telemetry/*$all
-
-! https://github.com/AdguardTeam/AdguardFilters/issues/204150
-||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$xhr,redirect=googlesyndication_adsbygoogle.js,script
-
-! Adb track
-://yandex.*/images/_$xhr,method=post
-
-! Major social trackers (sorted, deduped)
-||facebook.com^$important,3p
-||facebook.net^$important,3p
-||instagram.com^$important,3p
-||linkedin.com^$important,3p
-||tiktok.com^$important,3p
-||twitter.com^$3p
-||x.com^$3p
-
-! Google & Firebase (sorted, deduped, key exceptions up top)
 ||accounts.google.com^$3p
 ||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
-@@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
-@@||accounts.google.*/ServiceLogin$subdocument
-@@||apis.google.com^
-@@||consent.google.com^$subdocument
-@@||google.com^$script,domain=youtube.com
-@@||google.com/recaptcha
-@@||google.com/uds/*visualization$script,stylesheet
-@@||google*.^$domain=youtube.com|youtube-nocookie.com
-@@||gemini.google.com,domain=gstatic.com
+||api.github.com/_private/browser/errors^
+||challenges.cloudflare.com^$3p
 ||doubleclick.net^$3p,important
+||facebook.com^$important,3p
+||facebook.net^$important,3p
 ||firebase.com^$3p,important
 ||google-analytics.com^$3p,important
 ||google.com/cse/cse.js^
-
-! Google Custom Search fixes
-@@||google.com/cse/static^
-@@||cse.google.com/cse^
-
-! Cloudflare challenge
-||challenges.cloudflare.com^$3p
-@@||challenges.cloudflare.com/cdn-cgi/challenge-platform/$3p,script,frame
-
-! GitHub and browser error noise
-||api.github.com/_private/browser/errors^
-
-! Extra recaptcha safety for site breakage
-@@||www.google.com/recaptcha/$3p,subdocument
-
-! Allow doc/clients exceptions for YouTube etc
-@@||clients1.google.com^
+||instagram.com^$important,3p
+||linkedin.com^$important,3p
+||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$xhr,redirect=googlesyndication_adsbygoogle.js,script
+||tiktok.com^$important,3p
+||twitter.com^$3p
 ||www.google.com^$3p,subdocument
-
-!--- Prevent AdFender detection ---
-@@||webfail.com/image
-@@||pons.com/p/files/*$image
-@@||reutersmedia.net/resources^
+||x.com^$3p

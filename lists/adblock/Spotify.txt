@@ -4,10 +4,10 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 open.spotify.com##.Upqw01TOXETOmR5Td7Dj.X7lQWw2Ly_RZVPEFj2QY.Qt5xfSWikz6CLU8Vobxs
-open.spotify.com##.WvLkmOVB2R2vzI2ibR_r.eNs6P3JYpf2LScgTDHc6 > .ATUzFKub89lzvkmvhpyE.link-subtle
-open.spotify.com##.e-9640-button.e-9640-button-primary.encore-text-body-small-bold
-open.spotify.com##.Upqw01TOXETOmR5Td7Dj.lprIeE.Button-sc-y0gtbx-0
-open.spotify.com##.encore-over-media-set.eFyQzR.ButtonInner-sc-14ud5tc-0
 open.spotify.com##.Upqw01TOXETOmR5Td7Dj.encore-inverted-light-set.cUQyLR.ButtonInner-sc-14ud5tc-0
 open.spotify.com##.Upqw01TOXETOmR5Td7Dj.encore-inverted-light-set.jfhNps.ButtonInner-sc-14ud5tc-0
+open.spotify.com##.Upqw01TOXETOmR5Td7Dj.lprIeE.Button-sc-y0gtbx-0
+open.spotify.com##.WvLkmOVB2R2vzI2ibR_r.eNs6P3JYpf2LScgTDHc6 > .ATUzFKub89lzvkmvhpyE.link-subtle
+open.spotify.com##.e-9640-button.e-9640-button-primary.encore-text-body-small-bold
 open.spotify.com##.encore-over-media-set.eDaZIM.ButtonInner-sc-14ud5tc-0
+open.spotify.com##.encore-over-media-set.eFyQzR.ButtonInner-sc-14ud5tc-0

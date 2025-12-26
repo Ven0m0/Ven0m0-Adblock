@@ -13,6 +13,7 @@
 // @homepageURL  https://github.com/XIU2/UserScript
 // ==/UserScript==
 
-if(typeof onYouTubeIframeAPIReady == 'function') {
-    onYouTubeIframeAPIReady();
+/* global onYouTubeIframeAPIReady */
+if (typeof onYouTubeIframeAPIReady === "function") {
+  onYouTubeIframeAPIReady();
 }
