@@ -8,6 +8,7 @@
 // @exclude      */buy/*
 // @exclude      */checkout/*
 // @exclude      */gp/buy/*
+// @grant        none
 // @license      Unlicense
 // @run-at       document-start
 // ==/UserScript==

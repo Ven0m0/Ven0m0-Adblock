@@ -18,11 +18,11 @@
 ! Extra recaptcha safety for site breakage
 ! Allow doc/clients exceptions for YouTube etc
 !--- Prevent AdFender detection ---
-$removeparam=utm_campaign
-$removeparam=utm_content
-$removeparam=utm_medium
-$removeparam=utm_source
-$removeparam=utm_term
+*$removeparam=utm_campaign
+*$removeparam=utm_content
+*$removeparam=utm_medium
+*$removeparam=utm_source
+*$removeparam=utm_term
 ://yandex.*/images/_$xhr,method=post
 @@||accounts.google.*/ServiceLogin$subdocument
 @@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com

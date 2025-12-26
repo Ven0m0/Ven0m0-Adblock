@@ -8,6 +8,7 @@
 // @match        https://chat.openai.com/*
 // @match        https://chatgpt.com/*
 // @match        https://claude.ai/*
+// @grant        none
 // @run-at       document-start
 // ==/UserScript==
 (() => {

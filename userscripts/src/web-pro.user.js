@@ -3,6 +3,7 @@
 // @namespace   Ven0m0
 // @homepageURL https://github.com/Ven0m0/Ven0m0-Adblock
 // @match       *://*/*
+// @grant       none
 // @run-at      document-start
 // ==/UserScript==
 (() => {
