@@ -3,6 +3,7 @@
 // @namespace   Ven0m0
 // @homepageURL https://github.com/Ven0m0/Ven0m0-Adblock
 // @match       *://*/*
+// @grant       none
 // @run-at      document-start
 // ==/UserScript==
 (() => {
@@ -175,26 +176,28 @@
       });
     if (cfg.cpuTamer) {
       window.setTimeout = (fn, d = 0, ...a) => {
+        // eslint-disable-next-line prefer-const
         let id;
         const w =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+              awaitTO(id)
+                .then((v) => v && fn(...x))
+                .catch(throwE)
             : fn;
         d = Math.max(d, cfg.minTimeout);
         id = nTO(w, d, ...a);
         return id;
       };
       window.setInterval = (fn, d = 0, ...a) => {
+        // eslint-disable-next-line prefer-const
         let id;
         const w =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+              awaitTO(id)
+                .then((v) => v && fn(...x))
+                .catch(throwE)
             : fn;
         d = Math.max(d, cfg.minInterval);
         id = nSI(w, d, ...a);
@@ -226,6 +229,7 @@
         tl = a?.timeline || new T();
       } else tl = new T();
       window.requestAnimationFrame = (fn) => {
+        // eslint-disable-next-line prefer-const
         let id;
         const q = p;
         const w = (ts) => {
