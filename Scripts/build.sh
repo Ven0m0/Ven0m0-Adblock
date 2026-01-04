@@ -113,7 +113,7 @@ lint_filters(){
   npm list @adguard/aglint &>/dev/null || npm i -D @adguard/aglint &>/dev/null
   [[ -f .aglintrc.yaml ]] || npx aglint init &>/dev/null
   local s
-  s=$(npm pkg get scripts. lint 2>/dev/null || echo '""')
+  s=$(npm pkg get scripts.lint 2>/dev/null || echo '""')
   [[ $s == '""' || $s == "undefined" ]] && npm pkg set scripts.lint=aglint &>/dev/null
   npm run lint || warn "Lint found issues"
 }
