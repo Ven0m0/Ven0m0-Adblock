@@ -216,7 +216,7 @@ EOF
 
 main(){
   local -a tasks=("${@:-all}")
-  [[ ${tasks[0]} =~ ^(-h|--help|help)$ ]] && { usage; exit 0; }
+  if [[ " ${tasks[*]} " =~ " -h " || " ${tasks[*]} " =~ " --help " || " ${tasks[*]} " =~ " help " ]]; then usage; exit 0; fi
   setup_tools
   for task in "${tasks[@]}"; do
     case $task in
