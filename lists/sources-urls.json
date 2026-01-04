@@ -13,7 +13,7 @@
       "enabled":  true
     },
     {
-      "url":  "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter. txt",
+      "url":  "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt",
       "filename": "AdGuard-Base.txt",
       "skip_checksum": false,
       "enabled": true
