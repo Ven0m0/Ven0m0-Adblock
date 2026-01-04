@@ -4,7 +4,7 @@ set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
 readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=lib-common.sh
-.  "${SCRIPT_DIR}/lib-common.sh"
+. "${SCRIPT_DIR}/lib-common.sh"
 
 readonly PACKAGES=(
   "@adguard/aglint"
