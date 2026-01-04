@@ -95,7 +95,7 @@ def find_cross_file_duplicates(files: list[Path]) -> dict[str, list[str]]:
           if stripped and not is_header(stripped):
             entry_locations[stripped].append(filepath.name)
     except Exception as e:
-      print(f"Error reading {filepath. name}: {e}", file=sys.stderr)
+      print(f"Error reading {filepath.name}: {e}", file=sys.stderr)
   
   return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
 
