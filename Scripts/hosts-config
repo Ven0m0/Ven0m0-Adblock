@@ -1,0 +1,14 @@
+syshosts_file=/etc/hosts
+backupfilename=hosts.backup
+newhostsfn=hosts-new
+downloader=curl
+replacehosts=1
+RM_COMMENTS=1
+RM_DUPLICATE_LINES=1
+RM_TRAILING_SPACES=1
+RESOLVE_HOST="127.0.0.1 $(hostname 2>/dev/null || echo localhost).local $(hostname 2>/dev/null || echo localhost) localhost"
+HOSTS="https://badmojr.github.io/1Hosts/Pro/hosts.txt \
+https://hosts. oisd.nl \
+https://block.energized.pro/ultimate/formats/hosts \
+https://raw.githubusercontent.com/notracking/hosts-blocklists/master/hostnames.txt \
+https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt"
