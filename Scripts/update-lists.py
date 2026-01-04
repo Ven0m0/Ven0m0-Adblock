@@ -88,7 +88,7 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
   
   url_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
   domain = re.search(r'://([^/]+)', url)
-  domain_part = domain.group(1).replace('. ', '-') if domain else 'list'
+  domain_part = domain.group(1).replace('.', '-') if domain else 'list'
   return f"{domain_part}-{url_hash}.txt"
 
 def process_downloaded_file(
