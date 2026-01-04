@@ -92,14 +92,15 @@ sveip.no##.wmsb_f
 gismeteo.de##.ifnoie
 !#endif
 
-bing.com###assyc.bordertop
-bing.com###b-scopeListItem-conv
-bing.com###b_phead_chat
-bing.com###codex
-bing.com###sa_zis_Banner
-bing.com##.b_pag_lets_chat
-bing.com##.cdxCopilotIconBg
-bing.com##.cdxPrompt
-bing.com##.rs_chat > div
-bing.com##.wpt_bc_container
-msn.com##[instance-id="CodexBingChat"]
+||www.google.$doc,removeparam=dpr
+||www.google.$doc,removeparam=fbs
+||www.google.$doc,removeparam=ictx
+||www.google.$doc,removeparam=no_sw_cr
+||www.google.$doc,removeparam=sstk
+||www.google.$doc,removeparam=tfu
+||www.google.$doc,removeparam=zx
+||www.google.*/search$removeparam=oq,doc
+||www.google.*/search?$doc,removeparam=client
+||www.google.*/search?$doc,removeparam=sclient
+||www.google.com/finance/?$removeparam=output
+||www.google.com/finance/?$removeparam=source
