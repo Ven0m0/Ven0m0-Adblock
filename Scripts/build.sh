@@ -166,7 +166,7 @@ _process_js(){
   printf '%s\n' "$meta" > "$SCRIPT_OUT/$base. meta.js"
   printf '%s\n%s\n' "$meta" "$js" > "$SCRIPT_OUT/$base.user.js"
   orig_size=$(wc -c < "$f")
-  ok "$fn → $base. user.js ($orig_size → $len bytes)"
+  ok "$fn → $base.user.js ($orig_size → $len bytes)"
 }
 
 build_userscripts(){
