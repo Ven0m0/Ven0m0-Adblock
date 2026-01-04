@@ -1,4 +1,4 @@
-[Adblock Plus 3.6]
+[uBlock Origin]
 ! Title: Other Blocklist
 ! Description: Block uncategorized Stuff
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
