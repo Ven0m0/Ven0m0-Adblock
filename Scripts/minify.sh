@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -euo pipefail
-shopt -s nullglob globstar
+# shellcheck enable=all shell=bash source-path=SCRIPTDIR
+set -euo pipefail; shopt -s nullglob globstar
 LC_ALL=C IFS=$'\n\t'
 
 # TODO: finish
