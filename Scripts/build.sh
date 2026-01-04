@@ -125,7 +125,7 @@ download_userscripts(){
   local line url fn suffix
   while IFS= read -r line; do
     [[ -z $line || $line == \#* ]] && continue
-    url=$("$(rg)" -o 'https://[^[: space:]]+\. user\.js' <<< "$line" | head -n1)
+    url=$("$(rg)" -o 'https://[^[:space:]]+\.user\.js' <<< "$line" | head -n1)
     [[ -z $url ]] && continue
     fn=$(basename "$url" | tr -cd '[:alnum:]._-')
     [[ $fn != *.user.js ]] && fn="${fn}.user.js"
