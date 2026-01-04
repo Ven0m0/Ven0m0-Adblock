@@ -110,7 +110,7 @@ def main() -> int:
   
   txt_files = sorted(lists_dir.glob('**/*.txt'))
   if not txt_files:
-    print("No . txt files found in lists directory", file=sys.stderr)
+    print("No .txt files found in lists directory", file=sys.stderr)
     return 1
   
   print(f"Found {len(txt_files)} files\n")
