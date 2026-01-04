@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar
-IFS=$'\n\t'; 
-export LC_ALL=C LANG=C
+IFS=$'\n\t' LC_ALL=C
 builtin cd -P -- "$(dirname -- "${BASH_SOURCE[0]:-}")" && printf '%s\n' "$PWD" || exit 1
 [[ $EUID -ne 0 ]] && sudo -v; sync
 
