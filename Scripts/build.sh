@@ -65,7 +65,7 @@ EOF
     [[ -f $f ]] && ex+=("$f")
   done
   (( ${#ex[@]} == 0 )) && die "No filter source files found"
-  cat "${ex[@]}" | "$(rg)" -v '^[[:space:]]*! |\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out"
+  cat "${ex[@]}" | "$(rg)" -v '^[[:space:]]*!|\|Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out"
   cd "$OLDPWD"
   rule_count=$(wc -l < "$out")
   ok "$out ($rule_count rules)"
