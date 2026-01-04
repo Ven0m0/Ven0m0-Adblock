@@ -277,7 +277,7 @@ async def main() -> int:
   if args.filter:
     sources = {
       url: cfg for url, cfg in sources.items()
-      if args.filter. lower() in url.lower() or args.filter. lower() in cfg["filename"].lower()
+      if args.filter.lower() in url.lower() or args.filter.lower() in cfg["filename"].lower()
     }
     logger.info(f"Filtered to {len(sources)} sources matching '{args.filter}'")
 
