@@ -102,7 +102,7 @@ build_hostlist(){
   }
   [[ -f configuration_popup_filter.json ]] && {
     hostlist-compiler -c configuration_popup_filter.json -o "$FILTER_OUT/adguard_popup_filter.txt" --verbose || warn "Popup filter compilation failed"
-    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build. js "$FILTER_OUT/adguard_popup_filter.txt" || : 
+    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILTER_OUT/adguard_popup_filter.txt" || : 
   }
 }
 
