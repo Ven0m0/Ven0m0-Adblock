@@ -216,7 +216,7 @@ def save_metadata(sources: dict, results: dict[str, bool], output_dir: Path) -> 
     "sources": {
       url: {
         "filename": config["filename"],
-        "success": results. get(url, False),
+        "success": results.get(url, False),
         "checksum_validated": not config["skip_checksum"],
       }
       for url, config in sources.items()
