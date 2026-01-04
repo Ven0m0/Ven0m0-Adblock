@@ -124,7 +124,7 @@ def main() -> int:
   
   print(f"\n{'='*60}")
   print(f"Total:  {total_stats.original} → {total_stats.final} lines")
-  print(f"Removed: {total_stats.removed} ({total_stats.compression_ratio:. 1f}% reduction)")
+  print(f"Removed: {total_stats.removed} ({total_stats.compression_ratio:.1f}% reduction)")
   
   print(f"\n{'='*60}")
   print("Checking for cross-file duplicates...")
