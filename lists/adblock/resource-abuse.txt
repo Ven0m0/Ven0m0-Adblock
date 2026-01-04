@@ -1,4 +1,4 @@
-[Adblock Plus 3.6]
+[uBlock Origin]
 ! Title: uBlock filters – Resource abuse
 ! Last modified: %timestamp%
 ! Description: To foil sites potentially abusing CPU/bandwidth resources without informed consent.
