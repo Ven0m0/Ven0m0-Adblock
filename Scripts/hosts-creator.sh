@@ -8,7 +8,7 @@ readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 readonly CONFIG="${SCRIPT_DIR}/hosts-config"
 readonly HOSTS_FILE="${syshosts_file:-/etc/hosts}"
-readonly BACKUP_NAME="${backupfilename:-hosts. backup}"
+readonly BACKUP_NAME="${backupfilename:-hosts.backup}"
 readonly NEW_NAME="${newhostsfn:-hosts-new}"
 readonly DL="${downloader:-curl}"
 readonly REPLACE="${replacehosts:-1}"
