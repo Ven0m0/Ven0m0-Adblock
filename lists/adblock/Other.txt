@@ -4,104 +4,377 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! *** easylist:fanboy-addon/fanboy_chatapps_third-party.txt ***
+###WACLauncher__Button
+###popin-salescontact
+##.b24-widget-button-wrapper
+##.chat_hammerbot-iframe-wrapper__outer
+##.drift-facade
+##.intercom-launcher
+##.intercom-lightweight-app
+##.joinchat--chatbox
+##.m-chat-toggler
+##.sticky-button--whatsapp
+##.wix-blog-hide-in-print.SITE_FOOTER_WRAPPER
+##yardi-widget-craigslist
 ! Generic Blocks
+/creame-whatsapp-me/public/js/joinchat.min.js
+/wp-content/plugins/click-to-chat-for-whatsapp/*
+://webim.*/button.js
+://webim.*/button.php
+
 ! NOTE: Blogroll generic
+||gamelog.apexlegends-leaksnews.com/api/widget/$3p
+||re.trigs-sockets.com^
+||feedgrabbr.com^$3p
+||rss.solty.biz^
+||yameyou.com^$3p
+||antennasync.me^$3p
+||matomeantena.com/scripts/$3p
+||nullpoantenna.com/scripts/$3p
+/blogparts_iframe.php?sc=$subdocument,3p
+||rcm.shinobi.jp^
+||nullpoantenna.com/scripts/parts/blog/
+||matomeantena.com/scripts/parts/blog/
+||moviegate4.net/fukugansan/
+||rss.tc^$3p
+/rss/rss.html$subdocument,~3p
+.biz/rss.htm$subdocument,~3p
+.biz/rss2.htm$subdocument,~3p
+.com/rss.htm$subdocument,~3p
+.com/rss2.htm$subdocument,~3p
+.jp/rss.htm$subdocument,~3p
+.net/rss.htm$subdocument,~3p
+.net/rss2.htm$subdocument,~3p
+.com/rss/$subdocument,~3p
+||adlt18antenna.xyz/blogparts/blog_parts_js.php
+/sp_rss_iframe.html
+||blog-rss.com^$3p
+||rssfetcher.blogsys.jp^
+||blog.livedoor.jp/plugin/ldblog_rss_plugin.js
+||tanganrss.com^$3p
+||blogroll.matome-alpha.com^
+||komatech.net^$3p
+||fukugan.com^$3p
+||3site-rss.s3-ap-northeast-1.amazonaws.com^
+||blogroll.livedoor.net^
+||rss-loader.com^$3p
+||blozoo.info/js/rsstool/
+##.plugin-rss
+##.blogroll-wrapper
+##div[id^="blz_rss_"]
+##.plugin-blogroll
+##.blogroll-wrapper1
+##.blogroll-wrapper2
+##.blogroll-wrapper3
+##.blogroll-wrapper4
+##.blogroll-wrapper5
+##.blogroll-wrapper6
+##.blogroll-wrapper8
+##.blogroll-wrapper9
+##.blogroll_wrapper
+##.blogroll_wrapper_honbun
+##.elogch_blogparts_iframe
+
 ! Duckduckgo
 ! Share feedback
+duckduckgo.com##.WktWJWUFfihMbuzAEqk2.hUUdRtuaOUx7mcSwc56s.ffON2NH02oMAcqyoh2UU
+
 ! Nexusmods
+nexusmods.com##.background-2.premium-block--upgrade.premium-block
+nexusmods.com##.css-u1qlwc.qc-cmp-cleanslate
+nexusmods.com###mainContent > div.clearfix.agroup > .ads > .ad-unit.demo-billboard.ad
+nexusmods.com##div.clearfix.agroup:nth-of-type(1)
+nexusmods.com###rj-vortex
+nexusmods.com##.rj-standard-button
+nexusmods.com##.rj-supporter-wrapper > h3
+
 ! Removes "Downloads for non-premium members are capped at 2MB/s" banner
+nexusmods.com##.container.premium-banner
+nexusmods.com##.areplacer
+
 ! Playstation
+playstation.com##.evidon-banner-message
+playstation.com###_evidon_banner
+
 ! Sony
+my.account.sony.com###js-SIEWS1lib-header-Base
+
 ! Pixlr
+pixlr.com###try-premium
+
 ! Removes the "upgrade to office 365" box
+outlook.live.com##._4EQjiwXF4KIhqby_Qqf8J
+outlook.live.com##._2_1jS9rVrPuzoS0TkWEtIk
+outlook.live.com##.tTgHI
+
 ! Removes side bar asking to sign up for "Ad-Free Outlook"
+outlook.live.com##._1TpU2KF6f_EeQiytBaYj8I > ._3_hHr3kfEhbNYRFM5YJxH9
+outlook.live.com##._1xCBLVKl1qp6BB2jT7GN5b > ._3_hHr3kfEhbNYRFM5YJxH9
+outlook.live.com##._1dBL6mV6xRANqjh_Z8BjN6 > ._1fti_QgAzqGWPGlqh_FSvI
+outlook.live.com##.AK_my > .pBKjV
+
 ! Removes the video player from the side panel
+gbatemp.net##.with_undefined.sidebar > div:nth-of-type(2)
+
 ! Aims to remove unavailable emotes from the Discord emote selector
+discordapp.com#?#div[class^=row-]:-abp-has(> div[class^=emojiItem-][class*=disabled])
+
 ! Removes donate banner
+web.archive.org###donate_banner
+
 ! DuckDuckGo "shopping" ads
+duckduckgo.com##.ia-modules
+
 ! Remove Teams download app notification
+teams.microsoft.com##.app-notification-container
+teams.microsoft.com##.engagement-surface.button-banner.accent-banner.promo-banner.banner-show.app-notification-banner
+
 ! Help us improve Google notification
+google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
+
 ! Push notifications
+gbatemp.net##.notice-content
+gbatemp.net##.uix_noticeInner
+
 ! Paywall Press Plus
+||s.ppjol.net/lightbox/pp*.js
+
 ! Google chrome ad
+||ogs.google.com/u/0/widget/callout/sid?prid=19016403&pgid=19010599&puid=1b10da64bfa91688&dc=1&origin=https%3A%2F%2Fdrive.google.com&cn=callout&pid=49&spid=49&hl=en-GB$subdocument
+
 ! Ad banners
+calculateaspectratio.com##.right.rio
+calculateaspectratio.com##.left.rio
+fmovies-hd.to##.cky-consent-bar
+
 ! Imgur Go ad free button
+imgur.com##.Button.EmeraldButton
+
 ! Imgur donation button
+imgur.com##[href="https://donate.coreresponse.org/give/393950"] > .ProfileNavbar-item.uScaleTransition > svg
+
 ! Github sponsor buttons
+github.com###funding-links-modal-JosefNemec-Playnite > .btn.btn-sm
+github.com##.mr-1.btn-sm.btn
+
 ! Main Press Plus Paywall
+
 ! Google search rating
+google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
+
 ! Microsoft 365 ad
+support.microsoft.com###rail-banner-button
+support.microsoft.com##.ghcMtE.sc-bYoBSM
+
+||ogs.google.com/u/0/widget/callout/sid?prid=19018054&pgid=19008535&puid=a87840e5a60f1228&dc=1&origin=https%3A%2F%2Fgoogle.com&cn=callout&pid=1&spid=113&hl=en$subdocument
+
 ! Empty ad banner
+||cdn.browserhow.com/wp-content/uploads/sites/3/Ad-Removed-in-Edge-browser-after-enabling-flag*.png$image
+
 ! Patreon banner
+blocklistproject.github.io##p:nth-of-type(4)
+
+answers.microsoft.com##.ucsRailContainer
+
 ! Google Chrome recommendation
+||ogs.google.de/u/0/widget/callout/sid?prid=19026802&pgid=19026797&puid=63a1a1689acd7948&dc=1&origin=https%3A%2F%2Fgoogle.de&cn=callout&pid=1&spid=538&hl=en$subdocument
+
 ! Help tranlate NextDNS banner
+my.nextdns.io##.text-center.px-3
+
 ! AHKScript Footer
+p.ahkscript.org##footer
+
 ! Google login dialogs on various pages
+||accounts.google.com/gsi/*$xhr,script,3p
+
 ! Google consent, "before you continue"
+google.*##^script:has-text(consentCookiePayload)
+google.*##+js(acis, document.cookie, YES+)
+google.*##+js(aeld, DOMContentLoaded, CONSENT)
+||consent.google.com^
+
 ! Cloudflare subscription popup
+cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-row-ns.flex-column.flex.z-5.bottom-0.fixed
+
+askubuntu.com###credential_picker_container
+
 ! Proton lumo
+lumo.proton.me##.md\:block.hidden.my-2.text-xs.color-weak.relative.text-center
+lumo.proton.me##.lumo-plus-button-shadow.p-4.rounded-lg.bg-white.px-3.w-full.navigation-link
+##.lumo-upgrade-trigger.mb-0\.5.px-3.w-full.navigation-item
+lumo.proton.me##.text-hint.text-sm.rounded-sm.p-3
+##.mx-auto.mb-0.mr-2.ml-2.mt-4.rounded-sm.chat-history-upsell
+lumo.proton.me##.text-no-decoration.color-weak.p-3.inline-flex
+
 ! https://code.visualstudio.com/docs/configure/settings
-! Github
-! Github copilot
-! Claude
-! Chatgpt
-! Gemini
-! For when one really doesn't want to have a harder time with uBO's log error checker.
-! Very experimental entry; see https://github.com/DandelionSprout/adfilt/issues/950 and https://techspot.com/news/77949-ccleaner-could-install-avast-anti-virus-without-permission.html
-! Notifications
-! Mobile Notifications
-! substack
-! spot.im Notifications
-! International
-! aternos anti adb
+code.visualstudio.com###cookie-banner
+
 # Gitlab
+gitlab.archlinux.org##.broadcast-wrapper
+gitlab.freedesktop.org##.light-red.js-broadcast-notification-10.banner.gl-broadcast-message
+
+! Github
+-push-notification.$domain=~github.com
+-push-notification/$domain=~github.com
+
+! Github copilot
+github.com##.LegalDisclaimer-module__container--lNe5E
+github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner--L3kg0
+github.com##.prc-Banner-Banner-IR8eJ
+github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u7T1C
+github.com##.NewConversationDownloadActions-module__desktopActions--SOL35
+github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner__visual--dHdzB
+github.com###\:rak\: > .prc-ActionList-ActionListContent-sg9-x
+
+! Claude
+claude.ai##a.\[\&\[data-highlighted\]\]\:text-text-000.\[\&\[data-highlighted\]\]\:bg-bg-200.select-none.outline-none.items-center.gap-2.grid-cols-\[minmax\(0\,_1fr\)_auto\].grid.text-ellipsis.overflow-hidden.whitespace-nowrap.cursor-pointer.rounded-lg.px-2.py-1\.5.font-base:nth-of-type(2)
+claude.ai##div.w-fit:nth-of-type(2)
+
+! Chatgpt
+chatgpt.com##.md\:px-\[60px\].text-xs.text-center.p-2.justify-center.items-center.w-full.min-h-8.flex.mt-auto.relative.text-token-text-secondary
+chatgpt.com##.rtl\:translate-x-1\/2.ltr\:-translate-x-1\/2.lg\:start-1\/2.gap-2.items-center.flex-col.flex.start-0.absolute.pointer-events-none
+chatgpt.com##.hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary
+chatgpt.com##.dark\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\:items-center.shadow-xxs.dark\:border-transparent.lg\:mx-auto.\[text-wrap\:pretty\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex
+
+! Gemini
+gemini.google.com##.ng-star-inserted.adv-upsell.buttons-container > .ng-star-inserted.ng-tns-c1774853282-9
+gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c3313845457-6.gds-upsell-button.mat-mdc-button-base.mdc-button
+gemini.google.com##button.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(2)
+gemini.google.com##button.ng-star-inserted.mat-mdc-menu-item-submenu-trigger.mat-mdc-menu-trigger.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(3)
+gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c283640854-5.gds-upsell-button.mat-mdc-button-base.mdc-button
+gemini.google.com##.cdk-mouse-focused.cdk-focused.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
+gemini.google.com##.ng-star-inserted.adv-upsell.buttons-container > .ng-star-inserted.ng-tns-c638556977-30
+gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.experiment-driven-banner
+gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.announcement-banner-container
+
+! For when one really doesn't want to have a harder time with uBO's log error checker.
+/^172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])\$/$network
+
+! Very experimental entry; see https://github.com/DandelionSprout/adfilt/issues/950 and https://techspot.com/news/77949-ccleaner-could-install-avast-anti-virus-without-permission.html
+||avast.$app=CCleaner.exe|CCleaner64.exe|CCleanerCloudAgent.exe|ccsetup617.exe|ccsetup618.exe|ccsetup619.exe|ccsetup620.exe|ccsetup621.exe|ccsetup622.exe|ccsetup623.exe|ccsetup624.exe|ccsetup625.exe|ccsetup70.exe
+
+! Notifications
+/accusmartwebpush-fire-push-public.js
+/al-fb-notification/assets/scripts/al-main-script.js
+/amp-user-notification-
+/amp-web-push-0.1.js
+/assets/www/notification.
+/build/push.js
+/checkPush.js
+/content/js/push.js
+/fcmPush.js
+/FeedifySW.js
+/flying_push.js
+/ilabspush.min.js
+/inpl.webpush.js
+/jquery-notification.js
+/jsb/pushnotifications?
+/list_notificaciones.php
+/maximizly-push.js
+/mp-web-notification.js
+/notifee/notifee.js
+/notification-prod-sw.js
+/notification-sw.js
+/notification/notify.js
+/notifyme.js
+/notifyme.min.js
+/one-signal.js
+/one-signal.min.js
+/onesignal.js
+/onesignal.min.
+/onesignal/manifest.
+/onesignalfix.js
+/OneSignalSDKUpdaterWorker.js
+/OneSignalSDKWorker.js
+/perfecty-push-sdk.min.js
+/plugins/tfnotifier-wp/swloader.php
+/push-notification.js
+/push-notification.min.js
+/push-notification/*$domain=~upwork.com
+/push-notifications.$~stylesheet
+/push-notifications/*
+/push-notifications?
+/push-sw.js
+/push-worker-$script
+/push-wrap.js
+/push/sbscr.js
+/push/sbscrp.js
+/push/subscribe.js
+/push_app.js
+/push_notification.js
+/push_notification.min.js
+/push_notification/*
+/push_notifications.js
+/push_subscription.js
+/pushengine.js
+/pushes/firebase.js
+/pushes/notification.js
+/PushexSDK.js
+/pushly-sdk.min.js
+/pushNotification.js
+/pushNotifications.js
+/pushnotifications/*
+/pushNotificationSdkJS.js
+/pushpro-lib.js
+/pushsubscribe.js
+/pushup-notification/push-app.js
+/pushup-notification/push-messaging.js
+/pushv2.js
+/pushwoosh-service-worker.js
+/pushwoosh-web-notifications.js
+/pushwoosh-web-pushes-http-sdk.js
+/pushy-ver.js
+/site-notification-desk.min.js
+/smio-push-notification/js/frontend_webpush.js
+/subscribe-push-notifications.js
+/web-push-notifications.js
+/web-push.js
+/web-push/init.min.js
+/webalert-notification.js
+/webnotf.js
+/webnotification.js
+/webpush-client/webpush-client.min.js
+/webpush-production.js
+/webpush.js
+/webpush.min.js
+/webpush_register.php
+/webpush_service-worker.js
+/webPushNotifications.js
+/wonderpush-loader.min.js
+/wonderpush.js
+/wonderpush.min.js
+/wordpress-fire-push-public.js
+/wp-notification-bars-public.js
 ###FCMpush-slidedown-container
 ###NotificationsAskMsg
-###SmarterBannerContainer
 ###SubscribePush
 ###SubscribePushNotificationPanel
-###WACLauncher__Button
 ###Znotify_Prompt
 ###\5f __tdspushdiv
 ###___ndtvpushdiv
 ###app-follow-banner
 ###app-promo-overlay
-###appInstallNotification
-###appOpenNotification
-###appinstall_bnr
-###aside-app-banner
 ###auplusflash
 ###auwnotificationpopup
-###bannerInstallApp
 ###bigpicture-webpush-widget
-###branch-banner-iframe
 ###browser-notifications-prompt
-###brzpushpermission
 ###confirmaPush_Cont
 ###cont_webpush
 ###crocopush_banner
-###custom_smartbanner
-###daraz-smart-banner
 ###desktop-notification-ask-dialog
 ###desktop-notifications
 ###dialog-push-notification
 ###divPnot
-###download_app_banner_btn
 ###edrone--push--alert--box
-###floatingAppButton
 ###frizbit-prompter
 ###ggpush-main-area
 ###grow-consent-modal
-###head-app-download
 ###hint-push-service
 ###ilabspush-optin-container
-###inlineBannerForApp
-###iossmartbanner
 ###jeapie-prompt-widget
 ###js-gcm-notif
-###js-getAppHeader
 ###lwp-popover-container
-###mn-app-banner
 ###modalCognitoPush
 ###my_web_push_app_box_confirm
 ###nlSubscriptionCookie
@@ -119,7 +392,6 @@
 ###onesignal-slidedown-container
 ###pa-push-notification-subscription
 ###popUpNotification
-###popin-salescontact
 ###push-alert-block
 ###push-notification
 ###push-notification-box
@@ -146,17 +418,11 @@
 ###qrzpush-prompt-widget
 ###rd-webpush-modal
 ###shopify-section-order-notifications
-###smart-bnr-rbcapp
 ###smart_push_smio_overlay
 ###smart_push_smio_window
-###smartbanner-desktop
-###smartbanner.android
-###smartbanner.ios
 ###spm_msg_push_notification
 ###subscribeToPush
 ###subscribeToWebPush
-###tapcart-web-banner
-###uutiskirje-nosto
 ###visilabs_web_push_perm_box
 ###web-alerts-modal
 ###web-push-prompt
@@ -168,7 +434,6 @@
 ###webpush_soft_prompt
 ###webpushr-prompt-wrapper
 ###widget-pushNotification
-###xm_app_stickyHeader
 ##.FCMpush-slidedown-container
 ##.PushNotification--base
 ##.PushNotification--top
@@ -176,94 +441,44 @@
 ##.PushSubscription-block
 ##.ampnotification
 ##.apn-popover-container
-##.app-ad-container-desktop
-##.app-banner-container
-##.app-banner-header
-##.app-down-banner-container
-##.appInstlBnr
-##.app_banner_link
-##.appbnr-box
-##.appdown_popup
 ##.aswpn-fire-push-popup
 ##.b-notification-push
 ##.b-push-notification
-##.b24-widget-button-wrapper
-##.banner-download-app-hidden
 ##.bk-wonderpush
 ##.block-sbase-bene-newsletter
-##.blogroll-wrapper
-##.blogroll-wrapper1
-##.blogroll-wrapper2
-##.blogroll-wrapper3
-##.blogroll-wrapper4
-##.blogroll-wrapper5
-##.blogroll-wrapper6
-##.blogroll-wrapper8
-##.blogroll-wrapper9
-##.blogroll_wrapper
-##.blogroll_wrapper_honbun
-##.branch-banner
 ##.branded-app-shortcode-inarticle
 ##.bs-push-noti
 ##.bubble-push
-##.c-app-banner-header-wrap
-##.c-app-install
-##.c-install-banner
-##.c-notification-link-app
 ##.c-push-notification
-##.cept-banner-link
-##.chat_hammerbot-iframe-wrapper__outer
 ##.cleverpush-backdrop
 ##.cleverpush-confirm
 ##.cont_webpush
 ##.contentwebpush
 ##.desktop-notification-ask-dialog
 ##.dmgpush-popover-container
-##.drift-facade
 ##.e-push-notification-popup
-##.elogch_blogparts_iframe
 ##.et_push_notification
 ##.firebase-slidedown-container
-##.footer-app-download
-##.footer__download-app-container
 ##.frizbit-prompt
-##.gh-app-banner
 ##.grv-dialog-host
-##.gta-header-banner
-##.header-app-banner
-##.headerGetApp
 ##.hs-push
 ##.htpush-chrome-style-notification
 ##.i-push-notification
 ##.id-StoryElement-embed--cleverPush
 ##.insider-opt-in-notification
-##.installAppPopup-top
-##.intercom-launcher
-##.intercom-lightweight-app
 ##.item-newsletter-form
 ##.j-push-notifications-feature
 ##.jeg_push_notification_content
-##.joinchat--chatbox
 ##.js-custom-push-notifications
-##.js-link-to-app
 ##.js-notifications-button
-##.js-openAppBox
 ##.js-push-allow
 ##.kraken-popup
 ##.lightbox-push
-##.lumo-upgrade-trigger.mb-0\.5.px-3.w-full.navigation-item
-##.m-chat-toggler
 ##.m-notifications-banner
 ##.m-webpush-layer
 ##.message-push-notification
-##.mobile-app-banner
-##.mobile-download-app-tout
-##.mobile-web-redirect-bar
 ##.modal-push
-##.mopile-app-banner
-##.mx-auto.mb-0.mr-2.ml-2.mt-4.rounded-sm.chat-history-upsell
 ##.naf-web-notifications-popup
-##.native-app-banner
 ##.nav-link--notification-handler
 ##.notBar
 ##.notf-overlay
@@ -277,12 +492,8 @@
 ##.ntfc_overlay
 ##.ntfc_popup
 ##.oi-notify
-##.open-app-banner
-##.p-webtoapp-banner
 ##.page__notifications
 ##.perfecty-push-dialog-container
-##.plugin-blogroll
-##.plugin-rss
 ##.pnfpb-push-subscribe-icon
 ##.push-area-btn
 ##.push-bx
@@ -314,11 +525,83 @@
 ##.pushowl-optin
 ##.pwa-modal-prompt
 ##.rdmapps-push-dialog
-##.rsttop-webtoapp-banner-overlay
 ##.setrow-push-popup-container
 ##.showtvPushOverlay
 ##.simple-subscription-form
 ##.sk-notification-dialog
+##.softPush_notification
+##.surveymonkey-popup
+##.tsoft-push--in-notification
+##.ud_webpush_sticky
+##.web-notification
+##.web-push
+##.web-push-box
+##.webpush_wrap
+##.window-push
+##.wordpress-fire-push-popup
+##.ys-push
+##[data-cypress="soft-push-notification-modal"]
+##[soft-push-notification-modal]
+##amp-web-push-widget
+##div[class^="container_NotificationsBanner_"]
+##pwa-install
+
+! Mobile Notifications
+###SmarterBannerContainer
+###appInstallNotification
+###appOpenNotification
+###appinstall_bnr
+###aside-app-banner
+###bannerInstallApp
+###branch-banner-iframe
+###brzpushpermission
+###custom_smartbanner
+###daraz-smart-banner
+###download_app_banner_btn
+###floatingAppButton
+###head-app-download
+###inlineBannerForApp
+###iossmartbanner
+###js-getAppHeader
+###mn-app-banner
+###smart-bnr-rbcapp
+###smartbanner-desktop
+###smartbanner.android
+###smartbanner.ios
+###tapcart-web-banner
+###xm_app_stickyHeader
+##.app-ad-container-desktop
+##.app-banner-container
+##.app-banner-header
+##.app-down-banner-container
+##.appInstlBnr
+##.app_banner_link
+##.appbnr-box
+##.appdown_popup
+##.banner-download-app-hidden
+##.branch-banner
+##.c-app-banner-header-wrap
+##.c-app-install
+##.c-install-banner
+##.c-notification-link-app
+##.cept-banner-link
+##.footer-app-download
+##.footer__download-app-container
+##.gh-app-banner
+##.gta-header-banner
+##.header-app-banner
+##.headerGetApp
+##.installAppPopup-top
+##.js-link-to-app
+##.js-openAppBox
+##.mobile-app-banner
+##.mobile-download-app-tout
+##.mobile-web-redirect-bar
+##.mopile-app-banner
+##.native-app-banner
+##.open-app-banner
+##.p-webtoapp-banner
+##.rsttop-webtoapp-banner-overlay
 ##.smart-banner-collection
 ##.smart-banner-download
 ##.smartbanner--android
@@ -329,257 +612,23 @@
 ##.smartbanner-ios
 ##.smartbnr-android
 ##.smartbnr-ios
-##.softPush_notification
-##.sticky-button--whatsapp
-##.subscription-widget-wrap > .show-subscribe
-##.surveymonkey-popup
 ##.tmblr-iframe--app-cta-button
-##.tsoft-push--in-notification
-##.ud_webpush_sticky
-##.web-notification
-##.web-push
-##.web-push-box
-##.webpush_wrap
-##.window-push
-##.wix-blog-hide-in-print.SITE_FOOTER_WRAPPER
-##.wordpress-fire-push-popup
-##.ys-push
 ##.z-bit-smartbanner
-##[class*="NotificationsBell__notificationsWrapper-"]
 ##[class^="adjust-smart-banner"]
-##[data-cypress="soft-push-notification-modal"]
 ##[data-testid="app-install-container"]
-##[soft-push-notification-modal]
 ##a[href^="http://mobi24.net/"]
 ##a[href^="https://mobi24.net/"]
 ##amp-app-banner
-##amp-web-push-widget
-##div[class^="container_NotificationsBanner_"]
-##div[id^="blz_rss_"]
-##pwa-install
-##yardi-widget-craigslist
--push-notification.$domain=~github.com
--push-notification/$domain=~github.com
-.biz/rss.htm$subdocument,~3p
-.biz/rss2.htm$subdocument,~3p
-.com/rss.htm$subdocument,~3p
-.com/rss/$subdocument,~3p
-.com/rss2.htm$subdocument,~3p
-.jp/rss.htm$subdocument,~3p
-.net/rss.htm$subdocument,~3p
-.net/rss2.htm$subdocument,~3p
-/FeedifySW.js
-/OneSignalSDKUpdaterWorker.js
-/OneSignalSDKWorker.js
-/PushexSDK.js
-/^172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])\$/$network
-/accusmartwebpush-fire-push-public.js
-/al-fb-notification/assets/scripts/al-main-script.js
-/amp-user-notification-
-/amp-web-push-0.1.js
-/assets/www/notification.
-/blogparts_iframe.php?sc=$subdocument,3p
-/build/push.js
-/checkPush.js
-/content/js/push.js
-/creame-whatsapp-me/public/js/joinchat.min.js
-/fcmPush.js
-/flying_push.js
-/ilabspush.min.js
-/inpl.webpush.js
-/jquery-notification.js
-/jsb/pushnotifications?
-/list_notificaciones.php
-/maximizly-push.js
-/mp-web-notification.js
-/notifee/notifee.js
-/notification-prod-sw.js
-/notification-sw.js
-/notification/notify.js
-/notifyme.js
-/notifyme.min.js
-/one-signal.js
-/one-signal.min.js
-/onesignal.js
-/onesignal.min.
-/onesignal/manifest.
-/onesignalfix.js
-/perfecty-push-sdk.min.js
-/plugins/tfnotifier-wp/swloader.php
-/push-notification.js
-/push-notification.min.js
-/push-notification/*$domain=~upwork.com
-/push-notifications.$~stylesheet
-/push-notifications/*
-/push-notifications?
-/push-sw.js
-/push-worker-$script
-/push-wrap.js
-/push/sbscr.js
-/push/sbscrp.js
-/push/subscribe.js
-/pushNotification.js
-/pushNotificationSdkJS.js
-/pushNotifications.js
-/push_app.js
-/push_notification.js
-/push_notification.min.js
-/push_notification/*
-/push_notifications.js
-/push_subscription.js
-/pushengine.js
-/pushes/firebase.js
-/pushes/notification.js
-/pushly-sdk.min.js
-/pushnotifications/*
-/pushpro-lib.js
-/pushsubscribe.js
-/pushup-notification/push-app.js
-/pushup-notification/push-messaging.js
-/pushv2.js
-/pushwoosh-service-worker.js
-/pushwoosh-web-notifications.js
-/pushwoosh-web-pushes-http-sdk.js
-/pushy-ver.js
-/rss/rss.html$subdocument,~3p
-/site-notification-desk.min.js
-/smio-push-notification/js/frontend_webpush.js
-/sp_rss_iframe.html
-/subscribe-push-notifications.js
-/web-push-notifications.js
-/web-push.js
-/web-push/init.min.js
-/webPushNotifications.js
-/webalert-notification.js
-/webnotf.js
-/webnotification.js
-/webpush-client/webpush-client.min.js
-/webpush-production.js
-/webpush.js
-/webpush.min.js
-/webpush_register.php
-/webpush_service-worker.js
-/wonderpush-loader.min.js
-/wonderpush.js
-/wonderpush.min.js
-/wordpress-fire-push-public.js
-/wp-content/plugins/click-to-chat-for-whatsapp/*
-/wp-notification-bars-public.js
-://webim.*/button.js
-://webim.*/button.php
+! substack
+##.subscription-widget-wrap > .show-subscribe
+! spot.im Notifications
+##[class*="NotificationsBell__notificationsWrapper-"]
+! International
+###uutiskirje-nosto
+
+! aternos anti adb
 @@||hb.vntsm.com/v4/live/vms/sites/aternos.org/index.js$script,domain=aternos.org
-answers.microsoft.com##.ucsRailContainer
-askubuntu.com###credential_picker_container
-aternos.org###placement-takeover
-aternos.org##.ad-dfp:style(min-height: 0.1485mm !important; height: 0.1485mm !important;)
 aternos.org##.header-center:style(margin-top:-5000px !important;)
 aternos.org##.sidebar:style(width: 1.745px !important; padding: 1px !important)
-blocklistproject.github.io##p:nth-of-type(4)
-calculateaspectratio.com##.left.rio
-calculateaspectratio.com##.right.rio
-chatgpt.com##.dark\:bg-token-main-surface-secondary.text-token-text-primary.bg-token-main-surface-primary.border-token-border-default.md\:items-center.shadow-xxs.dark\:border-transparent.lg\:mx-auto.\[text-wrap\:pretty\].text-sm.pe-3.ps-5.py-4.border.rounded-3xl.gap-4.items-start.w-full.flex
-chatgpt.com##.hover\:cursor-pointer.cursor-default.me-0.my-0.btn-small.btn.btn-secondary
-chatgpt.com##.md\:px-\[60px\].text-xs.text-center.p-2.justify-center.items-center.w-full.min-h-8.flex.mt-auto.relative.text-token-text-secondary
-chatgpt.com##.rtl\:translate-x-1\/2.ltr\:-translate-x-1\/2.lg\:start-1\/2.gap-2.items-center.flex-col.flex.start-0.absolute.pointer-events-none
-claude.ai##a.\[\&\[data-highlighted\]\]\:text-text-000.\[\&\[data-highlighted\]\]\:bg-bg-200.select-none.outline-none.items-center.gap-2.grid-cols-\[minmax\(0\,_1fr\)_auto\].grid.text-ellipsis.overflow-hidden.whitespace-nowrap.cursor-pointer.rounded-lg.px-2.py-1\.5.font-base:nth-of-type(2)
-claude.ai##div.w-fit:nth-of-type(2)
-cloudflare.com##.black.bg-orange-1-500.pv3.w-100.flex-row-l.flex-row-m.flex-row-ns.flex-column.flex.z-5.bottom-0.fixed
-code.visualstudio.com###cookie-banner
-discordapp.com#?#div[class^=row-]:-abp-has(> div[class^=emojiItem-][class*=disabled])
-duckduckgo.com##.WktWJWUFfihMbuzAEqk2.hUUdRtuaOUx7mcSwc56s.ffON2NH02oMAcqyoh2UU
-duckduckgo.com##.ia-modules
-fmovies-hd.to##.cky-consent-bar
-gbatemp.net##.notice-content
-gbatemp.net##.uix_noticeInner
-gbatemp.net##.with_undefined.sidebar > div:nth-of-type(2)
-gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c283640854-5.gds-upsell-button.mat-mdc-button-base.mdc-button
-gemini.google.com##._mat-animation-noopable.mat-unthemed.mat-mdc-unelevated-button.mdc-button--unelevated.ng-tns-c3313845457-6.gds-upsell-button.mat-mdc-button-base.mdc-button
-gemini.google.com##.cdk-mouse-focused.cdk-focused.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item
-gemini.google.com##.ng-star-inserted.adv-upsell.buttons-container > .ng-star-inserted.ng-tns-c1774853282-9
-gemini.google.com##.ng-star-inserted.adv-upsell.buttons-container > .ng-star-inserted.ng-tns-c638556977-30
-gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.announcement-banner-container
-gemini.google.com##.ng-star-inserted.ng-tns-c3299329106-0.experiment-driven-banner
-gemini.google.com##button.ng-star-inserted.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(2)
-gemini.google.com##button.ng-star-inserted.mat-mdc-menu-item-submenu-trigger.mat-mdc-menu-trigger.mat-focus-indicator.mat-mdc-menu-item:nth-of-type(3)
-github.com###\:rak\: > .prc-ActionList-ActionListContent-sg9-x
-github.com###funding-links-modal-JosefNemec-Playnite > .btn.btn-sm
-github.com##.LegalDisclaimer-module__container--lNe5E
-github.com##.NewConversationDownloadActions-module__desktopActions--SOL35
-github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner--L3kg0
-github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner__visual--dHdzB
-github.com##.mr-1.btn-sm.btn
-github.com##.prc-Banner-Banner-IR8eJ
-github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u7T1C
-gitlab.archlinux.org##.broadcast-wrapper
-gitlab.freedesktop.org##.light-red.js-broadcast-notification-10.banner.gl-broadcast-message
-google.*##+js(acis, document.cookie, YES+)
-google.*##+js(aeld, DOMContentLoaded, CONSENT)
-google.*##^script:has-text(consentCookiePayload)
-google.com##.PnU5cd.fwsf4b.fHIdc > div > div > .ifrS0b.CkBlJd.LO47Ff
-google.com##.Ryrdad > .ifrS0b.CkBlJd.LO47Ff
-imgur.com##.Button.EmeraldButton
-imgur.com##[href="https://donate.coreresponse.org/give/393950"] > .ProfileNavbar-item.uScaleTransition > svg
-lumo.proton.me##.lumo-plus-button-shadow.p-4.rounded-lg.bg-white.px-3.w-full.navigation-link
-lumo.proton.me##.md\:block.hidden.my-2.text-xs.color-weak.relative.text-center
-lumo.proton.me##.text-hint.text-sm.rounded-sm.p-3
-lumo.proton.me##.text-no-decoration.color-weak.p-3.inline-flex
-my.account.sony.com###js-SIEWS1lib-header-Base
-my.nextdns.io##.text-center.px-3
-nexusmods.com###mainContent > div.clearfix.agroup > .ads > .ad-unit.demo-billboard.ad
-nexusmods.com###rj-vortex
-nexusmods.com##.areplacer
-nexusmods.com##.background-2.premium-block--upgrade.premium-block
-nexusmods.com##.container.premium-banner
-nexusmods.com##.css-u1qlwc.qc-cmp-cleanslate
-nexusmods.com##.rj-standard-button
-nexusmods.com##.rj-supporter-wrapper > h3
-nexusmods.com##div.clearfix.agroup:nth-of-type(1)
-outlook.live.com##.AK_my > .pBKjV
-outlook.live.com##._1TpU2KF6f_EeQiytBaYj8I > ._3_hHr3kfEhbNYRFM5YJxH9
-outlook.live.com##._1dBL6mV6xRANqjh_Z8BjN6 > ._1fti_QgAzqGWPGlqh_FSvI
-outlook.live.com##._1xCBLVKl1qp6BB2jT7GN5b > ._3_hHr3kfEhbNYRFM5YJxH9
-outlook.live.com##._2_1jS9rVrPuzoS0TkWEtIk
-outlook.live.com##._4EQjiwXF4KIhqby_Qqf8J
-outlook.live.com##.tTgHI
-p.ahkscript.org##footer
-pixlr.com###try-premium
-playstation.com###_evidon_banner
-playstation.com##.evidon-banner-message
-support.microsoft.com###rail-banner-button
-support.microsoft.com##.ghcMtE.sc-bYoBSM
-teams.microsoft.com##.app-notification-container
-teams.microsoft.com##.engagement-surface.button-banner.accent-banner.promo-banner.banner-show.app-notification-banner
-web.archive.org###donate_banner
-||3site-rss.s3-ap-northeast-1.amazonaws.com^
-||accounts.google.com/gsi/*$xhr,script,3p
-||adlt18antenna.xyz/blogparts/blog_parts_js.php
-||antennasync.me^$3p
-||avast.$app=CCleaner.exe|CCleaner64.exe|CCleanerCloudAgent.exe|ccsetup617.exe|ccsetup618.exe|ccsetup619.exe|ccsetup620.exe|ccsetup621.exe|ccsetup622.exe|ccsetup623.exe|ccsetup624.exe|ccsetup625.exe|ccsetup70.exe
-||blog-rss.com^$3p
-||blog.livedoor.jp/plugin/ldblog_rss_plugin.js
-||blogroll.livedoor.net^
-||blogroll.matome-alpha.com^
-||blozoo.info/js/rsstool/
-||cdn.browserhow.com/wp-content/uploads/sites/3/Ad-Removed-in-Edge-browser-after-enabling-flag*.png$image
-||consent.google.com^
-||feedgrabbr.com^$3p
-||fukugan.com^$3p
-||gamelog.apexlegends-leaksnews.com/api/widget/$3p
-||komatech.net^$3p
-||matomeantena.com/scripts/$3p
-||matomeantena.com/scripts/parts/blog/
-||moviegate4.net/fukugansan/
-||nullpoantenna.com/scripts/$3p
-||nullpoantenna.com/scripts/parts/blog/
-||ogs.google.com/u/0/widget/callout/sid?prid=19016403&pgid=19010599&puid=1b10da64bfa91688&dc=1&origin=https%3A%2F%2Fdrive.google.com&cn=callout&pid=49&spid=49&hl=en-GB$subdocument
-||ogs.google.com/u/0/widget/callout/sid?prid=19018054&pgid=19008535&puid=a87840e5a60f1228&dc=1&origin=https%3A%2F%2Fgoogle.com&cn=callout&pid=1&spid=113&hl=en$subdocument
-||ogs.google.de/u/0/widget/callout/sid?prid=19026802&pgid=19026797&puid=63a1a1689acd7948&dc=1&origin=https%3A%2F%2Fgoogle.de&cn=callout&pid=1&spid=538&hl=en$subdocument
-||rcm.shinobi.jp^
-||re.trigs-sockets.com^
-||rss-loader.com^$3p
-||rss.solty.biz^
-||rss.tc^$3p
-||rssfetcher.blogsys.jp^
-||s.ppjol.net/lightbox/pp*.js
-||tanganrss.com^$3p
-||yameyou.com^$3p
+aternos.org##.ad-dfp:style(min-height: 0.1485mm !important; height: 0.1485mm !important;)
+aternos.org###placement-takeover
