@@ -44,7 +44,7 @@ download(){
 process(){
   local awk_cmd=""
   [[ ${RM_COMMENTS:-1} == 1 ]] && awk_cmd="!/^#/"
-  [[ ${RM_TRAILING_SPACES:-1} == 1 ]] && awk_cmd="${awk_cmd: +$awk_cmd && }{gsub(/^ +| +$/,\"\");print}"
+  [[ ${RM_TRAILING_SPACES:-1} == 1 ]] && awk_cmd="${awk_cmd:+$awk_cmd && }{gsub(/^ +| +$/,\"\");print}"
   [[ ${RM_DUPLICATE_LINES:-1} == 1 ]] && awk_cmd="${awk_cmd:+$awk_cmd && }! seen[\$0]++"
   
   if [[ -n $awk_cmd ]]; then
