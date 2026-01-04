@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 
 @dataclass(slots=True)
 class Stats:
-  original:  int = 0
+  original: int = 0
   headers: int = 0
   final: int = 0
   removed: int = 0
