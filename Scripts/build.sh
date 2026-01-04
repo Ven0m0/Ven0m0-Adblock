@@ -119,7 +119,7 @@ lint_filters(){
 }
 
 download_userscripts(){
-  [[ !  -f $SCRIPT_LIST ]] && { log download "No $SCRIPT_LIST found, skipping"; return 0; }
+  [[ ! -f $SCRIPT_LIST ]] && { log download "No $SCRIPT_LIST found, skipping"; return 0; }
   log download "Processing $SCRIPT_LIST"
   mkdir -p "$SCRIPT_SRC"
   local line url fn suffix
