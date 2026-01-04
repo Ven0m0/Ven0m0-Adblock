@@ -31,7 +31,7 @@ MAX_CONCURRENT:  Final[int] = 10
 # ============================================================================
 # LOGGING
 # ============================================================================
-logging. basicConfig(
+logging.basicConfig(
   level=logging.INFO,
   format="[%(asctime)s] %(levelname)s %(message)s",
   datefmt="%H:%M:%S",
