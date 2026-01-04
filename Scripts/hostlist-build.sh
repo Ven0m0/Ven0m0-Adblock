@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail
-IFS=$'\n\t'; export LC_ALL=C LANG=C
+IFS=$'\n\t' LC_ALL=C
 has(){ command -v "$1" &>/dev/null; }
 has hostlist-compiler || { printf 'Installing hostlist-compiler...\n'; npm i -g @adguard/hostlist-compiler || { printf 'Install failed\n' >&2; exit 1; }; }
 mkdir -p Filters
