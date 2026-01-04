@@ -1,4 +1,4 @@
-[Adblock Plus 3.6]
+[uBlock Origin]
 ! Title: General rules (Optimized)
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/General.txt
