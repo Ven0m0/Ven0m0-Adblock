@@ -199,12 +199,12 @@ def load_sources(config_path: Path) -> dict[str, dict]:
   data = json.loads(config_path.read_text(encoding="utf-8"))
   return {
     src["url"]: {
-      "filename": src. get("filename") or sanitize_filename(src["url"]),
+      "filename": src.get("filename") or sanitize_filename(src["url"]),
       "skip_checksum": src.get("skip_checksum", False),
       "enabled": src.get("enabled", True),
     }
-    for src in data. get("sources", [])
-    if src. get("enabled", True)
+    for src in data.get("sources", [])
+    if src.get("enabled", True)
   }
 
 def save_metadata(sources: dict, results: dict[str, bool], output_dir: Path) -> None:
