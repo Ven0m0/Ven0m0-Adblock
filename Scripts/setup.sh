@@ -2,34 +2,57 @@
 # shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
-builtin cd -P -- "$(dirname -- "${BASH_SOURCE[0]:-}")" && printf '%s\n' "$PWD" || exit 1
-[[ $EUID -ne 0 ]] && sudo -v; sync
+readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=lib-common.sh
+. "${SCRIPT_DIR}/lib-common.sh"
 
-# [FIX] Properly detect Home directory instead of hardcoding /home/
-if [[ -n "${SUDO_USER:-}" ]]; then
-  # If running as sudo, try to get the target user's configured home
-  HOME=$(getent passwd "$SUDO_USER" | cut -d: -f6)
-fi
-# Fallback to current HOME if getent failed or not running as sudo
-export HOME="${HOME:-/home/${SUDO_USER:-$USER}}"
+readonly PACKAGES=(
+  "@adguard/aglint"
+  "@adguard/hostlist-compiler"
+  "@adguard/dead-domains-linter"
+)
 
-has(){ command -v -- "$1" &>/dev/null; }
-
-if has mise; then
+setup_mise(){
+  log mise "Installing packages"
   has bun && export MISE_NPM_BUN=true
-  mise use -g minify
-  mise use -g npm:@adguard/aglint
-  mise use -g npm:@adguard/hostlist-compiler
-  mise use -g npm:@adguard/dead-domains-linter
-  mise up -y; mise reshim
-elif has bun; then
-  bun i -g @adguard/aglint
-  bun i -g @adguard/hostlist-compiler
-  bun i -g @adguard/dead-domains-linter
-elif has npm; then
-  npm i -g @adguard/aglint
-  npm i -g @adguard/hostlist-compiler
-  npm i -g @adguard/dead-domains-linter
-fi
+  for pkg in "${PACKAGES[@]}"; do
+    mise use -g "npm: ${pkg}" || warn "Failed:  $pkg"
+  done
+  mise up -y && mise reshim
+}
 
-has esbuild || npm install --save-exact --save-dev esbuild
+setup_bun(){
+  log bun "Installing packages"
+  for pkg in "${PACKAGES[@]}"; do
+    bun i -g "$pkg" || warn "Failed: $pkg"
+  done
+}
+
+setup_npm(){
+  log npm "Installing packages"
+  for pkg in "${PACKAGES[@]}"; do
+    npm i -g "$pkg" || warn "Failed: $pkg"
+  done
+}
+
+setup_esbuild(){
+  has esbuild && return 0
+  log esbuild "Installing"
+  npm install --save-exact --save-dev esbuild &>/dev/null || warn "esbuild install failed"
+}
+
+main(){
+  if has mise; then
+    setup_mise
+  elif has bun; then
+    setup_bun
+  elif has npm; then
+    setup_npm
+  else
+    die "No package manager found (mise/bun/npm required)"
+  fi
+  setup_esbuild
+  ok "Setup complete"
+}
+
+main "$@"
