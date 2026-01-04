@@ -185,7 +185,7 @@ def load_sources(config_path: Path) -> dict[str, dict]:
           "enabled": True
         },
         {
-          "url": "https://easylist. to/easylist/easylist.txt",
+          "url": "https://easylist.to/easylist/easylist.txt",
           "filename": "EasyList.txt",
           "skip_checksum": False,
           "enabled": True
