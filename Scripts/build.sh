@@ -46,7 +46,7 @@ setup_tools(){
 }
 
 build_adblock(){
-  local -a src=(Combination*. txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
+  local -a src=(Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
   local out=$FILTER_OUT/adblock.txt v ts rule_count
   log adblock "Building filter list"
   mkdir -p "$FILTER_OUT"
