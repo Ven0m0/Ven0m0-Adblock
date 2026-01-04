@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck enable=all shell=bash source-path=SCRIPTDIR
 # Purpose: Deduplicate files and clean text content (sort/uniq/strip comments)
-# Targets: Arch/Wayland, Debian, Termux
 # Deps: md5sum, sort, sed, file (coreutils); optional: fd, inotify-tools (for -w)
 set -euo pipefail
 IFS=$'\n\t'
