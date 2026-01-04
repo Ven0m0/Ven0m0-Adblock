@@ -173,7 +173,7 @@ build_userscripts(){
   [[ -z $(runner) ]] && { warn "No JS runtime (bun/npx) found, skipping userscripts"; return 0; }
   mkdir -p "$SCRIPT_SRC" "$SCRIPT_OUT"
   local -a files=()
-  [[ $(fd) == *fd* ]] && mapfile -t files < <("$(fd)" -e js -t f .  "$SCRIPT_SRC" 2>/dev/null) || \
+  [[ $(fd) == *fd* ]] && mapfile -t files < <("$(fd)" -e js -t f . "$SCRIPT_SRC" 2>/dev/null) || \
     mapfile -t files < <(find "$SCRIPT_SRC" -type f -name "*.js" 2>/dev/null)
   (( ${#files[@]} == 0 )) && { log userscripts "No files in $SCRIPT_SRC"; return 0; }
   log userscripts "Processing ${#files[@]} files"
