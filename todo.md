@@ -30,3 +30,18 @@ Use bun for building/bundling
 bun build --compile --bytecode --minify --sourcemap --outdir=./dist --target=bun ./src/index.ts
 bun build ./index.ts --production --outfile=out.js
 ```
+
+
+package.json:
+
+```json
+    "scripts": {
+        "aglint": "aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\"",
+        "markdownlint": "markdownlint .",
+        "lint": "npm run aglint && npm run markdownlint"
+    },
+    "lint-staged": {
+        "*.txt": "aglint",
+        "*.md": "markdownlint"
+    },
+```
