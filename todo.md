@@ -45,3 +45,6 @@ package.json:
         "*.md": "markdownlint"
     },
 ```
+
+- https://github.com/AdguardTeam/AdguardFilters/tree/master/.github/workflows
+- https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/auto_build.sh
