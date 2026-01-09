@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
+# Hosts file creator and updater
+# Downloads, processes, and installs system-wide hosts file for ad-blocking
 # shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
 readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=lib-common.sh
-. "${SCRIPT_DIR}/lib-common. sh"
+. "${SCRIPT_DIR}/lib-common.sh"
 
 readonly CONFIG="${SCRIPT_DIR}/hosts-config"
 readonly HOSTS_FILE="${syshosts_file:-/etc/hosts}"
@@ -15,14 +17,14 @@ readonly REPLACE="${replacehosts:-1}"
 readonly BACKUP_DIR=backups
 readonly RESOLVE="${RESOLVE_HOST:-127.0.0.1 $(hostname 2>/dev/null || echo localhost).local $(hostname 2>/dev/null || echo localhost) localhost}"
 
-[[ -f $CONFIG ]] && .  "$CONFIG"
+[[ -f $CONFIG ]] && . "$CONFIG"
 
 chk "$DL"
 chk awk
 
 backup(){
   mkdir -p "$BACKUP_DIR"
-  if [[ !  -f $BACKUP_DIR/$BACKUP_NAME. old ]]; then
+  if [[ ! -f $BACKUP_DIR/$BACKUP_NAME.old ]]; then
     [[ -f $BACKUP_DIR/$BACKUP_NAME ]] && mv "$BACKUP_DIR/$BACKUP_NAME" "$BACKUP_DIR/$BACKUP_NAME.old"
     cp "$HOSTS_FILE" "$BACKUP_DIR/$BACKUP_NAME"
     log backup "Saved $HOSTS_FILE"
@@ -37,7 +39,7 @@ download(){
   for url in ${HOSTS:-}; do
     ((n++))
     printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
-    "$DL" -fsSL "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed:  $url"
+    "$DL" -fsSL "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed: $url"
   done
 }
 

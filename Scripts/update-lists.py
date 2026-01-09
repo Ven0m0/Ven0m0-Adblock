@@ -26,7 +26,7 @@ DEFAULT_OUTPUT: Final[str] = "lists/sources"
 METADATA_FILE: Final[str] = "lists/sources-metadata.json"
 TIMEOUT: Final[int] = 60
 CHUNK_SIZE: Final[int] = 8192
-MAX_CONCURRENT:  Final[int] = 10
+MAX_CONCURRENT: Final[int] = 10
 
 # ============================================================================
 # LOGGING
@@ -47,7 +47,7 @@ def validate_checksum(filepath: Path) -> bool:
   try:
     data = filepath.read_text(encoding="utf-8")
   except Exception as e:
-    logger.warning(f"Failed to read {filepath. name}: {e}")
+    logger.warning(f"Failed to read {filepath.name}: {e}")
     return False
 
   pattern = re.compile(
@@ -67,11 +67,11 @@ def validate_checksum(filepath: Path) -> bool:
   computed_checksum = base64.b64encode(computed_hash).decode().rstrip("=")
 
   if declared_checksum == computed_checksum:
-    logger.info(f"✓ Checksum valid:  {filepath.name}")
+    logger.info(f"✓ Checksum valid: {filepath.name}")
     return True
 
   logger.error(
-    f"✗ Checksum mismatch in {filepath. name}:  "
+    f"✗ Checksum mismatch in {filepath.name}: "
     f"expected {computed_checksum}, got {declared_checksum}"
   )
   return False
@@ -84,7 +84,7 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
   """Generate safe filename from URL or provided name."""
   if name:
     safe = re.sub(r'[^\w\-.]', '-', name)
-    return f"{safe}.txt" if not safe.endswith('. txt') else safe
+    return f"{safe}.txt" if not safe.endswith('.txt') else safe
   
   url_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
   domain = re.search(r'://([^/]+)', url)
@@ -102,7 +102,7 @@ def process_downloaded_file(
   dest_path = output_dir / filename
 
   try:
-    if not skip_checksum: 
+    if not skip_checksum:
       if not validate_checksum(temp_path):
         logger.warning(f"Checksum validation failed for {url}")
     
@@ -120,7 +120,7 @@ def process_downloaded_file(
     return dest_path
 
   except Exception as e:
-    logger.exception(f"Error processing {url}:  {e}")
+    logger.exception(f"Error processing {url}: {e}")
     if temp_path.exists():
       temp_path.unlink()
     return None
@@ -150,17 +150,17 @@ async def fetch_list(
         mode="wb",
         delete=False,
         suffix=".txt",
-      ) as tmp: 
+      ) as tmp:
         tmp_path = Path(tmp.name)
 
         async for chunk in resp.content.iter_chunked(CHUNK_SIZE):
-          tmp. write(chunk)
+          tmp.write(chunk)
 
       result = process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
       return (url, result is not None)
 
   except asyncio.TimeoutError:
-    logger.error(f"✗ Timeout:  {url}")
+    logger.error(f"✗ Timeout: {url}")
   except aiohttp.ClientError as e:
     logger.error(f"✗ HTTP error for {url}: {e}")
   except Exception as e:
@@ -172,15 +172,15 @@ async def fetch_list(
 # SOURCE CONFIGURATION
 # ============================================================================
 
-def load_sources(config_path: Path) -> dict[str, dict]: 
+def load_sources(config_path: Path) -> dict[str, dict]:
   """Load source URLs configuration."""
   if not config_path.exists():
     logger.warning(f"Config not found: {config_path}, creating template")
     template = {
       "sources": [
         {
-          "url":  "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt",
-          "filename":  "uBlock-Filters.txt",
+          "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt",
+          "filename": "uBlock-Filters.txt",
           "skip_checksum": False,
           "enabled": True
         },
@@ -194,7 +194,7 @@ def load_sources(config_path: Path) -> dict[str, dict]:
     }
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(json.dumps(template, indent=2) + "\n", encoding="utf-8")
-    logger.info(f"Created template config:  {config_path}")
+    logger.info(f"Created template config: {config_path}")
   
   data = json.loads(config_path.read_text(encoding="utf-8"))
   return {
@@ -228,7 +228,7 @@ def save_metadata(sources: dict, results: dict[str, bool], output_dir: Path) -> 
     json.dumps(metadata, indent=2, sort_keys=True) + "\n",
     encoding="utf-8",
   )
-  logger.info(f"Saved metadata:  {metadata_path}")
+  logger.info(f"Saved metadata: {metadata_path}")
 
 # ============================================================================
 # MAIN PIPELINE
@@ -236,7 +236,7 @@ def save_metadata(sources: dict, results: dict[str, bool], output_dir: Path) -> 
 
 async def main() -> int:
   """Main execution flow."""
-  parser = argparse. ArgumentParser(
+  parser = argparse.ArgumentParser(
     description="Update Ven0m0-Adblock filter lists from remote sources"
   )
   parser.add_argument(
@@ -268,7 +268,7 @@ async def main() -> int:
   )
   args = parser.parse_args()
 
-  output_dir:  Path = args.output_dir
+  output_dir: Path = args.output_dir
   output_dir.mkdir(parents=True, exist_ok=True)
 
   logger.info("Loading source configuration...")

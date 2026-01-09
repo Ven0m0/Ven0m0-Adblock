@@ -23,7 +23,7 @@ class Stats:
   def compression_ratio(self) -> float:
     return (1 - self.final / self.original) * 100 if self.original > 0 else 0.0
 
-DOMAIN_PATTERN = re.compile(r'^[a-z0-9][-a-z0-9]{0,61}(? :\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}$', re.I)
+DOMAIN_PATTERN = re.compile(r'^[a-z0-9][-a-z0-9]{0,61}(?:\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}$', re.I)
 
 def is_header(line: str) -> bool:
   """Check if line is a header/metadata line"""
@@ -34,18 +34,18 @@ def is_valid_rule(line: str) -> bool:
   if not line or len(line) > 2048:
     return False
   if line.startswith(('||', '@@||')):
-    domain = line. split('^')[0].lstrip('|@')
+    domain = line.split('^')[0].lstrip('|@')
     return bool(DOMAIN_PATTERN.match(domain))
   return True
 
 def deduplicate_file(filepath: Path) -> Stats:
   """Deduplicate entries in a single file"""
-  print(f"Processing:  {filepath}")
+  print(f"Processing: {filepath}")
   try:
     with filepath.open('r', encoding='utf-8') as f:
       lines = [line.rstrip() for line in f]
   except Exception as e:
-    print(f"  Error reading:  {e}", file=sys.stderr)
+    print(f"  Error reading: {e}", file=sys.stderr)
     return Stats()
   
   stats = Stats(original=len(lines))
@@ -66,7 +66,7 @@ def deduplicate_file(filepath: Path) -> Stats:
         seen.add(line)
         rules.append(line)
   
-  rules. sort()
+  rules.sort()
   final = headers + rules
   stats.headers = len(headers)
   stats.final = len(final)
@@ -123,7 +123,7 @@ def main() -> int:
     total_stats.removed += stats.removed
   
   print(f"\n{'='*60}")
-  print(f"Total:  {total_stats.original} → {total_stats.final} lines")
+  print(f"Total: {total_stats.original} → {total_stats.final} lines")
   print(f"Removed: {total_stats.removed} ({total_stats.compression_ratio:.1f}% reduction)")
   
   print(f"\n{'='*60}")

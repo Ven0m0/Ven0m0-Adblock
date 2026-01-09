@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+# Userscript formatting and git automation
+# Formats code with biome/ruff/yamlfmt and commits changes
 # shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
-has(){ command -v -- "$1" &>/dev/null; }
+has() { command -v -- "$1" &>/dev/null; }
 
 # Formatting
 git add -A
