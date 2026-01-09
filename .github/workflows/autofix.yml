@@ -8,7 +8,6 @@ on:
       - "userscripts/src/**/*.js"
       - "userscripts/src/**/*.user.js"
       - "Scripts/build.sh"
-      - "Scripts/minify-js.sh"
       - "List"
       - "mise.toml"
   pull_request:
@@ -92,9 +91,8 @@ jobs:
       - name: Build userscripts
         if: steps.detect.outputs.has_changes == 'true'
         run: |
-          chmod +x Scripts/build.sh Scripts/minify-js.sh || :
+          chmod +x Scripts/build.sh || :
           [[ -f Scripts/build.sh ]] && mise exec -- bash Scripts/build.sh userscripts dist List
-          [[ -f Scripts/minify-js.sh ]] && mise exec -- bash Scripts/minify-js.sh
           mkdir -p dist userscripts/dist
           for file in userscripts/src/**/*.js; do
             [[ -f $file ]] || continue
