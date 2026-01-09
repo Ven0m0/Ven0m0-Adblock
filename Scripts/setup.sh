@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Development environment setup script
+# Installs required tools and dependencies (AGLint, HostlistCompiler, etc.)
 # shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
@@ -16,7 +18,7 @@ setup_mise(){
   log mise "Installing packages"
   has bun && export MISE_NPM_BUN=true
   for pkg in "${PACKAGES[@]}"; do
-    mise use -g "npm: ${pkg}" || warn "Failed:  $pkg"
+    mise use -g "npm:${pkg}" || warn "Failed: $pkg"
   done
   mise up -y && mise reshim
 }

@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
+# Main build script for Ven0m0-Adblock
+# Builds filter lists, hosts files, and userscripts with parallel processing
 # shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar extglob
 IFS=$'\n\t' LC_ALL=C
 readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=lib-common.sh
-.  "${SCRIPT_DIR}/lib-common.sh"
+. "${SCRIPT_DIR}/lib-common.sh"
 
 readonly REPO="${GITHUB_REPOSITORY:-Ven0m0/Ven0m0-Adblock}"
 readonly FILTER_SRC="lists/sources"
 readonly FILTER_OUT="lists/releases"
 readonly SCRIPT_SRC="userscripts/src"
 readonly SCRIPT_OUT="userscripts/dist"
-readonly SCRIPT_LIST="userscripts/list. txt"
+readonly SCRIPT_LIST="userscripts/list.txt"
 readonly BIN="${HOME}/.local/bin"
 
 declare -rA TOOLS=(
@@ -31,7 +33,7 @@ ensure_tool(){
   [[ -x $dest ]] && return 0
   log tool "Installing $name"
   mkdir -p "$BIN" || die "Cannot create $BIN"
-  curl -fsSL "$url" -o "$dest" || die "Download failed:  $name"
+  curl -fsSL "$url" -o "$dest" || die "Download failed: $name"
   chmod +x "$dest" || die "chmod failed: $name"
 }
 
@@ -139,7 +141,7 @@ download_userscripts(){
     dbg "Downloading $fn from $url"
     curl -fsSL -A "Mozilla/5.0 (Android 14; Mobile; rv:138.0) Gecko/138.0 Firefox/138.0" \
       -H "Accept-Language: en-US,en;q=0.9" \
-      -m 30 "$url" -o "$SCRIPT_SRC/$fn" || warn "Failed to download:  $url"
+      -m 30 "$url" -o "$SCRIPT_SRC/$fn" || warn "Failed to download: $url"
   done < "$SCRIPT_LIST"
   ok "Downloaded to $SCRIPT_SRC/"
 }
@@ -154,7 +156,7 @@ _process_js(){
   [[ -z $meta || -z $code ]] && { err "$fn (missing metadata or code block)"; return 1; }
   meta=$(sed -E \
     -e '/^\/\/ @(name|description):/!b;/: en/!d' \
-    -e "s|^(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base. user.js|" \
+    -e "s|^(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.user.js|" \
     -e "s|^(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.meta.js|" \
     <<< "$meta")
   js=$("$(runner)" esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || {
@@ -163,7 +165,7 @@ _process_js(){
   }
   len=${#js}
   (( len < 50 )) && { err "$fn ($len bytes, suspiciously small)"; return 1; }
-  printf '%s\n' "$meta" > "$SCRIPT_OUT/$base. meta.js"
+  printf '%s\n' "$meta" > "$SCRIPT_OUT/$base.meta.js"
   printf '%s\n%s\n' "$meta" "$js" > "$SCRIPT_OUT/$base.user.js"
   orig_size=$(wc -c < "$f")
   ok "$fn → $base.user.js ($orig_size → $len bytes)"
