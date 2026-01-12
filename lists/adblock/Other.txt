@@ -147,11 +147,16 @@ calculateaspectratio.com##.right.rio
 calculateaspectratio.com##.left.rio
 fmovies-hd.to##.cky-consent-bar
 
-! Imgur Go ad free button
+! Imgur
 imgur.com##.Button.EmeraldButton
-
-! Imgur donation button
 imgur.com##[href="https://donate.coreresponse.org/give/393950"] > .ProfileNavbar-item.uScaleTransition > svg
+imgur.com##.BottomRecirc
+imgur.com##.Gallery-Content--ad
+imgur.com##.Gallery-EngagementBar
+imgur.com##.MainContainer > div > .UploadSpinner-contentWrapper > .FastGrid > .Grid-column > div[id^="Col-Child-Imgur/Home/InContent/"]:has(.fast-grid-ad)
+imgur.com##.MainContainer > div > .UploadSpinner-contentWrapper > .FastGrid > .Grid-column > div[id^="Col-Child-Imgur/Post/InContent/"]:has(.fast-grid-ad)
+imgur.com##body:style(overflow: auto !important;)
+imgur.com##div[class^="SeeImgurOIA-"]
 
 ! Github sponsor buttons
 github.com###funding-links-modal-JosefNemec-Playnite > .btn.btn-sm
