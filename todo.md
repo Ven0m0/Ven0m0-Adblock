@@ -2,6 +2,11 @@
 
 ## Maintenance Tasks
 
+- Add
+  ```
+  https://raw.githubusercontent.com/uBlockOrigin/uAssets/refs/heads/master/filters/resource-abuse.txt
+  ```
+
 - Run `python3 Scripts/deduplicate.py` to deduplicate entries within each blocklist file
 - Run `python3 Scripts/deduplicate_across_files.py` to check for duplicates across different files
 - Run `npm run format` to format markdown, YAML, and JSON files
