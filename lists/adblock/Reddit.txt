@@ -2,6 +2,7 @@
 ! Title: Reddit Annoyances
 ! Description: This list makes Reddit much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! License: MIT
 
 ! Posts whose scores are lower than a certain amount (New Reddit)
 ! The default for all subreddits is 10 points, although this can be adjusted for a handful of subreddits whose quality levels are deemed to sharply increase with a higher or lower limit.
