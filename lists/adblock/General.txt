@@ -5,6 +5,16 @@
 ! Last modified: %timestamp%
 ! License: https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE
 
+! Cosmetic Filters
+###cookies
+###onetrust-consent-sdk
+##.cookieConsent
+##.js-consent-banner
+##.outbrain
+##.outbrain-container
+##div[aria-label="Cookie Consent Banner"]
+##div[aria-label="cookieconsent"]
+
 !! Smartblock Embed Placeholders
 @@||smartblock.firefox.etp^
 
