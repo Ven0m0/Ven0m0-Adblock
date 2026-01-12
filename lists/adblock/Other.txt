@@ -655,3 +655,4 @@ giphy.com##div[class*="OpenInAppContainer"]
 
 mozilla.org###firefox-app-store-banner
 paypal.com###PPAppDownloadBannerContainer
+greasyfork.org##.ad
