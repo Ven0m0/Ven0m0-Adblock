@@ -9,6 +9,58 @@
 ! GitHub issues: https://github.com/uBlockOrigin/uAssets/issues
 ! GitHub pull requests: https://github.com/uBlockOrigin/uAssets/pulls
 
+
+! URL Parameter Filters
+$removeparam=/^utm_/,domain=music.apple.com|reddit.com|spotify.com
+$removeparam=cmpid,domain=coupons.albertsons.com|coupons.safeway.com
+@@||google.com/url?$removeparam=ved
+||amazon.com^$removeparam=channel
+||amazon.com^$removeparam=crid
+||amazon.com^$removeparam=field-lbr_brands_browse-bin
+||amazon.com^$removeparam=sprefix
+||google.com/search$removeparam=aqs
+||google.com/search$removeparam=bih
+||google.com/search$removeparam=biw
+||google.com/search$removeparam=client
+||google.com/search$removeparam=cshid
+||google.com/search$removeparam=ei
+||google.com/search$removeparam=fbs
+||google.com/search$removeparam=gs_lcp
+||google.com/search$removeparam=gs_ssp
+||google.com/search$removeparam=ie
+||google.com/search$removeparam=iflsig
+||google.com/search$removeparam=oq
+||google.com/search$removeparam=rlz
+||google.com/search$removeparam=sa
+||google.com/search$removeparam=sca_esv
+||google.com/search$removeparam=sclient
+||google.com/search$removeparam=source
+||google.com/search$removeparam=sourceid
+||google.com/search$removeparam=uact
+||google.com/search$removeparam=ved
+||music.apple.com^$removeparam=/^ign-/
+||music.apple.com^$removeparam=app
+||music.apple.com^$removeparam=at
+||music.apple.com^$removeparam=cc
+||music.apple.com^$removeparam=cId
+||music.apple.com^$removeparam=ct
+||music.apple.com^$removeparam=itscg
+||music.apple.com^$removeparam=itsct
+||music.apple.com^$removeparam=lId
+||music.apple.com^$removeparam=ls
+||music.apple.com^$removeparam=sr
+||music.apple.com^$removeparam=src
+||music.apple.com^$removeparam=uo
+||old.reddit.com^$removeparam=rdt
+||open.spotify.com^$removeparam=dlsi
+||open.spotify.com^$removeparam=flow_ctx
+||open.spotify.com^$removeparam=flow_id
+||open.spotify.com^$removeparam=go
+||open.spotify.com^$removeparam=nd
+||open.spotify.com^$removeparam=referral
+||open.spotify.com^$removeparam=si
+||open.spotify.com^$removeparam=sp_cid
+
 ! START: Specific cosmetic filters
 
 ! https://github.com/uBlockOrigin/uBOL-home/issues/250
