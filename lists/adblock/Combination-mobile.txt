@@ -17,4 +17,3 @@
 !#include URLShortener.txt
 !#include fanboy_sounds_thirdparty.txt
 !#include lan-block.txt
-!#include ublock-filters.txt
