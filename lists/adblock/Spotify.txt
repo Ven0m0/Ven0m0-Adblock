@@ -11,3 +11,4 @@ open.spotify.com##.WvLkmOVB2R2vzI2ibR_r.eNs6P3JYpf2LScgTDHc6 > .ATUzFKub89lzvkmv
 open.spotify.com##.e-9640-button.e-9640-button-primary.encore-text-body-small-bold
 open.spotify.com##.encore-over-media-set.eDaZIM.ButtonInner-sc-14ud5tc-0
 open.spotify.com##.encore-over-media-set.eFyQzR.ButtonInner-sc-14ud5tc-0
+open.spotify.com##button[data-testid="open-app-button"]
