@@ -637,3 +637,12 @@ aternos.org##.header-center:style(margin-top:-5000px !important;)
 aternos.org##.sidebar:style(width: 1.745px !important; padding: 1px !important)
 aternos.org##.ad-dfp:style(min-height: 0.1485mm !important; height: 0.1485mm !important;)
 aternos.org###placement-takeover
+
+! Gfycat
+gfycat.com##div[class="share-container share-mobile-container"] > div[style="width: 320px; text-align: center; margin: 10px auto;"]
+
+! Giphy
+giphy.com##div[class*="OpenInAppContainer"]
+
+mozilla.org###firefox-app-store-banner
+paypal.com###PPAppDownloadBannerContainer
