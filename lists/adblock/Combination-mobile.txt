@@ -8,7 +8,6 @@
 
 !#include General.txt
 !#include Other.txt
-!#include Youtube.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
 !#include antiadblock.txt
