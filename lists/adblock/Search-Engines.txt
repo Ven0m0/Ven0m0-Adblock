@@ -46,6 +46,26 @@ www.google.ac,www.google.ad,www.google.ae,www.google.al,www.google.am,www.google
 #@#.ads_1
 *###ads_1:style(height: 1px !important)
 *##.adsbygoogle:style(height: 1px !important)
+google.com###footer
+google.com###lb:has-text(Stay signed out)
+google.com###stUuGf
+google.com##.torspo_view__follow-button
+google.com##.zU3lCe
+google.com##body:style(overflow: auto !important; position: static !important;)
+google.com##div[aria-label="Navigation drawer"][role="menu"] > a[href^="https://search.app.goo.gl/"][role="menuitem"]
+google.com##div[class="HyoXdf Pk5QZ"][jsname="lC3xKd"]
+google.com##div[class="HyoXdf VZPqNb"][jsname="lC3xKd"]
+google.com##div[class="rKJOcDNwrHj__pb-dfr rKJOcDNwrHj__pb-s"][jsname="ORHb"]
+google.com##div[jsaction="f2nbFb"][jsname="rLQONe"][role="button"]
+google.com##div[jsaction="JdMZaf:ot0Etb;rcuQ6b:npT2md;ZUAQIc:aziXvf"][jscontroller="Kby1he"][jsname="Ycs7vc"]:has-text(Give feedback on the result above?)
+google.com##div[jsaction="KIgGGb;rcuQ6b:npT2md"][jscontroller="dJBiMd"][jsname="suEOdc"]
+google.com##div[jsaction="rcuQ6b:npT2md"][jscontroller="JlIvbd"][jsname="xy3Vt"]
+google.com##div[jsaction="rcuQ6b:npT2md"][jscontroller="OPwjEf"][role="section"]
+google.com##div[jsaction="rcuQ6b:npT2md"][jscontroller="R87u2"]
+google.com##div[jsaction="Y2XUzc:Fs7Xzc"][jscontroller="dve5w"][jsname="hK5Dwd"]
+google.com##ios-safari-home-screen-icon-banner
+google.com##promo-bottom-tout
+google.com##span[jsaction^="I9owB"][jsname="EFexIf"]
 
 ! Brave search browser ad
 search.brave.com##.svelte-1avqjm8.download-cta
