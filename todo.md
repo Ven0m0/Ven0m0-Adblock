@@ -6,6 +6,7 @@
   ```
   https://raw.githubusercontent.com/uBlockOrigin/uAssets/refs/heads/master/filters/resource-abuse.txt
   ```
+- https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js
 
 - Run `python3 Scripts/deduplicate.py` to deduplicate entries within each blocklist file
 - Run `python3 Scripts/deduplicate_across_files.py` to check for duplicates across different files
