@@ -656,3 +656,80 @@ giphy.com##div[class*="OpenInAppContainer"]
 mozilla.org###firefox-app-store-banner
 paypal.com###PPAppDownloadBannerContainer
 greasyfork.org##.ad
+
+amazon.com##.a-declarative:has(.sc-climate-pledge-friendly-badge)
+amazon.com##.a-section.sc-sss-box:has-text(You are getting FREE Same)
+amazon.com##.aok-inline-block:has-text(List)
+amazon.com##.aok-inline-block:has-text(Typical)
+amazon.com##.basisPrice:upward(2)
+amazon.com##.cart-mario-regular-message:has-text(Exclusive Prime price)
+amazon.com##.celwidget:has-text(You saved)
+amazon.com##.itemPriceDrop
+amazon.com##.prime-ad-banner-content
+amazon.com##.prime-ad-banner-content, [cel_widget_id="typ-prominentUpsellSlot-prime"]
+amazon.com##.savingPriceOverride
+amazon.com##.sc-product-scarcity, .sc-product-availability, #availability
+amazon.com##.sc-subscribe-and-save-upsell-message, .financial-offer-checkbox-section-spc-desktop
+amazon.com##[aria-label="Lowest price in 30 days"]
+amazon.com##[data-a-badge-type="deal"], [data-cy="certification-recipe"]
+amazon.com##[data-component-type="s-result-info-bar"]:style(position: static !important;)
+amazon.com##[id^="BEST_DEAL_"], .s-coupon-unclipped
+amazon.com##[id^="image-map_image-map_"]
+amazon.com###aod-sticky-pinned-offer
+amazon.com###btf-sub-nav-desktop-tabs
+amazon.com###climatePledgeFriendlyATF_feature_div
+amazon.com###dealBadge_feature_div
+amazon.com###delightPricingBadge_feature_div, .apex-savings-badge.reinventPriceSavingsPercentageMargin
+amazon.com###gutterCartViewForm .a-section.sc-sss-box:has-text(eligible items)
+amazon.com###issuancePriceblockAmabot_feature_div
+amazon.com###nav-flyout-ewc
+amazon.com###nav-flyout-rufus
+amazon.com###navbar-main:style(position: static !important;)
+amazon.com###percolate-ui-ilm_div
+amazon.com###primeExclusivePricingMessage, .promoPriceBlockMessage, #applicablePromotionList_feature_div, .delightPricingBadge, #mir-layout-DELIVERY_BLOCK-slot-SECONDARY_DELIVERY_MESSAGE_LARGE
+amazon.com###sitbReaderMessageContainer
+amazon.com##body:style(padding-right: 0 !important;)
+amazon.com##div.a-row.a-size-base.a-color-secondary:has-text( left in stock - order soon)
+amazon.com##div.a-section.a-spacing-none.a-spacing-top-micro:has-text(Small Business)
+amazon.com##div.a-section.sc-sss-box:has-text(You are getting FREE Overnight delivery!)
+amazon.com##span.a-size-base.a-color-secondary:has-text(bought in past month)
+
+github.com##.Box-sc-g0xbh4-0.bgyiQy.panel-content-narrow-styles.inner-panel-content-not-narrow
+github.com##.Box-sc-g0xbh4-0.edLsev.panel-content-narrow-styles.inner-panel-content-not-narrow
+github.com##.Box-sc-g0xbh4-0.gBKNLX.react-blob-view-header-sticky:style(position: static !important;)
+github.com##.Box-sc-g0xbh4-0.gvCnwW
+github.com##.Box-sc-g0xbh4-0.react-blob-sticky-header
+github.com##.file-header:style(position: static !important;)
+github.com##.gh-header-shadow
+github.com##.js-sticky:style(position: relative !important; left: unset !important; width: unset !important; margin-top: unset !important;)
+github.com##.js-vote-banner
+github.com##.position-sticky, [class^="Diff-module__diffHeaderWrapper"]:style(position: static !important;)
+github.com##.pr-toolbar:style(position: static !important; margin-bottom: 2em !important;)
+github.com##[aria-label$="requesting changes"]:style(color: red !important;)
+github.com##[data-testid="copilot-popover-button"]
+github.com##[data-testid="issue-metadata-sticky"]:style(position: static !important;)
+github.com###repos-sticky-header:style(position: static !important;)
+github.com##h2:has-text(Repository files navigation):upward(1):style(position: static !important;)
+github.community##.topic-avatar:style(position: static !important;)
+github.community##.topic-navigation:style(position: static !important;)
+github.community###main .d-header-wrap:style(position: static !important;)
+gitlab.com##.content-wrapper:style(padding-top: 0 !important;)
+gitlab.com##[data-testid="navbar"]:style(position: static !important;)
+gitlab.com##[data-testid="top-bar"]:style(position: absolute !important;)
+gitlab.com###super-sidebar:style(position: absolute !important;)
+gitlab.wikimedia.org##.content-wrapper:style(padding-top: 0 !important;)
+gitlab.wikimedia.org##.flash-container.sticky, .merge-request-tabs-holder:style(position: static !important;)
+gitlab.wikimedia.org##.gl-broadcast-message
+gitlab.wikimedia.org##.issuable-context-form.inline-update.js-issuable-update:style(position: static !important; height: unset !important;)
+gitlab.wikimedia.org##.issuable-sidebar.is-merge-request, .right-sidebar-merge-requests:style(height: unset !important;)
+gitlab.wikimedia.org##.issue-sticky-header
+gitlab.wikimedia.org##.layout-page:style(padding-top: 0 !important;)
+gitlab.wikimedia.org##.layout-page.hide-when-top-nav-responsive-open:style(padding-top: 0 !important;)
+gitlab.wikimedia.org##.nav-sidebar:style(position: absolute !important;)
+gitlab.wikimedia.org##.project-page-sidebar:style(position: static !important;)
+gitlab.wikimedia.org##.right-sidebar, .right-sidebar .issuable-sidebar:style(height: 125% !important;)
+gitlab.wikimedia.org##.top-bar-fixed:style(position: static !important;)
+gitlab.wikimedia.org###super-sidebar:style(position: absolute !important;)
+gitlab.wikimedia.org##header, .js-file-title:style(position: static !important;)
+
+google.com##promo-throttler + div
