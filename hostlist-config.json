@@ -2,8 +2,8 @@
   "name": "Ven0m0's Combined Hostlist",
   "description": "Curated ad-blocking and privacy-focused filter list",
   "homepage": "https://github.com/Ven0m0/Ven0m0-Adblock",
-  "license": "GPL-3.0",
-  "version": "1.0.0",
+  "license": "https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE",
+  "version": "1.0.1",
   "sources": [
     {
       "source": "lists/sources/Other.txt",
@@ -22,5 +22,5 @@
     }
   ],
   "output": "lists/releases/hosts.txt",
-  "transformations": ["RemoveComments", "Validate", "Deduplicate", "Sort", "Compress"]
+  "transformations": ["RemoveComments", "RemoveModifiers", "RemoveEmptyLines", "TrimLines", "Validate", "Deduplicate", "Sort", "Compress", "InsertFinalNewLine", "ConvertToAscii"]
 }
