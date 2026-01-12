@@ -231,6 +231,15 @@ github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u
 github.com##.NewConversationDownloadActions-module__desktopActions--SOL35
 github.com##.ProductAnnouncementBanner-module__ProductAnnouncementBanner__visual--dHdzB
 github.com###\:rak\: > .prc-ActionList-ActionListContent-sg9-x
+github.com##.flash-warn:has-text(Sign in to comment)
+github.com##.Banner--warning
+gist.github.com##.gist-detail-intro
+github.com##global-banner
+github.com##x-banner
+github.com##.js-hovercard-content
+github.com##.js-notice:has-text(You unlocked new Achievements!):upward(1)
+github.com##.Popover-message:has-text(Sign in to GitHub)
+github.com##.react-comments-container > div > div[class^="Flash__StyledFlash"]:has-text(Sign in to commen
 
 ! Claude
 claude.ai##a.\[\&\[data-highlighted\]\]\:text-text-000.\[\&\[data-highlighted\]\]\:bg-bg-200.select-none.outline-none.items-center.gap-2.grid-cols-\[minmax\(0\,_1fr\)_auto\].grid.text-ellipsis.overflow-hidden.whitespace-nowrap.cursor-pointer.rounded-lg.px-2.py-1\.5.font-base:nth-of-type(2)
