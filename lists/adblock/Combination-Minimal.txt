@@ -11,3 +11,6 @@
 !#include Youtube.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
+!#include Twitter.txt
+!#include antiadblock.txt
+!#include resource-abuse.txt
