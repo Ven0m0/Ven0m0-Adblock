@@ -10,7 +10,10 @@
 !#include Other.txt
 !#include Youtube.txt
 !#include Reddit.txt
-!#include Twitch.txt
 !#include Twitter.txt
 !#include Spotify.txt
 !#include Search-Engines.txt
+!#include antiadblock.txt
+!#include resource-abuse.txt
+!#include fanboy_sounds_thirdparty.txt
+!#include lan-block.txt
