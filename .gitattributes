@@ -12,12 +12,8 @@
 # Language detection for GitHub Linguist
 # ====================
 # Filter lists should be detected as AdBlock
-*.txt linguist-language=AdBlock linguist-detectable
-*.template linguist-language=AdBlock linguist-detectable
-lists/*.txt linguist-language=AdBlock
-*Hosts.txt linguist-detectable linguist-language=hosts
-*(Hosts).txt linguist-detectable linguist-language=hosts
-
+lists/adblock/*.txt linguist-language=AdBlock linguist-detectable
+lists/hostlist/*.txt linguist-language=hosts linguist-detectable
 
 [attr]adb   linguist-detectable linguist-language=AdBlock
 [attr]json  linguist-detectable linguist-language=jsonc
