@@ -147,3 +147,89 @@ www.reddit.com###section_0_pipeline_1_trending_query ~ *
 ! LOGGED OUT rules
 www.reddit.com###search-dropdown-results-container > div:has(svg[icon-name="trend"])
 www.reddit.com###search-dropdown-results-container > div:has(svg[icon-name="trend"]) ~ *
+
+redd.it##shreddit-async-loader[bundlename="bottom_bar_xpromo"]
+redd.it##shreddit-async-loader[bundlename="top_button"][paint-group="xpromo"]
+reddit.com###blocking-modal
+reddit.com###blocking-modal-blur-container:style(filter: none !important;)
+reddit.com###nsfw-qr-dialog
+reddit.com###post-image:style(margin-bottom: 0rem !important;)
+reddit.com###trending-searches-ad
+reddit.com###use-app
+reddit.com##+js(rc, rpl-scroll-lock, body, stay)
+reddit.com##+js(rc, scroll-disabled, body, stay)
+reddit.com##+js(rc, scroll-is-blocked, body, stay)
+reddit.com##._13geajc1u3mpvccghflqg4
+reddit.com##.blurred:style(background: none !important; filter: none !important;)
+reddit.com##.communityheader-text-row > .topiclist
+reddit.com##.getappfooter
+reddit.com##.joinbuttonfull
+reddit.com##.lb-footer
+reddit.com##.lb-header
+reddit.com##.m-blurred:style(filter: none !important;)
+reddit.com##.navframe:style(overflow: auto !important;)
+reddit.com##.paginationbuttons:style(padding: 0rem 1rem 0rem !important;)
+reddit.com##.pb-xl:style(padding-bottom: 0rem !important;)
+reddit.com##.postcontent__img[src]:style(object-fit: contain !important;)
+reddit.com##.previewdrawer
+reddit.com##.prompt
+reddit.com##.right-sidebar:has-text(More posts you may like)
+reddit.com##.scroll-disabled:style(overflow: auto !important; position: static !important;)
+reddit.com##.scroll-is-blocked:style(overflow: auto !important; position: static !important;)
+reddit.com##.shreddit-pagination:style(margin-bottom: 0rem !important; padding: 0rem 1rem 0.5rem !important;)
+reddit.com##.sidebar-grid:style(filter: none !important;)
+reddit.com##.slideimagemaindiv[style="object-fit: cover;"][src]:style(object-fit: contain !important;)
+reddit.com##.subreddit-content-error > .order-last
+reddit.com##.topics-links-block
+reddit.com##.topnav__promobutton
+reddit.com##.topnav__useappbutton
+reddit.com##.topposts
+reddit.com##.xpromoappstorefooter
+reddit.com##.xpromoblockingmodal
+reddit.com##.xpromoblockingmodalrpl
+reddit.com##.xpromobottombar
+reddit.com##.xpromochoicebanner
+reddit.com##.xpromoinfeed
+reddit.com##.xpromonsfwblocking__warning
+reddit.com##.xpromonsfwblockingmodal
+reddit.com##.xpromopill
+reddit.com##.xpromopopup
+reddit.com##.xpromopopuprpl
+reddit.com##.xpromopopuprplnew
+reddit.com##body:style(overflow: auto !important; position: static !important; pointer-events: auto !important; touch-action: auto !important;)
+reddit.com##button[id$="-read-more-button"]
+reddit.com##div[class*="safe-area-inset-bottom"]
+reddit.com##div[class^="sidebar-grid"][class$="fixed"]:style(position: static !important;)
+reddit.com##div[id$="-overflow-cover"]
+reddit.com##div[id$="-post-rtjson-content"]:style(max-height: fit-content !important;)
+reddit.com##faceplate-tracker[noun="campaign_slot"][source="nav"]
+reddit.com##faceplate-tracker[noun="campaign_slot"][source="nav"] + hr
+reddit.com##faceplate-tracker[noun="top_button"][source="xpromo"]
+reddit.com##img[class="_1VSyzeCqhLG-H2N68kAx9V _3UqAK6QeNaMYy-9jvRefdv"]:style(filter: none !important;)
+reddit.com##rpl-dialog-trigger[dialog-id$="-privacy-dialog"]
+reddit.com##shreddit-ad-post
+reddit.com##shreddit-app:style(padding: var(--shreddit-header-height) 0rem 0rem !important;)
+reddit.com##shreddit-async-loader[bundlename="app_selector"]
+reddit.com##shreddit-async-loader[bundlename="bottom_bar_xpromo"]
+reddit.com##shreddit-async-loader[bundlename="faceplate_alerts"]
+reddit.com##shreddit-async-loader[bundlename="nsfw_blocking_modal"]
+reddit.com##shreddit-async-loader[bundlename="nsfw_blocking_modal"]:remove()
+reddit.com##shreddit-async-loader[bundlename="post_deletion_modal"]
+reddit.com##shreddit-async-loader[bundlename="rpl_continue_chat_in_app"]
+reddit.com##shreddit-async-loader[bundlename="top_button"][paint-group="xpromo"]
+reddit.com##shreddit-comments-page-ad
+reddit.com##shreddit-experience-tree
+reddit.com##shreddit-experience-tree:remove()
+reddit.com##shreddit-overlay-display
+reddit.com##shreddit-overlay-display:remove()
+reddit.com##shreddit-post[view-context^="ListingBelow"][view-context$="Posts"]
+reddit.com##shreddit-rereddit-promo
+reddit.com##slot[name="use-app"]
+reddit.com##xpromo-app-selector
+reddit.com##xpromo-footer
+reddit.com##xpromo-new-app-selector
+reddit.com##xpromo-new-nsfw-blocking-modal
+reddit.com##xpromo-nsfw-blocking-container[slot="blurred"]
+reddit.com##xpromo-nsfw-blocking-modal
+reddit.com##xpromo-untagged-content-blocking-modal
+reddit.com##xpromo-untagged-content-blocking-modal:remove()
