@@ -731,5 +731,6 @@ gitlab.wikimedia.org##.right-sidebar, .right-sidebar .issuable-sidebar:style(hei
 gitlab.wikimedia.org##.top-bar-fixed:style(position: static !important;)
 gitlab.wikimedia.org###super-sidebar:style(position: absolute !important;)
 gitlab.wikimedia.org##header, .js-file-title:style(position: static !important;)
+github.com###sticky-header-backdrop:style(position: static !important;)
 
 google.com##promo-throttler + div
