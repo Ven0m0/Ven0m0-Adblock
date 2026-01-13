@@ -8,9 +8,9 @@
 
 !#include General.txt
 !#include Other.txt
-!#include Youtube.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
 !#include Twitter.txt
+!#include Youtube.txt
 !#include antiadblock.txt
 !#include resource-abuse.txt

@@ -4,36 +4,27 @@
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
 ! Login popup
-twitter.com##div#layers div[data-testid="sheetDialog"]:upward(div[role="group"][tabindex="0"])
-twitter.com##html:style(overflow: auto !important;)
-twitter.com#?##layers > div[class*=" "]:first-of-type:-abp-has(a[href="/i/flow/signup"])
-
 ! Twitter cookie banner
-twitter.com##.r-13qz1uu.r-1f1sjgu.r-ymttw5.r-1d7fvdj.r-18u37iz.r-15ce4ve.r-1sw30gj.r-1awozwy.css-1dbjc4n
-twitter.com###layers > div > div:nth-of-type(2):last-of-type
-
 ! Footer
-twitter.com##div:has(> nav[role="navigation"][aria-label="Footer"])
-
 ! Filter Words
-twitter.com##main section article[role=article]:has(span:has-text(Terms of Service))
-
 ! Unnecessary downvote banner
-mobile.twitter.com##.r-iyfy8q.r-1f1sjgu.r-ymttw5.r-hwh8t1.r-18u37iz.r-6koalj.r-1xfd6ze.r-rgqbpe.css-1dbjc4n
-
 ! https://x.com/coolshirtz?lang=en
-x.com##.r-yz1j6i.r-qo02w8.r-l5o3uw.css-175oi2r
-
-x.com,twitter.com##section[aria-labelledby^="accessible-list"] div[style^="transform"]:has(div[data-testid="tweetText"] > a:is([href^="https://jp.cookie-food.com/"],[href^="https://jp.cookicway.com/"]))
-x.com,twitter.com##section[aria-labelledby^="accessible-list"] div[style^="transform"]:has(div[data-testid="card.wrapper"] + a:contains(/bokepchudai[0-9A-z]+\.blogspot|jp\.cookie-food\.com|jp\.cookicway\.com|zennnews\.com/))
-
 ! Live on X, What's happening, Who to follow
-x.com##.r-ttdzmv.r-vacyoi.css-175oi2r > div.r-14wv3jr.r-g2wdr4.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.css-175oi2r
 ! Subscribe to Premium
-x.com##.r-14wv3jr.r-g2wdr4.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.css-175oi2r
 ! Relevant People
-x.com##.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.r-1kqtdi0.r-kemksi.css-175oi2r
-x.com##.r-12vffkv.r-1p0dtai.r-1xcajam.r-1d2f490.r-zchlnj.r-aqfbo4.css-175oi2r > div.r-12vffkv.css-175oi2r > .r-12vffkv.css-175oi2r
-
 ! Common rules for 'static.ads-twitter.com/uwt.js' bait
-||static.ads-twitter.com/uwt.js$xhr,redirect=noop.js,script
+mobile.twitter.com##.r-iyfy8q.r-1f1sjgu.r-ymttw5.r-hwh8t1.r-18u37iz.r-6koalj.r-1xfd6ze.r-rgqbpe.css-1dbjc4n
+twitter.com###layers > div > div:nth-of-type(2):last-of-type
+twitter.com##.r-13qz1uu.r-1f1sjgu.r-ymttw5.r-1d7fvdj.r-18u37iz.r-15ce4ve.r-1sw30gj.r-1awozwy.css-1dbjc4n
+twitter.com##div#layers div[data-testid="sheetDialog"]:upward(div[role="group"][tabindex="0"])
+twitter.com##div:has(> nav[role="navigation"][aria-label="Footer"])
+twitter.com##html:style(overflow: auto !important;)
+twitter.com##main section article[role=article]:has(span:has-text(Terms of Service))
+twitter.com#?##layers > div[class*=" "]:first-of-type:-abp-has(a[href="/i/flow/signup"])
+x.com##.r-12vffkv.r-1p0dtai.r-1xcajam.r-1d2f490.r-zchlnj.r-aqfbo4.css-175oi2r > div.r-12vffkv.css-175oi2r > .r-12vffkv.css-175oi2r
+x.com##.r-14wv3jr.r-g2wdr4.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.css-175oi2r
+x.com##.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.r-1kqtdi0.r-kemksi.css-175oi2r
+x.com##.r-ttdzmv.r-vacyoi.css-175oi2r > div.r-14wv3jr.r-g2wdr4.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.css-175oi2r
+x.com##.r-yz1j6i.r-qo02w8.r-l5o3uw.css-175oi2r
+x.com,twitter.com##section[aria-labelledby^="accessible-list"] div[style^="transform"]:has(div[data-testid="card.wrapper"] + a:contains(/bokepchudai[0-9A-z]+\.blogspot|jp\.cookie-food\.com|jp\.cookicway\.com|zennnews\.com/))
+x.com,twitter.com##section[aria-labelledby^="accessible-list"] div[style^="transform"]:has(div[data-testid="tweetText"] > a:is([href^="https://jp.cookie-food.com/"],[href^="https://jp.cookicway.com/"]))
