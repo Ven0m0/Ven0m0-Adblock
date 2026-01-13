@@ -1,5 +1,3 @@
-no-csp-reports: * true
-no-large-media: behind-the-scene false
 * * 3p-frame block
 * * 3p-script block
 * a.espncdn.com * noop
@@ -12,8 +10,8 @@ no-large-media: behind-the-scene false
 * ajax.googleapis.com * noop
 * ajaxzip3.github.io * noop
 * akadns.net * noop
-* akamaiedge.net * noop
 * akamai.net * noop
+* akamaiedge.net * noop
 * akamaihd.net * noop
 * akamaized.net * noop
 * amazonaws.com * noop
@@ -652,10 +650,10 @@ gatherhere.com cdnjs.gathercdn.com * noop
 genspark.space genspark.site * noop
 getpocket.com cdn-apple.com * noop
 gitee.com vo.aicdn.com * noop
-gitlab.com assets.gitlab-static.net * noop
 github.com github.githubassets.com * noop
 github.com githubusercontent.com * noop
 githubuniverse.com web.app * noop
+gitlab.com assets.gitlab-static.net * noop
 globalnews.ca videoplayer.smdg.ca * noop
 godaddy.com img1.wsimg.com * noop
 google.com googleusercontent.com * noop
@@ -705,6 +703,8 @@ microsoft.com s-msft.com * noop
 money.cnn.com cdn.turner.com * noop
 my.norton.com static.nortoncdn.com * noop
 myspace.com x.myspacecdn.com * noop
+no-csp-reports: * true
+no-large-media: behind-the-scene false
 nordvpn.com s1.nordcdn.com * noop
 office.com amp.azure.net * noop
 office.com c.s-microsoft.com * noop
@@ -712,8 +712,8 @@ office.com msocdn.com * noop
 office.com r1.res.office365.com * noop
 office.com videoplayercdn.osi.office.net * noop
 office.com www.microsoft.com * noop
-open.spotify.com open.spotifycdn.com * noop
 onedrive.live.com res.public.onecdn.static.microsoft * noop
+open.spotify.com open.spotifycdn.com * noop
 outlook.live.com msftauth.net * noop
 outlook.live.com office365.com * noop
 outlook.office.com b-msedge.net * noop

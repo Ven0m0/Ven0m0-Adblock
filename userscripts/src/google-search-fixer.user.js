@@ -11,8 +11,6 @@
 // ==/UserScript==
 
 (() => {
-  "use strict";
-
   const onReady = (fn) => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", fn, { once: true, passive: true });

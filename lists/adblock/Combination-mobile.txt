@@ -10,9 +10,9 @@
 !#include Other.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
-!#include antiadblock.txt
-!#include resource-abuse.txt
 !#include Twitter.txt
 !#include URLShortener.txt
+!#include antiadblock.txt
 !#include fanboy_sounds_thirdparty.txt
 !#include lan-block.txt
+!#include resource-abuse.txt
