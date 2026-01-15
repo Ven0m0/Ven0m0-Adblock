@@ -34,20 +34,20 @@ Why Both?
 - Together they address both memory and rendering bottlenecks
 */
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   const w = unsafeWindow;
   const DEBUG = false;
 
   // Emergency disable
-  if (localStorage.getItem('disable_chatgpt_optimizer') === '1') {
-    console.warn('[ChatGPT Optimizer]: Disabled by user');
+  if (localStorage.getItem("disable_chatgpt_optimizer") === "1") {
+    console.warn("[ChatGPT Optimizer]: Disabled by user");
     return;
   }
 
   function log(...args) {
-    if (DEBUG) console.log('[ChatGPT Optimizer]', ...args);
+    if (DEBUG) console.log("[ChatGPT Optimizer]", ...args);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -58,8 +58,8 @@ Why Both?
     DEFAULT_KEEP_LAST: 40,
     STEP: 20,
     SOFT_CAP: 400,
-    KEY_KEEP_LAST: 'cgpt_optimizer_keep_last',
-    KEY_DISABLE_ONCE: 'cgpt_optimizer_disable_once'
+    KEY_KEEP_LAST: "cgpt_optimizer_keep_last",
+    KEY_DISABLE_ONCE: "cgpt_optimizer_disable_once"
   };
 
   function getKeepLast() {
@@ -73,11 +73,11 @@ Why Both?
   }
 
   function shouldDisableOnce() {
-    return w.sessionStorage.getItem(FETCH_CONFIG.KEY_DISABLE_ONCE) === '1';
+    return w.sessionStorage.getItem(FETCH_CONFIG.KEY_DISABLE_ONCE) === "1";
   }
 
   function setDisableOnce(val) {
-    if (val) w.sessionStorage.setItem(FETCH_CONFIG.KEY_DISABLE_ONCE, '1');
+    if (val) w.sessionStorage.setItem(FETCH_CONFIG.KEY_DISABLE_ONCE, "1");
     else w.sessionStorage.removeItem(FETCH_CONFIG.KEY_DISABLE_ONCE);
   }
 
@@ -87,12 +87,12 @@ Why Both?
 
   function trimConversationPayload(json, keepLast) {
     try {
-      if (!json || typeof json !== 'object') return json;
+      if (!json || typeof json !== "object") return json;
 
       const mapping = json.mapping;
       const current = json.current_node;
 
-      if (!mapping || typeof mapping !== 'object' || !current || !mapping[current]) {
+      if (!mapping || typeof mapping !== "object" || !current || !mapping[current]) {
         return json;
       }
 
@@ -119,7 +119,7 @@ Why Both?
 
         // Filter children to only kept nodes
         if (Array.isArray(copy.children)) {
-          copy.children = copy.children.filter(ch => keepIds.has(ch));
+          copy.children = copy.children.filter((ch) => keepIds.has(ch));
         }
 
         // Nullify parent if not kept
@@ -136,7 +136,7 @@ Why Both?
 
       return { ...json, mapping: newMapping };
     } catch (e) {
-      log('Trim failed:', e);
+      log("Trim failed:", e);
       return json;
     }
   }
@@ -149,7 +149,7 @@ Why Both?
 
     if (!trimmingEnabled) {
       setDisableOnce(false);
-      log('Trimming disabled for this reload (one-time).');
+      log("Trimming disabled for this reload (one-time).");
     }
 
     w.fetch = async (...args) => {
@@ -158,14 +158,14 @@ Why Both?
       try {
         if (!trimmingEnabled) return res;
 
-        const url = typeof args[0] === 'string' ? args[0] :
-                    (args[0] && typeof args[0] === 'object' ? args[0].url || '' : '');
+        const url =
+          typeof args[0] === "string" ? args[0] : args[0] && typeof args[0] === "object" ? args[0].url || "" : "";
 
         if (!shouldIntercept(url)) return res;
 
         const clone = res.clone();
-        const ct = clone.headers.get('content-type') || '';
-        if (!ct.includes('application/json')) return res;
+        const ct = clone.headers.get("content-type") || "";
+        if (!ct.includes("application/json")) return res;
 
         const data = await clone.json();
         const trimmed = trimConversationPayload(data, keepLastNow);
@@ -200,25 +200,25 @@ Why Both?
     DEFAULT_LEAVE_ONLY: 5,
     DEFAULT_INTERVAL_SEC: 10,
     MIN_INTERVAL_SEC: 2,
-    KEY_LEAVE_ONLY: 'cgpt_optimizer_leave_only',
-    KEY_INTERVAL_SEC: 'cgpt_optimizer_interval_sec',
-    KEY_ENABLED: 'cgpt_optimizer_enabled'
+    KEY_LEAVE_ONLY: "cgpt_optimizer_leave_only",
+    KEY_INTERVAL_SEC: "cgpt_optimizer_interval_sec",
+    KEY_ENABLED: "cgpt_optimizer_enabled"
   };
 
   function cleanOldMessages(leaveOnly, manual = false) {
     try {
-      if (manual) console.info('[DOM Cleanup] Manual clean triggered');
+      if (manual) console.info("[DOM Cleanup] Manual clean triggered");
 
       const all = document.querySelectorAll('[data-testid^="conversation-turn-"]');
       if (all.length === 0) return;
 
-      const lastAttr = all[all.length - 1].getAttribute('data-testid');
-      const last = parseInt(lastAttr?.split('-')[2]);
+      const lastAttr = all[all.length - 1].getAttribute("data-testid");
+      const last = parseInt(lastAttr?.split("-")[2]);
 
       if (!isNaN(last)) {
         let removed = 0;
-        all.forEach(item => {
-          const idx = parseInt(item.getAttribute('data-testid')?.split('-')[2]);
+        all.forEach((item) => {
+          const idx = parseInt(item.getAttribute("data-testid")?.split("-")[2]);
           if (!isNaN(idx) && idx < last - leaveOnly) {
             item.remove();
             removed++;
@@ -227,7 +227,7 @@ Why Both?
         if (removed > 0) log(`Removed ${removed} old DOM nodes`);
       }
     } catch (e) {
-      console.error('[DOM Cleanup] Error:', e);
+      console.error("[DOM Cleanup] Error:", e);
     }
   }
 
@@ -236,63 +236,63 @@ Why Both?
   // ═══════════════════════════════════════════════════════════
 
   function createUI() {
-    if (document.getElementById('cgpt-optimizer-ui')) return;
+    if (document.getElementById("cgpt-optimizer-ui")) return;
 
     // Load settings
     const domSettings = {
       leaveOnly: parseInt(localStorage.getItem(DOM_CONFIG.KEY_LEAVE_ONLY)) || DOM_CONFIG.DEFAULT_LEAVE_ONLY,
       intervalSec: parseInt(localStorage.getItem(DOM_CONFIG.KEY_INTERVAL_SEC)) || DOM_CONFIG.DEFAULT_INTERVAL_SEC,
-      enabled: localStorage.getItem(DOM_CONFIG.KEY_ENABLED) !== 'false'
+      enabled: localStorage.getItem(DOM_CONFIG.KEY_ENABLED) !== "false"
     };
 
     let intervalId = null;
     let panelVisible = false;
 
     // Create container
-    const container = document.createElement('div');
-    container.id = 'cgpt-optimizer-ui';
+    const container = document.createElement("div");
+    container.id = "cgpt-optimizer-ui";
     Object.assign(container.style, {
-      position: 'fixed',
-      bottom: '8px',
-      right: '8px',
-      zIndex: '999999',
-      fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
-      fontSize: '12px',
-      userSelect: 'none'
+      position: "fixed",
+      bottom: "8px",
+      right: "8px",
+      zIndex: "999999",
+      fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+      fontSize: "12px",
+      userSelect: "none"
     });
 
     // Toggle button
-    const toggleBtn = document.createElement('button');
-    toggleBtn.textContent = '⚡';
-    toggleBtn.title = 'ChatGPT Optimizer';
+    const toggleBtn = document.createElement("button");
+    toggleBtn.textContent = "⚡";
+    toggleBtn.title = "ChatGPT Optimizer";
     Object.assign(toggleBtn.style, {
-      background: domSettings.enabled ? '#444' : '#c00',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '50%',
-      width: '32px',
-      height: '32px',
-      cursor: 'pointer',
-      fontSize: '16px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+      background: domSettings.enabled ? "#444" : "#c00",
+      color: "#fff",
+      border: "none",
+      borderRadius: "50%",
+      width: "32px",
+      height: "32px",
+      cursor: "pointer",
+      fontSize: "16px",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
     });
 
     // Panel
-    const panel = document.createElement('div');
-    panel.id = 'cgpt-optimizer-panel';
+    const panel = document.createElement("div");
+    panel.id = "cgpt-optimizer-panel";
     Object.assign(panel.style, {
-      display: 'none',
-      position: 'absolute',
-      bottom: '40px',
-      right: '0',
-      background: 'rgba(0,0,0,0.9)',
-      backdropFilter: 'blur(10px)',
-      color: '#fff',
-      padding: '12px',
-      borderRadius: '8px',
-      minWidth: '240px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-      border: '1px solid rgba(255,255,255,0.15)'
+      display: "none",
+      position: "absolute",
+      bottom: "40px",
+      right: "0",
+      background: "rgba(0,0,0,0.9)",
+      backdropFilter: "blur(10px)",
+      color: "#fff",
+      padding: "12px",
+      borderRadius: "8px",
+      minWidth: "240px",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+      border: "1px solid rgba(255,255,255,0.15)"
     });
 
     panel.innerHTML = `
@@ -308,7 +308,7 @@ Why Both?
 
       <div style="margin-bottom:8px;">
         <label style="display:flex;align-items:center;gap:6px;">
-          <input type="checkbox" id="cgpt-dom-enabled" ${domSettings.enabled ? 'checked' : ''}>
+          <input type="checkbox" id="cgpt-dom-enabled" ${domSettings.enabled ? "checked" : ""}>
           <span>DOM auto-clean enabled</span>
         </label>
       </div>
@@ -358,16 +358,16 @@ Why Both?
     document.body.appendChild(container);
 
     // Get elements
-    const closeBtn = panel.querySelector('#cgpt-close');
-    const domEnabledCheckbox = panel.querySelector('#cgpt-dom-enabled');
-    const domKeepInput = panel.querySelector('#cgpt-dom-keep');
-    const domIntervalInput = panel.querySelector('#cgpt-dom-interval');
-    const cleanNowBtn = panel.querySelector('#cgpt-clean-now');
-    const loadOlderBtn = panel.querySelector('#cgpt-load-older');
-    const resetFastBtn = panel.querySelector('#cgpt-reset-fast');
-    const fullHistoryBtn = panel.querySelector('#cgpt-full-history');
-    const keepDisplay = panel.querySelector('#cgpt-keep-display');
-    const leaveDisplay = panel.querySelector('#cgpt-leave-display');
+    const closeBtn = panel.querySelector("#cgpt-close");
+    const domEnabledCheckbox = panel.querySelector("#cgpt-dom-enabled");
+    const domKeepInput = panel.querySelector("#cgpt-dom-keep");
+    const domIntervalInput = panel.querySelector("#cgpt-dom-interval");
+    const cleanNowBtn = panel.querySelector("#cgpt-clean-now");
+    const loadOlderBtn = panel.querySelector("#cgpt-load-older");
+    const resetFastBtn = panel.querySelector("#cgpt-reset-fast");
+    const fullHistoryBtn = panel.querySelector("#cgpt-full-history");
+    const keepDisplay = panel.querySelector("#cgpt-keep-display");
+    const leaveDisplay = panel.querySelector("#cgpt-leave-display");
 
     // State
     let currentLeaveOnly = domSettings.leaveOnly;
@@ -392,19 +392,19 @@ Why Both?
     // Event handlers
     toggleBtn.onclick = () => {
       panelVisible = !panelVisible;
-      panel.style.display = panelVisible ? 'block' : 'none';
+      panel.style.display = panelVisible ? "block" : "none";
     };
 
     closeBtn.onclick = () => {
       panelVisible = false;
-      panel.style.display = 'none';
+      panel.style.display = "none";
     };
 
     domEnabledCheckbox.onchange = () => {
       currentEnabled = domEnabledCheckbox.checked;
       localStorage.setItem(DOM_CONFIG.KEY_ENABLED, currentEnabled);
-      toggleBtn.style.background = currentEnabled ? '#444' : '#c00';
-      log('DOM cleanup enabled:', currentEnabled);
+      toggleBtn.style.background = currentEnabled ? "#444" : "#c00";
+      log("DOM cleanup enabled:", currentEnabled);
     };
 
     domKeepInput.oninput = () => {
@@ -413,7 +413,7 @@ Why Both?
         currentLeaveOnly = val;
         localStorage.setItem(DOM_CONFIG.KEY_LEAVE_ONLY, val);
         leaveDisplay.textContent = val;
-        log('DOM keep set to', val);
+        log("DOM keep set to", val);
       }
     };
 
@@ -427,7 +427,7 @@ Why Both?
     };
 
     cleanNowBtn.onclick = () => {
-      console.info('[ChatGPT Optimizer] Manual DOM clean triggered');
+      console.info("[ChatGPT Optimizer] Manual DOM clean triggered");
       scheduleDOMClean(true);
     };
 
@@ -443,7 +443,7 @@ Why Both?
     };
 
     fullHistoryBtn.onclick = () => {
-      if (confirm('Load full history? This may cause significant lag.')) {
+      if (confirm("Load full history? This may cause significant lag.")) {
         setDisableOnce(true);
         w.location.reload();
       }
@@ -456,7 +456,7 @@ Why Both?
 
     // Re-inject UI if removed by ChatGPT navigation
     const observer = new MutationObserver(() => {
-      if (!document.getElementById('cgpt-optimizer-ui')) {
+      if (!document.getElementById("cgpt-optimizer-ui")) {
         observer.disconnect();
         setTimeout(createUI, 100);
       }
@@ -465,19 +465,19 @@ Why Both?
   }
 
   // Initialize UI when DOM ready
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  if (document.readyState === "complete" || document.readyState === "interactive") {
     createUI();
   } else {
-    window.addEventListener('DOMContentLoaded', createUI);
+    window.addEventListener("DOMContentLoaded", createUI);
   }
 
   // Fallback: ensure UI exists
   const uiTimer = w.setInterval(() => {
-    if (w.document?.body && !document.getElementById('cgpt-optimizer-ui')) {
+    if (w.document?.body && !document.getElementById("cgpt-optimizer-ui")) {
       createUI();
       w.clearInterval(uiTimer);
     }
   }, 500);
 
-  console.info('[ChatGPT Optimizer] Initialized (dual-layer: fetch + DOM)');
+  console.info("[ChatGPT Optimizer] Initialized (dual-layer: fetch + DOM)");
 })();

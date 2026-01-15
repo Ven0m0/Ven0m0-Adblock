@@ -11,6 +11,7 @@ export default [
       "Filters/**",
       "lists/releases/**",
       "lists/mirror/**",
+      "userscripts/todo/**",
       "*.min.js",
       "*.bundle.js"
     ]

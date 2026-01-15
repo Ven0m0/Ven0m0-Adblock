@@ -33,12 +33,12 @@ IMPROVEMENTS OVER ORIGINALS:
 - Emergency disable flag
 */
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   // Emergency disable
-  if (localStorage.getItem('disable_yt_complete_optimizer') === '1') {
-    console.warn('[YouTube Complete Optimizer]: Disabled by user');
+  if (localStorage.getItem("disable_yt_complete_optimizer") === "1") {
+    console.warn("[YouTube Complete Optimizer]: Disabled by user");
     return;
   }
 
@@ -51,35 +51,35 @@ IMPROVEMENTS OVER ORIGINALS:
 
   const CONFIG = {
     // Module 1: Codec Blocking
-    blockAV1: GM_getValue('yt_block_av1', true),
+    blockAV1: GM_getValue("yt_block_av1", true),
 
     // Module 2: CPU Timer Taming
-    enableCPUTamer: GM_getValue('yt_cpu_tamer', true),
+    enableCPUTamer: GM_getValue("yt_cpu_tamer", true),
 
     // Module 3: Resource Management
-    enableResourceOptimization: GM_getValue('yt_resource_opt', true),
+    enableResourceOptimization: GM_getValue("yt_resource_opt", true),
 
     // Module 4: Polymer UI Fixes
-    disableAnimations: GM_getValue('yt_disable_animations', true),
-    hideShorts: GM_getValue('yt_hide_shorts', true),
-    hideComments: GM_getValue('yt_hide_comments', false),
-    hideSidebar: GM_getValue('yt_hide_sidebar', false),
+    disableAnimations: GM_getValue("yt_disable_animations", true),
+    hideShorts: GM_getValue("yt_hide_shorts", true),
+    hideComments: GM_getValue("yt_hide_comments", false),
+    hideSidebar: GM_getValue("yt_hide_sidebar", false),
 
     // Module 5: Performance Features
-    instantNavigation: GM_getValue('yt_instant_nav', true),
-    blockTracking: GM_getValue('yt_block_tracking', true)
+    instantNavigation: GM_getValue("yt_instant_nav", true),
+    blockTracking: GM_getValue("yt_block_tracking", true)
   };
 
   function saveConfig() {
-    GM_setValue('yt_block_av1', CONFIG.blockAV1);
-    GM_setValue('yt_cpu_tamer', CONFIG.enableCPUTamer);
-    GM_setValue('yt_resource_opt', CONFIG.enableResourceOptimization);
-    GM_setValue('yt_disable_animations', CONFIG.disableAnimations);
-    GM_setValue('yt_hide_shorts', CONFIG.hideShorts);
-    GM_setValue('yt_hide_comments', CONFIG.hideComments);
-    GM_setValue('yt_hide_sidebar', CONFIG.hideSidebar);
-    GM_setValue('yt_instant_nav', CONFIG.instantNavigation);
-    GM_setValue('yt_block_tracking', CONFIG.blockTracking);
+    GM_setValue("yt_block_av1", CONFIG.blockAV1);
+    GM_setValue("yt_cpu_tamer", CONFIG.enableCPUTamer);
+    GM_setValue("yt_resource_opt", CONFIG.enableResourceOptimization);
+    GM_setValue("yt_disable_animations", CONFIG.disableAnimations);
+    GM_setValue("yt_hide_shorts", CONFIG.hideShorts);
+    GM_setValue("yt_hide_comments", CONFIG.hideComments);
+    GM_setValue("yt_hide_sidebar", CONFIG.hideSidebar);
+    GM_setValue("yt_instant_nav", CONFIG.instantNavigation);
+    GM_setValue("yt_block_tracking", CONFIG.blockTracking);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -89,11 +89,11 @@ IMPROVEMENTS OVER ORIGINALS:
   if (CONFIG.blockAV1) {
     // Codec checking function
     function typeTest(type) {
-      if (typeof type === 'string' && type.startsWith('video/')) {
+      if (typeof type === "string" && type.startsWith("video/")) {
         // Block AV1 codecs
-        if (type.includes('av01')) {
+        if (type.includes("av01")) {
           if (/codecs[\x20-\x7F]+\bav01\b/.test(type)) return false;
-        } else if (type.includes('av1')) {
+        } else if (type.includes("av1")) {
           if (/codecs[\x20-\x7F]+\bav1\b/.test(type)) return false;
         }
       }
@@ -101,10 +101,10 @@ IMPROVEMENTS OVER ORIGINALS:
 
     // Wrapper factory for codec checkers
     function makeModifiedTypeChecker(nativeFunc, isHTMLMediaElement = false) {
-      return function(type) {
+      return function (type) {
         const modResult = typeTest(type);
         if (modResult === false) {
-          return isHTMLMediaElement ? '' : false;
+          return isHTMLMediaElement ? "" : false;
         }
         return nativeFunc.call(this, type);
       };
@@ -112,32 +112,32 @@ IMPROVEMENTS OVER ORIGINALS:
 
     // Override HTMLMediaElement.canPlayType
     const proto = (HTMLVideoElement || 0).prototype;
-    if (proto && typeof proto.canPlayType === 'function') {
+    if (proto && typeof proto.canPlayType === "function") {
       proto.canPlayType = makeModifiedTypeChecker(proto.canPlayType, true);
     }
 
     // Override MediaSource.isTypeSupported
-    const mse = (window.MediaSource || 0);
-    if (mse && typeof mse.isTypeSupported === 'function') {
+    const mse = window.MediaSource || 0;
+    if (mse && typeof mse.isTypeSupported === "function") {
       const original = mse.isTypeSupported;
       mse.isTypeSupported = makeModifiedTypeChecker(original);
     }
 
     // Override localStorage preference
-    Object.defineProperty(localStorage.constructor.prototype, 'yt-player-av1-pref', {
+    Object.defineProperty(localStorage.constructor.prototype, "yt-player-av1-pref", {
       get() {
-        if (this === localStorage) return '480'; // Disable AV1
-        return this.getItem('yt-player-av1-pref');
+        if (this === localStorage) return "480"; // Disable AV1
+        return this.getItem("yt-player-av1-pref");
       },
       set(newValue) {
         if (this === localStorage) return true; // Block writes
-        return this.setItem('yt-player-av1-pref', newValue);
+        return this.setItem("yt-player-av1-pref", newValue);
       },
       enumerable: true,
       configurable: true
     });
 
-    console.log('[YouTube Optimizer] AV1 codec blocking enabled');
+    console.log("[YouTube Optimizer] AV1 codec blocking enabled");
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -146,53 +146,64 @@ IMPROVEMENTS OVER ORIGINALS:
 
   if (CONFIG.enableCPUTamer) {
     ((o) => {
-      const [setTimeout_, setInterval_, requestAnimationFrame_, clearTimeout_, clearInterval_, cancelAnimationFrame_] = o;
+      const [setTimeout_, setInterval_, requestAnimationFrame_, clearTimeout_, clearInterval_, cancelAnimationFrame_] =
+        o;
       const win = this instanceof Window ? this : window;
 
       // Duplicate detection
-      const hkey_script = 'yt_complete_optimizer_cpu_tamer';
+      const hkey_script = "yt_complete_optimizer_cpu_tamer";
       if (win[hkey_script]) return;
       win[hkey_script] = true;
 
       // GPU acceleration check
       const checkGPUAcceleration = (() => {
         try {
-          const canvas = document.createElement('canvas');
-          return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+          const canvas = document.createElement("canvas");
+          return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
         } catch (e) {
           return false;
         }
       })();
 
       if (!checkGPUAcceleration) {
-        console.warn('[YouTube Optimizer] GPU acceleration not available, CPU Tamer skipped');
+        console.warn("[YouTube Optimizer] GPU acceleration not available, CPU Tamer skipped");
         return;
       }
 
       // Time update detection
       const getTimeUpdate = (() => {
         window.lastTimeUpdate = 1;
-        document.addEventListener('timeupdate', function() {
-          window.lastTimeUpdate = Date.now();
-        }, true);
+        document.addEventListener(
+          "timeupdate",
+          function () {
+            window.lastTimeUpdate = Date.now();
+          },
+          true
+        );
         let topLastTimeUpdate = -1;
         try {
           topLastTimeUpdate = top.lastTimeUpdate;
         } catch (e) {}
-        return topLastTimeUpdate >= 1 ? function() { return top.lastTimeUpdate; } : function() { return window.lastTimeUpdate; };
+        return topLastTimeUpdate >= 1
+          ? function () {
+            return top.lastTimeUpdate;
+          }
+          : function () {
+            return window.lastTimeUpdate;
+          };
       })();
 
-      const PromiseConstructor = function(executor) {
+      const PromiseConstructor = function (executor) {
         return new Promise(executor);
       };
 
       const ExternalPromise = (() => {
         let resolve_, reject_;
-        const handler = function(resolve, reject) {
+        const handler = function (resolve, reject) {
           resolve_ = resolve;
           reject_ = reject;
         };
-        const PromiseExternal = function(cb) {
+        const PromiseExternal = function (cb) {
           cb = cb || handler;
           const promise = new PromiseConstructor(cb);
           if (cb === handler) {
@@ -205,21 +216,23 @@ IMPROVEMENTS OVER ORIGINALS:
       })();
 
       // Initialize isolated iframe context
-      const initializeContext = function(win) {
-        return new PromiseConstructor(function(resolve) {
+      const initializeContext = function (win) {
+        return new PromiseConstructor(function (resolve) {
           const waitForFrame = requestAnimationFrame_;
           let maxRetries = 16;
-          const frameId = 'yt-optimizer-iframe-v1';
+          const frameId = "yt-optimizer-iframe-v1";
           let frame = document.getElementById(frameId);
           let removeFrame = null;
 
           if (!frame) {
-            frame = document.createElement('iframe');
+            frame = document.createElement("iframe");
             frame.id = frameId;
-            const blobURL = typeof webkitCancelAnimationFrame === 'function' && typeof kagi === 'undefined' ?
-              (frame.src = URL.createObjectURL(new Blob([], { type: 'text/html' }))) : null;
-            frame.sandbox = 'allow-same-origin';
-            let noscriptElement = document.createElement('noscript');
+            const blobURL =
+              typeof webkitCancelAnimationFrame === "function" && typeof kagi === "undefined"
+                ? (frame.src = URL.createObjectURL(new Blob([], { type: "text/html" })))
+                : null;
+            frame.sandbox = "allow-same-origin";
+            let noscriptElement = document.createElement("noscript");
             noscriptElement.appendChild(frame);
 
             (function waitForDocument() {
@@ -228,20 +241,25 @@ IMPROVEMENTS OVER ORIGINALS:
               }
               const root = document.documentElement;
               root.appendChild(noscriptElement);
-              if (blobURL) PromiseConstructor.resolve().then(function() { URL.revokeObjectURL(blobURL); });
+              if (blobURL)
+                PromiseConstructor.resolve().then(function () {
+                  URL.revokeObjectURL(blobURL);
+                });
 
-              removeFrame = function(setTimeout) {
-                const removeFrameWhenReady = function(e) {
+              removeFrame = function (setTimeout) {
+                const removeFrameWhenReady = function (e) {
                   if (e) win.removeEventListener("DOMContentLoaded", removeFrameWhenReady, false);
                   e = noscriptElement;
                   noscriptElement = win = removeFrame = 0;
                   if (setTimeout) {
-                    setTimeout(function() { e.remove(); }, 200);
+                    setTimeout(function () {
+                      e.remove();
+                    }, 200);
                   } else {
                     e.remove();
                   }
                 };
-                if (!setTimeout || document.readyState !== 'loading') {
+                if (!setTimeout || document.readyState !== "loading") {
                   removeFrameWhenReady();
                 } else {
                   win.addEventListener("DOMContentLoaded", removeFrameWhenReady, false);
@@ -255,11 +273,11 @@ IMPROVEMENTS OVER ORIGINALS:
               return new PromiseConstructor(waitForFrame).then(waitForFrameContext);
             }
             const frameContext = frame.contentWindow;
-            if (!frameContext) throw new Error('window is not found.');
+            if (!frameContext) throw new Error("window is not found.");
             try {
               const { requestAnimationFrame, setInterval, setTimeout, clearInterval, clearTimeout } = frameContext;
               const boundFunctions = { requestAnimationFrame, setInterval, setTimeout, clearInterval, clearTimeout };
-              for (let key in boundFunctions) boundFunctions[key] = boundFunctions[key].bind(win);
+              for (const key in boundFunctions) boundFunctions[key] = boundFunctions[key].bind(win);
               if (removeFrame) PromiseConstructor.resolve(boundFunctions.setTimeout).then(removeFrame);
               resolve(boundFunctions);
             } catch (e) {
@@ -270,31 +288,31 @@ IMPROVEMENTS OVER ORIGINALS:
         });
       };
 
-      initializeContext(win).then(function(context) {
+      initializeContext(win).then(function (context) {
         if (!context) return null;
 
         const { requestAnimationFrame, setTimeout, setInterval, clearTimeout, clearInterval } = context;
         let animationFrameInterrupter = null;
 
-        const createRAFHelper = function() {
-          const animationElement = document.createElement('a-f');
-          if (!('onanimationiteration' in animationElement)) {
-            return function(resolve) {
+        const createRAFHelper = function () {
+          const animationElement = document.createElement("a-f");
+          if (!("onanimationiteration" in animationElement)) {
+            return function (resolve) {
               animationFrameInterrupter = resolve;
               requestAnimationFrame(resolve);
             };
           }
-          animationElement.id = 'a-f';
+          animationElement.id = "a-f";
           let animationQueue = null;
-          animationElement.onanimationiteration = function() {
+          animationElement.onanimationiteration = function () {
             if (animationQueue !== null) {
               animationQueue();
               animationQueue = null;
             }
           };
-          if (!document.getElementById('afscript')) {
-            const style = document.createElement('style');
-            style.id = 'afscript';
+          if (!document.getElementById("afscript")) {
+            const style = document.createElement("style");
+            style.id = "afscript";
             style.textContent = `
               @keyFrames aF1 {
                 0% { order: 0; }
@@ -321,7 +339,7 @@ IMPROVEMENTS OVER ORIGINALS:
             (document.head || document.documentElement).appendChild(style);
           }
           document.documentElement.insertBefore(animationElement, document.documentElement.firstChild);
-          return function(resolve) {
+          return function (resolve) {
             animationQueue = resolve;
             animationFrameInterrupter = resolve;
           };
@@ -334,10 +352,10 @@ IMPROVEMENTS OVER ORIGINALS:
           afPromisePrimary = afPromiseSecondary = { resolved: true };
           let afIndex = 0;
 
-          const resolveRAF = function(rafPromise) {
-            return new PromiseConstructor(function(resolve) {
+          const resolveRAF = function (rafPromise) {
+            return new PromiseConstructor(function (resolve) {
               rafHelper(resolve);
-            }).then(function() {
+            }).then(function () {
               rafPromise.resolved = true;
               const time = ++afIndex;
               if (time > 9e9) afIndex = 9;
@@ -346,29 +364,31 @@ IMPROVEMENTS OVER ORIGINALS:
             });
           };
 
-          const executeRAF = function() {
-            return new PromiseConstructor(function(resolve) {
+          const executeRAF = function () {
+            return new PromiseConstructor(function (resolve) {
               const pendingPrimary = !afPromisePrimary.resolved ? afPromisePrimary : null;
               const pendingSecondary = !afPromiseSecondary.resolved ? afPromiseSecondary : null;
               let time = 0;
 
               if (pendingPrimary && pendingSecondary) {
-                resolve(PromiseConstructor.all([pendingPrimary, pendingSecondary]).then(function(times) {
-                  const t1 = times[0];
-                  const t2 = times[1];
-                  time = t1 > t2 && t1 - t2 < 8e9 ? t1 : t2;
-                  return time;
-                }));
+                resolve(
+                  PromiseConstructor.all([pendingPrimary, pendingSecondary]).then(function (times) {
+                    const t1 = times[0];
+                    const t2 = times[1];
+                    time = t1 > t2 && t1 - t2 < 8e9 ? t1 : t2;
+                    return time;
+                  })
+                );
               } else {
                 const newPrimary = !pendingPrimary ? (afPromisePrimary = new ExternalPromise()) : null;
                 const newSecondary = !pendingSecondary ? (afPromiseSecondary = new ExternalPromise()) : null;
 
-                const executeSecondary = function() {
+                const executeSecondary = function () {
                   if (newPrimary) {
-                    resolveRAF(newPrimary).then(function(t) {
+                    resolveRAF(newPrimary).then(function (t) {
                       time = t;
                       if (newSecondary) {
-                        resolveRAF(newSecondary).then(function(t2) {
+                        resolveRAF(newSecondary).then(function (t2) {
                           time = t2;
                           resolve(time);
                         });
@@ -377,7 +397,7 @@ IMPROVEMENTS OVER ORIGINALS:
                       }
                     });
                   } else if (newSecondary) {
-                    resolveRAF(newSecondary).then(function(t) {
+                    resolveRAF(newSecondary).then(function (t) {
                       time = t;
                       resolve(time);
                     });
@@ -387,11 +407,11 @@ IMPROVEMENTS OVER ORIGINALS:
                 };
 
                 if (pendingSecondary) {
-                  pendingSecondary.then(function() {
+                  pendingSecondary.then(function () {
                     executeSecondary();
                   });
                 } else if (pendingPrimary) {
-                  pendingPrimary.then(function() {
+                  pendingPrimary.then(function () {
                     executeSecondary();
                   });
                 } else {
@@ -403,13 +423,13 @@ IMPROVEMENTS OVER ORIGINALS:
 
           const executingTasks = new Set();
 
-          const wrapFunction = function(handler, store) {
-            return function() {
+          const wrapFunction = function (handler, store) {
+            return function () {
               const currentTime = Date.now();
               if (currentTime - getTimeUpdate() < 800 && currentTime - store.lastTime < 800) {
                 const id = store.id;
                 executingTasks.add(id);
-                executeRAF().then(function(time) {
+                executeRAF().then(function (time) {
                   const isNotRemoved = executingTasks.delete(id);
                   if (!isNotRemoved || time === store.lastExecution) return;
                   store.lastExecution = time;
@@ -423,10 +443,10 @@ IMPROVEMENTS OVER ORIGINALS:
             };
           };
 
-          const createFunctionWrapper = function(originalFunction) {
-            return function(func, ms) {
+          const createFunctionWrapper = function (originalFunction) {
+            return function (func, ms) {
               if (ms === undefined) ms = 0;
-              if (typeof func === 'function') {
+              if (typeof func === "function") {
                 const store = { lastTime: Date.now() };
                 const wrappedFunc = wrapFunction(func, store);
                 store.id = originalFunction(wrappedFunc, ms);
@@ -440,8 +460,8 @@ IMPROVEMENTS OVER ORIGINALS:
           win.setTimeout = createFunctionWrapper(setTimeout);
           win.setInterval = createFunctionWrapper(setInterval);
 
-          const clearFunctionWrapper = function(originalFunction) {
-            return function(id) {
+          const clearFunctionWrapper = function (originalFunction) {
+            return function (id) {
               if (id) executingTasks.delete(id) || originalFunction(id);
             };
           };
@@ -458,7 +478,7 @@ IMPROVEMENTS OVER ORIGINALS:
         })();
 
         let intervalInterrupter = null;
-        setInterval(function() {
+        setInterval(function () {
           if (intervalInterrupter === animationFrameInterrupter) {
             if (intervalInterrupter !== null) {
               animationFrameInterrupter();
@@ -470,7 +490,7 @@ IMPROVEMENTS OVER ORIGINALS:
         }, 125);
       });
 
-      console.log('[YouTube Optimizer] CPU Timer Tamer enabled');
+      console.log("[YouTube Optimizer] CPU Timer Tamer enabled");
     })([setTimeout, setInterval, requestAnimationFrame, clearTimeout, clearInterval, cancelAnimationFrame]);
   }
 
@@ -484,13 +504,13 @@ IMPROVEMENTS OVER ORIGINALS:
       const locksQuery_ = navigator.locks.query;
       const locksRequest_ = navigator.locks.request;
 
-      navigator.locks.query = function() {
+      navigator.locks.query = function () {
         return new Promise((resolve) => {
           resolve({ held: [], pending: [] });
         });
       };
 
-      navigator.locks.request = function() {
+      navigator.locks.request = function () {
         return new Promise((resolve) => {
           resolve();
         });
@@ -506,27 +526,27 @@ IMPROVEMENTS OVER ORIGINALS:
       let cidxx = 0;
 
       const message = (obj) => {
-        console.log('[YouTube Optimizer] IndexedDB:', obj.action, obj.databaseId, 'count:', openCount);
+        console.log("[YouTube Optimizer] IndexedDB:", obj.action, obj.databaseId, "count:", openCount);
       };
 
       function releaseOnIdleHandler() {
         for (const request of [...dbSet.values()]) {
-          let db = request.result;
-          if (db && typeof db.close === 'function') {
+          const db = request.result;
+          if (db && typeof db.close === "function") {
             db.close();
             openCount--;
-            message({ databaseId: db.name, action: 'close', time: Date.now() });
+            message({ databaseId: db.name, action: "close", time: Date.now() });
           }
         }
         dbSet.clear();
       }
 
       window.indexedDB.constructor.prototype[openKey] = window.indexedDB.constructor.prototype.open;
-      window.indexedDB.constructor.prototype.open = function(databaseId) {
+      window.indexedDB.constructor.prototype.open = function (databaseId) {
         const request = this[openKey](databaseId);
         openCount++;
         dbSet.add(request);
-        message({ databaseId, action: 'open', time: Date.now() });
+        message({ databaseId, action: "open", time: Date.now() });
 
         if (cidxx > 0) clearTimeout(cidxx);
         cidxx = setTimeout(releaseOnIdleHandler, 18 * 1000);
@@ -535,7 +555,7 @@ IMPROVEMENTS OVER ORIGINALS:
       };
     }
 
-    console.log('[YouTube Optimizer] Resource management enabled (WebLock disabled, IndexedDB auto-close)');
+    console.log("[YouTube Optimizer] Resource management enabled (WebLock disabled, IndexedDB auto-close)");
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -544,7 +564,7 @@ IMPROVEMENTS OVER ORIGINALS:
 
   // CSS Optimizations
   if (CONFIG.disableAnimations || CONFIG.hideShorts || CONFIG.hideComments || CONFIG.hideSidebar) {
-    let css = '';
+    let css = "";
 
     if (CONFIG.disableAnimations) {
       css += `
@@ -559,15 +579,15 @@ IMPROVEMENTS OVER ORIGINALS:
     }
 
     if (CONFIG.hideShorts) {
-      css += `ytd-rich-section-renderer { display: none !important; }`;
+      css += "ytd-rich-section-renderer { display: none !important; }";
     }
 
     if (CONFIG.hideComments) {
-      css += `ytd-comments { display: none !important; }`;
+      css += "ytd-comments { display: none !important; }";
     }
 
     if (CONFIG.hideSidebar) {
-      css += `ytd-watch-next-secondary-results-renderer { display: none !important; }`;
+      css += "ytd-watch-next-secondary-results-renderer { display: none !important; }";
     }
 
     // Notification and popup fixes
@@ -590,7 +610,7 @@ IMPROVEMENTS OVER ORIGINALS:
     `;
 
     if (css) GM_addStyle(css);
-    console.log('[YouTube Optimizer] Polymer UI fixes applied');
+    console.log("[YouTube Optimizer] Polymer UI fixes applied");
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -599,48 +619,69 @@ IMPROVEMENTS OVER ORIGINALS:
 
   // Instant Navigation (prefetch on hover)
   if (CONFIG.instantNavigation) {
-    document.addEventListener('mouseover', function(e) {
-      const link = e.target.closest('a[href^="/watch"]');
-      if (link && !link.dataset.prefetched) {
-        const preload = document.createElement('link');
-        preload.rel = 'prefetch';
-        preload.href = link.href;
-        document.head.appendChild(preload);
-        link.dataset.prefetched = 'true';
-      }
-    }, { passive: true });
-    console.log('[YouTube Optimizer] Instant navigation enabled');
+    document.addEventListener(
+      "mouseover",
+      function (e) {
+        const link = e.target.closest('a[href^="/watch"]');
+        if (link && !link.dataset.prefetched) {
+          const preload = document.createElement("link");
+          preload.rel = "prefetch";
+          preload.href = link.href;
+          document.head.appendChild(preload);
+          link.dataset.prefetched = "true";
+        }
+      },
+      { passive: true }
+    );
+    console.log("[YouTube Optimizer] Instant navigation enabled");
   }
 
   // Tracking request blocker
   if (CONFIG.blockTracking) {
     const originalFetch = window.fetch;
-    window.fetch = function(...args) {
+    window.fetch = function (...args) {
       const url = args[0];
-      if (typeof url === 'string' && (
-        url.includes('/log_event') ||
-        url.includes('/log_interaction') ||
-        url.includes('/tracking') ||
-        url.includes('/beacon/') ||
-        url.includes('/ptracking')
-      )) {
-        return Promise.reject(new Error('Blocked by YouTube Optimizer'));
+      if (
+        typeof url === "string" &&
+        (url.includes("/log_event") ||
+          url.includes("/log_interaction") ||
+          url.includes("/tracking") ||
+          url.includes("/beacon/") ||
+          url.includes("/ptracking"))
+      ) {
+        return Promise.reject(new Error("Blocked by YouTube Optimizer"));
       }
       return originalFetch.apply(this, args);
     };
-    console.log('[YouTube Optimizer] Tracking blocker enabled');
+    console.log("[YouTube Optimizer] Tracking blocker enabled");
   }
 
   // ═══════════════════════════════════════════════════════════
   // INITIALIZATION
   // ═══════════════════════════════════════════════════════════
 
-  console.info('[YouTube Complete Optimizer] Initialized (' +
-    'AV1 blocking: ' + CONFIG.blockAV1 + ', ' +
-    'CPU tamer: ' + CONFIG.enableCPUTamer + ', ' +
-    'Resource opt: ' + CONFIG.enableResourceOptimization + ', ' +
-    'Animations: ' + CONFIG.disableAnimations + ', ' +
-    'Hide Shorts: ' + CONFIG.hideShorts + ', ' +
-    'Instant nav: ' + CONFIG.instantNavigation + ', ' +
-    'Block tracking: ' + CONFIG.blockTracking + ')');
+  console.info(
+    "[YouTube Complete Optimizer] Initialized (" +
+      "AV1 blocking: " +
+      CONFIG.blockAV1 +
+      ", " +
+      "CPU tamer: " +
+      CONFIG.enableCPUTamer +
+      ", " +
+      "Resource opt: " +
+      CONFIG.enableResourceOptimization +
+      ", " +
+      "Animations: " +
+      CONFIG.disableAnimations +
+      ", " +
+      "Hide Shorts: " +
+      CONFIG.hideShorts +
+      ", " +
+      "Instant nav: " +
+      CONFIG.instantNavigation +
+      ", " +
+      "Block tracking: " +
+      CONFIG.blockTracking +
+      ")"
+  );
 })();

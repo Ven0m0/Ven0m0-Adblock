@@ -93,134 +93,130 @@
 // @updateURL https://update.greasyfork.org/scripts/520298/Add%20Copy%20Button%20to%20Chat%20Messages%20on%20Github%20Copilot%20web%20page.meta.js
 // ==/UserScript==
 
+(function () {
+  "use strict";
 
+  // Update these if class names change
+  const MESSAGE_CONTENT_CLASS = "UserMessage-module__container--cAvvK";
+  const CHAT_MESSAGE_CONTENT_CLASS = "ChatMessage-module__content--MYneF";
 
+  /**
+   * Creates and returns a copy button element.
+   */
+  function createCopyButton() {
+    const button = document.createElement("button");
+    button.innerText = "Copy";
+    button.classList.add("copy-button");
 
+    // Use sticky positioning to keep it visible while the element is in view
+    button.style.position = "sticky";
+    button.style.top = "10px";
+    button.style.right = "10px";
+    button.style.backgroundColor = "#4CAF50";
+    button.style.color = "#fff";
+    button.style.border = "none";
+    button.style.borderRadius = "4px";
+    button.style.padding = "5px 10px";
+    button.style.cursor = "pointer";
+    button.style.fontSize = "0.9em";
+    button.style.zIndex = "1000";
+    button.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+    button.style.marginLeft = "auto";
+    button.style.float = "right";
+    button.style.display = "inline-block";
+    // Ensure parent or relevant ancestor allows sticky to function
+    // For sticky to work, the ancestor should have no overflow constraints that break it.
 
-(function() {
-    'use strict';
+    button.addEventListener("mouseenter", () => {
+      button.style.backgroundColor = "#45a049";
+    });
+    button.addEventListener("mouseleave", () => {
+      button.style.backgroundColor = "#4CAF50";
+    });
 
-    // Update these if class names change
-    const MESSAGE_CONTENT_CLASS = 'UserMessage-module__container--cAvvK';
-    const CHAT_MESSAGE_CONTENT_CLASS = 'ChatMessage-module__content--MYneF';
+    return button;
+  }
 
-    /**
-     * Creates and returns a copy button element.
-     */
-    function createCopyButton() {
-        const button = document.createElement('button');
-        button.innerText = 'Copy';
-        button.classList.add('copy-button');
+  /**
+   * Adds a copy button to a chat message element.
+   * @param {HTMLElement} messageElement
+   */
+  function addCopyButton(messageElement) {
+    // Prevent adding multiple buttons
+    if (messageElement.querySelector(".copy-button")) return;
 
-        // Use sticky positioning to keep it visible while the element is in view
-        button.style.position = 'sticky';
-        button.style.top = '10px';
-        button.style.right = '10px';
-        button.style.backgroundColor = '#4CAF50';
-        button.style.color = '#fff';
-        button.style.border = 'none';
-        button.style.borderRadius = '4px';
-        button.style.padding = '5px 10px';
-        button.style.cursor = 'pointer';
-        button.style.fontSize = '0.9em';
-        button.style.zIndex = '1000';
-        button.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
-        button.style.marginLeft = 'auto';
-        button.style.float = 'right';
-        button.style.display = 'inline-block';
-        // Ensure parent or relevant ancestor allows sticky to function
-        // For sticky to work, the ancestor should have no overflow constraints that break it.
+    const messageContent = messageElement.querySelector(`.${MESSAGE_CONTENT_CLASS}`);
+    if (!messageContent) return;
 
-        button.addEventListener('mouseenter', () => {
-            button.style.backgroundColor = '#45a049';
+    // Ensure the parent is a block-level container that supports sticky
+    messageElement.style.position = "relative";
+    messageElement.style.display = "block";
+
+    const copyButton = createCopyButton();
+
+    copyButton.addEventListener("click", () => {
+      const textToCopy = messageContent.innerText.trim();
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          copyButton.innerText = "Copied!";
+          copyButton.style.backgroundColor = "#388E3C";
+          setTimeout(() => {
+            copyButton.innerText = "Copy";
+            copyButton.style.backgroundColor = "#4CAF50";
+          }, 2000);
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
         });
-        button.addEventListener('mouseleave', () => {
-            button.style.backgroundColor = '#4CAF50';
-        });
+    });
 
-        return button;
-    }
+    messageElement.appendChild(copyButton);
+  }
 
-    /**
-     * Adds a copy button to a chat message element.
-     * @param {HTMLElement} messageElement
-     */
-    function addCopyButton(messageElement) {
-        // Prevent adding multiple buttons
-        if (messageElement.querySelector('.copy-button')) return;
+  /**
+   * Processes all existing chat messages on page load.
+   */
+  function processExistingMessages() {
+    const messageElements = document.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
+    messageElements.forEach((messageElement) => addCopyButton(messageElement));
+  }
 
-        const messageContent = messageElement.querySelector(`.${MESSAGE_CONTENT_CLASS}`);
-        if (!messageContent) return;
+  /**
+   * Observes newly added messages dynamically.
+   */
+  function observeNewMessages() {
+    const targetNode = document.body;
+    const config = { childList: true, subtree: true };
 
-        // Ensure the parent is a block-level container that supports sticky
-        messageElement.style.position = 'relative';
-        messageElement.style.display = 'block';
-
-        const copyButton = createCopyButton();
-
-        copyButton.addEventListener('click', () => {
-            const textToCopy = messageContent.innerText.trim();
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                copyButton.innerText = 'Copied!';
-                copyButton.style.backgroundColor = '#388E3C';
-                setTimeout(() => {
-                    copyButton.innerText = 'Copy';
-                    copyButton.style.backgroundColor = '#4CAF50';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
-        });
-
-        messageElement.appendChild(copyButton);
-    }
-
-    /**
-     * Processes all existing chat messages on page load.
-     */
-    function processExistingMessages() {
-        const messageElements = document.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-        messageElements.forEach(messageElement => addCopyButton(messageElement));
-    }
-
-    /**
-     * Observes newly added messages dynamically.
-     */
-    function observeNewMessages() {
-        const targetNode = document.body;
-        const config = { childList: true, subtree: true };
-
-        const callback = (mutationsList) => {
-            for (const mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE) {
-                            if (node.classList && node.classList.contains(CHAT_MESSAGE_CONTENT_CLASS)) {
-                                addCopyButton(node);
-                            }
-                            const nestedMessages = node.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-                            nestedMessages.forEach(nestedNode => addCopyButton(nestedNode));
-                        }
-                    });
-                }
+    const callback = (mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === "childList") {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              if (node.classList && node.classList.contains(CHAT_MESSAGE_CONTENT_CLASS)) {
+                addCopyButton(node);
+              }
+              const nestedMessages = node.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
+              nestedMessages.forEach((nestedNode) => addCopyButton(nestedNode));
             }
-        };
+          });
+        }
+      }
+    };
 
-        const observer = new MutationObserver(callback);
-        observer.observe(targetNode, config);
-    }
+    const observer = new MutationObserver(callback);
+    observer.observe(targetNode, config);
+  }
 
-    function init() {
-        processExistingMessages();
-        observeNewMessages();
-    }
+  function init() {
+    processExistingMessages();
+    observeNewMessages();
+  }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();
-
-

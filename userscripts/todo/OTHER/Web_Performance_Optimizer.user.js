@@ -32,12 +32,12 @@ IMPROVEMENTS OVER ORIGINALS:
 - SELECTIVE meta tag removal (only trackers, keeps SEO)
 */
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   // Emergency disable
-  if (localStorage.getItem('disable_web_perf_optimizer') === '1') {
-    console.warn('[Web Performance Optimizer]: Disabled by user');
+  if (localStorage.getItem("disable_web_perf_optimizer") === "1") {
+    console.warn("[Web Performance Optimizer]: Disabled by user");
     return;
   }
 
@@ -48,25 +48,32 @@ IMPROVEMENTS OVER ORIGINALS:
   ((o) => {
     const [setTimeout_, setInterval_, requestAnimationFrame_, clearTimeout_, clearInterval_, cancelAnimationFrame_] = o;
     const queueMicrotask_ = queueMicrotask;
-    const win = typeof window.wrappedJSObject === 'object' ? window.wrappedJSObject :
-                typeof unsafeWindow === 'object' ? unsafeWindow :
-                this instanceof Window ? this : window;
+    const win =
+      typeof window.wrappedJSObject === "object"
+        ? window.wrappedJSObject
+        : typeof unsafeWindow === "object"
+          ? unsafeWindow
+          : this instanceof Window
+            ? this
+            : window;
 
     // Duplicate detection
-    const hkey_script = 'web_perf_optimizer_cpu_tamer';
+    const hkey_script = "web_perf_optimizer_cpu_tamer";
     if (win[hkey_script]) return; // Avoid duplicated scripting
     win[hkey_script] = true;
 
     const Promise = (async () => {})().constructor;
 
-    let resolvePr = () => {}, pr;
-    const setPr = () => (pr = new Promise((resolve) => {
-      resolvePr = resolve;
-    }));
+    let resolvePr = () => {},
+      pr;
+    const setPr = () =>
+      (pr = new Promise((resolve) => {
+        resolvePr = resolve;
+      }));
 
     setPr();
 
-    const cme = document.createComment('--WebPerfOptimizer--');
+    const cme = document.createComment("--WebPerfOptimizer--");
     let cmi = 0;
     let lastPr = null;
 
@@ -74,7 +81,7 @@ IMPROVEMENTS OVER ORIGINALS:
       if (lastPr !== pr) {
         lastPr = pr;
         cmi = (cmi & 7) + 1;
-        cme.data = (cmi & 1) ? '++WebPerfOptimizer++' : '--WebPerfOptimizer--';
+        cme.data = cmi & 1 ? "++WebPerfOptimizer++" : "--WebPerfOptimizer--";
       }
     }
 
@@ -88,17 +95,18 @@ IMPROVEMENTS OVER ORIGINALS:
     }
 
     let tl;
-    if (typeof DocumentTimeline === 'function') {
+    if (typeof DocumentTimeline === "function") {
       tl = new DocumentTimeline();
-    } else if (typeof Animation === 'function') {
-      let AnimationConstructor = Animation, e = document.documentElement;
+    } else if (typeof Animation === "function") {
+      let AnimationConstructor = Animation,
+        e = document.documentElement;
       try {
         if (e) {
           e = e.animate(null);
-          if (typeof (e || 0) === 'object' && '_animation' in e && e.constructor === Object) {
+          if (typeof (e || 0) === "object" && "_animation" in e && e.constructor === Object) {
             e = e._animation;
           }
-          if (typeof (e || 0) === 'object' && 'timeline' in e && typeof e.constructor === 'function') {
+          if (typeof (e || 0) === "object" && "timeline" in e && typeof e.constructor === "function") {
             AnimationConstructor = e.constructor;
           }
         }
@@ -135,78 +143,97 @@ IMPROVEMENTS OVER ORIGINALS:
       return az.delete(r);
     };
 
-    const errCatch = e => {
-      queueMicrotask_(() => { throw e });
+    const errCatch = (e) => {
+      queueMicrotask_(() => {
+        throw e;
+      });
     };
 
     const dOffset = 2 ** -26; // Avoid Brave/uBlock adjustSetTimeout
 
-    setTimeout = function(f, d = void 0, ...args) {
+    setTimeout = function (f, d = void 0, ...args) {
       let r;
-      const g = (typeof f === 'function') ? (...args) => {
-        h1(r).then((act) => {
-          act && f(...args);
-        }).catch(errCatch);
-      } : f;
+      const g =
+        typeof f === "function"
+          ? (...args) => {
+            h1(r)
+              .then((act) => {
+                act && f(...args);
+              })
+              .catch(errCatch);
+          }
+          : f;
       if (d >= 1) d -= dOffset;
       r = setTimeout_(g, d, ...args);
       return r;
     };
 
-    setInterval = function(f, d = void 0, ...args) {
+    setInterval = function (f, d = void 0, ...args) {
       let r;
-      const g = (typeof f === 'function') ? (...args) => {
-        h1(r).then((act) => {
-          act && f(...args);
-        }).catch(errCatch);
-      } : f;
+      const g =
+        typeof f === "function"
+          ? (...args) => {
+            h1(r)
+              .then((act) => {
+                act && f(...args);
+              })
+              .catch(errCatch);
+          }
+          : f;
       if (d >= 1) d -= dOffset;
       r = setInterval_(g, d, ...args);
       return r;
     };
 
-    clearTimeout = function(cid) {
+    clearTimeout = function (cid) {
       tz.delete(cid);
       return clearTimeout_(cid);
     };
 
-    clearInterval = function(cid) {
+    clearInterval = function (cid) {
       tz.delete(cid);
       return clearInterval_(cid);
     };
 
-    requestAnimationFrame = function(f) {
+    requestAnimationFrame = function (f) {
       let r;
       const upr = pr;
       const g = (timeRes) => {
         const q1 = tl_.currentTime;
-        h2(r, upr).then((act) => {
-          act && f(timeRes + (tl_.currentTime - q1));
-        }).catch(errCatch);
+        h2(r, upr)
+          .then((act) => {
+            act && f(timeRes + (tl_.currentTime - q1));
+          })
+          .catch(errCatch);
       };
       if (lastPr !== pr) queueMicrotask_(act);
       r = requestAnimationFrame_(g);
       return r;
     };
 
-    cancelAnimationFrame = function(aid) {
+    cancelAnimationFrame = function (aid) {
       az.delete(aid);
       return cancelAnimationFrame_(aid);
     };
 
     // Export for content scripts
-    const isContentScript = (typeof window.wrappedJSObject === 'object' && typeof unsafeWindow === 'object' && typeof exportFunction === 'function') ||
-                            (typeof GM === 'object' && ((GM || 0).info || 0).injectInto === 'content');
+    const isContentScript =
+      (typeof window.wrappedJSObject === "object" &&
+        typeof unsafeWindow === "object" &&
+        typeof exportFunction === "function") ||
+      (typeof GM === "object" && ((GM || 0).info || 0).injectInto === "content");
     if (isContentScript) {
       const exportFn = (f, name) => {
-        typeof exportFunction === 'function' ? exportFunction(f, win, { defineAs: name, allowCrossOriginArguments: true }) : (win[name] = f);
+        typeof exportFunction === "function"
+          ? exportFunction(f, win, { defineAs: name, allowCrossOriginArguments: true })
+          : (win[name] = f);
       };
-      exportFn(setTimeout, 'setTimeout');
-      exportFn(setInterval, 'setInterval');
-      exportFn(requestAnimationFrame, 'requestAnimationFrame');
-      exportFn(clearTimeout, 'clearTimeout');
-      exportFn(clearInterval, 'clearInterval');
-      exportFn(cancelAnimationFrame, 'cancelAnimationFrame');
+      exportFn(setTimeout, "setTimeout");
+      exportFn(setInterval, "setInterval");
+      exportFn(requestAnimationFrame, "requestAnimationFrame");
+      exportFn(clearTimeout, "clearTimeout");
+      exportFn(clearInterval, "clearInterval");
+      exportFn(cancelAnimationFrame, "cancelAnimationFrame");
     }
   })([setTimeout, setInterval, requestAnimationFrame, clearTimeout, clearInterval, cancelAnimationFrame]);
 
@@ -216,28 +243,21 @@ IMPROVEMENTS OVER ORIGINALS:
 
   const GPUModule = {
     // Only apply GPU acceleration to elements that actually benefit
-    highChangeSelectors: [
-      'video',
-      'canvas',
-      '[data-gpu-accelerate]',
-      '.animation-container',
-      '.slider',
-      '.carousel'
-    ],
+    highChangeSelectors: ["video", "canvas", "[data-gpu-accelerate]", ".animation-container", ".slider", ".carousel"],
 
     apply() {
       try {
-        const elements = document.querySelectorAll(this.highChangeSelectors.join(','));
-        for (let el of elements) {
-          el.style.transform = 'translateZ(0)';
-          el.style.willChange = 'transform';
-          el.style.backfaceVisibility = 'hidden';
+        const elements = document.querySelectorAll(this.highChangeSelectors.join(","));
+        for (const el of elements) {
+          el.style.transform = "translateZ(0)";
+          el.style.willChange = "transform";
+          el.style.backfaceVisibility = "hidden";
         }
         if (elements.length > 0) {
           console.log(`[Web Perf] GPU acceleration applied to ${elements.length} elements`);
         }
       } catch (e) {
-        console.error('[Web Perf] GPU acceleration error:', e);
+        console.error("[Web Perf] GPU acceleration error:", e);
       }
     },
 
@@ -289,13 +309,13 @@ IMPROVEMENTS OVER ORIGINALS:
         }
       }
 
-      return fetch(url).then(response => {
-        const contentLength = response.headers.get('Content-Length');
+      return fetch(url).then((response) => {
+        const contentLength = response.headers.get("Content-Length");
         if (contentLength && parseInt(contentLength) > 1048576) {
           return response.text();
         }
 
-        return response.text().then(data => {
+        return response.text().then((data) => {
           if (this.cacheSize + data.length <= this.MAX_CACHE_SIZE) {
             this.cache.set(url, { data, timestamp: now });
             this.cacheSize += data.length;
@@ -308,8 +328,8 @@ IMPROVEMENTS OVER ORIGINALS:
     interceptRequests() {
       // XMLHttpRequest
       const originalOpen = XMLHttpRequest.prototype.open;
-      XMLHttpRequest.prototype.open = function(method, url, ...args) {
-        if (ResourceModule.blockList.some(regex => regex.test(url))) {
+      XMLHttpRequest.prototype.open = function (method, url, ...args) {
+        if (ResourceModule.blockList.some((regex) => regex.test(url))) {
           return;
         }
         originalOpen.call(this, method, url, ...args);
@@ -317,12 +337,12 @@ IMPROVEMENTS OVER ORIGINALS:
 
       // Fetch API
       const originalFetch = window.fetch;
-      window.fetch = function(input, init) {
-        if (typeof input === 'string' && ResourceModule.blockList.some(regex => regex.test(input))) {
-          return Promise.reject(new Error('Request blocked by Web Performance Optimizer'));
+      window.fetch = function (input, init) {
+        if (typeof input === "string" && ResourceModule.blockList.some((regex) => regex.test(input))) {
+          return Promise.reject(new Error("Request blocked by Web Performance Optimizer"));
         }
 
-        if (typeof input === 'string' && ResourceModule.isCacheable(input)) {
+        if (typeof input === "string" && ResourceModule.isCacheable(input)) {
           return ResourceModule.cachedFetch(input);
         }
 
@@ -331,12 +351,12 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     lazyLoad() {
-      const lazyLoadElements = (selector, attr = 'src') => {
+      const lazyLoadElements = (selector, attr = "src") => {
         const elements = document.querySelectorAll(selector);
-        if ('loading' in HTMLImageElement.prototype) {
-          elements.forEach(el => {
-            if (!el.hasAttribute('loading')) {
-              el.setAttribute('loading', 'lazy');
+        if ("loading" in HTMLImageElement.prototype) {
+          elements.forEach((el) => {
+            if (!el.hasAttribute("loading")) {
+              el.setAttribute("loading", "lazy");
             }
             if (el.dataset.src) {
               el[attr] = el.dataset.src;
@@ -344,7 +364,7 @@ IMPROVEMENTS OVER ORIGINALS:
           });
         } else {
           const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
               if (entry.isIntersecting) {
                 const el = entry.target;
                 if (el.dataset.src) {
@@ -354,18 +374,18 @@ IMPROVEMENTS OVER ORIGINALS:
               }
             });
           });
-          elements.forEach(el => observer.observe(el));
+          elements.forEach((el) => observer.observe(el));
         }
       };
 
-      lazyLoadElements('img');
-      lazyLoadElements('iframe', 'src');
+      lazyLoadElements("img");
+      lazyLoadElements("iframe", "src");
     },
 
     enableYouTubePrivacy() {
-      document.querySelectorAll('iframe').forEach(iframe => {
-        if (iframe.src.includes('youtube.com/embed/')) {
-          iframe.src = iframe.src.replace('youtube.com/embed/', 'youtube-nocookie.com/embed/');
+      document.querySelectorAll("iframe").forEach((iframe) => {
+        if (iframe.src.includes("youtube.com/embed/")) {
+          iframe.src = iframe.src.replace("youtube.com/embed/", "youtube-nocookie.com/embed/");
         }
       });
     }
@@ -378,52 +398,47 @@ IMPROVEMENTS OVER ORIGINALS:
   const DOMCleanupModule = {
     // Only remove tracker-related meta tags
     trackerMetaTags: [
-      'google-site-verification',
-      'msvalidate.01',
-      'yandex-verification',
-      'apple-itunes-app',
-      'juicyads-site-verification',
-      'exoclick-site-verification',
-      'trafficjunky-site-verification',
-      'ero_verify',
-      'linkbuxverifycode'
+      "google-site-verification",
+      "msvalidate.01",
+      "yandex-verification",
+      "apple-itunes-app",
+      "juicyads-site-verification",
+      "exoclick-site-verification",
+      "trafficjunky-site-verification",
+      "ero_verify",
+      "linkbuxverifycode"
     ],
 
     // Remove tracker scripts
-    trackerScripts: [
-      'google-analytics',
-      'googletagmanager',
-      'adsbygoogle',
-      'doubleclick.net'
-    ],
+    trackerScripts: ["google-analytics", "googletagmanager", "adsbygoogle", "doubleclick.net"],
 
     cleanup() {
       // Remove tracker meta tags ONLY
-      document.querySelectorAll('meta').forEach(meta => {
-        const name = meta.getAttribute('name');
-        const property = meta.getAttribute('property');
+      document.querySelectorAll("meta").forEach((meta) => {
+        const name = meta.getAttribute("name");
+        const property = meta.getAttribute("property");
 
-        if (name && this.trackerMetaTags.some(tracker => name.toLowerCase().includes(tracker))) {
+        if (name && this.trackerMetaTags.some((tracker) => name.toLowerCase().includes(tracker))) {
           meta.remove();
-        } else if (property && property.startsWith('fb:')) {
+        } else if (property && property.startsWith("fb:")) {
           meta.remove(); // Facebook trackers
         }
       });
 
       // Remove tracker scripts
-      document.querySelectorAll('script').forEach(script => {
-        const src = script.getAttribute('src');
-        if (src && this.trackerScripts.some(tracker => src.includes(tracker))) {
+      document.querySelectorAll("script").forEach((script) => {
+        const src = script.getAttribute("src");
+        if (src && this.trackerScripts.some((tracker) => src.includes(tracker))) {
           script.remove();
         }
       });
 
       // Remove noscript tags (usually contain tracking pixels)
-      document.querySelectorAll('noscript').forEach(noscript => noscript.remove());
+      document.querySelectorAll("noscript").forEach((noscript) => noscript.remove());
 
       // Remove empty paragraphs
-      document.querySelectorAll('p').forEach(p => {
-        if (p.innerHTML.trim() === '&nbsp;') p.remove();
+      document.querySelectorAll("p").forEach((p) => {
+        if (p.innerHTML.trim() === "&nbsp;") p.remove();
       });
     }
   };
@@ -443,16 +458,15 @@ IMPROVEMENTS OVER ORIGINALS:
       ResourceModule.lazyLoad();
       ResourceModule.enableYouTubePrivacy();
       DOMCleanupModule.cleanup();
-      console.log('[Web Performance Optimizer] Initialized');
+      console.log("[Web Performance Optimizer] Initialized");
     } catch (e) {
-      console.error('[Web Performance Optimizer] Init error:', e);
+      console.error("[Web Performance Optimizer] Init error:", e);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
-
 })();

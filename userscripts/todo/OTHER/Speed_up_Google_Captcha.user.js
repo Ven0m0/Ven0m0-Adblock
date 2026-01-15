@@ -12,11 +12,11 @@
 // @updateURL https://update.greasyfork.org/scripts/382039/Speed%20up%20Google%20Captcha.meta.js
 // ==/UserScript==
 
-(st => {
+((st) => {
   st = setTimeout;
-  setTimeout = function(fn, dur) {
-    if ([4000,50].includes(dur)) dur = 0;
+  setTimeout = function (fn, dur) {
+    if ([4000, 50].includes(dur)) dur = 0;
     return st.apply(this, arguments);
   };
-  document.head.appendChild(document.createElement("STYLE")).innerHTML = '*{transition:none!important}'
-})()
+  document.head.appendChild(document.createElement("STYLE")).innerHTML = "*{transition:none!important}";
+})();

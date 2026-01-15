@@ -2,3 +2,4 @@ https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Min
 https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/gh-pro.user.js
 https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/tweak-optimized.user.js
 https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/Mine/youtube-optimized.user.js
+https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js

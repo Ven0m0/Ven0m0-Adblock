@@ -10,18 +10,28 @@
 // @updateURL https://update.greasyfork.org/scripts/386075/AUR%20helper.meta.js
 // ==/UserScript==
 
-addEventListener('DOMContentLoaded', function() {
-	var ul = document.getElementById('actionlist').getElementsByTagName('ul');
-	if (!ul) return ;
+addEventListener(
+  "DOMContentLoaded",
+  function () {
+    let ul = document.getElementById("actionlist").getElementsByTagName("ul");
+    if (ul.length === 0) return;
 
-	ul = ul[0];
+    ul = ul[0];
 
-	var pkgName = ul.getElementsByTagName('a')[0].href.match(/\/cgit\/aur\.git\/tree\/PKGBUILD\?h=([-_\w\d\.]+)/)[1];
-	var li = document.createElement('li');
-	var link = document.createElement('a');
-	li.appendChild(link);
-	ul.insertBefore(li, ul.firstChild);
+    const firstLink = ul.getElementsByTagName("a")[0];
+    if (!firstLink) return;
 
-	link.textContent = '安装软件包 (yay -S '+ pkgName +')';
-	link.href = 'yay://' + pkgName ;
-}, false);
+    const match = firstLink.href.match(/\/cgit\/aur\.git\/tree\/PKGBUILD\?h=([-_\w\d\.]+)/);
+    if (!match || !match[1]) return;
+
+    const pkgName = match[1];
+    const li = document.createElement("li");
+    const link = document.createElement("a");
+    li.appendChild(link);
+    ul.insertBefore(li, ul.firstChild);
+
+    link.textContent = "安装软件包 (yay -S " + pkgName + ")";
+    link.href = "yay://" + pkgName;
+  },
+  false
+);

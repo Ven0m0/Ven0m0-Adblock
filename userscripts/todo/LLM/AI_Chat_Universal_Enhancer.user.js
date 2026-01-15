@@ -46,12 +46,12 @@ CONSOLIDATED FEATURES:
 5. Multi-language Support - English, Chinese (Simplified/Traditional)
 */
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   // Emergency disable
-  if (localStorage.getItem('disable_ai_chat_enhancer') === '1') {
-    console.warn('[AI Chat Enhancer]: Disabled by user');
+  if (localStorage.getItem("disable_ai_chat_enhancer") === "1") {
+    console.warn("[AI Chat Enhancer]: Disabled by user");
     return;
   }
 
@@ -60,18 +60,18 @@ CONSOLIDATED FEATURES:
   // ═══════════════════════════════════════════════════════════
 
   const STYLE_CONFIG = {
-    maxWidth: '95%',
-    maxViewportWidth: '90vw',
-    scrollbarWidth: 'thin',
-    scrollbarThumbColor: '#aaaa',
-    scrollbarTrackColor: '#1111',
-    codeBlockScrollbarHeight: '8px',
-    codeBlockScrollbarThumbColor: '#666',
-    codeBlockScrollbarTrackColor: '#f1f1f1',
-    codeSelectionBgColor: 'rgba(70, 130, 180, 0.5)',
-    codeSelectionTextColor: 'white',
-    lightCodeSelectionBgColor: 'rgba(0, 120, 215, 0.3)',
-    lightCodeSelectionTextColor: 'black'
+    maxWidth: "95%",
+    maxViewportWidth: "90vw",
+    scrollbarWidth: "thin",
+    scrollbarThumbColor: "#aaaa",
+    scrollbarTrackColor: "#1111",
+    codeBlockScrollbarHeight: "8px",
+    codeBlockScrollbarThumbColor: "#666",
+    codeBlockScrollbarTrackColor: "#f1f1f1",
+    codeSelectionBgColor: "rgba(70, 130, 180, 0.5)",
+    codeSelectionTextColor: "white",
+    lightCodeSelectionBgColor: "rgba(0, 120, 215, 0.3)",
+    lightCodeSelectionTextColor: "black"
   };
 
   // Enter key configuration
@@ -83,7 +83,7 @@ CONSOLIDATED FEATURES:
 
   function loadEnterConfig() {
     try {
-      const saved = GM_getValue('aiEnterConfig');
+      const saved = GM_getValue("aiEnterConfig");
       if (saved) {
         const config = JSON.parse(saved);
         return {
@@ -93,17 +93,17 @@ CONSOLIDATED FEATURES:
         };
       }
     } catch (e) {
-      console.error('[AI Chat Enhancer] Error loading config:', e);
+      console.error("[AI Chat Enhancer] Error loading config:", e);
     }
     return DEFAULT_SHORTCUTS;
   }
 
   function saveEnterConfig(shortcuts) {
     try {
-      GM_setValue('aiEnterConfig', JSON.stringify({ shortcuts: { send: shortcuts } }));
+      GM_setValue("aiEnterConfig", JSON.stringify({ shortcuts: { send: shortcuts } }));
       return true;
     } catch (e) {
-      console.error('[AI Chat Enhancer] Error saving config:', e);
+      console.error("[AI Chat Enhancer] Error saving config:", e);
       return false;
     }
   }
@@ -115,19 +115,19 @@ CONSOLIDATED FEATURES:
   // ═══════════════════════════════════════════════════════════
 
   const PLATFORM_MAP = {
-    'chatgpt.com': 'chatgpt',
-    'chat.openai.com': 'chatgpt',
-    'claude.ai': 'claude',
-    'gemini.google.com': 'gemini',
-    'chat.deepseek.com': 'deepseek',
-    'kimi.moonshot.cn': 'kimi',
-    'tongyi.aliyun.com': 'tongyi',
-    'tiangong.cn': 'tiangong',
-    'chatglm.cn': 'chatglm',
-    'perplexity.ai': 'perplexity',
-    'grok.com': 'grok',
-    'felo.ai': 'felo',
-    'duckduckgo.com': 'duckduckgo'
+    "chatgpt.com": "chatgpt",
+    "chat.openai.com": "chatgpt",
+    "claude.ai": "claude",
+    "gemini.google.com": "gemini",
+    "chat.deepseek.com": "deepseek",
+    "kimi.moonshot.cn": "kimi",
+    "tongyi.aliyun.com": "tongyi",
+    "tiangong.cn": "tiangong",
+    "chatglm.cn": "chatglm",
+    "perplexity.ai": "perplexity",
+    "grok.com": "grok",
+    "felo.ai": "felo",
+    "duckduckgo.com": "duckduckgo"
   };
 
   function detectPlatform() {
@@ -135,7 +135,7 @@ CONSOLIDATED FEATURES:
     for (const [domain, platform] of Object.entries(PLATFORM_MAP)) {
       if (host.includes(domain)) return platform;
     }
-    return 'default';
+    return "default";
   }
 
   const currentPlatform = detectPlatform();
@@ -342,7 +342,7 @@ CONSOLIDATED FEATURES:
       GM_addStyle(styleToApply);
       console.log(`[AI Chat Enhancer] Applied styles for platform: ${currentPlatform}`);
     } catch (e) {
-      console.error('[AI Chat Enhancer] Error applying styles:', e);
+      console.error("[AI Chat Enhancer] Error applying styles:", e);
     }
   }
 
@@ -360,10 +360,10 @@ CONSOLIDATED FEATURES:
       try {
         const links = document.querySelectorAll('div[data-message-id] a[rel="noreferrer"]');
         if (links.length > 0) {
-          links.forEach(link => {
+          links.forEach((link) => {
             if (!link.href && link.innerText && link.innerText.trim()) {
               const linkText = link.innerText.trim();
-              if (linkText.startsWith('http') || linkText.includes('www.')) {
+              if (linkText.startsWith("http") || linkText.includes("www.")) {
                 link.href = linkText;
                 link.target = "_blank";
                 link.rel = "noopener noreferrer";
@@ -372,15 +372,15 @@ CONSOLIDATED FEATURES:
           });
         }
       } catch (e) {
-        console.error('[AI Chat Enhancer] Error enhancing links:', e);
+        console.error("[AI Chat Enhancer] Error enhancing links:", e);
       }
 
       LinkEnhancer.timer = setTimeout(() => {
         if (!LinkEnhancer.observer) {
           LinkEnhancer.observer = new MutationObserver((mutations) => {
-            const shouldProcess = mutations.some(mutation =>
-              mutation.addedNodes.length > 0 ||
-              (mutation.type === 'attributes' && mutation.attributeName === 'href')
+            const shouldProcess = mutations.some(
+              (mutation) =>
+                mutation.addedNodes.length > 0 || (mutation.type === "attributes" && mutation.attributeName === "href")
             );
             if (shouldProcess) LinkEnhancer.enhance();
           });
@@ -389,7 +389,7 @@ CONSOLIDATED FEATURES:
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ['href']
+            attributeFilter: ["href"]
           });
         }
       }, 2000);
@@ -418,7 +418,7 @@ CONSOLIDATED FEATURES:
       winEnter: "Win + Enter",
       superEnter: "Super + Enter"
     },
-    'zh-tw': {
+    "zh-tw": {
       settings: "設定",
       close: "✕",
       sendShortcut: "傳送訊息快捷鍵（+ Enter）：",
@@ -434,7 +434,7 @@ CONSOLIDATED FEATURES:
       winEnter: "Win + Enter",
       superEnter: "Super + Enter"
     },
-    'zh-cn': {
+    "zh-cn": {
       settings: "设置",
       close: "✕",
       sendShortcut: "发送消息快捷键（+ Enter）：",
@@ -454,10 +454,10 @@ CONSOLIDATED FEATURES:
 
   function detectLanguage() {
     const lang = navigator.language || navigator.userLanguage;
-    if (lang.startsWith('zh')) {
-      return (lang.includes('TW') || lang.includes('HK') || lang.includes('MO')) ? 'zh-tw' : 'zh-cn';
+    if (lang.startsWith("zh")) {
+      return lang.includes("TW") || lang.includes("HK") || lang.includes("MO") ? "zh-tw" : "zh-cn";
     }
-    return 'en';
+    return "en";
   }
 
   function t(key) {
@@ -469,63 +469,63 @@ CONSOLIDATED FEATURES:
     const ua = navigator.userAgent.toLowerCase();
     const platform = navigator.platform.toLowerCase();
 
-    if (platform.includes('mac') || ua.includes('mac')) return 'mac';
-    if (platform.includes('win') || ua.includes('win')) return 'windows';
-    if (platform.includes('linux') || ua.includes('linux')) return 'linux';
-    return 'other';
+    if (platform.includes("mac") || ua.includes("mac")) return "mac";
+    if (platform.includes("win") || ua.includes("win")) return "windows";
+    if (platform.includes("linux") || ua.includes("linux")) return "linux";
+    return "other";
   }
 
   function createSettingsUI() {
-    const existing = document.getElementById('ai-enter-config');
+    const existing = document.getElementById("ai-enter-config");
     if (existing) {
       existing.remove();
       return;
     }
 
     const os = detectOS();
-    const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
 
     const colors = {
-      background: isDark ? '#2d2d2d' : '#ffffff',
-      text: isDark ? '#e0e0e0' : '#333333',
-      border: isDark ? '#555555' : '#dddddd',
-      inputBg: isDark ? '#3d3d3d' : '#ffffff',
-      buttonBg: isDark ? '#3d3d3d' : '#f5f5f5',
-      buttonText: isDark ? '#e0e0e0' : '#333333',
-      primary: '#4caf50',
-      shadow: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.15)'
+      background: isDark ? "#2d2d2d" : "#ffffff",
+      text: isDark ? "#e0e0e0" : "#333333",
+      border: isDark ? "#555555" : "#dddddd",
+      inputBg: isDark ? "#3d3d3d" : "#ffffff",
+      buttonBg: isDark ? "#3d3d3d" : "#f5f5f5",
+      buttonText: isDark ? "#e0e0e0" : "#333333",
+      primary: "#4caf50",
+      shadow: isDark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.15)"
     };
 
-    const dialog = document.createElement('div');
-    dialog.id = 'ai-enter-config';
+    const dialog = document.createElement("div");
+    dialog.id = "ai-enter-config";
     Object.assign(dialog.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
       backgroundColor: colors.background,
       color: colors.text,
       border: `1px solid ${colors.border}`,
-      borderRadius: '8px',
-      padding: '20px',
-      width: '350px',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      zIndex: '10000',
+      borderRadius: "8px",
+      padding: "20px",
+      width: "350px",
+      maxWidth: "90vw",
+      maxHeight: "90vh",
+      overflowY: "auto",
+      zIndex: "10000",
       boxShadow: `0 4px 12px ${colors.shadow}`,
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
     });
 
-    const titleDiv = document.createElement('div');
-    titleDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;';
+    const titleDiv = document.createElement("div");
+    titleDiv.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;";
 
-    const title = document.createElement('h2');
-    title.textContent = t('settings');
+    const title = document.createElement("h2");
+    title.textContent = t("settings");
     title.style.cssText = `margin: 0; fontSize: 18px; color: ${colors.text};`;
 
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = t('close');
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = t("close");
     closeBtn.style.cssText = `background: none; border: none; color: ${colors.text}; cursor: pointer; font-size: 18px;`;
     closeBtn.onclick = () => dialog.remove();
 
@@ -533,31 +533,34 @@ CONSOLIDATED FEATURES:
     titleDiv.appendChild(closeBtn);
     dialog.appendChild(titleDiv);
 
-    const label = document.createElement('label');
-    label.textContent = t('sendShortcut');
+    const label = document.createElement("label");
+    label.textContent = t("sendShortcut");
     label.style.cssText = `display: block; margin-bottom: 12px; color: ${colors.text}; font-weight: bold;`;
     dialog.appendChild(label);
 
-    const container = document.createElement('div');
-    container.style.cssText = `margin-bottom: 16px; padding: 12px; background-color: ${isDark ? '#3a3a3a' : '#f8f9fa'}; border: 1px solid ${colors.border}; border-radius: 6px;`;
+    const container = document.createElement("div");
+    container.style.cssText = `margin-bottom: 16px; padding: 12px; background-color: ${isDark ? "#3a3a3a" : "#f8f9fa"}; border: 1px solid ${colors.border}; border-radius: 6px;`;
 
     const shortcuts = [
-      { key: 'ctrl', label: os === 'mac' ? `⌃ ${t('ctrlEnter')}` : t('ctrlEnter') },
-      { key: 'alt', label: os === 'mac' ? `⌥ ${t('altEnter')}` : t('altEnter') },
-      { key: 'meta', label: os === 'mac' ? `⌘ ${t('cmdEnter')}` : os === 'windows' ? `⊞ ${t('winEnter')}` : t('superEnter') }
+      { key: "ctrl", label: os === "mac" ? `⌃ ${t("ctrlEnter")}` : t("ctrlEnter") },
+      { key: "alt", label: os === "mac" ? `⌥ ${t("altEnter")}` : t("altEnter") },
+      {
+        key: "meta",
+        label: os === "mac" ? `⌘ ${t("cmdEnter")}` : os === "windows" ? `⊞ ${t("winEnter")}` : t("superEnter")
+      }
     ];
 
-    shortcuts.forEach(shortcut => {
-      const optionDiv = document.createElement('div');
-      optionDiv.style.cssText = 'display: flex; align-items: center; margin-bottom: 8px;';
+    shortcuts.forEach((shortcut) => {
+      const optionDiv = document.createElement("div");
+      optionDiv.style.cssText = "display: flex; align-items: center; margin-bottom: 8px;";
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
       checkbox.id = `shortcut-${shortcut.key}`;
       checkbox.checked = currentShortcuts[shortcut.key];
       if (isDark) checkbox.style.accentColor = colors.primary;
 
-      const labelEl = document.createElement('label');
+      const labelEl = document.createElement("label");
       labelEl.htmlFor = `shortcut-${shortcut.key}`;
       labelEl.style.cssText = `margin-left: 8px; color: ${colors.text}; cursor: pointer; flex-grow: 1;`;
       labelEl.textContent = shortcut.label;
@@ -569,34 +572,34 @@ CONSOLIDATED FEATURES:
 
     dialog.appendChild(container);
 
-    const buttonDiv = document.createElement('div');
-    buttonDiv.style.cssText = 'display: flex; justify-content: flex-end; margin-top: 16px;';
+    const buttonDiv = document.createElement("div");
+    buttonDiv.style.cssText = "display: flex; justify-content: flex-end; margin-top: 16px;";
 
-    const saveBtn = document.createElement('button');
-    saveBtn.textContent = t('save');
+    const saveBtn = document.createElement("button");
+    saveBtn.textContent = t("save");
     saveBtn.style.cssText = `padding: 8px 16px; background-color: ${colors.primary}; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 8px;`;
     saveBtn.onclick = () => {
       const newShortcuts = {
-        ctrl: document.getElementById('shortcut-ctrl').checked,
-        alt: document.getElementById('shortcut-alt').checked,
-        meta: document.getElementById('shortcut-meta').checked
+        ctrl: document.getElementById("shortcut-ctrl").checked,
+        alt: document.getElementById("shortcut-alt").checked,
+        meta: document.getElementById("shortcut-meta").checked
       };
       if (saveEnterConfig(newShortcuts)) {
-        alert(t('saveSuccess'));
+        alert(t("saveSuccess"));
         dialog.remove();
         currentShortcuts = newShortcuts;
       } else {
-        alert(t('saveFailed'));
+        alert(t("saveFailed"));
       }
     };
 
-    const resetBtn = document.createElement('button');
-    resetBtn.textContent = t('reset');
+    const resetBtn = document.createElement("button");
+    resetBtn.textContent = t("reset");
     resetBtn.style.cssText = `padding: 8px 16px; background-color: ${colors.buttonBg}; color: ${colors.buttonText}; border: 1px solid ${colors.border}; border-radius: 4px; cursor: pointer;`;
     resetBtn.onclick = () => {
-      if (confirm(t('resetConfirm'))) {
+      if (confirm(t("resetConfirm"))) {
         saveEnterConfig(DEFAULT_SHORTCUTS);
-        alert(t('resetSuccess'));
+        alert(t("resetSuccess"));
         dialog.remove();
         currentShortcuts = DEFAULT_SHORTCUTS;
         createSettingsUI();
@@ -609,8 +612,8 @@ CONSOLIDATED FEATURES:
 
     document.body.appendChild(dialog);
 
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: ${isDark ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)'}; z-index: 9999;`;
+    const overlay = document.createElement("div");
+    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: ${isDark ? "rgba(0,0,0,0.7)" : "rgba(0,0,0,0.5)"}; z-index: 9999;`;
     overlay.onclick = () => {
       overlay.remove();
       dialog.remove();
@@ -628,14 +631,16 @@ CONSOLIDATED FEATURES:
   }
 
   function isInTextInput(target) {
-    return target.id === 'prompt-textarea' ||
-           target.closest('#prompt-textarea') ||
-           /INPUT|TEXTAREA|SELECT|LABEL/.test(target.tagName) ||
-           (target.getAttribute && target.getAttribute('contenteditable') === 'true');
+    return (
+      target.id === "prompt-textarea" ||
+      target.closest("#prompt-textarea") ||
+      /INPUT|TEXTAREA|SELECT|LABEL/.test(target.tagName) ||
+      (target.getAttribute && target.getAttribute("contenteditable") === "true")
+    );
   }
 
   function isPotentialSendShortcut(e) {
-    if (e.key !== 'Enter') return false;
+    if (e.key !== "Enter") return false;
     const isCtrlOnly = e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey;
     const isAltOnly = e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey;
     const isMetaOnly = e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey;
@@ -643,76 +648,110 @@ CONSOLIDATED FEATURES:
   }
 
   function isSendShortcut(e) {
-    if (e.key !== 'Enter') return false;
-    return (currentShortcuts.ctrl && e.ctrlKey && !e.altKey && !e.metaKey) ||
-           (currentShortcuts.alt && e.altKey && !e.ctrlKey && !e.metaKey) ||
-           (currentShortcuts.meta && e.metaKey && !e.ctrlKey && !e.altKey);
+    if (e.key !== "Enter") return false;
+    return (
+      (currentShortcuts.ctrl && e.ctrlKey && !e.altKey && !e.metaKey) ||
+      (currentShortcuts.alt && e.altKey && !e.ctrlKey && !e.metaKey) ||
+      (currentShortcuts.meta && e.metaKey && !e.ctrlKey && !e.altKey)
+    );
   }
 
   function findChatGPTSubmitButton() {
     return document.querySelector('button[data-testid="send-button"]');
   }
 
-  window.addEventListener('keydown', (e) => {
-    if (isChineseInputMode(e)) return;
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (isChineseInputMode(e)) return;
 
-    const target = getEventTarget(e);
+      const target = getEventTarget(e);
 
-    // ChatGPT special handling
-    if (currentPlatform === 'chatgpt') {
-      if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) {
-        if (isInTextInput(target)) {
-          e.stopPropagation();
-          e.preventDefault();
+      // ChatGPT special handling
+      if (currentPlatform === "chatgpt") {
+        if (e.key === "Enter" && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) {
+          if (isInTextInput(target)) {
+            e.stopPropagation();
+            e.preventDefault();
 
-          const shiftEnterEvent = new KeyboardEvent('keydown', {
-            key: 'Enter',
-            code: 'Enter',
-            shiftKey: true,
-            bubbles: true,
-            cancelable: true
-          });
-          target.dispatchEvent(shiftEnterEvent);
+            const shiftEnterEvent = new KeyboardEvent("keydown", {
+              key: "Enter",
+              code: "Enter",
+              shiftKey: true,
+              bubbles: true,
+              cancelable: true
+            });
+            target.dispatchEvent(shiftEnterEvent);
 
-          if (!shiftEnterEvent.defaultPrevented) {
-            document.execCommand('insertParagraph');
+            if (!shiftEnterEvent.defaultPrevented) {
+              document.execCommand("insertParagraph");
+            }
+            return;
           }
-          return;
         }
-      }
 
-      if (isSendShortcut(e)) {
-        if (isInTextInput(target)) {
-          const submitButton = findChatGPTSubmitButton();
-          if (submitButton && !submitButton.disabled) {
+        if (isSendShortcut(e)) {
+          if (isInTextInput(target)) {
+            const submitButton = findChatGPTSubmitButton();
+            if (submitButton && !submitButton.disabled) {
+              e.preventDefault();
+              e.stopPropagation();
+              submitButton.click();
+            }
+          }
+        }
+
+        if (isPotentialSendShortcut(e)) {
+          if (isInTextInput(target)) {
             e.preventDefault();
             e.stopPropagation();
-            submitButton.click();
+          }
+        }
+      } else {
+        // Other platforms
+        if (e.key === "Enter" && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) {
+          if (isInTextInput(target)) {
+            e.stopPropagation();
+          }
+        }
+
+        if (isSendShortcut(e)) {
+          return; // Let native behavior execute
+        }
+
+        if (isPotentialSendShortcut(e)) {
+          // Special case for felo.ai - allow ctrl+enter for web search
+          if (currentPlatform === "felo" && e.ctrlKey && e.key === "Enter" && !e.altKey && !e.metaKey) {
+            return;
+          }
+
+          if (isInTextInput(target)) {
+            e.stopPropagation();
           }
         }
       }
+    },
+    true
+  );
 
-      if (isPotentialSendShortcut(e)) {
+  window.addEventListener(
+    "keypress",
+    (e) => {
+      if (currentPlatform === "chatgpt") return;
+      if (isChineseInputMode(e)) return;
+
+      const target = getEventTarget(e);
+
+      if (e.key === "Enter" && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) {
         if (isInTextInput(target)) {
-          e.preventDefault();
           e.stopPropagation();
         }
       }
-    } else {
-      // Other platforms
-      if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) {
-        if (isInTextInput(target)) {
-          e.stopPropagation();
-        }
-      }
 
-      if (isSendShortcut(e)) {
-        return; // Let native behavior execute
-      }
+      if (isSendShortcut(e)) return;
 
       if (isPotentialSendShortcut(e)) {
-        // Special case for felo.ai - allow ctrl+enter for web search
-        if (currentPlatform === 'felo' && e.ctrlKey && e.key === 'Enter' && !e.altKey && !e.metaKey) {
+        if (currentPlatform === "felo" && e.ctrlKey && e.key === "Enter" && !e.altKey && !e.metaKey) {
           return;
         }
 
@@ -720,56 +759,31 @@ CONSOLIDATED FEATURES:
           e.stopPropagation();
         }
       }
-    }
-  }, true);
-
-  window.addEventListener('keypress', (e) => {
-    if (currentPlatform === 'chatgpt') return;
-    if (isChineseInputMode(e)) return;
-
-    const target = getEventTarget(e);
-
-    if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey && !e.metaKey && !e.altKey) {
-      if (isInTextInput(target)) {
-        e.stopPropagation();
-      }
-    }
-
-    if (isSendShortcut(e)) return;
-
-    if (isPotentialSendShortcut(e)) {
-      if (currentPlatform === 'felo' && e.ctrlKey && e.key === 'Enter' && !e.altKey && !e.metaKey) {
-        return;
-      }
-
-      if (isInTextInput(target)) {
-        e.stopPropagation();
-      }
-    }
-  }, true);
+    },
+    true
+  );
 
   // ═══════════════════════════════════════════════════════════
   // INITIALIZATION
   // ═══════════════════════════════════════════════════════════
 
-  GM_registerMenuCommand('⚙️ AI Chat Enhancer Settings', createSettingsUI);
+  GM_registerMenuCommand("⚙️ AI Chat Enhancer Settings", createSettingsUI);
 
   function init() {
     applyPlatformStyles();
     LinkEnhancer.enhance();
 
     // Monitor page changes for SPAs
-    window.addEventListener('popstate', applyPlatformStyles);
-    window.addEventListener('pushstate', applyPlatformStyles);
-    window.addEventListener('replacestate', applyPlatformStyles);
+    window.addEventListener("popstate", applyPlatformStyles);
+    window.addEventListener("pushstate", applyPlatformStyles);
+    window.addEventListener("replacestate", applyPlatformStyles);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
 
-  console.info('[AI Chat Enhancer] Initialized for platform:', currentPlatform,
-    '| Shortcuts:', currentShortcuts);
+  console.info("[AI Chat Enhancer] Initialized for platform:", currentPlatform, "| Shortcuts:", currentShortcuts);
 })();

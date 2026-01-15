@@ -31,12 +31,12 @@ IMPROVEMENTS OVER ORIGINALS:
 - OPTIMIZED CSS injection (theme at document-start, functional CSS at document-end)
 */
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   // Emergency disable
-  if (localStorage.getItem('disable_claude_complete') === '1') {
-    console.warn('[Claude Complete]: Disabled by user');
+  if (localStorage.getItem("disable_claude_complete") === "1") {
+    console.warn("[Claude Complete]: Disabled by user");
     return;
   }
 
@@ -47,12 +47,12 @@ IMPROVEMENTS OVER ORIGINALS:
   const CONFIG = {
     // Token Saver
     thresholds: {
-      warning: GM_getValue('warning_threshold', 1500),
-      danger: GM_getValue('danger_threshold', 3500)
+      warning: GM_getValue("warning_threshold", 1500),
+      danger: GM_getValue("danger_threshold", 3500)
     },
     patterns: {
-      paste: ['```', 'Here is', 'Here\'s', 'I\'ve added', 'I\'ve updated'],
-      file: ['created file', 'saved to', 'written to', 'file has been', 'download', '/mnt/user-data/']
+      paste: ["```", "Here is", "Here's", "I've added", "I've updated"],
+      file: ["created file", "saved to", "written to", "file has been", "download", "/mnt/user-data/"]
     },
     intervals: {
       responseCheck: 300,
@@ -62,35 +62,35 @@ IMPROVEMENTS OVER ORIGINALS:
 
     // Code Collapser
     codeCollapser: {
-      defaultCollapsed: GM_getValue('cc_default_collapsed', true),
+      defaultCollapsed: GM_getValue("cc_default_collapsed", true),
       typingCheckInterval: 500
     },
 
     // UI Position
     ui: {
-      minimized: GM_getValue('ui_minimized', true),
-      position: GM_getValue('ui_position', { bottom: 100, right: 20 }),
-      activeTab: GM_getValue('ui_active_tab', 'token-saver')
+      minimized: GM_getValue("ui_minimized", true),
+      position: GM_getValue("ui_position", { bottom: 100, right: 20 }),
+      activeTab: GM_getValue("ui_active_tab", "token-saver")
     },
 
     // Feature Toggles
     features: {
-      theme: GM_getValue('feature_theme', true),
-      tokenSaver: GM_getValue('feature_token_saver', true),
-      codeCollapser: GM_getValue('feature_code_collapser', true),
-      usageMonitor: GM_getValue('feature_usage_monitor', true),
-      fork: GM_getValue('feature_fork', true)
+      theme: GM_getValue("feature_theme", true),
+      tokenSaver: GM_getValue("feature_token_saver", true),
+      codeCollapser: GM_getValue("feature_code_collapser", true),
+      usageMonitor: GM_getValue("feature_usage_monitor", true),
+      fork: GM_getValue("feature_fork", true)
     }
   };
 
   function saveConfig() {
-    GM_setValue('warning_threshold', CONFIG.thresholds.warning);
-    GM_setValue('danger_threshold', CONFIG.thresholds.danger);
-    GM_setValue('cc_default_collapsed', CONFIG.codeCollapser.defaultCollapsed);
-    GM_setValue('ui_minimized', CONFIG.ui.minimized);
-    GM_setValue('ui_position', CONFIG.ui.position);
-    GM_setValue('ui_active_tab', CONFIG.ui.activeTab);
-    Object.keys(CONFIG.features).forEach(key => {
+    GM_setValue("warning_threshold", CONFIG.thresholds.warning);
+    GM_setValue("danger_threshold", CONFIG.thresholds.danger);
+    GM_setValue("cc_default_collapsed", CONFIG.codeCollapser.defaultCollapsed);
+    GM_setValue("ui_minimized", CONFIG.ui.minimized);
+    GM_setValue("ui_position", CONFIG.ui.position);
+    GM_setValue("ui_active_tab", CONFIG.ui.activeTab);
+    Object.keys(CONFIG.features).forEach((key) => {
       GM_setValue(`feature_${key}`, CONFIG.features[key]);
     });
   }
@@ -163,22 +163,30 @@ IMPROVEMENTS OVER ORIGINALS:
     `);
 
     // Fix paste handler (newlines)
-    document.addEventListener('paste', function(e) {
-      const textarea = document.activeElement;
-      if (textarea && textarea.tagName === 'TEXTAREA') {
-        e.stopImmediatePropagation();
-        const text = e.clipboardData.getData('text/plain');
-        document.execCommand('insertText', false, text);
-        e.preventDefault();
-      }
-    }, true);
+    document.addEventListener(
+      "paste",
+      function (e) {
+        const textarea = document.activeElement;
+        if (textarea && textarea.tagName === "TEXTAREA") {
+          e.stopImmediatePropagation();
+          const text = e.clipboardData.getData("text/plain");
+          document.execCommand("insertText", false, text);
+          e.preventDefault();
+        }
+      },
+      true
+    );
 
     // Override ctrl+shift+i to open devtools
-    document.addEventListener('keydown', function(e) {
-      if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-        e.stopImmediatePropagation();
-      }
-    }, true);
+    document.addEventListener(
+      "keydown",
+      function (e) {
+        if (e.ctrlKey && e.shiftKey && e.key === "I") {
+          e.stopImmediatePropagation();
+        }
+      },
+      true
+    );
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -186,8 +194,8 @@ IMPROVEMENTS OVER ORIGINALS:
   // ═══════════════════════════════════════════════════════════
 
   // Wait for DOM
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFeatureModules);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFeatureModules);
   } else {
     initFeatureModules();
   }
@@ -205,7 +213,7 @@ IMPROVEMENTS OVER ORIGINALS:
     // Initialize unified UI
     UIController.init();
 
-    console.info('[Claude Complete] Initialized (5 modules)');
+    console.info("[Claude Complete] Initialized (5 modules)");
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -772,71 +780,71 @@ IMPROVEMENTS OVER ORIGINALS:
     copyText(text, successMsg) {
       try {
         navigator.clipboard.writeText(text).then(() => {
-          this.showStatus('info', successMsg);
+          this.showStatus("info", successMsg);
         });
       } catch {
-        const textarea = document.createElement('textarea');
+        const textarea = document.createElement("textarea");
         textarea.value = text;
-        textarea.style.cssText = 'position:fixed;opacity:0;';
+        textarea.style.cssText = "position:fixed;opacity:0;";
         document.body.appendChild(textarea);
         textarea.select();
-        document.execCommand('copy');
+        document.execCommand("copy");
         document.body.removeChild(textarea);
-        this.showStatus('info', successMsg);
+        this.showStatus("info", successMsg);
       }
     },
 
     showStatus(type, message, duration = 3000) {
-      let status = document.getElementById('cts-status');
+      let status = document.getElementById("cts-status");
 
       if (!status) {
-        status = document.createElement('div');
-        status.id = 'cts-status';
+        status = document.createElement("div");
+        status.id = "cts-status";
         document.body.appendChild(status);
       }
 
-      if (this.state.fileDetected && type !== 'safe' && type !== 'info') return;
+      if (this.state.fileDetected && type !== "safe" && type !== "info") return;
 
       status.className = type;
       status.textContent = message;
-      status.style.display = 'block';
+      status.style.display = "block";
 
       clearTimeout(this.statusTimeout);
       if (duration > 0) {
         this.statusTimeout = setTimeout(() => {
-          status.style.display = 'none';
+          status.style.display = "none";
         }, duration);
       }
     },
 
     hasPastePattern(text) {
-      return CONFIG.patterns.paste.some(p => text.includes(p));
+      return CONFIG.patterns.paste.some((p) => text.includes(p));
     },
 
     hasFileMention(text) {
-      return CONFIG.patterns.file.some(p => text.toLowerCase().includes(p.toLowerCase()));
+      return CONFIG.patterns.file.some((p) => text.toLowerCase().includes(p.toLowerCase()));
     },
 
     checkResponse() {
       if (!this.state.monitoring) return;
 
-      const responses = document.querySelectorAll('[data-test-render-count]');
+      const responses = document.querySelectorAll("[data-test-render-count]");
       if (responses.length === 0) return;
 
       const latest = responses[responses.length - 1];
-      const text = latest.textContent || '';
+      const text = latest.textContent || "";
       this.state.responseLength = text.length;
 
       if (this.hasFileMention(text)) {
         this.state.fileDetected = true;
-        this.showStatus('safe', '✅ File creation detected!');
+        this.showStatus("safe", "✅ File creation detected!");
         return;
       }
 
       if (this.state.responseLength > CONFIG.thresholds.danger && this.hasPastePattern(text)) {
-        this.showStatus('danger', `❌ ${this.state.responseLength} chars - paste detected!`, 0);
+        this.showStatus("danger", `❌ ${this.state.responseLength} chars - paste detected!`, 0);
       } else if (this.state.responseLength > CONFIG.thresholds.warning) {
-        this.showStatus('warning', `⚠️ ${this.state.responseLength} chars - consider file`, 0);
+        this.showStatus("warning", `⚠️ ${this.state.responseLength} chars - consider file`, 0);
       }
 
       setTimeout(() => this.checkResponse(), CONFIG.intervals.responseCheck);
@@ -855,8 +863,7 @@ IMPROVEMENTS OVER ORIGINALS:
         for (const mutation of mutations) {
           for (const node of mutation.addedNodes) {
             if (node.nodeType === 1) {
-              if (node.querySelector?.('[data-test-render-count]') ||
-                  node.hasAttribute?.('data-test-render-count')) {
+              if (node.querySelector?.("[data-test-render-count]") || node.hasAttribute?.("data-test-render-count")) {
                 this.startMonitoring();
                 return;
               }
@@ -873,10 +880,10 @@ IMPROVEMENTS OVER ORIGINALS:
       const elements = document.querySelectorAll(selectors);
       const files = new Set();
 
-      elements.forEach(el => {
-        const name = el.textContent || el.getAttribute('title') || el.getAttribute('href') || '';
-        if (name.includes('.')) {
-          const clean = name.split('/').pop().trim();
+      elements.forEach((el) => {
+        const name = el.textContent || el.getAttribute("title") || el.getAttribute("href") || "";
+        if (name.includes(".")) {
+          const clean = name.split("/").pop().trim();
           if (clean) files.add(clean);
         }
       });
@@ -884,23 +891,26 @@ IMPROVEMENTS OVER ORIGINALS:
       if (files.size > this.state.files.length) {
         this.state.files = [...files];
         UIController.updateFileList();
-        this.showStatus('info', `📂 ${files.size} file(s) detected`);
+        this.showStatus("info", `📂 ${files.size} file(s) detected`);
       }
     },
 
     scanUploads() {
-      this.copyText(`Please use the view tool to scan /mnt/user-data/uploads and list all files there.`, '📋 Scan command copied!');
+      this.copyText(
+        "Please use the view tool to scan /mnt/user-data/uploads and list all files there.",
+        "📋 Scan command copied!"
+      );
     },
 
     refresh() {
       this.detectFiles();
-      this.showStatus('info', '🔄 Refreshed!');
+      this.showStatus("info", "🔄 Refreshed!");
     },
 
     clear() {
       this.state.files = [];
       UIController.updateFileList();
-      this.showStatus('info', '🗑️ Cleared!');
+      this.showStatus("info", "🗑️ Cleared!");
     }
   };
 
@@ -914,16 +924,19 @@ IMPROVEMENTS OVER ORIGINALS:
 
     ICONS: {
       copy: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
-      download: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
-      expand: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>',
-      collapse: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>'
+      download:
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+      expand:
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>',
+      collapse:
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></svg>'
     },
 
     init() {
       this.processBlocks();
 
       const observer = new MutationObserver((mutations) => {
-        let shouldProcess = mutations.some(m => m.addedNodes.length > 0);
+        const shouldProcess = mutations.some((m) => m.addedNodes.length > 0);
         if (shouldProcess) this.processBlocks();
         this.checkTyping();
       });
@@ -932,33 +945,29 @@ IMPROVEMENTS OVER ORIGINALS:
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ['data-is-streaming']
+        attributeFilter: ["data-is-streaming"]
       });
 
       setInterval(() => this.checkTyping(), CONFIG.codeCollapser.typingCheckInterval);
     },
 
     checkTyping() {
-      const selectors = [
-        '[data-is-streaming="true"]',
-        '.animate-pulse',
-        '[data-testid="stop-button"]'
-      ];
-      const nowTyping = selectors.some(s => document.querySelector(s));
+      const selectors = ['[data-is-streaming="true"]', ".animate-pulse", '[data-testid="stop-button"]'];
+      const nowTyping = selectors.some((s) => document.querySelector(s));
 
       if (nowTyping !== this.isTyping) {
         this.isTyping = nowTyping;
         if (!this.isTyping) {
-          document.querySelectorAll('.ccb-wrapper:not(.done)').forEach(w => {
-            w.classList.add('done');
+          document.querySelectorAll(".ccb-wrapper:not(.done)").forEach((w) => {
+            w.classList.add("done");
           });
         }
       }
     },
 
     processBlocks() {
-      document.querySelectorAll('pre:not(.ccb-processed)').forEach(pre => {
-        if (!pre.closest('.ccb-wrapper')) {
+      document.querySelectorAll("pre:not(.ccb-processed)").forEach((pre) => {
+        if (!pre.closest(".ccb-wrapper")) {
           this.wrapCodeBlock(pre);
         }
       });
@@ -967,39 +976,48 @@ IMPROVEMENTS OVER ORIGINALS:
     wrapCodeBlock(pre) {
       if (this.processedBlocks.has(pre)) return;
       this.processedBlocks.add(pre);
-      pre.classList.add('ccb-processed');
+      pre.classList.add("ccb-processed");
 
       const lang = this.detectLanguage(pre);
 
-      const wrapper = document.createElement('div');
-      wrapper.className = 'ccb-wrapper';
+      const wrapper = document.createElement("div");
+      wrapper.className = "ccb-wrapper";
       if (CONFIG.codeCollapser.defaultCollapsed) {
-        wrapper.classList.add('collapsed');
+        wrapper.classList.add("collapsed");
       }
       wrapper.dataset.lang = lang;
 
-      const header = document.createElement('div');
-      header.className = 'ccb-header';
+      const header = document.createElement("div");
+      header.className = "ccb-header";
 
-      const copyBtn = document.createElement('button');
-      copyBtn.className = 'ccb-btn copy';
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "ccb-btn copy";
       copyBtn.innerHTML = `${this.ICONS.copy} Copy`;
-      copyBtn.onclick = (e) => { e.stopPropagation(); this.copyCode(wrapper, copyBtn); };
+      copyBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.copyCode(wrapper, copyBtn);
+      };
 
-      const downloadBtn = document.createElement('button');
-      downloadBtn.className = 'ccb-btn download';
+      const downloadBtn = document.createElement("button");
+      downloadBtn.className = "ccb-btn download";
       downloadBtn.innerHTML = `${this.ICONS.download} Download`;
-      downloadBtn.onclick = (e) => { e.stopPropagation(); this.downloadCode(wrapper, downloadBtn); };
+      downloadBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.downloadCode(wrapper, downloadBtn);
+      };
 
-      const toggleBtn = document.createElement('button');
-      toggleBtn.className = 'ccb-btn toggle';
-      toggleBtn.innerHTML = CONFIG.codeCollapser.defaultCollapsed ?
-        `${this.ICONS.expand} Expand` :
-        `${this.ICONS.collapse} Collapse`;
-      toggleBtn.onclick = (e) => { e.stopPropagation(); this.toggleCollapse(wrapper, toggleBtn); };
+      const toggleBtn = document.createElement("button");
+      toggleBtn.className = "ccb-btn toggle";
+      toggleBtn.innerHTML = CONFIG.codeCollapser.defaultCollapsed
+        ? `${this.ICONS.expand} Expand`
+        : `${this.ICONS.collapse} Collapse`;
+      toggleBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.toggleCollapse(wrapper, toggleBtn);
+      };
 
-      const info = document.createElement('div');
-      info.className = 'ccb-info';
+      const info = document.createElement("div");
+      info.className = "ccb-info";
       info.innerHTML = `
         <div class="ccb-title">${lang}</div>
         <span class="ccb-lang">${lang.toUpperCase()}</span>
@@ -1010,10 +1028,10 @@ IMPROVEMENTS OVER ORIGINALS:
       header.appendChild(info);
       header.appendChild(toggleBtn);
 
-      header.addEventListener('dblclick', () => this.toggleCollapse(wrapper, toggleBtn));
+      header.addEventListener("dblclick", () => this.toggleCollapse(wrapper, toggleBtn));
 
-      const content = document.createElement('div');
-      content.className = 'ccb-content';
+      const content = document.createElement("div");
+      content.className = "ccb-content";
 
       pre.parentNode.insertBefore(wrapper, pre);
       content.appendChild(pre);
@@ -1022,65 +1040,85 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     detectLanguage(pre) {
-      const code = pre.querySelector('code');
+      const code = pre.querySelector("code");
       if (code) {
-        const classes = code.className.split(' ');
+        const classes = code.className.split(" ");
         for (const cls of classes) {
-          if (cls.startsWith('language-')) {
-            return cls.replace('language-', '');
+          if (cls.startsWith("language-")) {
+            return cls.replace("language-", "");
           }
         }
       }
-      return 'code';
+      return "code";
     },
 
     toggleCollapse(wrapper, toggleBtn) {
-      const isCollapsed = wrapper.classList.toggle('collapsed');
-      toggleBtn.innerHTML = isCollapsed ?
-        `${this.ICONS.expand} Expand` :
-        `${this.ICONS.collapse} Collapse`;
+      const isCollapsed = wrapper.classList.toggle("collapsed");
+      toggleBtn.innerHTML = isCollapsed ? `${this.ICONS.expand} Expand` : `${this.ICONS.collapse} Collapse`;
     },
 
     copyCode(wrapper, btn) {
-      const pre = wrapper.querySelector('pre');
+      const pre = wrapper.querySelector("pre");
       const code = pre.textContent;
 
       navigator.clipboard.writeText(code).then(() => {
         const orig = btn.innerHTML;
-        btn.innerHTML = '✓ Copied!';
-        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        btn.innerHTML = "✓ Copied!";
+        setTimeout(() => {
+          btn.innerHTML = orig;
+        }, 2000);
       });
     },
 
     downloadCode(wrapper, btn) {
-      const pre = wrapper.querySelector('pre');
+      const pre = wrapper.querySelector("pre");
       const code = pre.textContent;
-      const lang = wrapper.dataset.lang || 'txt';
+      const lang = wrapper.dataset.lang || "txt";
       const ext = this.getExtension(lang);
       const filename = `code.${ext}`;
 
-      const blob = new Blob([code], { type: 'text/plain' });
+      const blob = new Blob([code], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
 
       const orig = btn.innerHTML;
-      btn.innerHTML = '✓ Downloaded!';
-      setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      btn.innerHTML = "✓ Downloaded!";
+      setTimeout(() => {
+        btn.innerHTML = orig;
+      }, 2000);
     },
 
     getExtension(lang) {
       const map = {
-        javascript: 'js', typescript: 'ts', python: 'py', java: 'java',
-        cpp: 'cpp', c: 'c', csharp: 'cs', php: 'php', ruby: 'rb',
-        go: 'go', rust: 'rs', swift: 'swift', kotlin: 'kt', html: 'html',
-        css: 'css', json: 'json', yaml: 'yaml', xml: 'xml', sql: 'sql',
-        bash: 'sh', shell: 'sh', markdown: 'md', text: 'txt'
+        javascript: "js",
+        typescript: "ts",
+        python: "py",
+        java: "java",
+        cpp: "cpp",
+        c: "c",
+        csharp: "cs",
+        php: "php",
+        ruby: "rb",
+        go: "go",
+        rust: "rs",
+        swift: "swift",
+        kotlin: "kt",
+        html: "html",
+        css: "css",
+        json: "json",
+        yaml: "yaml",
+        xml: "xml",
+        sql: "sql",
+        bash: "sh",
+        shell: "sh",
+        markdown: "md",
+        text: "txt"
       };
-      return map[lang.toLowerCase()] || 'txt';
+      return map[lang.toLowerCase()] || "txt";
     }
   };
 
@@ -1090,11 +1128,21 @@ IMPROVEMENTS OVER ORIGINALS:
 
   const UsageMonitorModule = {
     FEATURES: [
-      { key: 'enabled_monkeys_in_a_barrel', name: 'Code execution', desc: 'Virtual code environment', exclusive: 'enabled_artifacts_attachments' },
-      { key: 'enabled_artifacts_attachments', name: 'Repl Tool', desc: 'Additional features for Artifacts', exclusive: 'enabled_monkeys_in_a_barrel' },
-      { key: 'enabled_saffron', name: 'Memory', desc: 'Cross-window memory' },
-      { key: 'enabled_saffron_search', name: 'Search chats', desc: 'Chat search' },
-      { key: 'enabled_sourdough', name: 'Projects', desc: 'Project memory' }
+      {
+        key: "enabled_monkeys_in_a_barrel",
+        name: "Code execution",
+        desc: "Virtual code environment",
+        exclusive: "enabled_artifacts_attachments"
+      },
+      {
+        key: "enabled_artifacts_attachments",
+        name: "Repl Tool",
+        desc: "Additional features for Artifacts",
+        exclusive: "enabled_monkeys_in_a_barrel"
+      },
+      { key: "enabled_saffron", name: "Memory", desc: "Cross-window memory" },
+      { key: "enabled_saffron_search", name: "Search chats", desc: "Chat search" },
+      { key: "enabled_sourdough", name: "Projects", desc: "Project memory" }
     ],
 
     usageData: null,
@@ -1107,35 +1155,32 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     async refresh() {
-      [this.usageData, this.settings] = await Promise.all([
-        this.getUsageData(),
-        this.getUserSettings()
-      ]);
+      [this.usageData, this.settings] = await Promise.all([this.getUsageData(), this.getUserSettings()]);
       UIController.updateUsageTab();
     },
 
     async getUserSettings() {
       try {
-        const response = await fetch('/api/account', { credentials: 'include' });
+        const response = await fetch("/api/account", { credentials: "include" });
         const data = await response.json();
         return data.settings;
       } catch (err) {
-        console.error('[Usage Monitor] Failed to fetch settings:', err);
+        console.error("[Usage Monitor] Failed to fetch settings:", err);
         return null;
       }
     },
 
     async getUsageData() {
       try {
-        const orgsResponse = await fetch('/api/organizations', { credentials: 'include' });
+        const orgsResponse = await fetch("/api/organizations", { credentials: "include" });
         const orgs = await orgsResponse.json();
         const orgId = orgs[0]?.uuid;
         if (!orgId) return null;
 
-        const usageResponse = await fetch(`/api/organizations/${orgId}/usage`, { credentials: 'include' });
+        const usageResponse = await fetch(`/api/organizations/${orgId}/usage`, { credentials: "include" });
         return await usageResponse.json();
       } catch (err) {
-        console.error('[Usage Monitor] Failed to fetch usage:', err);
+        console.error("[Usage Monitor] Failed to fetch usage:", err);
         return null;
       }
     },
@@ -1147,28 +1192,28 @@ IMPROVEMENTS OVER ORIGINALS:
           body[exclusiveKey] = false;
         }
 
-        const response = await fetch('/api/account/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+        const response = await fetch("/api/account/settings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(body)
         });
 
         if (!response.ok) {
-          console.error('[Usage Monitor] HTTP error:', response.status);
+          console.error("[Usage Monitor] HTTP error:", response.status);
           return { success: false };
         }
 
         const result = await response.json();
         return { success: true, data: result };
       } catch (err) {
-        console.error('[Usage Monitor] Toggle failed:', err);
+        console.error("[Usage Monitor] Toggle failed:", err);
         return { success: false };
       }
     },
 
     formatResetTime(isoTime) {
-      if (!isoTime) return 'N/A';
+      if (!isoTime) return "N/A";
       const date = new Date(isoTime);
       const now = new Date();
       const diff = date - now;
@@ -1176,7 +1221,7 @@ IMPROVEMENTS OVER ORIGINALS:
       const hours = Math.floor(diff / 3600000);
       const days = Math.floor(diff / 86400000);
 
-      if (minutes < 1) return 'Resetting soon';
+      if (minutes < 1) return "Resetting soon";
       if (minutes < 60) return `In ${minutes} min`;
       if (hours < 24) return `In ${hours} hr`;
       return `In ${days} days`;
@@ -1200,8 +1245,9 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     createBranchButton() {
-      const button = document.createElement('button');
-      button.className = 'branch-button flex flex-row items-center gap-1 rounded-md p-1 py-0.5 text-xs transition-opacity delay-100 hover:bg-bg-200 group/button';
+      const button = document.createElement("button");
+      button.className =
+        "branch-button flex flex-row items-center gap-1 rounded-md p-1 py-0.5 text-xs transition-opacity delay-100 hover:bg-bg-200 group/button";
 
       button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="1.35em" height="1.35em" fill="currentColor" viewBox="0 0 22 22">
@@ -1217,15 +1263,15 @@ IMPROVEMENTS OVER ORIGINALS:
         const modal = await this.createModal();
         document.body.appendChild(modal);
 
-        modal.querySelector('#cancelFork').onclick = () => modal.remove();
+        modal.querySelector("#cancelFork").onclick = () => modal.remove();
 
-        modal.querySelector('#confirmFork').onclick = async () => {
-          const model = modal.querySelector('select').value;
-          const useSummary = modal.querySelector('#summaryMode').checked;
+        modal.querySelector("#confirmFork").onclick = async () => {
+          const model = modal.querySelector("select").value;
+          const useSummary = modal.querySelector("#summaryMode").checked;
 
-          const confirmBtn = modal.querySelector('#confirmFork');
+          const confirmBtn = modal.querySelector("#confirmFork");
           confirmBtn.disabled = true;
-          confirmBtn.textContent = 'Processing...';
+          confirmBtn.textContent = "Processing...";
 
           await this.forkConversationClicked(model, button, modal, useSummary);
           modal.remove();
@@ -1240,8 +1286,8 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     async createModal() {
-      const modal = document.createElement('div');
-      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      const modal = document.createElement("div");
+      modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
 
       modal.innerHTML = `
         <div class="bg-bg-100 rounded-lg p-6 shadow-xl max-w-sm w-full mx-4 border border-border-300">
@@ -1289,35 +1335,35 @@ IMPROVEMENTS OVER ORIGINALS:
       `;
 
       try {
-        const accountData = await fetch('/api/account', { credentials: 'include' }).then(r => r.json());
+        const accountData = await fetch("/api/account", { credentials: "include" }).then((r) => r.json());
         this.originalSettings = accountData.settings;
       } catch (error) {
-        console.error('Failed to fetch account settings:', error);
+        console.error("Failed to fetch account settings:", error);
       }
 
       return modal;
     },
 
     findMessageControls(messageElement) {
-      const group = messageElement.closest('.group');
-      const buttons = group?.querySelectorAll('button');
+      const group = messageElement.closest(".group");
+      const buttons = group?.querySelectorAll("button");
       if (!buttons) return null;
-      const retryButton = Array.from(buttons).find(button => button.textContent.includes('Retry'));
-      return retryButton?.closest('.justify-between');
+      const retryButton = Array.from(buttons).find((button) => button.textContent.includes("Retry"));
+      return retryButton?.closest(".justify-between");
     },
 
     addBranchButtons() {
       if (this.isProcessing) return;
       try {
         this.isProcessing = true;
-        const messages = document.querySelectorAll('.font-claude-response');
+        const messages = document.querySelectorAll(".font-claude-response");
         messages.forEach((message) => {
           const controls = this.findMessageControls(message);
-          if (controls && !controls.querySelector('.branch-button')) {
-            const container = document.createElement('div');
-            container.className = 'flex items-center gap-0.5';
-            const divider = document.createElement('div');
-            divider.className = 'w-px h-4/5 self-center bg-border-300 mr-0.5';
+          if (controls && !controls.querySelector(".branch-button")) {
+            const container = document.createElement("div");
+            container.className = "flex items-center gap-0.5";
+            const divider = document.createElement("div");
+            divider.className = "w-px h-4/5 self-center bg-border-300 mr-0.5";
             const branchBtn = this.createBranchButton();
             container.appendChild(branchBtn);
             container.appendChild(divider);
@@ -1325,45 +1371,49 @@ IMPROVEMENTS OVER ORIGINALS:
           }
         });
       } catch (error) {
-        console.error('Error adding branch buttons:', error);
+        console.error("Error adding branch buttons:", error);
       } finally {
         this.isProcessing = false;
       }
     },
 
     async forkConversationClicked(model, forkButton, modal, useSummary = false) {
-      const conversationId = window.location.pathname.split('/').pop();
+      const conversationId = window.location.pathname.split("/").pop();
 
       if (this.originalSettings) {
         const newSettings = { ...this.originalSettings };
         newSettings.paprika_mode = null;
-        await fetch('/api/account', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/account", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ settings: newSettings })
         });
       }
 
       this.pendingForkModel = model;
-      this.includeAttachments = modal.querySelector('#includeFiles')?.checked ?? true;
+      this.includeAttachments = modal.querySelector("#includeFiles")?.checked ?? true;
       this.pendingUseSummary = useSummary;
 
-      const buttonGroup = forkButton.closest('.justify-between');
-      const retryButton = Array.from(buttonGroup.querySelectorAll('button'))
-        .find(button => button.textContent.includes('Retry'));
+      const buttonGroup = forkButton.closest(".justify-between");
+      const retryButton = Array.from(buttonGroup.querySelectorAll("button")).find((button) =>
+        button.textContent.includes("Retry")
+      );
 
       if (retryButton) {
-        retryButton.dispatchEvent(new PointerEvent('pointerdown', {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-          pointerType: 'mouse'
-        }));
+        retryButton.dispatchEvent(
+          new PointerEvent("pointerdown", {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            pointerType: "mouse"
+          })
+        );
 
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
-        const withNoChangesOption = Array.from(document.querySelectorAll('[role="menuitem"]'))
-          .find(element => element.textContent.includes('With no changes'));
+        const withNoChangesOption = Array.from(document.querySelectorAll('[role="menuitem"]')).find((element) =>
+          element.textContent.includes("With no changes")
+        );
 
         if (withNoChangesOption) {
           withNoChangesOption.click();
@@ -1381,15 +1431,15 @@ IMPROVEMENTS OVER ORIGINALS:
         let url = undefined;
         if (input instanceof URL) {
           url = input.href;
-        } else if (typeof input === 'string') {
+        } else if (typeof input === "string") {
           url = input;
         } else if (input instanceof Request) {
           url = input.url;
         }
 
-        if (url && url.includes('/retry_completion') && this.pendingForkModel) {
+        if (url && url.includes("/retry_completion") && this.pendingForkModel) {
           // Fork conversation logic (simplified - full implementation available in original)
-          console.log('[Fork] Intercepted retry request');
+          console.log("[Fork] Intercepted retry request");
           // ... (fork implementation details omitted for brevity)
 
           this.pendingForkModel = null;
@@ -1412,45 +1462,45 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     createUI() {
-      document.getElementById('claude-mini-btn')?.remove();
-      document.getElementById('claude-unified-panel')?.remove();
+      document.getElementById("claude-mini-btn")?.remove();
+      document.getElementById("claude-unified-panel")?.remove();
 
       const pos = CONFIG.ui.position;
 
       // Mini button
-      const miniBtn = document.createElement('div');
-      miniBtn.id = 'claude-mini-btn';
-      miniBtn.textContent = '⚡';
+      const miniBtn = document.createElement("div");
+      miniBtn.id = "claude-mini-btn";
+      miniBtn.textContent = "⚡";
 
       if (pos.left !== undefined) {
-        miniBtn.style.left = pos.left + 'px';
-        miniBtn.style.top = (pos.top || 100) + 'px';
+        miniBtn.style.left = pos.left + "px";
+        miniBtn.style.top = (pos.top || 100) + "px";
       } else {
-        miniBtn.style.bottom = (pos.bottom || 100) + 'px';
-        miniBtn.style.right = (pos.right || 20) + 'px';
+        miniBtn.style.bottom = (pos.bottom || 100) + "px";
+        miniBtn.style.right = (pos.right || 20) + "px";
       }
 
       if (!CONFIG.ui.minimized) {
-        miniBtn.style.display = 'none';
+        miniBtn.style.display = "none";
       }
 
       document.body.appendChild(miniBtn);
-      this.makeDraggable(miniBtn, 'ui_position', () => this.togglePanel());
+      this.makeDraggable(miniBtn, "ui_position", () => this.togglePanel());
 
       // Panel
-      const panel = document.createElement('div');
-      panel.id = 'claude-unified-panel';
+      const panel = document.createElement("div");
+      panel.id = "claude-unified-panel";
 
       if (pos.left !== undefined) {
-        panel.style.left = Math.max(10, pos.left - 480) + 'px';
-        panel.style.top = (pos.top || 100) + 'px';
+        panel.style.left = Math.max(10, pos.left - 480) + "px";
+        panel.style.top = (pos.top || 100) + "px";
       } else {
-        panel.style.bottom = (pos.bottom || 100) + 'px';
-        panel.style.right = (pos.right || 20) + 'px';
+        panel.style.bottom = (pos.bottom || 100) + "px";
+        panel.style.right = (pos.right || 20) + "px";
       }
 
       if (!CONFIG.ui.minimized) {
-        panel.classList.add('visible');
+        panel.classList.add("visible");
       }
 
       panel.innerHTML = `
@@ -1464,9 +1514,9 @@ IMPROVEMENTS OVER ORIGINALS:
           </div>
         </div>
         <div class="panel-tabs">
-          <button class="panel-tab ${CONFIG.ui.activeTab === 'token-saver' ? 'active' : ''}" data-tab="token-saver">💾 Token Saver</button>
-          <button class="panel-tab ${CONFIG.ui.activeTab === 'usage' ? 'active' : ''}" data-tab="usage">📊 Usage</button>
-          <button class="panel-tab ${CONFIG.ui.activeTab === 'settings' ? 'active' : ''}" data-tab="settings">⚙️ Settings</button>
+          <button class="panel-tab ${CONFIG.ui.activeTab === "token-saver" ? "active" : ""}" data-tab="token-saver">💾 Token Saver</button>
+          <button class="panel-tab ${CONFIG.ui.activeTab === "usage" ? "active" : ""}" data-tab="usage">📊 Usage</button>
+          <button class="panel-tab ${CONFIG.ui.activeTab === "settings" ? "active" : ""}" data-tab="settings">⚙️ Settings</button>
         </div>
         <div class="panel-content">
           ${this.renderTokenSaverTab()}
@@ -1478,28 +1528,28 @@ IMPROVEMENTS OVER ORIGINALS:
       document.body.appendChild(panel);
 
       // Event listeners
-      panel.querySelector('#panel-toggle').addEventListener('click', () => this.togglePanel());
+      panel.querySelector("#panel-toggle").addEventListener("click", () => this.togglePanel());
 
-      panel.querySelectorAll('.panel-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
+      panel.querySelectorAll(".panel-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
           const tabName = tab.dataset.tab;
           this.switchTab(tabName);
         });
       });
 
       // Token Saver buttons
-      document.getElementById('cts-scan')?.addEventListener('click', () => TokenSaverModule.scanUploads());
-      document.getElementById('cts-refresh')?.addEventListener('click', () => TokenSaverModule.refresh());
-      document.getElementById('cts-clear')?.addEventListener('click', () => TokenSaverModule.clear());
+      document.getElementById("cts-scan")?.addEventListener("click", () => TokenSaverModule.scanUploads());
+      document.getElementById("cts-refresh")?.addEventListener("click", () => TokenSaverModule.refresh());
+      document.getElementById("cts-clear")?.addEventListener("click", () => TokenSaverModule.clear());
 
       // Draggable header
-      const header = panel.querySelector('.panel-header');
-      this.makeDraggable(panel, 'ui_position', null, header);
+      const header = panel.querySelector(".panel-header");
+      this.makeDraggable(panel, "ui_position", null, header);
     },
 
     renderTokenSaverTab() {
       return `
-        <div class="panel-section ${CONFIG.ui.activeTab === 'token-saver' ? 'active' : ''}" id="tab-token-saver">
+        <div class="panel-section ${CONFIG.ui.activeTab === "token-saver" ? "active" : ""}" id="tab-token-saver">
           <div class="cts-section">
             <div class="cts-section-title">📊 Status</div>
             <div class="cts-features">
@@ -1535,7 +1585,7 @@ IMPROVEMENTS OVER ORIGINALS:
 
     renderUsageTab() {
       return `
-        <div class="panel-section ${CONFIG.ui.activeTab === 'usage' ? 'active' : ''}" id="tab-usage">
+        <div class="panel-section ${CONFIG.ui.activeTab === "usage" ? "active" : ""}" id="tab-usage">
           <div class="loading">Loading usage data...</div>
         </div>
       `;
@@ -1543,15 +1593,15 @@ IMPROVEMENTS OVER ORIGINALS:
 
     renderSettingsTab() {
       return `
-        <div class="panel-section ${CONFIG.ui.activeTab === 'settings' ? 'active' : ''}" id="tab-settings">
+        <div class="panel-section ${CONFIG.ui.activeTab === "settings" ? "active" : ""}" id="tab-settings">
           <div class="cts-section">
             <div class="cts-section-title">⚙️ Feature Toggles</div>
             <div class="cts-help">
-              <label><input type="checkbox" ${CONFIG.features.theme ? 'checked' : ''}> Dark oceanic theme</label><br>
-              <label><input type="checkbox" ${CONFIG.features.tokenSaver ? 'checked' : ''}> Token Saver</label><br>
-              <label><input type="checkbox" ${CONFIG.features.codeCollapser ? 'checked' : ''}> Code Collapser</label><br>
-              <label><input type="checkbox" ${CONFIG.features.usageMonitor ? 'checked' : ''}> Usage Monitor</label><br>
-              <label><input type="checkbox" ${CONFIG.features.fork ? 'checked' : ''}> Fork Conversation</label><br>
+              <label><input type="checkbox" ${CONFIG.features.theme ? "checked" : ""}> Dark oceanic theme</label><br>
+              <label><input type="checkbox" ${CONFIG.features.tokenSaver ? "checked" : ""}> Token Saver</label><br>
+              <label><input type="checkbox" ${CONFIG.features.codeCollapser ? "checked" : ""}> Code Collapser</label><br>
+              <label><input type="checkbox" ${CONFIG.features.usageMonitor ? "checked" : ""}> Usage Monitor</label><br>
+              <label><input type="checkbox" ${CONFIG.features.fork ? "checked" : ""}> Fork Conversation</label><br>
               <br>
               <small style="color:#909090;">Refresh page to apply changes</small>
             </div>
@@ -1562,29 +1612,29 @@ IMPROVEMENTS OVER ORIGINALS:
 
     switchTab(tabName) {
       CONFIG.ui.activeTab = tabName;
-      GM_setValue('ui_active_tab', tabName);
+      GM_setValue("ui_active_tab", tabName);
 
-      document.querySelectorAll('.panel-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tab === tabName);
+      document.querySelectorAll(".panel-tab").forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.tab === tabName);
       });
 
-      document.querySelectorAll('.panel-section').forEach(section => {
-        section.classList.toggle('active', section.id === `tab-${tabName}`);
+      document.querySelectorAll(".panel-section").forEach((section) => {
+        section.classList.toggle("active", section.id === `tab-${tabName}`);
       });
 
-      if (tabName === 'usage' && UsageMonitorModule.usageData === null) {
+      if (tabName === "usage" && UsageMonitorModule.usageData === null) {
         UsageMonitorModule.refresh();
       }
     },
 
     togglePanel() {
-      const miniBtn = document.getElementById('claude-mini-btn');
-      const panel = document.getElementById('claude-unified-panel');
+      const miniBtn = document.getElementById("claude-mini-btn");
+      const panel = document.getElementById("claude-unified-panel");
 
       if (CONFIG.ui.minimized) {
         const btnRect = miniBtn.getBoundingClientRect();
 
-        miniBtn.style.display = 'none';
+        miniBtn.style.display = "none";
 
         let panelX = btnRect.left - 480;
         let panelY = btnRect.top;
@@ -1592,32 +1642,32 @@ IMPROVEMENTS OVER ORIGINALS:
         panelX = Math.max(10, Math.min(panelX, window.innerWidth - 550));
         panelY = Math.max(10, Math.min(panelY, window.innerHeight - 300));
 
-        panel.style.left = panelX + 'px';
-        panel.style.top = panelY + 'px';
-        panel.style.right = 'auto';
-        panel.style.bottom = 'auto';
-        panel.classList.add('visible');
+        panel.style.left = panelX + "px";
+        panel.style.top = panelY + "px";
+        panel.style.right = "auto";
+        panel.style.bottom = "auto";
+        panel.classList.add("visible");
 
         CONFIG.ui.minimized = false;
       } else {
         const panelRect = panel.getBoundingClientRect();
 
-        panel.classList.remove('visible');
+        panel.classList.remove("visible");
 
-        miniBtn.style.left = (panelRect.right - 60) + 'px';
-        miniBtn.style.top = panelRect.top + 'px';
-        miniBtn.style.right = 'auto';
-        miniBtn.style.bottom = 'auto';
-        miniBtn.style.display = 'flex';
+        miniBtn.style.left = panelRect.right - 60 + "px";
+        miniBtn.style.top = panelRect.top + "px";
+        miniBtn.style.right = "auto";
+        miniBtn.style.bottom = "auto";
+        miniBtn.style.display = "flex";
 
         CONFIG.ui.minimized = true;
       }
 
-      GM_setValue('ui_minimized', CONFIG.ui.minimized);
+      GM_setValue("ui_minimized", CONFIG.ui.minimized);
     },
 
     updateFileList() {
-      const list = document.getElementById('cts-file-list');
+      const list = document.getElementById("cts-file-list");
       if (!list) return;
 
       if (TokenSaverModule.state.files.length === 0) {
@@ -1625,22 +1675,26 @@ IMPROVEMENTS OVER ORIGINALS:
         return;
       }
 
-      list.innerHTML = TokenSaverModule.state.files.map(file => `
+      list.innerHTML = TokenSaverModule.state.files
+        .map(
+          (file) => `
         <div class="cts-file-item" data-file="${file}">
           <div class="cts-file-name">📄 ${file}</div>
         </div>
-      `).join('');
+      `
+        )
+        .join("");
 
-      list.querySelectorAll('.cts-file-item').forEach(item => {
-        item.addEventListener('click', () => {
+      list.querySelectorAll(".cts-file-item").forEach((item) => {
+        item.addEventListener("click", () => {
           const cmd = `Please use the view tool to read: /mnt/user-data/uploads/${item.dataset.file}\n\nThen process it and create a downloadable output file in /mnt/user-data/outputs/ - do NOT paste content in chat.`;
-          TokenSaverModule.copyText(cmd, `📋 Copied!`);
+          TokenSaverModule.copyText(cmd, "📋 Copied!");
         });
       });
     },
 
     updateUsageTab() {
-      const tabContent = document.getElementById('tab-usage');
+      const tabContent = document.getElementById("tab-usage");
       if (!tabContent) return;
 
       const usage = UsageMonitorModule.usageData;
@@ -1651,14 +1705,14 @@ IMPROVEMENTS OVER ORIGINALS:
         return;
       }
 
-      let html = '';
+      let html = "";
 
       if (usage) {
         html += '<div class="cts-section"><div class="cts-section-title">📊 Usage</div>';
 
         if (usage.five_hour) {
           const percent = usage.five_hour.utilization || 0;
-          const barClass = percent > 80 ? 'danger' : percent > 60 ? 'warning' : '';
+          const barClass = percent > 80 ? "danger" : percent > 60 ? "warning" : "";
           html += `
             <div class="usage-item">
               <div class="usage-label">
@@ -1675,7 +1729,7 @@ IMPROVEMENTS OVER ORIGINALS:
 
         if (usage.seven_day) {
           const percent = usage.seven_day.utilization || 0;
-          const barClass = percent > 80 ? 'danger' : percent > 60 ? 'warning' : '';
+          const barClass = percent > 80 ? "danger" : percent > 60 ? "warning" : "";
           html += `
             <div class="usage-item">
               <div class="usage-label">
@@ -1690,13 +1744,13 @@ IMPROVEMENTS OVER ORIGINALS:
           `;
         }
 
-        html += '</div>';
+        html += "</div>";
       }
 
       if (settings) {
         html += '<div class="cts-section"><div class="cts-section-title">🔧 Feature Toggles</div>';
 
-        UsageMonitorModule.FEATURES.forEach(feature => {
+        UsageMonitorModule.FEATURES.forEach((feature) => {
           const isEnabled = settings[feature.key] === true;
           html += `
             <div class="feature-item">
@@ -1704,31 +1758,31 @@ IMPROVEMENTS OVER ORIGINALS:
                 <div class="feature-name">${feature.name}</div>
                 <div class="feature-desc">${feature.desc}</div>
               </div>
-              <button class="feature-toggle ${isEnabled ? 'on' : 'off'}"
+              <button class="feature-toggle ${isEnabled ? "on" : "off"}"
                       data-key="${feature.key}"
                       data-value="${isEnabled}"
-                      data-exclusive="${feature.exclusive || ''}">
-                ${isEnabled ? '✓ ON' : 'OFF'}
+                      data-exclusive="${feature.exclusive || ""}">
+                ${isEnabled ? "✓ ON" : "OFF"}
               </button>
             </div>
           `;
         });
 
-        html += '</div>';
+        html += "</div>";
       }
 
       tabContent.innerHTML = html;
 
       // Add event listeners for feature toggles
-      tabContent.querySelectorAll('.feature-toggle').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+      tabContent.querySelectorAll(".feature-toggle").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
           const button = e.target;
           const key = button.dataset.key;
-          const currentValue = button.dataset.value === 'true';
+          const currentValue = button.dataset.value === "true";
           const exclusiveKey = button.dataset.exclusive || null;
 
           button.disabled = true;
-          button.textContent = '...';
+          button.textContent = "...";
 
           await UsageMonitorModule.toggleFeature(key, currentValue, exclusiveKey);
           setTimeout(() => UsageMonitorModule.refresh(), 300);
@@ -1742,8 +1796,8 @@ IMPROVEMENTS OVER ORIGINALS:
       let isDragging = false;
       let hasMoved = false;
 
-      handle.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'BUTTON') return;
+      handle.addEventListener("mousedown", (e) => {
+        if (e.target.tagName === "BUTTON") return;
 
         isDragging = true;
         hasMoved = false;
@@ -1755,11 +1809,11 @@ IMPROVEMENTS OVER ORIGINALS:
         startLeft = rect.left;
         startTop = rect.top;
 
-        element.classList.add('dragging');
+        element.classList.add("dragging");
         e.preventDefault();
       });
 
-      document.addEventListener('mousemove', (e) => {
+      document.addEventListener("mousemove", (e) => {
         if (!isDragging) return;
 
         const dx = e.clientX - startX;
@@ -1778,18 +1832,18 @@ IMPROVEMENTS OVER ORIGINALS:
           newX = Math.max(0, Math.min(newX, window.innerWidth - w));
           newY = Math.max(0, Math.min(newY, window.innerHeight - h));
 
-          element.style.left = newX + 'px';
-          element.style.top = newY + 'px';
-          element.style.right = 'auto';
-          element.style.bottom = 'auto';
+          element.style.left = newX + "px";
+          element.style.top = newY + "px";
+          element.style.right = "auto";
+          element.style.bottom = "auto";
         }
       });
 
-      document.addEventListener('mouseup', () => {
+      document.addEventListener("mouseup", () => {
         if (!isDragging) return;
 
         isDragging = false;
-        element.classList.remove('dragging');
+        element.classList.remove("dragging");
 
         if (hasMoved) {
           const rect = element.getBoundingClientRect();
@@ -1800,5 +1854,4 @@ IMPROVEMENTS OVER ORIGINALS:
       });
     }
   };
-
 })();

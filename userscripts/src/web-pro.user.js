@@ -181,9 +181,9 @@
         const w =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+              awaitTO(id)
+                .then((v) => v && fn(...x))
+                .catch(throwE)
             : fn;
         d = Math.max(d, cfg.minTimeout);
         id = nTO(w, d, ...a);
@@ -195,9 +195,9 @@
         const w =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+              awaitTO(id)
+                .then((v) => v && fn(...x))
+                .catch(throwE)
             : fn;
         d = Math.max(d, cfg.minInterval);
         id = nSI(w, d, ...a);

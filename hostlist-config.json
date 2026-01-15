@@ -22,5 +22,16 @@
     }
   ],
   "output": "lists/releases/hosts.txt",
-  "transformations": ["RemoveComments", "RemoveModifiers", "RemoveEmptyLines", "TrimLines", "Validate", "Deduplicate", "Sort", "Compress", "InsertFinalNewLine", "ConvertToAscii"]
+  "transformations": [
+    "RemoveComments",
+    "RemoveModifiers",
+    "RemoveEmptyLines",
+    "TrimLines",
+    "Validate",
+    "Deduplicate",
+    "Sort",
+    "Compress",
+    "InsertFinalNewLine",
+    "ConvertToAscii"
+  ]
 }

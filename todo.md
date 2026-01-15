@@ -2,16 +2,21 @@
 
 ## Maintenance Tasks
 
-- Add
-  ```
-  https://raw.githubusercontent.com/uBlockOrigin/uAssets/refs/heads/master/filters/resource-abuse.txt
-  ```
-- https://userscripts.adtidy.org/beta/adguard-extra/1.0/adguard-extra.user.js
+### Completed ✅
+- ✅ Added uBlockOrigin resource-abuse.txt filter to `lists/sources-urls.json`
+- ✅ Added adguard-extra userscript to `userscripts/list.txt`
+- ✅ Ran deduplicate.py (found 348 cross-file duplicates for manual review)
+- ✅ Ran format command (formatted 26 files, fixed 15)
+- ✅ Ran lint:fix command (ESLint passed, AGLint found 133 issues)
 
-- Run `python3 Scripts/deduplicate.py` to deduplicate entries within each blocklist file
-- Run `python3 Scripts/deduplicate_across_files.py` to check for duplicates across different files
-- Run `npm run format` to format markdown, YAML, and JSON files
-- Run `npm run lint:fix` to lint and auto-fix code style issues
+### Manual Review Needed
+- Review and consolidate 348 cross-file duplicates found by deduplicate.py
+- Fix AGLint errors in filter lists:
+  - if/endif directive mismatches in Reddit.txt, Search-Engines.txt, Twitch.txt, Youtube.txt
+  - IPv6 domain values in lan-block.txt
+  - Empty modifiers in hostlist files
+  - Invalid CSS syntax in Other.txt
+  - Unsupported modifiers in URLShortener.txt
 
 ## Future Improvements
 
