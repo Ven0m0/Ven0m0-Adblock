@@ -114,7 +114,7 @@
 
         // Fill first part
         for (let i = 0; i < codeParts[0].length; i++) {
-          this.waitForElement(`#user-code-${i}`).then((el) => (el.value = codeParts[0][i]));
+          this.waitForElement(`#user-code-${i}`).then((el) => (el.value = codeParts[0][i])).catch(err => console.error('[GitHub Enhancer] Error filling code part 1:', err));
         }
 
         // Fill second part
