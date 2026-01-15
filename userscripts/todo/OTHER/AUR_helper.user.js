@@ -18,7 +18,13 @@ addEventListener(
 
     ul = ul[0];
 
-    const pkgName = ul.getElementsByTagName("a")[0].href.match(/\/cgit\/aur\.git\/tree\/PKGBUILD\?h=([-_\w\d\.]+)/)[1];
+    const firstLink = ul.getElementsByTagName("a")[0];
+    if (!firstLink) return;
+
+    const match = firstLink.href.match(/\/cgit\/aur\.git\/tree\/PKGBUILD\?h=([-_\w\d\.]+)/);
+    if (!match || !match[1]) return;
+
+    const pkgName = match[1];
     const li = document.createElement("li");
     const link = document.createElement("a");
     li.appendChild(link);
