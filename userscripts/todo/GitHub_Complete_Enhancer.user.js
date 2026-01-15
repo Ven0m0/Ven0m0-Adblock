@@ -258,7 +258,6 @@
       let scale = 1,
         tx = 0,
         ty = 0,
-        dragging = false,
         rafId = null;
       let images = [],
         currentIdx = 0,
