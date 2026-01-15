@@ -43,7 +43,10 @@
   // ==================== CONSTANTS ====================
 
   // Platform detection (must be first for other constants to use)
-  const IS_BILIBILI = window.location.hostname.includes("bilibili.com");
+  const IS_BILIBILI = (function () {
+    const hostname = window.location.hostname;
+    return hostname === "bilibili.com" || hostname.endsWith(".bilibili.com");
+  })();
 
   const API_BASE_YOUTUBE = "https://sponsor.ajay.app";
   const API_BASE_BILIBILI = "https://bsbsb.top";
