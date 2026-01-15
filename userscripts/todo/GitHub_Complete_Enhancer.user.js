@@ -123,9 +123,9 @@
         }
 
         // Submit after 1 second
-        this.waitForElement('input[type="submit"][name="commit"]').then((button) =>
-          setTimeout(() => button.click(), 1000)
-        );
+        this.waitForElement('input[type="submit"][name="commit"]')
+          .then((button) => setTimeout(() => button.click(), 1000))
+          .catch((err) => console.error("[GitHub Enhancer] Could not find submit button:", err));
       } catch (error) {
         console.error("[GitHub Enhancer] Auto-auth error:", error);
       }
