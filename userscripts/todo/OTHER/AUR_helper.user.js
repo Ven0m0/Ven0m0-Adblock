@@ -14,7 +14,7 @@ addEventListener(
   "DOMContentLoaded",
   function () {
     let ul = document.getElementById("actionlist").getElementsByTagName("ul");
-    if (!ul) return;
+    if (ul.length === 0) return;
 
     ul = ul[0];
 
