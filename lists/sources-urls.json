@@ -10,18 +10,24 @@
       "url": "https://easylist.to/easylist/easylist.txt",
       "filename": "EasyList.txt",
       "skip_checksum": false,
-      "enabled":  true
+      "enabled": true
     },
     {
-      "url":  "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt",
+      "url": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt",
       "filename": "AdGuard-Base.txt",
       "skip_checksum": false,
       "enabled": true
     },
     {
       "url": "https://filters.adtidy.org/extension/ublock/filters/17.txt",
-      "filename":  "AdGuard-Tracking-Protection.txt",
+      "filename": "AdGuard-Tracking-Protection.txt",
       "skip_checksum": true,
+      "enabled": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/uBlockOrigin/uAssets/refs/heads/master/filters/resource-abuse.txt",
+      "filename": "uBlock-ResourceAbuse.txt",
+      "skip_checksum": false,
       "enabled": true
     }
   ]

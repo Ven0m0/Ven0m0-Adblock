@@ -284,16 +284,16 @@
       }
       const wrapTO =
         (impl) =>
-        (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
-          return impl(() => fn(...a), d);
-        };
+          (fn, d = 0, ...a) => {
+            if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
+            return impl(() => fn(...a), d);
+          };
       const wrapIV =
         (impl) =>
-        (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
-          return impl(() => fn(...a), d);
-        };
+          (fn, d = 0, ...a) => {
+            if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
+            return impl(() => fn(...a), d);
+          };
       window.setTimeout = wrapTO(timers.setTimeout);
       window.clearTimeout = timers.clearTimeout;
       window.setInterval = wrapIV(timers.setInterval);

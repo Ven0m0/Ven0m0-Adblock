@@ -21,19 +21,21 @@
 // ==/UserScript==
 
 (function () {
-    'use strict';
+  "use strict";
 
-    // Override scroll-related functions to no-ops
-    Element.prototype.scrollIntoView = function () { };
-    Element.prototype.scrollIntoViewIfNeeded = function () { };
-    Element.prototype.scrollTo = function () { };
-    window.scrollTo = function () { };
-    window.scrollBy = function () { };
+  // Override scroll-related functions to no-ops
+  Element.prototype.scrollIntoView = function () {};
+  Element.prototype.scrollIntoViewIfNeeded = function () {};
+  Element.prototype.scrollTo = function () {};
+  window.scrollTo = function () {};
+  window.scrollBy = function () {};
 
-    // Block scrollTop assignments (what falcon.tii uses)
-    Object.defineProperty(HTMLElement.prototype, 'scrollTop', {
-        set() { },
-        get() { return 0; },
-        configurable: false
-    });
+  // Block scrollTop assignments (what falcon.tii uses)
+  Object.defineProperty(HTMLElement.prototype, "scrollTop", {
+    set() {},
+    get() {
+      return 0;
+    },
+    configurable: false
+  });
 })();

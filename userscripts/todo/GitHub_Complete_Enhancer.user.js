@@ -13,12 +13,12 @@
 // @updateURL    https://update.greasyfork.org/scripts/[ID]/GitHub%20Complete%20Enhancer.meta.js
 // ==/UserScript==
 
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   // Emergency disable
-  if (localStorage.getItem('disable_github_enhancer') === '1') {
-    console.warn('[GitHub Enhancer]: Disabled by user');
+  if (localStorage.getItem("disable_github_enhancer") === "1") {
+    console.warn("[GitHub Enhancer]: Disabled by user");
     return;
   }
 
@@ -28,19 +28,20 @@
 
   const UsefulForksModule = {
     UI_IDS: {
-      li: 'useful_forks_li',
-      btn: 'useful_forks_btn',
-      tip: 'useful_forks_tooltip'
+      li: "useful_forks_li",
+      btn: "useful_forks_btn",
+      tip: "useful_forks_tooltip"
     },
 
     getRepoUrl() {
-      const pathComponents = window.location.pathname.split('/');
-      const user = pathComponents[1], repo = pathComponents[2];
+      const pathComponents = window.location.pathname.split("/");
+      const user = pathComponents[1],
+        repo = pathComponents[2];
       return `https://useful-forks.github.io/?repo=${user}/${repo}`;
     },
 
     createButton() {
-      const li = document.createElement('li');
+      const li = document.createElement("li");
       li.id = this.UI_IDS.li;
       li.innerHTML = `
         <div class="float-left">
@@ -63,19 +64,19 @@
       const oldLi = document.getElementById(this.UI_IDS.li);
       if (oldLi) oldLi.remove();
 
-      const forkBtn = document.getElementById('repo-network-counter');
+      const forkBtn = document.getElementById("repo-network-counter");
       if (!forkBtn) return; // Not on a repository page
 
       const forksAmount = parseInt(forkBtn.textContent);
       if (forksAmount < 1) return; // No forks
 
-      const parentLi = forkBtn.closest('li');
+      const parentLi = forkBtn.closest("li");
       const newLi = this.createButton();
       parentLi.parentNode.insertBefore(newLi, parentLi);
 
       // Set button click handler
-      document.getElementById(this.UI_IDS.btn).addEventListener('click', () => {
-        window.open(this.getRepoUrl(), '_blank');
+      document.getElementById(this.UI_IDS.btn).addEventListener("click", () => {
+        window.open(this.getRepoUrl(), "_blank");
       });
     }
   };
@@ -105,35 +106,36 @@
     async fillAndSubmitCode() {
       try {
         const userCode = await navigator.clipboard.readText();
-        const codeParts = userCode.split('-');
+        const codeParts = userCode.split("-");
         if (codeParts.length !== 2) {
-          console.error('[GitHub Enhancer] Invalid device code format');
+          console.error("[GitHub Enhancer] Invalid device code format");
           return;
         }
 
         // Fill first part
         for (let i = 0; i < codeParts[0].length; i++) {
-          this.waitForElement(`#user-code-${i}`).then(el => el.value = codeParts[0][i]);
+          this.waitForElement(`#user-code-${i}`).then((el) => (el.value = codeParts[0][i]));
         }
 
         // Fill second part
         for (let i = 0; i < codeParts[1].length; i++) {
-          this.waitForElement(`#user-code-${i + 5}`).then(el => el.value = codeParts[1][i]);
+          this.waitForElement(`#user-code-${i + 5}`).then((el) => (el.value = codeParts[1][i]));
         }
 
         // Submit after 1 second
-        this.waitForElement('input[type="submit"][name="commit"]')
-          .then(button => setTimeout(() => button.click(), 1000));
+        this.waitForElement('input[type="submit"][name="commit"]').then((button) =>
+          setTimeout(() => button.click(), 1000)
+        );
       } catch (error) {
-        console.error('[GitHub Enhancer] Auto-auth error:', error);
+        console.error("[GitHub Enhancer] Auto-auth error:", error);
       }
     },
 
     autoSubmitConfirmation() {
-      window.addEventListener('load', () => {
+      window.addEventListener("load", () => {
         this.waitForElement('form[action="/login/device/authorize"] button[name="authorize"][value="1"]')
-          .then(button => setTimeout(() => button.click(), 1000))
-          .catch(error => console.error('[GitHub Enhancer] Auto-confirm error:', error));
+          .then((button) => setTimeout(() => button.click(), 1000))
+          .catch((error) => console.error("[GitHub Enhancer] Auto-confirm error:", error));
       });
     },
 
@@ -145,18 +147,18 @@
       }
 
       // Auto-fill device code
-      if (window.location.pathname.includes('/login/device')) {
+      if (window.location.pathname.includes("/login/device")) {
         this.fillAndSubmitCode();
       }
 
       // Auto-confirm authorization
-      if (window.location.pathname.includes('/login/device/confirmation')) {
+      if (window.location.pathname.includes("/login/device/confirmation")) {
         this.autoSubmitConfirmation();
       }
 
       // OAuth local server verification
-      if (window.location.pathname.includes('/login/oauth')) {
-        document.querySelector('form > input.btn-primary')?.click();
+      if (window.location.pathname.includes("/login/oauth")) {
+        document.querySelector("form > input.btn-primary")?.click();
       }
     }
   };
@@ -168,7 +170,9 @@
   const ImagePreviewModule = {
     init() {
       // Inject CSS
-      document.head.insertAdjacentHTML('beforeend', `<style>
+      document.head.insertAdjacentHTML(
+        "beforeend",
+        `<style>
         #gh-img-preview-mask {
           position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);
           z-index: 999999; display: none; align-items: center; justify-content: center;
@@ -218,10 +222,13 @@
           #gh-img-preview-prev, #gh-img-preview-next { width: 48px; height: 48px; }
           #gh-img-preview-prev { left: 15px; } #gh-img-preview-next { right: 15px; }
         }
-      </style>`);
+      </style>`
+      );
 
       // Inject DOM
-      document.body.insertAdjacentHTML('beforeend', `
+      document.body.insertAdjacentHTML(
+        "beforeend",
+        `
         <div id="gh-img-preview-mask">
           <div id="gh-img-preview-container">
             <img id="gh-img-preview-img" alt="Preview">
@@ -237,38 +244,46 @@
           <div id="gh-img-preview-prev" title="Previous (←)"><svg viewBox="0 0 24 24"><line x1="15" y1="18" x2="9" y2="12"/><line x1="15" y1="6" x2="9" y2="12"/></svg></div>
           <div id="gh-img-preview-next" title="Next (→)"><svg viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="12"/><line x1="9" y1="6" x2="15" y2="12"/></svg></div>
         </div>
-      `);
+      `
+      );
 
-      const mask = document.getElementById('gh-img-preview-mask');
-      const container = document.getElementById('gh-img-preview-container');
-      const img = document.getElementById('gh-img-preview-img');
-      const closeBtn = document.getElementById('gh-img-preview-close');
-      const downloadBtn = document.getElementById('gh-img-preview-download');
-      const prevBtn = document.getElementById('gh-img-preview-prev');
-      const nextBtn = document.getElementById('gh-img-preview-next');
+      const mask = document.getElementById("gh-img-preview-mask");
+      const container = document.getElementById("gh-img-preview-container");
+      const img = document.getElementById("gh-img-preview-img");
+      const closeBtn = document.getElementById("gh-img-preview-close");
+      const downloadBtn = document.getElementById("gh-img-preview-download");
+      const prevBtn = document.getElementById("gh-img-preview-prev");
+      const nextBtn = document.getElementById("gh-img-preview-next");
 
-      let scale = 1, tx = 0, ty = 0, dragging = false, rafId = null;
-      let images = [], currentIdx = 0, clickTimer = null;
+      let scale = 1,
+        tx = 0,
+        ty = 0,
+        dragging = false,
+        rafId = null;
+      let images = [],
+        currentIdx = 0,
+        clickTimer = null;
 
       const reset = () => {
-        scale = 1; tx = ty = 0;
-        container.style.transform = 'translate(0px,0px) scale(1)';
-        img.classList.remove('loaded');
+        scale = 1;
+        tx = ty = 0;
+        container.style.transform = "translate(0px,0px) scale(1)";
+        img.classList.remove("loaded");
       };
 
       const close = () => {
-        document.body.classList.remove('img-preview-active');
-        document.body.style.overflow = '';
+        document.body.classList.remove("img-preview-active");
+        document.body.style.overflow = "";
         setTimeout(reset, 300);
       };
 
       const download = () => {
         const url = img.src;
-        const name = url.split('/').pop().split('?')[0] || 'github-image.png';
+        const name = url.split("/").pop().split("?")[0] || "github-image.png";
         fetch(url)
-          .then(r => r.blob())
-          .then(blob => {
-            const a = document.createElement('a');
+          .then((r) => r.blob())
+          .then((blob) => {
+            const a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
             a.download = name;
             a.click();
@@ -277,8 +292,8 @@
       };
 
       const updateNav = () => {
-        prevBtn.classList.toggle('disabled', currentIdx === 0);
-        nextBtn.classList.toggle('disabled', currentIdx === images.length - 1);
+        prevBtn.classList.toggle("disabled", currentIdx === 0);
+        nextBtn.classList.toggle("disabled", currentIdx === images.length - 1);
       };
 
       const load = (idx) => {
@@ -287,36 +302,37 @@
         const el = images[idx];
         img.src = el.dataset.src || el.src;
         reset();
-        img.onload = () => img.classList.add('loaded');
+        img.onload = () => img.classList.add("loaded");
         updateNav();
       };
 
       const open = (clickedEl) => {
-        images = Array.from(document.querySelectorAll('.markdown-body img, .comment-body img, .blob-wrapper img'))
-          .filter(el => el.src && !el.src.endsWith('.svg') && !el.closest('[data-lightbox]'));
+        images = Array.from(
+          document.querySelectorAll(".markdown-body img, .comment-body img, .blob-wrapper img")
+        ).filter((el) => el.src && !el.src.endsWith(".svg") && !el.closest("[data-lightbox]"));
         currentIdx = images.indexOf(clickedEl);
         if (currentIdx === -1) currentIdx = 0;
         load(currentIdx);
-        document.body.classList.add('img-preview-active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add("img-preview-active");
+        document.body.style.overflow = "hidden";
         updateNav();
       };
 
       // Event handlers
-      mask.onclick = e => e.target === mask && close();
+      mask.onclick = (e) => e.target === mask && close();
       closeBtn.onclick = close;
       downloadBtn.onclick = download;
       prevBtn.onclick = () => load(currentIdx - 1);
       nextBtn.onclick = () => load(currentIdx + 1);
 
-      document.onkeydown = e => {
-        if (!document.body.classList.contains('img-preview-active')) return;
-        if (e.key === 'Escape') close();
-        if (e.key === 'ArrowLeft') load(currentIdx - 1);
-        if (e.key === 'ArrowRight') load(currentIdx + 1);
+      document.onkeydown = (e) => {
+        if (!document.body.classList.contains("img-preview-active")) return;
+        if (e.key === "Escape") close();
+        if (e.key === "ArrowLeft") load(currentIdx - 1);
+        if (e.key === "ArrowRight") load(currentIdx + 1);
       };
 
-      container.onwheel = e => {
+      container.onwheel = (e) => {
         e.preventDefault();
         const rect = container.getBoundingClientRect();
         const ox = e.clientX - rect.left - rect.width / 2;
@@ -329,15 +345,15 @@
         container.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
       };
 
-      container.onmousedown = e => {
+      container.onmousedown = (e) => {
         if (e.button !== 0) return;
         e.preventDefault();
         dragging = true;
         const startX = e.clientX - tx;
         const startY = e.clientY - ty;
-        container.style.cursor = 'grabbing';
+        container.style.cursor = "grabbing";
 
-        const move = e => {
+        const move = (e) => {
           tx = e.clientX - startX;
           ty = e.clientY - startY;
           cancelAnimationFrame(rafId);
@@ -348,32 +364,32 @@
 
         const up = () => {
           dragging = false;
-          container.style.cursor = 'move';
-          document.removeEventListener('mousemove', move);
-          document.removeEventListener('mouseup', up);
+          container.style.cursor = "move";
+          document.removeEventListener("mousemove", move);
+          document.removeEventListener("mouseup", up);
         };
 
-        document.addEventListener('mousemove', move);
-        document.addEventListener('mouseup', up);
+        document.addEventListener("mousemove", move);
+        document.addEventListener("mouseup", up);
       };
 
       container.ondblclick = reset;
 
       // Bind image clicks
       const bind = () => {
-        document.querySelectorAll('.markdown-body img, .comment-body img, .blob-wrapper img').forEach(el => {
-          if (el.dataset.bound || el.src.endsWith('.svg') || el.closest('[data-lightbox]')) return;
-          el.dataset.bound = '1';
+        document.querySelectorAll(".markdown-body img, .comment-body img, .blob-wrapper img").forEach((el) => {
+          if (el.dataset.bound || el.src.endsWith(".svg") || el.closest("[data-lightbox]")) return;
+          el.dataset.bound = "1";
           el.dataset.src = el.currentSrc || el.src;
 
-          el.onclick = e => {
+          el.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
 
             if (clickTimer) {
               clearTimeout(clickTimer);
               clickTimer = null;
-              const link = el.closest('a');
+              const link = el.closest("a");
               window.location.href = link?.href || el.src;
               return;
             }
@@ -409,12 +425,12 @@
   }
 
   // Module 2: Auto Device Authorization (on auth pages)
-  if (window.location.pathname.includes('/login/device') || window.location.pathname.includes('/login/oauth')) {
+  if (window.location.pathname.includes("/login/device") || window.location.pathname.includes("/login/oauth")) {
     AutoAuthModule.init();
   }
 
   // Module 3: Image Preview (everywhere on GitHub)
   ImagePreviewModule.init();
 
-  console.info('[GitHub Enhancer] Initialized (3 modules: Useful Forks, Auto Auth, Image Preview)');
+  console.info("[GitHub Enhancer] Initialized (3 modules: Useful Forks, Auto Auth, Image Preview)");
 })();

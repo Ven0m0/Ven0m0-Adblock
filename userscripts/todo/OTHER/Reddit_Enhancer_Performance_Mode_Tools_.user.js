@@ -13,107 +13,115 @@
 // ==/UserScript==
 
 (function () {
-    'use strict';
+  "use strict";
 
-    const settingsKey = 'redditEnhancerSettings';
-    const positionKey = 'redditEnhancerPosition';
+  const settingsKey = "redditEnhancerSettings";
+  const positionKey = "redditEnhancerPosition";
 
-    const defaultSettings = {
-        darkMode: false,
-        hidePromoted: true,
-        hideSuggested: true,
-        wideMode: true,
-        fontSize: '15px',
-        lineHeight: '1.6',
-        autoExpandComments: true,
-        autoRefresh: false,
-        performanceMode: false
-    };
+  const defaultSettings = {
+    darkMode: false,
+    hidePromoted: true,
+    hideSuggested: true,
+    wideMode: true,
+    fontSize: "15px",
+    lineHeight: "1.6",
+    autoExpandComments: true,
+    autoRefresh: false,
+    performanceMode: false
+  };
 
-    let settings = JSON.parse(localStorage.getItem(settingsKey)) || defaultSettings;
-    let savedPos = JSON.parse(localStorage.getItem(positionKey)) || { top: null, left: null };
+  let settings = JSON.parse(localStorage.getItem(settingsKey)) || defaultSettings;
+  const savedPos = JSON.parse(localStorage.getItem(positionKey)) || { top: null, left: null };
 
-    function saveSettings() {
-        localStorage.setItem(settingsKey, JSON.stringify(settings));
-    }
+  function saveSettings() {
+    localStorage.setItem(settingsKey, JSON.stringify(settings));
+  }
 
-    function applySettings() {
-        document.body.style.setProperty('--custom-font-size', settings.fontSize);
-        document.body.style.setProperty('--custom-line-height', settings.lineHeight);
-        document.body.classList.toggle('re-wide-mode', settings.wideMode);
-        document.body.classList.toggle('re-dark-mode', settings.darkMode);
-    }
+  function applySettings() {
+    document.body.style.setProperty("--custom-font-size", settings.fontSize);
+    document.body.style.setProperty("--custom-line-height", settings.lineHeight);
+    document.body.classList.toggle("re-wide-mode", settings.wideMode);
+    document.body.classList.toggle("re-dark-mode", settings.darkMode);
+  }
 
-    function hideElements() {
-        const isOldReddit = location.hostname.startsWith('old.');
-        if (settings.hidePromoted) {
-            const promos = isOldReddit
-                ? document.querySelectorAll('.promotedlink')
-                : document.querySelectorAll('span');
-            promos.forEach(el => {
-                if (el.textContent.toLowerCase().includes('promoted')) {
-                    el.closest('div[data-testid="post-container"]')?.remove();
-                    el.closest('.promotedlink')?.remove();
-                }
-            });
+  function hideElements() {
+    const isOldReddit = location.hostname.startsWith("old.");
+    if (settings.hidePromoted) {
+      const promos = isOldReddit ? document.querySelectorAll(".promotedlink") : document.querySelectorAll("span");
+      promos.forEach((el) => {
+        if (el.textContent.toLowerCase().includes("promoted")) {
+          el.closest('div[data-testid="post-container"]')?.remove();
+          el.closest(".promotedlink")?.remove();
         }
-
-        if (settings.hideSuggested) {
-            document.querySelectorAll('div[data-testid="post-container"], .thing').forEach(el => {
-                const txt = el.innerText.toLowerCase();
-                if (txt.includes('because you follow') || txt.includes('suggested')) el.remove();
-            });
-        }
+      });
     }
 
-    function performanceCleanup() {
-        try {
-            // Remove iframes and slow footers
-            document.querySelectorAll('iframe, .premium-banner-outer, footer, .bottom-bar, [id*="ad-"]').forEach(el => el.remove());
+    if (settings.hideSuggested) {
+      document.querySelectorAll('div[data-testid="post-container"], .thing').forEach((el) => {
+        const txt = el.innerText.toLowerCase();
+        if (txt.includes("because you follow") || txt.includes("suggested")) el.remove();
+      });
+    }
+  }
 
-            // Kill observers
-            if (window.ResizeObserver) window.ResizeObserver = class { observe() {} disconnect() {} };
-            if (window.IntersectionObserver) window.IntersectionObserver = class { observe() {} disconnect() {} };
+  function performanceCleanup() {
+    try {
+      // Remove iframes and slow footers
+      document
+        .querySelectorAll('iframe, .premium-banner-outer, footer, .bottom-bar, [id*="ad-"]')
+        .forEach((el) => el.remove());
 
-            // Kill scroll/resize events
-            window.addEventListener = new Proxy(window.addEventListener, {
-                apply(target, thisArg, args) {
-                    const type = args[0];
-                    if (['scroll', 'resize'].includes(type)) return;
-                    return Reflect.apply(target, thisArg, args);
-                }
-            });
-        } catch (e) {
-            console.warn('Performance cleanup failed:', e);
+      // Kill observers
+      if (window.ResizeObserver)
+        window.ResizeObserver = class {
+          observe() {}
+          disconnect() {}
+        };
+      if (window.IntersectionObserver)
+        window.IntersectionObserver = class {
+          observe() {}
+          disconnect() {}
+        };
+
+      // Kill scroll/resize events
+      window.addEventListener = new Proxy(window.addEventListener, {
+        apply(target, thisArg, args) {
+          const type = args[0];
+          if (["scroll", "resize"].includes(type)) return;
+          return Reflect.apply(target, thisArg, args);
         }
+      });
+    } catch (e) {
+      console.warn("Performance cleanup failed:", e);
+    }
+  }
+
+  function autoExpandComments() {
+    if (!settings.autoExpandComments) return;
+    const isOldReddit = location.hostname.startsWith("old.");
+    const buttons = isOldReddit
+      ? document.querySelectorAll(".morecomments a")
+      : document.querySelectorAll('button[data-testid="comment_expand_button"]');
+    buttons.forEach((btn) => btn.click());
+  }
+
+  function autoRefreshFeed() {
+    if (settings.autoRefresh) {
+      setTimeout(() => location.reload(), 1000 * 60 * 5);
+    }
+  }
+
+  function createSettingsMenu() {
+    const menu = document.createElement("div");
+    menu.id = "reddit-enhancer-menu";
+    if (savedPos.top && savedPos.left) {
+      menu.style.top = savedPos.top + "px";
+      menu.style.left = savedPos.left + "px";
+      menu.style.right = "auto";
+      menu.style.bottom = "auto";
     }
 
-    function autoExpandComments() {
-        if (!settings.autoExpandComments) return;
-        const isOldReddit = location.hostname.startsWith('old.');
-        const buttons = isOldReddit
-            ? document.querySelectorAll('.morecomments a')
-            : document.querySelectorAll('button[data-testid="comment_expand_button"]');
-        buttons.forEach(btn => btn.click());
-    }
-
-    function autoRefreshFeed() {
-        if (settings.autoRefresh) {
-            setTimeout(() => location.reload(), 1000 * 60 * 5);
-        }
-    }
-
-    function createSettingsMenu() {
-        const menu = document.createElement('div');
-        menu.id = 'reddit-enhancer-menu';
-        if (savedPos.top && savedPos.left) {
-            menu.style.top = savedPos.top + 'px';
-            menu.style.left = savedPos.left + 'px';
-            menu.style.right = 'auto';
-            menu.style.bottom = 'auto';
-        }
-
-        menu.innerHTML = `
+    menu.innerHTML = `
             <button id="re-toggle" title="Reddit Enhancer Settings">⚙️</button>
             <div id="re-panel">
                 <label><input type="checkbox" id="re-darkMode"> Dark Mode</label><br>
@@ -133,99 +141,103 @@
                 <input type="file" id="re-import-file" style="display:none">
             </div>
         `;
-        document.body.appendChild(menu);
+    document.body.appendChild(menu);
 
-        const ids = Object.keys(defaultSettings);
-        ids.forEach(id => {
-            const el = document.getElementById(`re-${id}`);
-            if (el) el.checked = settings[id];
-        });
-        document.getElementById('re-fontSize').value = settings.fontSize;
-        document.getElementById('re-lineHeight').value = settings.lineHeight;
+    const ids = Object.keys(defaultSettings);
+    ids.forEach((id) => {
+      const el = document.getElementById(`re-${id}`);
+      if (el) el.checked = settings[id];
+    });
+    document.getElementById("re-fontSize").value = settings.fontSize;
+    document.getElementById("re-lineHeight").value = settings.lineHeight;
 
-        document.getElementById('re-toggle').onclick = () =>
-            document.getElementById('re-panel').classList.toggle('open');
+    document.getElementById("re-toggle").onclick = () => document.getElementById("re-panel").classList.toggle("open");
 
-        document.getElementById('re-save').onclick = () => {
-            ids.forEach(id => {
-                const el = document.getElementById(`re-${id}`);
-                if (el) settings[id] = el.type === 'checkbox' ? el.checked : el.value;
-            });
-            settings.fontSize = document.getElementById('re-fontSize').value;
-            settings.lineHeight = document.getElementById('re-lineHeight').value;
-            saveSettings();
-            applySettings();
-            hideElements();
-            if (settings.performanceMode) performanceCleanup();
-        };
+    document.getElementById("re-save").onclick = () => {
+      ids.forEach((id) => {
+        const el = document.getElementById(`re-${id}`);
+        if (el) settings[id] = el.type === "checkbox" ? el.checked : el.value;
+      });
+      settings.fontSize = document.getElementById("re-fontSize").value;
+      settings.lineHeight = document.getElementById("re-lineHeight").value;
+      saveSettings();
+      applySettings();
+      hideElements();
+      if (settings.performanceMode) performanceCleanup();
+    };
 
-        document.getElementById('re-export').onclick = () => {
-            const blob = new Blob([JSON.stringify(settings)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'redditEnhancerSettings.json';
-            a.click();
-        };
+    document.getElementById("re-export").onclick = () => {
+      const blob = new Blob([JSON.stringify(settings)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "redditEnhancerSettings.json";
+      a.click();
+    };
 
-        document.getElementById('re-import').onclick = () => {
-            document.getElementById('re-import-file').click();
-        };
+    document.getElementById("re-import").onclick = () => {
+      document.getElementById("re-import-file").click();
+    };
 
-        document.getElementById('re-import-file').addEventListener('change', function () {
-            const reader = new FileReader();
-            reader.onload = function () {
-                try {
-                    settings = JSON.parse(reader.result);
-                    saveSettings();
-                    location.reload();
-                } catch (e) {
-                    alert('Invalid settings file.');
-                }
-            };
-            reader.readAsText(this.files[0]);
-        });
+    document.getElementById("re-import-file").addEventListener("change", function () {
+      const reader = new FileReader();
+      reader.onload = function () {
+        try {
+          settings = JSON.parse(reader.result);
+          saveSettings();
+          location.reload();
+        } catch (e) {
+          alert("Invalid settings file.");
+        }
+      };
+      reader.readAsText(this.files[0]);
+    });
 
-        document.getElementById('re-reset').onclick = () => {
-            localStorage.removeItem(settingsKey);
-            location.reload();
-        };
+    document.getElementById("re-reset").onclick = () => {
+      localStorage.removeItem(settingsKey);
+      location.reload();
+    };
 
-        document.getElementById('re-reset-pos').onclick = () => {
-            localStorage.removeItem(positionKey);
-            location.reload();
-        };
+    document.getElementById("re-reset-pos").onclick = () => {
+      localStorage.removeItem(positionKey);
+      location.reload();
+    };
 
-        // Drag logic
-        let isDragging = false, offsetX = 0, offsetY = 0;
-        document.getElementById('re-toggle').addEventListener('mousedown', (e) => {
-            isDragging = true;
-            offsetX = e.clientX - menu.offsetLeft;
-            offsetY = e.clientY - menu.offsetTop;
-            menu.style.transition = 'none';
-        });
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                const x = Math.max(0, e.clientX - offsetX);
-                const y = Math.max(0, e.clientY - offsetY);
-                menu.style.left = x + 'px';
-                menu.style.top = y + 'px';
-                menu.style.right = 'auto';
-                menu.style.bottom = 'auto';
-            }
-        });
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                localStorage.setItem(positionKey, JSON.stringify({
-                    top: parseInt(menu.style.top),
-                    left: parseInt(menu.style.left)
-                }));
-            }
-        });
-    }
+    // Drag logic
+    let isDragging = false,
+      offsetX = 0,
+      offsetY = 0;
+    document.getElementById("re-toggle").addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - menu.offsetLeft;
+      offsetY = e.clientY - menu.offsetTop;
+      menu.style.transition = "none";
+    });
+    document.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        const x = Math.max(0, e.clientX - offsetX);
+        const y = Math.max(0, e.clientY - offsetY);
+        menu.style.left = x + "px";
+        menu.style.top = y + "px";
+        menu.style.right = "auto";
+        menu.style.bottom = "auto";
+      }
+    });
+    document.addEventListener("mouseup", () => {
+      if (isDragging) {
+        isDragging = false;
+        localStorage.setItem(
+          positionKey,
+          JSON.stringify({
+            top: parseInt(menu.style.top),
+            left: parseInt(menu.style.left)
+          })
+        );
+      }
+    });
+  }
 
-    function addStyles() {
-        GM_addStyle(`
+  function addStyles() {
+    GM_addStyle(`
             #reddit-enhancer-menu {
                 position: fixed;
                 bottom: 12px;
@@ -301,21 +313,21 @@
                 color: #e0e0e0 !important;
             }
         `);
-    }
+  }
 
-    function init() {
-        addStyles();
-        createSettingsMenu();
-        applySettings();
-        hideElements();
-        autoExpandComments();
-        autoRefreshFeed();
-        if (settings.performanceMode) performanceCleanup();
-        new MutationObserver(() => {
-            hideElements();
-            if (settings.performanceMode) performanceCleanup();
-        }).observe(document.body, { childList: true, subtree: true });
-    }
+  function init() {
+    addStyles();
+    createSettingsMenu();
+    applySettings();
+    hideElements();
+    autoExpandComments();
+    autoRefreshFeed();
+    if (settings.performanceMode) performanceCleanup();
+    new MutationObserver(() => {
+      hideElements();
+      if (settings.performanceMode) performanceCleanup();
+    }).observe(document.body, { childList: true, subtree: true });
+  }
 
-    window.addEventListener('load', init);
+  window.addEventListener("load", init);
 })();
