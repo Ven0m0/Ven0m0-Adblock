@@ -364,9 +364,21 @@ CONSOLIDATED FEATURES:
             if (!link.href && link.innerText && link.innerText.trim()) {
               const linkText = link.innerText.trim();
               if (linkText.startsWith("http") || linkText.includes("www.")) {
-                link.href = linkText;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
+                let candidateUrl = linkText;
+                // If the text looks like a bare domain (contains "www." but no scheme), prepend https://
+                if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(candidateUrl) && candidateUrl.includes("www.")) {
+                  candidateUrl = "https://" + candidateUrl.replace(/^\/*/, "");
+                }
+                try {
+                  const url = new URL(candidateUrl, window.location.origin);
+                  if (url.protocol === "http:" || url.protocol === "https:") {
+                    link.href = url.toString();
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                  }
+                } catch (e) {
+                  // Ignore invalid URLs derived from innerText
+                }
               }
             }
           });
