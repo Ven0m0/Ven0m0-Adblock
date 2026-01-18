@@ -121,26 +121,70 @@
       menu.style.bottom = "auto";
     }
 
-    menu.innerHTML = `
-            <button id="re-toggle" title="Reddit Enhancer Settings">⚙️</button>
-            <div id="re-panel">
-                <label><input type="checkbox" id="re-darkMode"> Dark Mode</label><br>
-                <label><input type="checkbox" id="re-hidePromoted"> Hide Promoted Posts</label><br>
-                <label><input type="checkbox" id="re-hideSuggested"> Hide Suggested Posts</label><br>
-                <label><input type="checkbox" id="re-wideMode"> Wide Layout</label><br>
-                <label><input type="checkbox" id="re-autoExpandComments"> Auto Expand Comments</label><br>
-                <label><input type="checkbox" id="re-autoRefresh"> Auto Refresh Feed</label><br>
-                <label><input type="checkbox" id="re-performanceMode"> 🧠 Performance Mode</label><br>
-                <label>Font Size: <input type="text" id="re-fontSize" value="${settings.fontSize}"></label><br>
-                <label>Line Height: <input type="text" id="re-lineHeight" value="${settings.lineHeight}"></label><br>
-                <button id="re-save">💾 Save</button>
-                <button id="re-export">⬇️ Export</button>
-                <button id="re-import">⬆️ Import</button>
-                <button id="re-reset">🧼 Reset Settings</button>
-                <button id="re-reset-pos">📍 Reset Position</button>
-                <input type="file" id="re-import-file" style="display:none">
-            </div>
-        `;
+    // Build menu DOM safely without using innerHTML with untrusted data
+    const toggleButton = document.createElement("button");
+    toggleButton.id = "re-toggle";
+    toggleButton.title = "Reddit Enhancer Settings";
+    toggleButton.textContent = "⚙️";
+    menu.appendChild(toggleButton);
+
+    const panel = document.createElement("div");
+    panel.id = "re-panel";
+
+    function addCheckbox(id, labelText) {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.id = id;
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(" " + labelText));
+      panel.appendChild(label);
+      panel.appendChild(document.createElement("br"));
+    }
+
+    addCheckbox("re-darkMode", "Dark Mode");
+    addCheckbox("re-hidePromoted", "Hide Promoted Posts");
+    addCheckbox("re-hideSuggested", "Hide Suggested Posts");
+    addCheckbox("re-wideMode", "Wide Layout");
+    addCheckbox("re-autoExpandComments", "Auto Expand Comments");
+    addCheckbox("re-autoRefresh", "Auto Refresh Feed");
+    addCheckbox("re-performanceMode", "🧠 Performance Mode");
+
+    function addTextInput(id, labelText) {
+      const label = document.createElement("label");
+      label.appendChild(document.createTextNode(labelText + ": "));
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = id;
+      label.appendChild(input);
+      panel.appendChild(label);
+      panel.appendChild(document.createElement("br"));
+    }
+
+    addTextInput("re-fontSize", "Font Size");
+    addTextInput("re-lineHeight", "Line Height");
+
+    function addButton(id, text) {
+      const btn = document.createElement("button");
+      btn.id = id;
+      btn.textContent = text;
+      panel.appendChild(btn);
+    }
+
+    addButton("re-save", "💾 Save");
+    addButton("re-export", "⬇️ Export");
+    addButton("re-import", "⬆️ Import");
+    addButton("re-reset", "🧼 Reset Settings");
+    addButton("re-reset-pos", "📍 Reset Position");
+
+    const importFileInput = document.createElement("input");
+    importFileInput.type = "file";
+    importFileInput.id = "re-import-file";
+    importFileInput.style.display = "none";
+    panel.appendChild(importFileInput);
+
+    menu.appendChild(panel);
+
     document.body.appendChild(menu);
 
     const ids = Object.keys(defaultSettings);
