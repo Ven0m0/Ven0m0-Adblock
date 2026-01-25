@@ -1,0 +1,14 @@
+[uBlock Origin]
+! Title: Ven0m0's minimal Adblocking Filter
+! Description: Combination List of multiple filters to make the internet comfortable
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/combination-desktop.txt
+! Last modified: %timestamp%
+! License: https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE
+
+!#include General.txt
+!#include Other.txt
+!#include Reddit.txt
+!#include Search-Engines.txt
+!#include antiadblock.txt
+!#include Youtube.txt
