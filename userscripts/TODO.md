@@ -14,6 +14,10 @@
 - <https://greasyfork.org/en/scripts/533232-nicefont-%E8%80%90%E8%A7%86%E5%AD%97%E4%BD%93>
 - <https://greasyfork.org/en/scripts/457205-unhold-youtube-resource-locks>
 - <https://greasyfork.org/en/scripts/416688-%E5%AD%97%E4%BD%93%E6%B8%B2%E6%9F%93-%E8%87%AA%E7%94%A8%E8%84%9A%E6%9C%AC>
+- https://greasyfork.org/en/scripts/562271-claude-monitor
+- https://greasyfork.org/en/scripts/465933-cleanurls-clean-url-improved
+
+
 ### Phone
 - <https://greasyfork.org/en/scripts/539700-nextgenmobileview>
 - <https://greasyfork.org/en/scripts/535508-gemini-better-ui>
