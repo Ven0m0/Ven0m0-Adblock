@@ -20,6 +20,8 @@ uv_venv_create_args = ["--system-site-packages", "--seed"]
 binstall = true
 
 [tools]
+node = "lts"
+bun = "latest"
 lefthook = "latest"
 
 [env]
