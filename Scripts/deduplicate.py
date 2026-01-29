@@ -99,10 +99,10 @@ def main() -> int:
   script_dir = Path(__file__).parent
   repo_dir = script_dir.parent
 
-  if len(sys.argv) > 1:
-    lists_dir = Path(sys.argv[1])
-  else:
-    lists_dir = repo_dir / 'lists'
+  parser = argparse.ArgumentParser(description="Deduplicate and optimize blocklist files.")
+  parser.add_argument("lists_dir", nargs="?", type=Path, default=repo_dir / "lists", help="Directory to process.")
+  args = parser.parse_args()
+  lists_dir = args.lists_dir
   
   if not lists_dir.exists():
     print(f"Error: Lists directory not found at {lists_dir}", file=sys.stderr)
