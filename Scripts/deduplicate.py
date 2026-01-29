@@ -38,7 +38,7 @@ def is_valid_rule(line: str) -> bool:
     return bool(DOMAIN_PATTERN.match(domain))
   return True
 
-def deduplicate_file(filepath: Path) -> Stats:
+def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
   """Deduplicate entries in a single file"""
   print(f"Processing: {filepath}")
   try:
@@ -46,7 +46,7 @@ def deduplicate_file(filepath: Path) -> Stats:
       lines = [line.rstrip() for line in f]
   except Exception as e:
     print(f"  Error reading: {e}", file=sys.stderr)
-    return Stats()
+    return Stats(), []
   
   stats = Stats(original=len(lines))
   headers, rules, seen = [], [], set()
@@ -78,31 +78,31 @@ def deduplicate_file(filepath: Path) -> Stats:
         f.write(f"{line}\n")
   except Exception as e:
     print(f"  Error writing: {e}", file=sys.stderr)
-    return Stats()
+    return Stats(), []
   
   print(f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)")
-  return stats
+  return stats, rules
 
-def find_cross_file_duplicates(files: list[Path]) -> dict[str, list[str]]:
+def find_cross_file_duplicates(file_contents: dict[Path, list[str]]) -> dict[str, list[str]]:
   """Find entries appearing in multiple files"""
   entry_locations = defaultdict(list)
   
-  for filepath in files:
-    try: 
-      with filepath.open('r', encoding='utf-8') as f:
-        for line in f:
-          stripped = line.strip()
-          if stripped and not is_header(stripped):
-            entry_locations[stripped].append(filepath.name)
-    except Exception as e:
-      print(f"Error reading {filepath.name}: {e}", file=sys.stderr)
+  for filepath, lines in file_contents.items():
+    for line in lines:
+      stripped = line.strip()
+      if stripped and not is_header(stripped):
+        entry_locations[stripped].append(filepath.name)
   
   return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
 
 def main() -> int:
   script_dir = Path(__file__).parent
   repo_dir = script_dir.parent
-  lists_dir = repo_dir / 'lists'
+
+  if len(sys.argv) > 1:
+    lists_dir = Path(sys.argv[1])
+  else:
+    lists_dir = repo_dir / 'lists'
   
   if not lists_dir.exists():
     print(f"Error: Lists directory not found at {lists_dir}", file=sys.stderr)
@@ -116,8 +116,11 @@ def main() -> int:
   print(f"Found {len(txt_files)} files\n")
   
   total_stats = Stats()
+  file_contents = {}
+
   for filepath in txt_files:
-    stats = deduplicate_file(filepath)
+    stats, rules = deduplicate_file(filepath)
+    file_contents[filepath] = rules
     total_stats.original += stats.original
     total_stats.final += stats.final
     total_stats.removed += stats.removed
@@ -128,7 +131,7 @@ def main() -> int:
   
   print(f"\n{'='*60}")
   print("Checking for cross-file duplicates...")
-  duplicates = find_cross_file_duplicates(txt_files)
+  duplicates = find_cross_file_duplicates(file_contents)
   
   if duplicates:
     file_groups = defaultdict(list)
@@ -136,8 +139,8 @@ def main() -> int:
       file_groups[tuple(sorted(files))].append(entry)
     
     print(f"Found {len(duplicates)} cross-file duplicates:\n")
-    for files, entries in sorted(file_groups.items()):
-      print(f"{len(entries)} entries in: {', '.join(files)}")
+    for file_group, entries in sorted(file_groups.items()):
+      print(f"{len(entries)} entries in: {', '.join(file_group)}")
       for entry in sorted(entries)[:5]: 
         print(f"  {entry}")
       if len(entries) > 5:
