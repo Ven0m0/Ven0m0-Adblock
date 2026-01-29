@@ -69,13 +69,6 @@
 ! https://github.com/uBlockOrigin/uAssets/issues/25323
 ! https://github.com/uBlockOrigin/uAssets/issues/29153
 ! https://github.com/uBlockOrigin/uAssets/issues/18148
-! https://github.com/AdguardTeam/AdguardFilters/commit/828dd91e2a34c07276df372ebf8028ef28b85ee4
-! https://github.com/uBlockOrigin/uAssets/issues/29451
-! https://github.com/uBlockOrigin/uBlock-discussions/discussions/833#discussioncomment-14008173
-! TODO: remove once exceptions for highly-generic cosmetics are implemented
-! https://github.com/uBlockOrigin/uAssets/issues/29682
-!
-!#endif
 !#if env_safari
 $removeparam=/^utm_/,domain=music.apple.com|reddit.com|spotify.com
 $removeparam=cmpid,domain=coupons.albertsons.com|coupons.safeway.com
@@ -90,6 +83,7 @@ $removeparam=cmpid,domain=coupons.albertsons.com|coupons.safeway.com
 ://ads.$object,redirect=noopframe,domain=rtl.hr
 ://www.*.xyz/script/*.de.js|$script,3p
 ://www.*.xyz/script/*.jp.js|$script,3p
+!#endif
 ebay.*##+js(href-sanitizer, li.nav--list > a[href^="http://"], +https)
 fuqster.com##a[href^="https://landing.brazzersnetwork.com/"]
 histalk2.com###header_ad
