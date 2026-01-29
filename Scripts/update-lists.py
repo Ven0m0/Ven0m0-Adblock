@@ -156,7 +156,16 @@ async def fetch_list(
         async for chunk in resp.content.iter_chunked(CHUNK_SIZE):
           tmp.write(chunk)
 
-      result = process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
+      loop = asyncio.get_running_loop()
+      result = await loop.run_in_executor(
+        None,
+        process_downloaded_file,
+        tmp_path,
+        url,
+        filename,
+        output_dir,
+        skip_checksum,
+      )
       return (url, result is not None)
 
   except asyncio.TimeoutError:
