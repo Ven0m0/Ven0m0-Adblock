@@ -17,10 +17,6 @@ ADGUARD_INDICATORS = [
     '##.', '###', '##:', '~', '|'
 ]
 
-# Keywords for domain categorization
-ADS_KEYWORDS_REGEX = re.compile(r'(?:ad|ads|analytics|tracking|telemetry|metric)', re.IGNORECASE)
-SOCIAL_KEYWORDS_REGEX = re.compile(r'(?:social|facebook|twitter|instagram)', re.IGNORECASE)
-
 def is_pure_domain(line: str) -> bool:
     """Check if a line is a pure domain without AdGuard syntax"""
     line = line.strip()
@@ -39,22 +35,22 @@ def is_pure_domain(line: str) -> bool:
 
 def categorize_domain(domain: str, source_file: str) -> str:
     """Determine which hostlist category a domain belongs to"""
-    source_lower = source_file.lower()
+    domain_lower = domain.lower()
 
     # Map based on source file name
-    if 'spotify' in source_lower:
+    if 'spotify' in source_file.lower():
         return 'Spotify.txt'
-    elif 'youtube' in source_lower or 'twitch' in source_lower:
+    elif 'youtube' in source_file.lower() or 'twitch' in source_file.lower():
         return 'Social-Media.txt'
-    elif 'reddit' in source_lower or 'twitter' in source_lower:
+    elif 'reddit' in source_file.lower() or 'twitter' in source_file.lower():
         return 'Social-Media.txt'
-    elif 'game' in source_lower:
+    elif 'game' in source_file.lower():
         return 'Games.txt'
 
     # Map based on domain content
-    if ADS_KEYWORDS_REGEX.search(domain):
+    if any(keyword in domain_lower for keyword in ['ad', 'ads', 'analytics', 'tracking', 'telemetry', 'metric']):
         return 'Ads.txt'
-    elif SOCIAL_KEYWORDS_REGEX.search(domain):
+    elif any(keyword in domain_lower for keyword in ['social', 'facebook', 'twitter', 'instagram']):
         return 'Social-Media.txt'
     else:
         return 'Other.txt'
