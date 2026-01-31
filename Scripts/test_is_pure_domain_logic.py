@@ -25,7 +25,6 @@ class TestIsPureDomain(unittest.TestCase):
         # Each indicator should cause False
         for indicator in ADGUARD_INDICATORS:
             # We use a domain that WOULD match if not for the indicator
-            base_domain = 'sub.example.com'
             # Inject indicator
             self.assertFalse(is_pure_domain(f'sub{indicator}.example.com'), f"Failed for indicator: {indicator}")
 
