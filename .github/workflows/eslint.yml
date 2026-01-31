@@ -30,17 +30,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install ESLint
+      # Install project dependencies (including ESLint 9+)
+      - name: Install dependencies
         run: |
-          npm install eslint@8.10.0
-          npm install @microsoft/eslint-formatter-sarif@3.1.0
+          npm install -g bun
+          bun install
+
+      # Install SARIF formatter (needed for CodeQL upload)
+      - name: Install SARIF formatter
+        run: npm install @microsoft/eslint-formatter-sarif
 
       - name: Run ESLint
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
+        # Using 'bun run lint:eslint' or directly invoking eslint.
+        # Since we need SARIF output, we'll invoke eslint directly but use the project's installed version.
         run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results.sarif
         continue-on-error: true
