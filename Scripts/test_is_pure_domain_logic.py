@@ -21,10 +21,14 @@ class TestIsPureDomain(unittest.TestCase):
 
     def test_adguard_indicators(self):
         # Each indicator should cause False
+        base_domain = 'example.com'
         for indicator in ADGUARD_INDICATORS:
             # We use a domain that WOULD match if not for the indicator
             # Inject indicator
-            self.assertFalse(is_pure_domain(f'sub{indicator}.example.com'), f"Failed for indicator: {indicator}")
+            self.assertFalse(
+                is_pure_domain(f'sub{indicator}.{base_domain}'),
+                f"Failed for indicator: {indicator}",
+            )
 
     def test_comments_and_special_starts(self):
         # Starts with !, #, [, ;
