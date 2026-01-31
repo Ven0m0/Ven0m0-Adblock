@@ -90,7 +90,7 @@ def find_cross_file_duplicates(file_contents: dict[Path, list[str]]) -> dict[str
   for filepath, lines in file_contents.items():
     for line in lines:
       stripped = line.strip()
-      if stripped and not is_header(stripped):
+      if stripped:
         entry_locations[stripped].append(filepath.name)
   
   return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
