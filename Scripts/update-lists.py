@@ -119,7 +119,12 @@ async def process_downloaded_file(
     # Offload CPU-intensive task to executor if needed, but for now simple processing
     # Using run_in_executor for the list comprehension if files are huge might be beneficial
     # but let's stick to I/O optimization first.
-    rule_count = len([line for line in content.splitlines() if line.strip() and not line.strip().startswith(('! ', '#', '['))])
+    rule_count = sum(
+      1
+      for line in content.splitlines()
+      if line.strip()
+      and not line.strip().startswith(("! ", "#", "["))
+    )
     
     async with aiofiles.open(dest_path, mode="w", encoding="utf-8") as f:
       await f.write(content)
