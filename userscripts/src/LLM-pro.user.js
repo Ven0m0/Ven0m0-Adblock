@@ -151,10 +151,10 @@
       : isGem
         ? () => document.querySelectorAll(SEL.GEMINI.BOX)
         : () => {
-          const el = document.querySelector(SEL.CLAUDE.RENDER);
-          if (!el) return [];
-          return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
-        };
+            const el = document.querySelector(SEL.CLAUDE.RENDER);
+            if (!el) return [];
+            return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
+          };
     runReady((isCGPT ? SEL.CGPT.TEXT : SEL.GEMINI.BOX).split(",")[0], () => {
       applyW(getEls);
       obsW(getEls);
