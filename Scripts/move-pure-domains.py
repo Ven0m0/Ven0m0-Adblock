@@ -16,6 +16,7 @@ ADGUARD_INDICATORS = [
     '||', '##', '#@#', '#?#', '@@', '$', '^', '*', '!', '[', ']',
     '##.', '###', '##:', '~', '|'
 ]
+ADGUARD_INDICATORS_REGEX = re.compile('|'.join(map(re.escape, ADGUARD_INDICATORS)))
 
 def is_pure_domain(line: str) -> bool:
     """Check if a line is a pure domain without AdGuard syntax"""
@@ -26,9 +27,8 @@ def is_pure_domain(line: str) -> bool:
         return False
 
     # Check for AdGuard syntax indicators
-    for indicator in ADGUARD_INDICATORS:
-        if indicator in line:
-            return False
+    if ADGUARD_INDICATORS_REGEX.search(line):
+        return False
 
     # Validate as domain
     return bool(DOMAIN_PATTERN.match(line))

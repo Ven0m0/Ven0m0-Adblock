@@ -38,6 +38,8 @@ jobs:
       - name: Run ESLint
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
+        # Using 'bun run lint:eslint' or directly invoking eslint.
+        # Since we need SARIF output, we'll invoke eslint directly but use the project's installed version.
         run: npx eslint .
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results.sarif
