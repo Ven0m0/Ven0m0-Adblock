@@ -183,7 +183,7 @@ IMPROVEMENTS OVER ORIGINALS:
         let topLastTimeUpdate = -1;
         try {
           topLastTimeUpdate = top.lastTimeUpdate;
-        } catch (e) {}
+        } catch {}
         return topLastTimeUpdate >= 1
           ? function () {
               return top.lastTimeUpdate;
