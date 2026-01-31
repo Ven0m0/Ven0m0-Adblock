@@ -54,8 +54,8 @@ jobs:
       - name: Detect changes
         id: detect
         env:
-          FORCE_REBUILD: ${{ github.event.inputs.force_rebuild }}
-          FETCH_UPDATES: ${{ github.event.inputs.fetch_updates }}
+          FORCE_REBUILD: ${{ github.event.inputs.force_rebuild || 'false' }}
+          FETCH_UPDATES: ${{ github.event.inputs.fetch_updates || 'false' }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
           mkdir -p userscripts/dist dist
