@@ -22,8 +22,8 @@ def is_pure_domain(line: str) -> bool:
     """Check if a line is a pure domain without AdGuard syntax"""
     line = line.strip()
 
-    # Skip empty lines and comments
-    if not line or line.startswith(('!', '#', '[', ';')):
+    # Skip empty lines, comments, and common adblock start patterns
+    if not line or line.startswith(('!', '#', '[', ';', '|', '@', '$', '^', '*', ']', '~')):
         return False
 
     # Check for AdGuard syntax indicators

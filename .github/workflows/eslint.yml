@@ -30,7 +30,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Install project dependencies (including ESLint 9+)
       - name: Install dependencies
         run: |
           npm install

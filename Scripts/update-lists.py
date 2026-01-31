@@ -17,6 +17,7 @@ import tempfile
 from pathlib import Path
 from typing import Final
 import aiohttp
+import aiofiles
 
 # ============================================================================
 # CONFIGURATION
@@ -25,7 +26,7 @@ SOURCES_CONFIG: Final[str] = "lists/sources-urls.json"
 DEFAULT_OUTPUT: Final[str] = "lists/sources"
 METADATA_FILE: Final[str] = "lists/sources-metadata.json"
 TIMEOUT: Final[int] = 60
-CHUNK_SIZE: Final[int] = 8192
+CHUNK_SIZE: Final[int] = 65536
 MAX_CONCURRENT: Final[int] = 10
 
 # ============================================================================
@@ -42,10 +43,11 @@ logger = logging.getLogger(__name__)
 # CHECKSUM VALIDATION
 # ============================================================================
 
-def validate_checksum(filepath: Path) -> bool:
+async def validate_checksum(filepath: Path) -> bool:
   """Validate Adblock Plus checksum header."""
   try:
-    data = filepath.read_text(encoding="utf-8")
+    async with aiofiles.open(filepath, mode="r", encoding="utf-8") as f:
+      data = await f.read()
   except Exception as e:
     logger.warning(f"Failed to read {filepath.name}: {e}")
     return False
@@ -91,7 +93,7 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
   domain_part = domain.group(1).replace('.', '-') if domain else 'list'
   return f"{domain_part}-{url_hash}.txt"
 
-def process_downloaded_file(
+async def process_downloaded_file(
   temp_path: Path,
   url: str,
   filename: str,
@@ -103,19 +105,33 @@ def process_downloaded_file(
 
   try:
     if not skip_checksum:
-      if not validate_checksum(temp_path):
+      if not await validate_checksum(temp_path):
         logger.warning(f"Checksum validation failed for {url}")
+        if temp_path.exists():
+          temp_path.unlink()
+        return None
     
-    content = temp_path.read_text(encoding="utf-8")
+    async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
+      content = await f.read()
     
     if len(content) < 100:
       logger.error(f"Downloaded file suspiciously small ({len(content)} bytes): {url}")
       temp_path.unlink()
       return None
     
-    rule_count = len([line for line in content.splitlines() if line.strip() and not line.strip().startswith(('! ', '#', '['))])
+    # Offload CPU-intensive task to executor if needed, but for now simple processing
+    # Using run_in_executor for the list comprehension if files are huge might be beneficial
+    # but let's stick to I/O optimization first.
+    rule_count = sum(
+      1
+      for line in content.splitlines()
+      if line.strip()
+      and not line.strip().startswith(("! ", "#", "["))
+    )
     
-    dest_path.write_text(content, encoding="utf-8")
+    async with aiofiles.open(dest_path, mode="w", encoding="utf-8") as f:
+      await f.write(content)
+
     logger.info(f"✓ {filename} ({rule_count} rules)")
     return dest_path
 
@@ -146,27 +162,28 @@ async def fetch_list(
     async with session.get(url, timeout=TIMEOUT, headers=headers) as resp:
       resp.raise_for_status()
 
+      tmp_path = None
       with tempfile.NamedTemporaryFile(
         mode="wb",
         delete=False,
         suffix=".txt",
       ) as tmp:
         tmp_path = Path(tmp.name)
+        # Close immediately, re-open async below
 
-        async for chunk in resp.content.iter_chunked(CHUNK_SIZE):
-          tmp.write(chunk)
-
-      loop = asyncio.get_running_loop()
-      result = await loop.run_in_executor(
-        None,
-        process_downloaded_file,
-        tmp_path,
-        url,
-        filename,
-        output_dir,
-        skip_checksum,
-      )
-      return (url, result is not None)
+      try:
+        async with aiofiles.open(tmp_path, mode="wb") as f:
+          async for chunk in resp.content.iter_chunked(CHUNK_SIZE):
+            await f.write(chunk)
+        result = await process_downloaded_file(tmp_path, url, sanitize_filename(url, filename), output_dir, skip_checksum)
+        result = await process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
+        return (url, result is not None)
+      finally:
+        # Ensure cleanup always
+        try:
+          await asyncio.to_thread(tmp_path.unlink)
+        except FileNotFoundError:
+          pass
 
   except asyncio.TimeoutError:
     logger.error(f"✗ Timeout: {url}")
