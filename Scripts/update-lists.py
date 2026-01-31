@@ -175,7 +175,7 @@ async def fetch_list(
         async with aiofiles.open(tmp_path, mode="wb") as f:
           async for chunk in resp.content.iter_chunked(CHUNK_SIZE):
             await f.write(chunk)
-
+        result = await process_downloaded_file(tmp_path, url, sanitize_filename(url, filename), output_dir, skip_checksum)
         result = await process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
         return (url, result is not None)
       finally:
