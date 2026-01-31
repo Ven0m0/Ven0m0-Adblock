@@ -107,6 +107,9 @@ async def process_downloaded_file(
     if not skip_checksum:
       if not await validate_checksum(temp_path):
         logger.warning(f"Checksum validation failed for {url}")
+        if temp_path.exists():
+          temp_path.unlink()
+        return None
     
     async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
       content = await f.read()
