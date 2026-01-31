@@ -186,11 +186,11 @@ IMPROVEMENTS OVER ORIGINALS:
         } catch (e) {}
         return topLastTimeUpdate >= 1
           ? function () {
-            return top.lastTimeUpdate;
-          }
+              return top.lastTimeUpdate;
+            }
           : function () {
-            return window.lastTimeUpdate;
-          };
+              return window.lastTimeUpdate;
+            };
       })();
 
       const PromiseConstructor = function (executor) {

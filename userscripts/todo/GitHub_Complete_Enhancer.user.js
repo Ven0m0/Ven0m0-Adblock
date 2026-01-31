@@ -114,12 +114,16 @@
 
         // Fill first part
         for (let i = 0; i < codeParts[0].length; i++) {
-          this.waitForElement(`#user-code-${i}`).then((el) => (el.value = codeParts[0][i])).catch(err => console.error('[GitHub Enhancer] Error filling code part 1:', err));
+          this.waitForElement(`#user-code-${i}`)
+            .then((el) => (el.value = codeParts[0][i]))
+            .catch((err) => console.error("[GitHub Enhancer] Error filling code part 1:", err));
         }
 
         // Fill second part
         for (let i = 0; i < codeParts[1].length; i++) {
-          this.waitForElement(`#user-code-${i + 5}`).then((el) => (el.value = codeParts[1][i])).catch(err => console.error('[GitHub Enhancer] Error filling code part 2:', err));
+          this.waitForElement(`#user-code-${i + 5}`)
+            .then((el) => (el.value = codeParts[1][i]))
+            .catch((err) => console.error("[GitHub Enhancer] Error filling code part 2:", err));
         }
 
         // Submit after 1 second
