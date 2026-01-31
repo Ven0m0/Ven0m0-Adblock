@@ -56,9 +56,9 @@ jobs:
         run: |
           mkdir -p userscripts/dist dist
           has_changes=false
-          if [[ ${{ github.event.inputs.force_rebuild }} == true ]]; then
+          if [[ "${{ github.event.inputs.force_rebuild }}" == "true" ]]; then
             printf 'Force rebuild requested\n'; has_changes=true
-          elif [[ ${{ github.event_name }} == schedule ]] || [[ ${{ github.event.inputs.fetch_updates }} == true ]]; then
+          elif [[ "${{ github.event_name }}" == "schedule" ]] || [[ "${{ github.event.inputs.fetch_updates }}" == "true" ]]; then
             printf 'Scheduled run or fetch updates requested\n'
             has_changes=true
           else
