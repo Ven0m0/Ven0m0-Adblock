@@ -177,8 +177,10 @@ async def fetch_list(
         return (url, result is not None)
       finally:
         # Ensure cleanup always
-        if tmp_path.exists():
-          tmp_path.unlink()
+        try:
+          await asyncio.to_thread(tmp_path.unlink)
+        except FileNotFoundError:
+          pass
 
   except asyncio.TimeoutError:
     logger.error(f"✗ Timeout: {url}")
