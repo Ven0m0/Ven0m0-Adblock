@@ -154,6 +154,7 @@ async def fetch_list(
     async with session.get(url, timeout=TIMEOUT, headers=headers) as resp:
       resp.raise_for_status()
 
+      tmp_path = None
       with tempfile.NamedTemporaryFile(
         mode="wb",
         delete=False,
