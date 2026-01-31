@@ -8,13 +8,10 @@ from pathlib import Path
 repo_root = Path(__file__).parent.parent
 script_path = repo_root / "Scripts" / "move-pure-domains.py"
 
-spec = importlib.util.spec_from_file_location("move_pure_domains", str(script_path))
-module = importlib.util.module_from_spec(spec)
-sys.modules["move_pure_domains"] = module
-spec.loader.exec_module(module)
+module_globals = __import__('runpy').run_path(str(script_path))
 
-is_pure_domain = module.is_pure_domain
-ADGUARD_INDICATORS = module.ADGUARD_INDICATORS
+is_pure_domain = module_globals['is_pure_domain']
+ADGUARD_INDICATORS = module_globals['ADGUARD_INDICATORS']
 
 class TestIsPureDomain(unittest.TestCase):
     def test_pure_domains(self):
