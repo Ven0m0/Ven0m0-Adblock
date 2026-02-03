@@ -1,0 +1,9 @@
+# Paid Content Links
+
+image2.pubmatic.com
+images.outbrain.com
+images.taboola.com
+log.outbrain.com
+odb.outbrain.com
+trc.taboola.com
+widgets.outbrain.com
