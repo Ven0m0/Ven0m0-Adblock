@@ -32,8 +32,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install
-          npm install @microsoft/eslint-formatter-sarif@3.1.0
+          npm install eslint
+          npm install @microsoft/eslint-formatter-sarif
 
       - name: Run ESLint
         env:
@@ -41,6 +41,7 @@ jobs:
         # Using 'bun run lint:eslint' or directly invoking eslint.
         # Since we need SARIF output, we'll invoke eslint directly but use the project's installed version.
         run: npx eslint .
+          --config eslint.config.mjs
           --format @microsoft/eslint-formatter-sarif
           --output-file eslint-results.sarif
         continue-on-error: true
