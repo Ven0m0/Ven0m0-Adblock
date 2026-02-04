@@ -83,15 +83,15 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
   print(f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)")
   return stats, rules
 
-def find_cross_file_duplicates(file_contents: dict[Path, list[str]]) -> dict[str, list[str]]:
+def find_cross_file_duplicates(file_rules: dict[str, list[str]]) -> dict[str, list[str]]:
   """Find entries appearing in multiple files"""
   entry_locations = defaultdict(list)
   
-  for filepath, lines in file_contents.items():
-    for line in lines:
-      stripped = line.strip()
+  for filename, rules in file_rules.items():
+    for rule in rules:
+      stripped = rule.strip()
       if stripped:
-        entry_locations[stripped].append(filepath.name)
+        entry_locations[stripped].append(filename)
   
   return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
 
@@ -116,11 +116,10 @@ def main() -> int:
   print(f"Found {len(txt_files)} files\n")
   
   total_stats = Stats()
-  file_contents = {}
-
+  file_rules = {}
   for filepath in txt_files:
     stats, rules = deduplicate_file(filepath)
-    file_contents[filepath] = rules
+    file_rules[filepath.name] = rules
     total_stats.original += stats.original
     total_stats.final += stats.final
     total_stats.removed += stats.removed
@@ -131,7 +130,7 @@ def main() -> int:
   
   print(f"\n{'='*60}")
   print("Checking for cross-file duplicates...")
-  duplicates = find_cross_file_duplicates(file_contents)
+  duplicates = find_cross_file_duplicates(file_rules)
   
   if duplicates:
     file_groups = defaultdict(list)
@@ -139,8 +138,8 @@ def main() -> int:
       file_groups[tuple(sorted(files))].append(entry)
     
     print(f"Found {len(duplicates)} cross-file duplicates:\n")
-    for file_group, entries in sorted(file_groups.items()):
-      print(f"{len(entries)} entries in: {', '.join(file_group)}")
+    for file_tuple, entries in sorted(file_groups.items()):
+      print(f"{len(entries)} entries in: {', '.join(file_tuple)}")
       for entry in sorted(entries)[:5]: 
         print(f"  {entry}")
       if len(entries) > 5:
