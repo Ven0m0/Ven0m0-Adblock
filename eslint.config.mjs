@@ -35,7 +35,7 @@ export default [
       "no-var": "warn",
       semi: ["error", "always"],
       quotes: ["error", "double", { avoidEscape: true }],
-      indent: ["error", 2],
+      indent: "off",
       "comma-dangle": ["error", "never"],
       "no-console": "off"
     }

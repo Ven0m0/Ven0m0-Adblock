@@ -181,9 +181,9 @@
         const w =
           typeof fn === "function"
             ? (...x) =>
-              awaitTO(id)
-                .then((v) => v && fn(...x))
-                .catch(throwE)
+                awaitTO(id)
+                  .then((v) => v && fn(...x))
+                  .catch(throwE)
             : fn;
         d = Math.max(d, cfg.minTimeout);
         id = nTO(w, d, ...a);
@@ -195,9 +195,9 @@
         const w =
           typeof fn === "function"
             ? (...x) =>
-              awaitTO(id)
-                .then((v) => v && fn(...x))
-                .catch(throwE)
+                awaitTO(id)
+                  .then((v) => v && fn(...x))
+                  .catch(throwE)
             : fn;
         d = Math.max(d, cfg.minInterval);
         id = nSI(w, d, ...a);
@@ -597,17 +597,24 @@
   }
   function extractOrigins() {
     if (!cfg.preconnect) return;
-    document.querySelectorAll("img[src],script[src],link[href],iframe[src],video[src],source[src]").forEach((e) => {
-      const u = e.src || e.href;
-      if (!u || !/^\s*https?:/i.test(u)) return;
-      try {
-        const url = new URL(u);
-        if (url.origin !== location.origin) state.origins.add(url.origin);
-      } catch (e) {
-        cfg.log && console.error("[WebPro] Origin extract error:", e);
-      }
-    });
-    for (const o of state.origins) addHint("preconnect", o);
+    document
+      .querySelectorAll(
+        "img[src]:not([data-wp-o]),script[src]:not([data-wp-o]),link[href]:not([data-wp-o]),iframe[src]:not([data-wp-o]),video[src]:not([data-wp-o]),source[src]:not([data-wp-o])"
+      )
+      .forEach((e) => {
+        mark(e, "data-wp-o");
+        const u = e.src || e.href;
+        if (!u || !/^\s*https?:/i.test(u)) return;
+        try {
+          const url = new URL(u);
+          if (url.origin !== location.origin && !state.origins.has(url.origin)) {
+            state.origins.add(url.origin);
+            addHint("preconnect", url.origin);
+          }
+        } catch (e) {
+          cfg.log && console.error("[WebPro] Origin extract error:", e);
+        }
+      });
   }
   function preloadCritical() {
     if (!cfg.preconnect) return;
@@ -641,6 +648,7 @@
       lazyVideos();
       optimizeVids();
       deferScripts();
+      extractOrigins();
     }, C.TIME.THR_MUT);
     new MutationObserver(() => mut()).observe(document.documentElement, {
       childList: true,

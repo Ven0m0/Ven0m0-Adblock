@@ -98,7 +98,11 @@ def find_cross_file_duplicates(file_rules: dict[str, list[str]]) -> dict[str, li
 def main() -> int:
   script_dir = Path(__file__).parent
   repo_dir = script_dir.parent
-  lists_dir = repo_dir / 'lists'
+
+  if len(sys.argv) > 1:
+    lists_dir = Path(sys.argv[1])
+  else:
+    lists_dir = repo_dir / 'lists'
   
   if not lists_dir.exists():
     print(f"Error: Lists directory not found at {lists_dir}", file=sys.stderr)
