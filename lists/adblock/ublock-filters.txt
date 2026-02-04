@@ -67,8 +67,6 @@
 ! StevenBlack/hosts issue
 ! https://github.com/uBlockOrigin/uAssets/issues/28512
 ! https://github.com/uBlockOrigin/uAssets/issues/25323
-! https://github.com/uBlockOrigin/uAssets/issues/29153
-! https://github.com/uBlockOrigin/uAssets/issues/18148
 !#if env_safari
 $removeparam=/^utm_/,domain=music.apple.com|reddit.com|spotify.com
 $removeparam=cmpid,domain=coupons.albertsons.com|coupons.safeway.com
@@ -122,3 +120,4 @@ upn.one##div[style^="position: fixed; inset: 0px; z-index: 2147483647; backgroun
 ||open.spotify.com^$removeparam=referral
 ||open.spotify.com^$removeparam=si
 ||open.spotify.com^$removeparam=sp_cid
+!#endif
