@@ -1,3 +1,11 @@
+### userjs
+
+- look into https://greasemonkey.github.io/gm4-polyfill/
+
+```javascript
+// @require https://greasemonkey.github.io/gm4-polyfill/gm4-polyfill.js
+```
+
 ### Desktop
 - <https://greasyfork.org/en/scripts/538374-copilot-continue>
 - <https://greasyfork.org/en/scripts/508956-github-automatically-confirm-device-authorization>

@@ -156,12 +156,12 @@ IMPROVEMENTS OVER ORIGINALS:
       const g =
         typeof f === "function"
           ? (...args) => {
-            h1(r)
-              .then((act) => {
-                act && f(...args);
-              })
-              .catch(errCatch);
-          }
+              h1(r)
+                .then((act) => {
+                  act && f(...args);
+                })
+                .catch(errCatch);
+            }
           : f;
       if (d >= 1) d -= dOffset;
       r = setTimeout_(g, d, ...args);
@@ -173,12 +173,12 @@ IMPROVEMENTS OVER ORIGINALS:
       const g =
         typeof f === "function"
           ? (...args) => {
-            h1(r)
-              .then((act) => {
-                act && f(...args);
-              })
-              .catch(errCatch);
-          }
+              h1(r)
+                .then((act) => {
+                  act && f(...args);
+                })
+                .catch(errCatch);
+            }
           : f;
       if (d >= 1) d -= dOffset;
       r = setInterval_(g, d, ...args);
