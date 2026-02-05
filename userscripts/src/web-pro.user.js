@@ -110,7 +110,8 @@
     loaded: new WeakSet(),
     deferredScripts: new Map(),
     origins: new Set(),
-    interactionBound: 0
+    interactionBound: 0,
+    videoObserver: null
   };
   const idle = (fn, to = C.TIME.IDLE) =>
     "requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: to }) : setTimeout(fn, C.TIME.FALLBACK);
@@ -473,32 +474,38 @@
   }
   function lazyVideos() {
     if (!cfg.videos || !("IntersectionObserver" in window)) return;
-    const obs = new IntersectionObserver(
-      (es) => {
-        es.forEach((e) => {
-          if (e.isIntersecting) {
-            const v = e.target;
-            if (!state.loaded.has(v)) {
-              v.querySelectorAll("source[data-src]").forEach((s) => {
-                if (s.dataset.src) {
-                  s.src = s.dataset.src;
-                  delete s.dataset.src;
+    const vids = document.querySelectorAll("video[data-src],video:has(source[data-src])");
+    if (!vids.length) return;
+    if (!state.videoObserver) {
+      state.videoObserver = new IntersectionObserver(
+        (es, obs) => {
+          es.forEach((e) => {
+            if (e.isIntersecting) {
+              const v = e.target;
+              if (!state.loaded.has(v)) {
+                v.querySelectorAll("source[data-src]").forEach((s) => {
+                  if (s.dataset.src) {
+                    s.src = s.dataset.src;
+                    delete s.dataset.src;
+                  }
+                });
+                if (v.dataset.src) {
+                  v.src = v.dataset.src;
+                  delete v.dataset.src;
                 }
-              });
-              if (v.dataset.src) {
-                v.src = v.dataset.src;
-                delete v.dataset.src;
+                v.load();
+                state.loaded.add(v);
               }
-              v.load();
-              state.loaded.add(v);
+              obs.unobserve(v);
             }
-            obs.unobserve(v);
-          }
-        });
-      },
-      { rootMargin: C.IO_MARGIN }
-    );
-    document.querySelectorAll("video[data-src],video:has(source[data-src])").forEach((v) => obs.observe(v));
+          });
+        },
+        {
+          rootMargin: C.IO_MARGIN
+        }
+      );
+    }
+    vids.forEach((v) => state.videoObserver.observe(v));
   }
   function optimizeVids() {
     if (!cfg.videos) return;
