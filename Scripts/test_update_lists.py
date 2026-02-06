@@ -34,7 +34,7 @@ class TestUpdateLists(unittest.TestCase):
         self.assertFalse(result)
 
     def test_validate_checksum_no_checksum(self):
-        content = "||example.comxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx^\n"
+        content = self.valid_content_body
         result = update_lists.validate_checksum(content)
         self.assertTrue(result)
 
