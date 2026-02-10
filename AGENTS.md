@@ -1,1096 +1,331 @@
-# CLAUDE.md - AI Assistant Guide
+# AGENTS.md - AI Agent Quick Reference
 
-This document provides a comprehensive guide for AI assistants working with the Ven0m0-Adblock repository. It covers the codebase structure, development workflows, conventions, and best practices.
-
-## Table of Contents
-
-- [Repository Overview](#repository-overview)
-- [Codebase Structure](#codebase-structure)
-- [Development Environment](#development-environment)
-- [Build System](#build-system)
-- [CI/CD Workflows](#cicd-workflows)
-- [Code Quality & Linting](#code-quality--linting)
-- [Testing & Validation](#testing--validation)
-- [Git Workflow](#git-workflow)
-- [Key Conventions](#key-conventions)
-- [Common Tasks](#common-tasks)
-- [Important Files](#important-files)
-- [Troubleshooting](#troubleshooting)
-
----
-
-## Repository Overview
-
-**Repository:** Ven0m0/Ven0m0-Adblock
+**Project:** Ven0m0-Adblock
+**Type:** Ad-blocking filter lists + userscripts
 **License:** GPL-3.0
-**Purpose:** Comprehensive ad-blocking and web experience enhancement project with filter lists and userscripts
 
-### Main Components
+## Stack
 
-1. **Filter Lists** - AdGuard-compatible ad-blocking rules in `lists/sources/`
-2. **Userscripts** - Browser userscripts for web enhancement in `userscripts/src/`
-3. **Build Scripts** - Automation tools in `Scripts/`
-4. **Configuration** - Linting and build configs in root directory
+- **Runtime:** Bun (primary), Node.js 18+ (fallback)
+- **Tool Manager:** Mise
+- **Languages:** AdGuard filter syntax, JavaScript (ES2020)
+- **Build:** esbuild, terser, AGLint, HostlistCompiler
+- **Quality:** ESLint (flat config), Biome, Oxlint, Prettier
+- **CI/CD:** GitHub Actions
+- **Git Hooks:** Lefthook
 
-### Key Deliverables
-
-- **Combined Filter Lists:**
-  - `lists/releases/adblock.txt` - Main combined list
-  - `Filters/Venom-Combined.txt` - AdGuard compiled version
-  - `Filters/Ragibkl-Combined.txt` - Alternative compilation
-- **Individual Lists:**
-  - Youtube, Reddit, Spotify, Twitter, Twitch, Search Engines, etc.
-- **Optimized Userscripts:**
-  - Built and minified in `dist/` directory
-
----
-
-## Codebase Structure
+## Repository Structure
 
 ```
-Ven0m0-Adblock/
-├── .github/
-│   └── workflows/              # GitHub Actions CI/CD pipelines
-│       ├── build-filter-lists.yml
-│       ├── lint-and-format.yml
-│       └── userscripts.yml
-├── lists/
-│   ├── sources/                # Source filter lists (.txt files)
-│   │   ├── Youtube.txt
-│   │   ├── Reddit.txt
-│   │   ├── Twitter.txt
-│   │   ├── Twitch.txt
-│   │   ├── Spotify.txt
-│   │   ├── General.txt
-│   │   ├── Search-Engines.txt
-│   │   ├── URLShortener.txt
-│   │   ├── Combination.txt
-│   │   └── Combination-Minimal.txt
-│   └── releases/               # Built/compiled filter lists
-├── userscripts/
-│   ├── src/
-│   │   └── Mine/              # Custom userscripts
-│   │       ├── youtube-optimized.user.js
-│   │       ├── tweak-optimized.user.js
-│   │       └── LLM-optimizer-optimized.user.js
-│   └── dist/                  # Built userscripts
-├── Scripts/                   # Build and utility scripts
-│   ├── build-all.sh          # Master build orchestrator
-│   ├── aglint.sh             # AGLint wrapper
-│   ├── hostlist-build.sh     # Hostlist compilation
-│   ├── kompressor.sh         # Compression utility
-│   ├── lib-common.sh         # Shared functions
-│   ├── setup.sh              # Environment setup
-│   └── hosts-creator/        # Hosts file generator
-├── Filters/                   # Compiled AdGuard filters (generated)
-├── dist/                      # Built userscripts (generated)
-├── hostlist-config.json      # Hostlist compiler configuration
-├── mise.toml                 # Mise tool version manager config
-├── package.json              # NPM/Bun package configuration
-├── eslint.config.mjs         # ESLint configuration (flat config)
-├── .prettierrc.json          # Prettier code formatter config
-├── .aglintrc.yml             # AGLint filter list linter config
-├── .markdownlint-cli2.jsonc  # Markdownlint-cli2 config
-├── .yamllint.yml             # YAML linter config
-├── .lefthook.yml             # Lefthook git hooks config
-├── biome.json                # Biome linter/formatter config
-├── .oxlintrc.json            # Oxlint configuration
-├── .editorconfig             # Editor configuration
-├── esbuild.config.js         # ESBuild bundler config
-├── README.md                 # Project documentation
-├── SECURITY.md               # Security policy
-└── LICENSE                   # GPL-3.0 license
+@package.json                  # NPM scripts, dependencies
+@mise.toml                     # Tool versions, tasks
+@eslint.config.mjs            # ESLint flat config
+@biome.json                   # Biome linter/formatter
+@.aglintrc.yml                # Filter list linting
+@esbuild.config.js            # Bundler config
+@hostlist-config.json         # Filter compilation
+@.lefthook.yml                # Git hooks
 
-Generated Directories (gitignored):
-├── node_modules/             # NPM dependencies
-├── .eslintcache              # ESLint cache
-└── coverage/                 # Test coverage reports
+lists/
+  sources/*.txt               # Hand-edited filter rules
+  releases/                   # Built filter lists (generated)
+
+userscripts/
+  src/Mine/*.user.js          # Source userscripts
+  dist/                       # Built userscripts (generated)
+
+Scripts/
+  build-lists.sh              # Main filter builder
+  build-all.sh                # Master orchestrator
+  quality-check.sh            # Quality validation
+
+.github/workflows/
+  build-filter-lists.yml      # Daily filter builds
+  lint-and-format.yml         # Code quality CI
+  userscripts.yml             # Weekly userscript builds
+  maintain-lists.yml          # List maintenance
+  update-lists.yml            # Dependency updates
+
+Filters/                      # AdGuard compiled (generated)
 ```
 
-### Directory Purposes
+## Development Workflows
 
-- **lists/sources/** - Hand-maintained filter rules (human-edited)
-- **lists/releases/** - Compiled, optimized, production-ready lists
-- **Filters/** - AdGuard-specific compiled outputs
-- **userscripts/src/** - Source userscripts (human-edited)
-- **dist/** - Minified, optimized userscripts for production
-- **Scripts/** - Build automation and tooling
-
----
-
-## Development Environment
-
-### Package Manager
-
-**Primary:** [Bun](https://bun.sh/) (>=1.0.0)
-**Alternative:** Node.js (>=18.0.0)
-
-The project uses Bun as the primary package manager (configured in `package.json` via `packageManager: "bun@1.0.0"`).
-
-### Tool Version Manager
-
-**[Mise](https://mise.jdx.dev/)** - Manages all development tools and runtimes
-
-Configuration in `mise.toml`:
-
-```toml
-[tools]
-node = "lts"
-bun = "latest"
-python = "3.13"
-# Plus various npm packages and system tools
-```
-
-### Environment Setup
+### Setup
 
 ```bash
-# Install mise (if not installed)
+# Install mise (if needed)
 curl https://mise.run | sh
 
-# Install all tools and dependencies
+# Install all tools + dependencies
 mise install && bun install
 
-# Or use the mise task
+# Or use mise task
 mise run install
 ```
 
-### Core Tools
-
-#### Runtimes
-
-- **Node.js** (LTS) - JavaScript runtime
-- **Bun** (latest) - Fast JS runtime and package manager
-- **Python** (3.13) - For Python-based tools
-
-#### AdBlock Tooling
-
-- **@adguard/aglint** - Filter list linter and fixer
-- **@adguard/dead-domains-linter** - Removes dead/expired domains
-- **@adguard/hostlist-compiler** - Compiles filter lists into various formats
-
-#### Linting & Formatting
-
-- **ESLint** - JavaScript linter (flat config format)
-- **Biome** - Fast Rust-based JavaScript/TypeScript linter and formatter
-- **Oxlint** - Rust-based fast linter for JavaScript/TypeScript
-- **Prettier** - Code formatter (JS, JSON, YAML, Markdown)
-- **markdownlint-cli2** - Markdown linter
-- **yamllint** - YAML linter
-- **shellcheck** - Shell script linter
-- **shfmt** - Shell script formatter
-- **Lefthook** - Fast git hooks manager
-
-#### Build Tools
-
-- **esbuild** - Fast JavaScript bundler
-- **terser** - JavaScript minifier
-- **minify** - General minification tool
-
-#### Utilities
-
-- **fd** - Fast file finder
-- **ripgrep** - Fast grep alternative
-- **sd** - Find and replace tool
-
----
-
-## Build System
-
-### Build Scripts
-
-#### Primary Build Script: `Scripts/build-lists.sh`
-
-Located in `Scripts/`, this is the main entry point for building filter lists.
-
-**Process:**
-1. Ensures required tools are installed (aglint, hostlist-compiler, kompressor)
-2. Concatenates all source lists from `lists/sources/*.txt`
-3. Runs AGLint validation (non-blocking)
-4. Compresses output with kompressor
-5. Outputs to `lists/releases/adblock.txt`
-6. Builds hostlist using `hostlist-config.json`
-
-**Usage:**
-```bash
-./Scripts/build-lists.sh
-# Or via npm/bun script:
-bun run build
-```
-
-#### Master Build Script: `Scripts/build-all.sh`
-
-Orchestrates building multiple components.
-
-**Usage:**
-```bash
-./Scripts/build-all.sh [adblock] [hosts] [userscripts]
-./Scripts/build-all.sh all  # Build everything
-```
-
-**Individual builds:**
-```bash
-bun run build:adblock      # Filter lists only
-bun run build:hosts        # Hosts file only
-bun run build:userscripts  # Userscripts only
-bun run build:all          # Everything
-```
-
-### Userscript Build Process
-
-**Pipeline:**
-1. Source files in `userscripts/src/Mine/*.user.js`
-2. Bundle and minify with esbuild (ES2020, IIFE format)
-3. Further optimize with Terser (preserve userscript headers)
-4. Output to `dist/*.js`
-
-**Build command:**
-```bash
-bun run build:userscripts
-```
-
-**Key settings:**
-- Target: ES2020
-- Format: IIFE (Immediately Invoked Function Expression)
-- Comments preserved: UserScript headers, licenses
-- Minification: Enabled with Terser
-
-### HostlistCompiler Configuration
-
-File: `hostlist-config.json`
-
-Defines:
-- Source files to include
-- Output path (`lists/releases/hosts.txt`)
-- Transformations: RemoveComments, Validate, Deduplicate, Sort, Compress
-
----
-
-## CI/CD Workflows
-
-All workflows use GitHub Actions and are located in `.github/workflows/`.
-
-### 1. Build Filter Lists (build-filter-lists.yml)
-
-**Triggers:**
-- Push to main (when filter sources change)
-- Schedule: Daily at 7:00 AM UTC
-- Manual dispatch
-
-**Jobs:**
-
-1. **lint** - Runs AGLint with auto-fix, commits fixes
-2. **build-adguard** - Compiles with HostlistCompiler, cleans with DeadDomainsLinter
-3. **build-ragibkl** - Alternative compilation (if ragibkl-config.json exists)
-4. **build-custom** - Runs custom build-lists.sh script
-5. **commit** - Downloads artifacts, commits built lists to main
-6. **convert** - (Scheduled only) Converts lists, pushes to release branch
-7. **cleanup** - Deletes old workflow runs (7+ days)
-
-**Important:**
-- All jobs run in parallel except commit (needs builds)
-- Uses mise for tool management
-- Commits as `github-actions[bot]`
-
-### 2. Lint & Format (lint-and-format.yml)
-
-**Triggers:**
-- Push to main
-- Pull requests to main
-- Manual dispatch
-
-**Jobs:**
-
-1. **lint** (matrix strategy):
-   - ESLint for JavaScript files
-   - AGLint for filter lists
-   - Prettier format checking
-   - Only runs if relevant files changed
-
-2. **format** - Auto-fixes and commits (main/develop only, not PRs)
-3. **yamllint** - Lints workflow YAML files
-4. **shellcheck** - Lints and formats shell scripts
-5. **summary** - Aggregates results
-
-**Note:** Auto-fix only runs on main/develop branches, not PRs.
-
-### 3. Build Userscripts (userscripts.yml)
-
-**Triggers:**
-- Push to main (when userscripts change)
-- PRs affecting userscripts
-- Weekly schedule (Monday 00:00 UTC)
-- Manual dispatch (with force rebuild option)
-
-**Process:**
-1. Detects changed scripts
-2. Optionally fetches external scripts from `List` file
-3. Builds with esbuild
-4. Optimizes with Terser
-5. Generates README
-6. Commits built scripts (skips on PRs)
-7. Uploads artifacts
-
-**Manual Options:**
-- `force_rebuild` - Rebuild all scripts regardless of changes
-- `fetch_updates` - Fetch latest versions of external scripts
-
----
-
-## Code Quality & Linting
-
-### Filter List Linting (AGLint)
-
-**Config:** `.aglintrc.yml`
-
-- Syntax: Common (AdGuard syntax)
-- Extends: `aglint:recommended`
-- Special handling for excluded patterns (no-excluded-rules)
-
-**Commands:**
-```bash
-bun run lint:aglint       # Check only
-bunx aglint --fix         # Auto-fix
-bun run lint:filters      # Same as lint:aglint
-```
-
-**Integration:** Runs in CI on every commit, auto-fixes and commits changes.
-
-### JavaScript Linting (ESLint)
-
-**Config:** `eslint.config.mjs` (flat config format)
-
-**Rules:**
-- No unused variables (except prefixed with `_`)
-- Enforce `===` over `==`
-- No `eval()` or implied eval
-- Prefer `const` over `let`, warn on `var`
-- Semicolons required
-- Double quotes (with escape allowance)
-- 2-space indentation
-- No trailing commas
-
-**File-specific:**
-- `*.user.js` - Script sourceType, Greasemonkey globals
-- `Scripts/*.sh`, `*.config.js` - Node globals, console allowed
-
-**Commands:**
-```bash
-bun run lint:js           # Check only
-bun run lint:eslint       # Same as lint:js
-eslint . --fix            # Auto-fix
-bun run lint:fix          # Fix ESLint + AGLint
-```
-
-### Code Formatting (Prettier)
-
-**Config:** `.prettierrc.json`
-
-**Settings:**
-- 2-space indentation
-- Double quotes
-- Semicolons required
-- Trailing commas: none
-- Print width: 100
-
-**Commands:**
-```bash
-bun run format            # Format all files
-bun run format:check      # Check only (CI mode)
-bun run format:js         # JavaScript only
-bun run format:json       # JSON only
-bun run format:yaml       # YAML only
-bun run format:md         # Markdown only
-```
-
-### Biome (Fast Linter & Formatter)
-
-**Config:** `biome.json`
-
-Biome is a fast, Rust-based toolchain for JavaScript/TypeScript that combines linting and formatting. It provides excellent performance and is configured to work alongside ESLint and Prettier.
-
-**Commands:**
-```bash
-biome check --write .            # Lint and format with auto-fix
-biome check .                    # Check only
-biome format --write .           # Format only
-```
-
-**Integration:** Runs in Lefthook pre-commit hooks for staged files.
-
-### Oxlint (Fast JavaScript Linter)
-
-**Config:** `.oxlintrc.json`
-
-Oxlint is a high-performance Rust-based linter for JavaScript and TypeScript, offering faster linting than traditional tools.
-
-**Commands:**
-```bash
-oxlint .                         # Lint all files
-mise exec -- oxlint .            # Lint via mise
-```
-
-**Integration:** Can be integrated into quality checks for additional validation.
-
-### Markdown Linting
-
-**Config:** `.markdownlint-cli2.jsonc`
-
-**Command:**
-```bash
-bun run lint:md
-bunx markdownlint-cli2 --fix     # Auto-fix
-```
-
-### YAML Linting
-
-**Config:** `.yamllint.yml`
-
-**Command:**
-```bash
-bun run lint:yaml
-```
-
-### Shell Script Linting
-
-**Tools:** shellcheck, shfmt
-
-**Commands:**
-```bash
-bun run lint:shell        # ShellCheck only (continue on error)
-mise exec -- shellcheck Scripts/*.sh
-mise exec -- shfmt -d -i 2 -ci Scripts/*.sh
-```
-
-### Comprehensive Linting
+### Build
 
 ```bash
-bun run lint              # All linters
-bun run lint:fix:all      # Auto-fix all + format
-bun run test              # Lint + format check
-bun run test:ci           # Same as test
-bun run validate          # Test + build
+bun run build                 # Filter lists
+bun run build:userscripts     # Userscripts only
+bun run build:all             # Everything
 ```
 
----
+**Filter Build Pipeline:**
+1. Concatenate `lists/sources/*.txt`
+2. Run AGLint validation
+3. Compress with kompressor
+4. Output to `lists/releases/adblock.txt`
+5. Build hostlist from `hostlist-config.json`
 
-## Testing & Validation
+**Userscript Build Pipeline:**
+1. Bundle with esbuild (ES2020, IIFE)
+2. Minify with Terser (preserve headers)
+3. Output to `dist/*.js`
 
-### Pre-commit Testing
-
-The project uses **Lefthook** for git hooks management.
-
-**Config:** `.lefthook.yml`
-
-**Pre-commit hooks include:**
-- Shell script formatting (shfmt, shellcheck, shellharden)
-- YAML linting (yamlfmt, yamllint)
-- TOML linting (taplo)
-- JSON validation (jq/jaq)
-- AGLint for filter lists
-- Biome for JavaScript/TypeScript
-- Markdown linting
-- File normalization (whitespace, encoding)
-- Security scanning (secrets detection, merge conflicts)
-- GitHub Actions linting (actionlint)
-- Branch protection (blocks direct commits to main/master)
-
-**Commit message hooks:**
-- Conventional Commits validation
-- Subject length check (max 72 chars)
-- WIP/TODO detection
-
-**Pre-push hooks:**
-- Automated testing
-- Branch naming validation (git-flow patterns)
-- Security audits
-
-**Installation:**
-```bash
-lefthook install               # Install git hooks
-lefthook run pre-commit        # Run pre-commit hooks manually
-```
-
-### Manual Validation
+### Test & Lint
 
 ```bash
-# Full validation (lint + format + build)
-bun run validate
-
-# Just testing (no build)
-bun run test
-
-# CI mode (no fixes, just check)
-bun run test:ci
+bun run lint                  # All linters
+bun run lint:fix              # Auto-fix ESLint + AGLint
+bun run lint:fix:all          # Fix + format all
+bun run format                # Biome format all
+bun run test                  # Lint + format check
+bun run validate              # Test + build
 ```
 
-### What Gets Validated
+**Linters:**
+- **JavaScript:** ESLint, Biome, Oxlint
+- **Filters:** AGLint (uBlock Origin syntax)
+- **Markdown:** markdownlint-cli2
+- **YAML:** yamllint
+- **Shell:** shellcheck, shfmt
 
-1. **JavaScript** - ESLint rules compliance
-2. **Filter Lists** - AGLint validation (AdGuard syntax)
-3. **Code Formatting** - Prettier formatting consistency
-4. **Markdown** - Markdownlint rules
-5. **YAML** - YAML syntax and style
-6. **Shell Scripts** - ShellCheck static analysis
-7. **Build Success** - All build scripts execute without errors
+### Deploy
 
----
+- **Automated:** CI runs on push to main, daily schedule
+- **Manual:** GitHub Actions workflow dispatch
 
-## Git Workflow
+## Conventions
 
-### Branch Strategy
+### Naming
 
-**Main Branch:** `main` - Production-ready code
-**Release Branch:** `release` - Converted filter lists (auto-created)
-**Feature Branches:** `claude/*` or descriptive names
-
-### Commit Conventions
-
-The project follows conventional commit messages:
-
-- `ci:` - CI/CD changes
-- `style:` - Code formatting, linting fixes
-- `feat:` - New features
-- `fix:` - Bug fixes
-- `docs:` - Documentation changes
-- `refactor:` - Code refactoring
-- `test:` - Test additions/changes
-- `chore:` - Maintenance tasks
-
-**Examples:**
-```
-ci: build and update filter lists
-style: auto-format code and fix linting issues
-feat: add new YouTube ad-blocking rules
-fix: resolve AGLint validation errors
-```
-
-### Automated Commits
-
-**Bot Commits:** `github-actions[bot]`
-Email: `41898282+github-actions[bot]@users.noreply.github.com`
-
-These are created by CI workflows for:
-- Lint fixes
-- Built filter lists
-- Compiled userscripts
-- Converted lists on release branch
-
-### Git Ignore
-
-**Ignored directories:**
-- `node_modules/` - Dependencies
-- `dist/` - Built files
-- `lists/releases/` - Generated lists (actually committed in some workflows)
-- `userscripts/dist/` - Generated userscripts
-- `*.min.js` - Minified files
-- `coverage/` - Test coverage
-- `.eslintcache` - Linter cache
-
----
-
-## Key Conventions
-
-### File Naming
-
-**Filter Lists:**
-- PascalCase or descriptive names: `Youtube.txt`, `Search-Engines.txt`
-- Stored in `lists/sources/`
-- Use `.txt` extension
-
-**Userscripts:**
-- kebab-case with `-optimized.user.js` suffix
-- Example: `youtube-optimized.user.js`
-- Must have `.user.js` extension for Greasemonkey compatibility
-
-**Scripts:**
-- kebab-case with `.sh` extension
-- Example: `build-all.sh`
-- Should be executable (`chmod +x`)
+- **Filter Lists:** `PascalCase.txt` or `Kebab-Case.txt`
+- **Userscripts:** `kebab-case-optimized.user.js`
+- **Scripts:** `kebab-case.sh`
 
 ### Code Style
 
 **JavaScript:**
 - 2-space indentation
-- Double quotes for strings
+- Double quotes
 - Semicolons required
-- Prefer `const` over `let`, avoid `var`
-- Use descriptive variable names
-- Document complex logic with comments
+- `const` over `let`, no `var`
+- `===` over `==`
 
-**Shell Scripts:**
+**Shell:**
 - Bash strict mode: `set -Eeuo pipefail`
+- Quote variables: `"$var"`
 - Use `readonly` for constants
-- Use local variables in functions
-- Quote all variables: `"$var"`
-- Prefer `[[` over `[` for conditionals
 
-**Filter Lists:**
-- Follow AdGuard syntax
+**Filters:**
+- AdGuard/uBlock syntax
 - One rule per line
-- Use comments to explain complex rules: `! Comment`
-- Group related rules together
+- Comments: `! Comment text`
 
-### UserScript Headers
+### File Operations
 
-All userscripts must include proper metadata:
+**EDIT source files:**
+- `lists/sources/*.txt` - Filter rules
+- `userscripts/src/Mine/*.user.js` - Userscripts
+- `Scripts/*.sh` - Build scripts
 
-```javascript
-// ==UserScript==
-// @name         Script Name
-// @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  What it does
-// @author       Ven0m0
-// @match        https://example.com/*
-// @grant        none
-// ==/UserScript==
+**NEVER edit generated files:**
+- `dist/`, `Filters/`, `lists/releases/`
+- These are rebuilt from source
+
+### Commit Messages
+
+Follow Conventional Commits:
+- `feat:` New features
+- `fix:` Bug fixes
+- `ci:` CI/CD changes
+- `style:` Formatting/linting
+- `docs:` Documentation
+- `refactor:` Code refactoring
+- `test:` Testing
+- `chore:` Maintenance
+
+## Dependencies
+
+### Core Tools (Mise-managed)
+
+```toml
+node = "lts"
+bun = "latest"
+lefthook = "latest"
 ```
 
-These headers are preserved during minification.
+### NPM Packages
 
----
+**AdBlock:**
+- @adguard/aglint - Filter linter
+- @adguard/dead-domains-linter - Domain validator
+- @adguard/hostlist-compiler - Filter compiler
+
+**Build:**
+- esbuild - Bundler
+- terser - Minifier
+
+**Quality:**
+- eslint - JavaScript linter
+- @biomejs/biome - Fast linter/formatter
+- markdownlint-cli2 - Markdown linter
 
 ## Common Tasks
 
-### Adding a New Filter Rule
+### Add Filter Rule
 
-1. Identify the appropriate source file in `lists/sources/`:
-   - YouTube → `Youtube.txt`
-   - Reddit → `Reddit.txt`
-   - General web → `General.txt`
-   - etc.
-
-2. Add the rule following AdGuard syntax:
+1. **Choose file:** `lists/sources/Youtube.txt`, `Reddit.txt`, etc.
+2. **Add rule:**
    ```
    ! Block example ads
    ||example.com/ads/*
    example.com##.ad-container
    ```
+3. **Validate:** `bun run lint:aglint`
+4. **Build:** `bun run build`
+5. **Commit:** `git commit -m "feat: block new ad element"`
 
-3. Validate:
-   ```bash
-   bun run lint:aglint
-   ```
+### Create Userscript
 
-4. Build:
-   ```bash
-   bun run build
-   ```
-
-5. Commit:
-   ```bash
-   git add lists/sources/Youtube.txt
-   git commit -m "feat: block new YouTube ad element"
-   ```
-
-### Creating a New Userscript
-
-1. Create file in `userscripts/src/Mine/`:
-   ```bash
-   touch userscripts/src/Mine/my-script-optimized.user.js
-   ```
-
-2. Add UserScript header and code:
+1. **Create:** `userscripts/src/Mine/script-optimized.user.js`
+2. **Add header:**
    ```javascript
    // ==UserScript==
-   // @name         My Script
+   // @name         Script Name
    // @version      1.0
-   // @description  Does something cool
+   // @description  Description
    // @match        https://example.com/*
    // @grant        none
    // ==/UserScript==
-
-   (function() {
-     "use strict";
-     // Your code here
-   })();
    ```
+3. **Build:** `bun run build:userscripts`
+4. **Test:** Check `dist/script-optimized.user.js`
 
-3. Build:
-   ```bash
-   bun run build:userscripts
-   ```
-
-4. Test the output in `dist/my-script-optimized.user.js`
-
-### Updating Dependencies
-
-**Bun dependencies:**
-```bash
-bun update
-```
-
-**Mise tools:**
-```bash
-mise outdated          # Check for updates
-mise upgrade           # Update all tools
-```
-
-**Check specific tool:**
-```bash
-mise list              # See installed versions
-```
-
-### Running Specific Linters
+### Fix Linting Errors
 
 ```bash
-# JavaScript only
-bun run lint:eslint
-
-# Filter lists only
-bun run lint:aglint
-
-# Markdown only
-bun run lint:md
-
-# YAML only
-bun run lint:yaml
-
-# Shell scripts only
-bun run lint:shell
-```
-
-### Cleaning Build Artifacts
-
-```bash
-# Remove build outputs and dependencies
-bun run clean
-
-# Remove caches only
-bun run clean:cache
-
-# Nuclear option (everything)
-bun run clean:all
-```
-
-### Manual Workflow Dispatch
-
-Trigger workflows manually from GitHub Actions UI:
-
-- **Build Filter Lists** - Force rebuild of filter lists
-- **Lint & Format** - Run all linters on-demand
-- **Build Userscripts** - Options:
-  - `force_rebuild` - Rebuild all scripts
-  - `fetch_updates` - Download external scripts
-
----
-
-## Important Files
-
-### Configuration Files
-
-| File | Purpose | Format |
-|------|---------|--------|
-| `package.json` | NPM/Bun package config, scripts | JSON |
-| `mise.toml` | Tool version management | TOML |
-| `eslint.config.mjs` | JavaScript linting rules | ES Module |
-| `biome.json` | Biome linter/formatter config | JSON |
-| `.oxlintrc.json` | Oxlint configuration | JSON |
-| `.prettierrc.json` | Code formatting rules | JSON |
-| `.aglintrc.yml` | Filter list linting rules | YAML |
-| `.markdownlint-cli2.jsonc` | Markdownlint-cli2 config | JSONC |
-| `.yamllint.yml` | YAML linting rules | YAML |
-| `.lefthook.yml` | Git hooks configuration | YAML |
-| `.editorconfig` | Editor behavior | INI-like |
-| `esbuild.config.js` | Bundler configuration | CommonJS |
-| `hostlist-config.json` | Filter compilation config | JSON |
-
-### Build Scripts
-
-| Script | Purpose |
-|--------|---------|
-| `Scripts/build-lists.sh` | Main filter list builder |
-| `Scripts/build-all.sh` | Master build orchestrator |
-| `Scripts/aglint.sh` | AGLint wrapper |
-| `Scripts/hostlist-build.sh` | Hostlist compilation |
-| `Scripts/kompressor.sh` | Compression utility |
-| `Scripts/lib-common.sh` | Shared shell functions |
-| `Scripts/setup.sh` | Development setup |
-
-### Workflow Files
-
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `build-filter-lists.yml` | Push, daily | Build and deploy filter lists |
-| `lint-and-format.yml` | Push, PR | Code quality checks |
-| `userscripts.yml` | Push, weekly | Build userscripts |
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-#### 1. `mise: command not found`
-
-**Solution:** Install mise:
-```bash
-curl https://mise.run | sh
-# Add to shell profile if needed
-```
-
-#### 2. `bun: command not found`
-
-**Solution:** Install via mise:
-```bash
-mise install bun@latest
-```
-
-Or directly:
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
-#### 3. AGLint Validation Errors
-
-**Symptoms:** Build fails with filter syntax errors
-
-**Solution:**
-```bash
-# Auto-fix most issues
-bunx aglint --fix
-
-# Check what's wrong
-bunx aglint
-```
-
-Common issues:
-- Duplicate rules → Removed by auto-fix
-- Invalid syntax → Check `.aglintrc.yml` for excluded patterns
-- Unknown modifiers → Ensure using AdGuard Common syntax
-
-#### 4. ESLint Errors
-
-**Solution:**
-```bash
-# Auto-fix
-eslint . --fix
-
-# Or use the npm script
-bun run lint:fix
-```
-
-Common issues:
-- Unused variables → Remove or prefix with `_`
-- Missing semicolons → Add or run Prettier
-- Wrong quotes → Prefer double quotes
-
-#### 5. Build Script Permission Denied
-
-**Symptoms:** `./build-lists.sh: Permission denied`
-
-**Solution:**
-```bash
-chmod +x build-lists.sh
-chmod +x Scripts/*.sh
-```
-
-#### 6. Userscript Build Fails
-
-**Check:**
-1. Valid UserScript headers present
-2. JavaScript syntax is valid
-3. esbuild and terser are installed
-
-**Debug:**
-```bash
-# Verbose esbuild output
-mise exec -- bunx esbuild userscripts/src/Mine/script.user.js --outfile=test.js --log-level=info
-```
-
-#### 7. Git Pre-commit Hook Fails
-
-**Symptoms:** Commit rejected by pre-commit hook
-
-**Cause:** Linting or formatting issues
-
-**Solution:**
-```bash
-# Fix all issues
+# Auto-fix everything
 bun run lint:fix:all
 
-# Then retry commit
-git commit
+# Individual fixes
+eslint . --fix                # JavaScript
+bunx aglint --fix             # Filters
+bun run format                # Format all
 ```
 
-**Skip hook (not recommended):**
+### Update Dependencies
+
 ```bash
-git commit --no-verify
+bun update                    # NPM packages
+mise outdated                 # Check mise tools
+mise upgrade                  # Update mise tools
 ```
 
-#### 8. CI Workflow Failures
+### Clean Build Artifacts
 
-**Check:**
-1. Workflow logs in GitHub Actions tab
-2. Ensure all required files are committed
-3. Check for syntax errors in YAML workflows
-
-**Common causes:**
-- Missing configuration files
-- Invalid YAML syntax
-- Tool installation failures
-
-**Validate YAML locally:**
 ```bash
-bun run lint:yaml
+bun run clean                 # Remove built files
+bun run clean:cache           # Remove caches
+bun run clean:all             # Nuclear clean
 ```
 
-#### 9. Dead Domains Linter Takes Too Long
+## CI/CD Workflows
 
-**Expected:** Can take 5-10+ minutes for large lists
+### build-filter-lists.yml
 
-**Solution:** Be patient, it's network-intensive (DNS lookups)
+**Triggers:** Push to main, daily 7:00 UTC, manual
+**Jobs:**
+1. `lint` - AGLint auto-fix
+2. `build-adguard` - HostlistCompiler + DeadDomainsLinter
+3. `build-ragibkl` - Alternative compilation
+4. `build-custom` - Custom build script
+5. `commit` - Commit built lists
+6. `convert` - Convert for release branch (scheduled only)
+7. `cleanup` - Delete old runs
 
-**Alternative:** Skip in local builds:
-```bash
-# Edit build script to comment out dead-domains-linter step
-```
+### lint-and-format.yml
 
-#### 10. Mise Tool Installation Fails
+**Triggers:** Push, PRs, manual
+**Jobs:**
+1. `lint` - ESLint, AGLint, Prettier (matrix)
+2. `format` - Auto-fix (main/develop only)
+3. `yamllint` - YAML validation
+4. `shellcheck` - Shell script validation
+5. `summary` - Aggregate results
 
-**Check mise doctor:**
-```bash
-mise doctor
-```
+### userscripts.yml
 
-**Common fixes:**
-```bash
-# Clear cache and reinstall
-mise cache clear
-mise install
-```
+**Triggers:** Push, PRs, weekly Monday 00:00 UTC, manual
+**Jobs:**
+1. Detect changed scripts
+2. Fetch external scripts (optional)
+3. Build with esbuild
+4. Optimize with Terser
+5. Generate README
+6. Commit (skip on PRs)
 
----
+**Manual Options:**
+- `force_rebuild` - Rebuild all
+- `fetch_updates` - Fetch latest externals
 
-## Development Best Practices
+## Git Hooks (Lefthook)
+
+**Pre-commit:**
+- Shell formatting (shfmt, shellcheck, shellharden)
+- YAML linting (yamlfmt, yamllint)
+- TOML linting (taplo)
+- JSON validation (jq/jaq)
+- AGLint for filters
+- Biome for JavaScript
+- Markdown linting
+- Security scanning
+- Branch protection (blocks main/master)
+
+**Commit-msg:**
+- Conventional Commits validation
+- Subject length check (max 72)
+- WIP/TODO detection
+
+**Pre-push:**
+- Automated testing
+- Branch naming validation
+- Security audits
+
+## Critical Rules
 
 ### Before Making Changes
 
-1. **Pull latest changes:**
-   ```bash
-   git pull origin main
-   ```
+1. **Read files first** - Never edit code you haven't read
+2. **Edit source files only** - Never modify `dist/`, `Filters/`, `lists/releases/`
+3. **Validate syntax** - Run linters before committing
+4. **Test builds** - Ensure builds succeed
 
-2. **Ensure clean working directory:**
-   ```bash
-   git status
-   ```
+### During Development
 
-3. **Update dependencies:**
-   ```bash
-   mise install && bun install
-   ```
-
-### While Working
-
-1. **Run linters frequently:**
-   ```bash
-   bun run lint
-   ```
-
-2. **Test builds locally:**
-   ```bash
-   bun run build
-   ```
-
-3. **Keep commits atomic** - One logical change per commit
-
-4. **Write descriptive commit messages** - Follow conventional commits
+1. **Run linters frequently** - `bun run lint`
+2. **Keep commits atomic** - One logical change per commit
+3. **Follow conventions** - Match existing code style
+4. **Preserve comments** - Don't remove explanatory comments
 
 ### Before Committing
 
-1. **Run full validation:**
-   ```bash
-   bun run validate
-   ```
-
-2. **Review changes:**
-   ```bash
-   git diff
-   ```
-
-3. **Stage selectively:**
-   ```bash
-   git add -p  # Interactive staging
-   ```
-
-### After Committing
-
-1. **Push to remote:**
-   ```bash
-   git push origin your-branch
-   ```
-
-2. **Monitor CI workflows** in GitHub Actions
-
-3. **Verify artifacts** are generated correctly
-
----
-
-## AI Assistant Guidelines
-
-### When Working with This Repository
-
-1. **Always read files before editing** - Never propose changes to code you haven't read
-
-2. **Use appropriate tools:**
-   - Filter lists → Edit `.txt` files in `lists/sources/`
-   - Userscripts → Edit `.user.js` files in `userscripts/src/Mine/`
-   - Build process → Modify scripts in `Scripts/` or root
-
-3. **Validate syntax:**
-   - Filter lists: `bun run lint:aglint`
-   - JavaScript: `bun run lint:js`
-   - All: `bun run lint`
-
-4. **Test builds:**
-   ```bash
-   bun run build        # Filter lists
-   bun run build:userscripts  # Userscripts
-   bun run validate     # Everything
-   ```
-
-5. **Follow conventions:**
-   - AdGuard syntax for filter rules
-   - ESLint rules for JavaScript
-   - Conventional commits for messages
-
-6. **Document changes:**
-   - Add comments for complex rules
-   - Update README if adding major features
-   - Explain reasoning in commit messages
-
-7. **Respect existing patterns:**
-   - Match coding style of surrounding code
-   - Use existing utilities and functions
-   - Don't introduce unnecessary dependencies
-
-8. **Handle errors gracefully:**
-   - Check linter output carefully
-   - Fix validation errors before committing
-   - Test edge cases
-
-### Common AI Assistant Mistakes to Avoid
-
-❌ **Don't:**
-- Modify generated files (`dist/`, `Filters/`, `lists/releases/`)
-- Skip linting/validation steps
-- Make bulk changes without testing
-- Ignore existing code style
-- Create duplicate rules
-- Remove comments without understanding them
-- Commit directly to main (use feature branches)
-
-✅ **Do:**
-- Edit source files (`lists/sources/`, `userscripts/src/`)
-- Run linters after every change
-- Test incrementally
-- Match existing code patterns
-- Check for duplicate rules before adding
-- Preserve explanatory comments
-- Use descriptive branch names
-
----
+1. **Full validation** - `bun run validate`
+2. **Review changes** - `git diff`
+3. **Stage selectively** - `git add -p`
+4. **Write good messages** - Follow conventional commits
 
 ## Quick Reference
 
@@ -1100,69 +335,71 @@ mise install
 # Setup
 mise install && bun install
 
-# Development
-bun run lint                 # Check all code quality
-bun run lint:fix            # Auto-fix issues
-bun run format              # Format all code
-bun run build               # Build filter lists
-bun run build:userscripts   # Build userscripts
-bun run validate            # Full validation + build
+# Build
+bun run build                 # Filter lists
+bun run build:userscripts     # Userscripts
+bun run build:all             # Everything
 
-# Testing
-bun run test                # Lint + format check
-bun run test:ci             # CI mode (check only)
+# Quality
+bun run lint                  # Check all
+bun run lint:fix:all          # Fix all
+bun run format                # Format all
+bun run validate              # Test + build
 
-# Cleanup
-bun run clean               # Remove build artifacts
-bun run clean:all           # Nuclear clean
+# Clean
+bun run clean                 # Build artifacts
+bun run clean:all             # Everything
 ```
 
-### File Locations
+### File Paths
 
-| What | Where |
-|------|-------|
-| Filter list sources | `lists/sources/*.txt` |
+| What | Path |
+|------|------|
+| Filter sources | `lists/sources/*.txt` |
 | Userscript sources | `userscripts/src/Mine/*.user.js` |
-| Build scripts | `Scripts/*.sh`, `build-lists.sh` |
-| Configuration | Root directory (`*.json`, `*.yml`, `*.mjs`) |
-| CI workflows | `.github/workflows/*.yml` |
-| Built filter lists | `lists/releases/`, `Filters/` |
+| Build scripts | `Scripts/*.sh` |
+| Built filters | `lists/releases/`, `Filters/` |
 | Built userscripts | `dist/` |
+| Config | Root `*.json`, `*.yml`, `*.mjs` |
 
 ### Key URLs
 
-- **Repository:** https://github.com/Ven0m0/Ven0m0-Adblock
+- **Repo:** https://github.com/Ven0m0/Ven0m0-Adblock
 - **Issues:** https://github.com/Ven0m0/Ven0m0-Adblock/issues
 - **Main List:** https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/refs/heads/main/Combination.txt
 
----
+## AI Assistant Guidelines
 
-## Version History
+### DO
 
-- **v1.0** (2025-12-04) - Initial CLAUDE.md creation
+✅ Edit source files (`lists/sources/`, `userscripts/src/`)
+✅ Run linters after changes
+✅ Match existing code style
+✅ Check for duplicate rules
+✅ Preserve comments
+✅ Test builds before committing
+✅ Use feature branches
+✅ Follow conventional commits
 
----
+### DON'T
 
-## Additional Resources
+❌ Modify generated files (`dist/`, `Filters/`, `lists/releases/`)
+❌ Skip validation
+❌ Make bulk changes without testing
+❌ Ignore code style
+❌ Remove comments without understanding
+❌ Commit directly to main
+❌ Create unnecessary documentation
 
-### External Documentation
+## External Resources
 
 - [AdGuard Filters Syntax](https://adguard.com/kb/general/ad-filtering/create-own-filters/)
-- [AGLint Documentation](https://github.com/AdguardTeam/AGLint)
-- [Mise Documentation](https://mise.jdx.dev/)
-- [Bun Documentation](https://bun.sh/docs)
+- [AGLint Docs](https://github.com/AdguardTeam/AGLint)
+- [Mise Docs](https://mise.jdx.dev/)
+- [Bun Docs](https://bun.sh/docs)
 - [ESLint Flat Config](https://eslint.org/docs/latest/use/configure/configuration-files)
-- [Greasemonkey API](https://wiki.greasespot.net/Greasemonkey_Manual:API)
-
-### Related Projects
-
-- [AdGuard Filters](https://github.com/AdguardTeam/AdguardFilters)
-- [AdGuard Scriptlets](https://github.com/AdguardTeam/Scriptlets)
-- [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler)
-- [DandelionSprout's adfilt](https://github.com/DandelionSprout/adfilt)
 
 ---
 
-**Last Updated:** 2025-12-04
-**Maintained By:** Ven0m0
-**For AI Assistants:** This document is specifically designed to help AI assistants understand and work with this codebase effectively.
+**Last Updated:** 2026-02-10
+**For:** AI Agents (Claude, Gemini, Copilot, etc.)
