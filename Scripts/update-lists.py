@@ -126,8 +126,8 @@ async def process_downloaded_file(
     rule_count = sum(
       1
       for line in io.StringIO(content)
-      if line.strip()
-      and not line.strip().startswith(("! ", "#", "["))
+      if (stripped := line.strip())
+      and not stripped.startswith(("! ", "#", "["))
     )
     
     async with aiofiles.open(dest_path, mode="w", encoding="utf-8") as f:
