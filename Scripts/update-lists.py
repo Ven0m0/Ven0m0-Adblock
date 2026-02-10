@@ -9,6 +9,7 @@ import argparse
 import asyncio
 import base64
 import hashlib
+import io
 import json
 import logging
 import re
@@ -117,9 +118,9 @@ async def process_downloaded_file(
     # but let's stick to I/O optimization first.
     rule_count = sum(
       1
-      for line in content.splitlines()
-      if line.strip()
-      and not line.strip().startswith(("! ", "#", "["))
+      for line in io.StringIO(content)
+      if (stripped := line.strip())
+      and not stripped.startswith(("! ", "#", "["))
     )
     
     async with aiofiles.open(dest_path, mode="w", encoding="utf-8") as f:
