@@ -44,37 +44,30 @@ logger = logging.getLogger(__name__)
 # CHECKSUM VALIDATION
 # ============================================================================
 
-async def validate_checksum(filepath: Path) -> bool:
+def validate_checksum(content: str, name: str = "unknown") -> bool:
   """Validate Adblock Plus checksum header."""
-  try:
-    async with aiofiles.open(filepath, mode="r", encoding="utf-8") as f:
-      data = await f.read()
-  except Exception as e:
-    logger.warning(f"Failed to read {filepath.name}: {e}")
-    return False
-
   pattern = re.compile(
     r"^\s*!\s*checksum[\s\-:]+([\w\+\/=]+).*\n",
     re.MULTILINE | re.IGNORECASE,
   )
-  match = pattern.search(data)
+  match = pattern.search(content)
 
   if not match:
-    logger.debug(f"No checksum in {filepath.name} (optional)")
+    logger.debug(f"No checksum in {name} (optional)")
     return True
 
   declared_checksum = match.group(1)
-  data_no_checksum = pattern.sub("", data, 1)
+  data_no_checksum = pattern.sub("", content, 1)
   normalized = data_no_checksum.replace("\r", "").rstrip("\n") + "\n"
   computed_hash = hashlib.md5(normalized.encode("utf-8")).digest()
   computed_checksum = base64.b64encode(computed_hash).decode().rstrip("=")
 
   if declared_checksum == computed_checksum:
-    logger.info(f"✓ Checksum valid: {filepath.name}")
+    logger.info(f"✓ Checksum valid: {name}")
     return True
 
   logger.error(
-    f"✗ Checksum mismatch in {filepath.name}: "
+    f"✗ Checksum mismatch in {name}: "
     f"expected {computed_checksum}, got {declared_checksum}"
   )
   return False
@@ -105,15 +98,15 @@ async def process_downloaded_file(
   dest_path = output_dir / filename
 
   try:
+    async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
+      content = await f.read()
+
     if not skip_checksum:
-      if not await validate_checksum(temp_path):
+      if not validate_checksum(content, filename):
         logger.warning(f"Checksum validation failed for {url}")
         if temp_path.exists():
           temp_path.unlink()
         return None
-    
-    async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
-      content = await f.read()
     
     if len(content) < 100:
       logger.error(f"Downloaded file suspiciously small ({len(content)} bytes): {url}")
