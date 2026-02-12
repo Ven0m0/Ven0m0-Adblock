@@ -1,2 +1,14 @@
 ##.diysdk_webServices_banners1und1MainContent
+#qa-modal-body
+.adblock_title
+.adblock_subtitle
+.dialog-overlay
+#adblock_tooltip
+.adblock-killme-overlay
+.inactivity
+.protection
+.adblock
+.adblock__container
+.unblocker-wrapper
+.unblocker
 usgang.ch###rectangle-wrapper
