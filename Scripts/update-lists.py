@@ -20,6 +20,12 @@ from typing import Final
 import aiohttp
 import aiofiles
 
+# Import common utilities
+if str(Path(__file__).parent) not in sys.path:
+    sys.path.append(str(Path(__file__).parent))
+
+from common import sanitize_filename
+
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
@@ -76,17 +82,6 @@ def validate_checksum(content: str, name: str = "unknown") -> bool:
 # FILE OPERATIONS
 # ============================================================================
 
-def sanitize_filename(url: str, name: str | None = None) -> str:
-  """Generate safe filename from URL or provided name."""
-  if name:
-    safe = re.sub(r'[^\w\-.]', '-', name)
-    return f"{safe}.txt" if not safe.endswith('.txt') else safe
-  
-  url_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
-  domain = re.search(r'://([^/]+)', url)
-  domain_part = domain.group(1).replace('.', '-') if domain else 'list'
-  return f"{domain_part}-{url_hash}.txt"
-
 async def process_downloaded_file(
   temp_path: Path,
   url: str,
@@ -104,18 +99,14 @@ async def process_downloaded_file(
     if not skip_checksum:
       if not validate_checksum(content, filename):
         logger.warning(f"Checksum validation failed for {url}")
-        if temp_path.exists():
-          temp_path.unlink()
+        # Note: We do NOT unlink temp_path here because it might be needed by caller?
+        # No, caller handles cleanup in finally block. But here we can just return None.
         return None
     
     if len(content) < 100:
       logger.error(f"Downloaded file suspiciously small ({len(content)} bytes): {url}")
-      temp_path.unlink()
       return None
     
-    # Offload CPU-intensive task to executor if needed, but for now simple processing
-    # Using run_in_executor for the list comprehension if files are huge might be beneficial
-    # but let's stick to I/O optimization first.
     rule_count = sum(
       1
       for line in io.StringIO(content)
@@ -131,8 +122,6 @@ async def process_downloaded_file(
 
   except Exception as e:
     logger.exception(f"Error processing {url}: {e}")
-    if temp_path.exists():
-      temp_path.unlink()
     return None
 
 # ============================================================================
@@ -169,8 +158,10 @@ async def fetch_list(
         async with aiofiles.open(tmp_path, mode="wb") as f:
           async for chunk in resp.content.iter_chunked(CHUNK_SIZE):
             await f.write(chunk)
-        result = await process_downloaded_file(tmp_path, url, sanitize_filename(url, filename), output_dir, skip_checksum)
-        result = await process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
+
+        # Only call process once with the correct filename
+        safe_filename = sanitize_filename(url, filename)
+        result = await process_downloaded_file(tmp_path, url, safe_filename, output_dir, skip_checksum)
         return (url, result is not None)
       finally:
         # Ensure cleanup always
