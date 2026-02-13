@@ -542,7 +542,6 @@ giphy.com##div[class*="OpenInAppContainer"]
 gist.github.com##.gist-detail-intro
 github.com###\:rak\: > .prc-ActionList-ActionListContent-sg9-x
 github.com###funding-links-modal-JosefNemec-Playnite > .btn.btn-sm
-github.com###repos-sticky-header:style(position: static !important;)
 github.com###sticky-header-backdrop:style(position: static !important;)
 github.com##.Banner--warning
 github.com##.Box-sc-g0xbh4-0.bgyiQy.panel-content-narrow-styles.inner-panel-content-not-narrow
