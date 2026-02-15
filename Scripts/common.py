@@ -33,8 +33,6 @@ def is_adguard_rule(line: str) -> bool:
     """
     if ADGUARD_INDICATORS_REGEX.search(line):
         return True
-    # Also check if it starts with common adblock chars not in the list if needed
-    # But the list covers most.
     return False
 
 def sanitize_filename(url: str, name: str | None = None) -> str:
