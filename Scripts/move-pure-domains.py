@@ -144,10 +144,10 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
 
     for filepath, new_lines in file_updates.items():
         try:
-             with filepath.open('w', encoding='utf-8', newline='\n') as f:
-                 for line in new_lines:
-                     f.write(f"{line}\n")
-             print(f"Updated {filepath.name}")
+            with filepath.open('w', encoding='utf-8', newline='\n') as f:
+                for line in new_lines:
+                    f.write(f"{line}\n")
+            print(f"Updated {filepath.name}")
         except Exception as e:
             print(f"Error updating source file {filepath}: {e}", file=sys.stderr)
 
