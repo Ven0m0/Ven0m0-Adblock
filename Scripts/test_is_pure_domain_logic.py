@@ -1,15 +1,19 @@
-
 import unittest
+import sys
 from pathlib import Path
+import importlib
 
-# Import the module dynamically
-repo_root = Path(__file__).parent.parent
-script_path = repo_root / "Scripts" / "move-pure-domains.py"
+# Add Scripts to path
+scripts_dir = Path(__file__).parent
+if str(scripts_dir) not in sys.path:
+    sys.path.append(str(scripts_dir))
 
-module_globals = __import__('runpy').run_path(str(script_path))
+# Import ADGUARD_INDICATORS from common
+from common import ADGUARD_INDICATORS
 
-is_pure_domain = module_globals['is_pure_domain']
-ADGUARD_INDICATORS = module_globals['ADGUARD_INDICATORS']
+# Import is_pure_domain from move-pure-domains
+move_pure_domains = importlib.import_module("move-pure-domains")
+is_pure_domain = move_pure_domains.is_pure_domain
 
 class TestIsPureDomain(unittest.TestCase):
     def test_pure_domains(self):

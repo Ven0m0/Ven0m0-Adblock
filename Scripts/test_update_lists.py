@@ -104,8 +104,8 @@ class TestUpdateLists(unittest.TestCase):
         ))
 
         self.assertIsNone(result)
-        # Should unlink temp path
-        temp_path.unlink.assert_called_once()
+        # Should NOT unlink temp path (delegated to caller)
+        temp_path.unlink.assert_not_called()
         # Should call validate with content
         mock_validate.assert_called_once_with("some content", 'final.txt')
 
