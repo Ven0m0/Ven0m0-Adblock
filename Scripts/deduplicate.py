@@ -99,9 +99,6 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
     if lines is None:
         return Stats(), []
 
-    if not lines and not filepath.exists():
-        return Stats(), []
-
     headers, rules, stats = process_content(lines)
     final_content = headers + rules
 
