@@ -99,8 +99,7 @@ async def process_downloaded_file(
     if not skip_checksum:
       if not validate_checksum(content, filename):
         logger.warning(f"Checksum validation failed for {url}")
-        # Note: We do NOT unlink temp_path here because it might be needed by caller?
-        # No, caller handles cleanup in finally block. But here we can just return None.
+        # Do not delete temp_path here; the caller's finally block is responsible for cleanup.
         return None
     
     if len(content) < 100:
