@@ -38,7 +38,6 @@ def is_valid_rule(line: str) -> bool:
         return False
     if line.startswith(('||', '@@||')):
         # Extract domain part: remove || or @@||, stop at ^ or $ or options separator
-        # Original code was: domain = line.split('^')[0].lstrip('|@')
         domain = line.split('^')[0].lstrip('|@')
         return is_valid_domain(domain)
     return True
