@@ -164,10 +164,11 @@ async def fetch_list(
         return (url, result is not None)
       finally:
         # Ensure cleanup always
-        try:
-          await asyncio.to_thread(tmp_path.unlink)
-        except FileNotFoundError:
-          pass
+        if tmp_path:
+          try:
+            await asyncio.to_thread(tmp_path.unlink)
+          except FileNotFoundError:
+            pass
 
   except asyncio.TimeoutError:
     logger.error(f"✗ Timeout: {url}")
@@ -317,7 +318,7 @@ async def main() -> int:
       import subprocess
       logger.info("Running AGLint validation...")
       result = subprocess.run(
-        ["bunx", "aglint", str(output_dir / "*.txt")],
+        ["bun", "x", "aglint", str(output_dir / "*.txt")],
         capture_output=True,
         text=True,
         check=False,
