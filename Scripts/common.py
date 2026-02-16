@@ -41,8 +41,8 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
         safe = re.sub(r'[^\w\-.]', '-', name)
         return f"{safe}.txt" if not safe.endswith('.txt') else safe
 
-    url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
     domain = re.search(r'://([^/]+)', url)
+    domain_part = domain.group(1).replace('.', '-') if domain else 'list'
     # Use MD5 here for backward-compatible filename generation with the original update-lists.py.
     # This hash is for stable naming only and is not used for security purposes.
     url_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
