@@ -9,7 +9,11 @@
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
 // @run-at       document-start
+// @require      https://cdn.jsdelivr.net/npm/brotli@1.3.0/umd/browser/brotli.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/zstd/1.3.8/zstd.min.js
+// @connect      *
 // ==/UserScript==
 (() => {
   'use strict';
