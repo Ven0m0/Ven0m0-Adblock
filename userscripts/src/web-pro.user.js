@@ -13,6 +13,8 @@
 // ==/UserScript==
 (() => {
   'use strict';
+  // Reduce logging
+  console.log = console.warn = console.error = function() {};
   const C = {
     KEY: "ven0m0.webpro.v4.optimized",
     CACHE: {
