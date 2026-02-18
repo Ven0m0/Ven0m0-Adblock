@@ -318,7 +318,7 @@ async def main() -> int:
       import subprocess
       logger.info("Running AGLint validation...")
       result = subprocess.run(
-        ["bunx", "aglint", str(output_dir / "*.txt")],
+        ["bun", "x", "aglint", str(output_dir / "*.txt")],
         capture_output=True,
         text=True,
         check=False,
