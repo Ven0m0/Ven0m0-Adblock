@@ -1,12 +1,18 @@
 // ==UserScript==
-// @name        Web Pro (Compact)
-// @namespace   Ven0m0
-// @homepageURL https://github.com/Ven0m0/Ven0m0-Adblock
-// @match       *://*/*
-// @grant       none
-// @run-at      document-start
+// @name         Web Pro (Compact)
+// @author       Ven0m0
+// @namespace    http://tampermonkey.net/
+// @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
+// @match        *://*/*
+// @grant        GM_addStyle
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_registerMenuCommand
+// @grant        GM_xmlhttpRequest
+// @run-at       document-start
 // ==/UserScript==
 (() => {
+  'use strict';
   const C = {
     KEY: "ven0m0.webpro.v4.optimized",
     CACHE: {
