@@ -15,22 +15,14 @@ class TestIsPureDomain(unittest.TestCase):
             "www.example.com",
             "sub.example.com",
             "test.co.uk",
-            "very.long.domain.name.with.many.parts.org"
-        ]
-        for domain in valid_domains:
-            with self.subTest(domain=domain):
-                self.assertTrue(is_pure_domain(domain), f"Should be True: {domain}")
-
-    def test_currently_rejected_domains(self):
-        # These SHOULD be valid but are rejected by the current regex
-        rejected_domains = [
+            "very.long.domain.name.with.many.parts.org",
             "example.com",
             "a-b.com",
             "123.com",
         ]
-        for domain in rejected_domains:
+        for domain in valid_domains:
             with self.subTest(domain=domain):
-                self.assertFalse(is_pure_domain(domain), f"Should be False (current limitation): {domain}")
+                self.assertTrue(is_pure_domain(domain), f"Should be True: {domain}")
 
     def test_adguard_syntax(self):
         invalid_lines = [

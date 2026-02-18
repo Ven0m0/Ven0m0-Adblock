@@ -17,8 +17,8 @@ is_pure_domain = move_pure_domains.is_pure_domain
 
 class TestIsPureDomain(unittest.TestCase):
     def test_pure_domains(self):
-        # Valid pure domains (current regex requires at least 2 dots, e.g. sub.example.com)
-        # self.assertTrue(is_pure_domain('example.com')) # Currently False in codebase
+        # Valid pure domains
+        self.assertTrue(is_pure_domain('example.com'))
         self.assertTrue(is_pure_domain('sub.example.com'))
         self.assertTrue(is_pure_domain('valid-domain.co.uk'))
         self.assertTrue(is_pure_domain('abc.123.net'))
@@ -45,7 +45,6 @@ class TestIsPureDomain(unittest.TestCase):
         # Invalid domain format but no indicators
         self.assertFalse(is_pure_domain('invalid_domain.com')) # underscore not allowed
         self.assertFalse(is_pure_domain('example')) # No TLD
-        self.assertFalse(is_pure_domain('example.com')) # Regex requires 2 dots (bug/feature preserved)
         self.assertFalse(is_pure_domain('-example.com'))
 
     def test_complex_rules(self):

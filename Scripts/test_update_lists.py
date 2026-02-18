@@ -8,6 +8,10 @@ import hashlib
 import base64
 
 # Import the target module
+# Mock missing dependencies
+sys.modules["aiohttp"] = MagicMock()
+sys.modules["aiofiles"] = MagicMock()
+
 spec = importlib.util.spec_from_file_location("update_lists", "Scripts/update-lists.py")
 update_lists = importlib.util.module_from_spec(spec)
 sys.modules["update_lists"] = update_lists
