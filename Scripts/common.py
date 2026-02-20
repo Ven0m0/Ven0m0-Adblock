@@ -66,6 +66,6 @@ def write_lines(filepath: Path, lines: list[str], mode: str = 'w') -> bool:
             for line in lines:
                 f.write(f"{line}\n")
         return True
-    except Exception as e:
+    except (OSError, UnicodeError) as e:
         print(f"  Error writing {filepath}: {e}", file=sys.stderr)
         return False
