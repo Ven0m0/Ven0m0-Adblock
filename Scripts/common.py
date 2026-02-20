@@ -55,7 +55,7 @@ def read_lines(filepath: Path) -> list[str] | None:
     try:
         with filepath.open('r', encoding='utf-8') as f:
             return [line.rstrip() for line in f]
-    except Exception as e:
+    except (OSError, UnicodeError) as e:
         print(f"  Error reading {filepath}: {e}", file=sys.stderr)
         return None
 
