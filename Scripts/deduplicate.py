@@ -16,7 +16,7 @@ from collections.abc import Iterable
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import is_valid_domain
+from common import is_valid_domain, read_lines, write_lines
 
 @dataclass(slots=True)
 class Stats:
@@ -43,7 +43,7 @@ def is_valid_rule(line: str) -> bool:
         return is_valid_domain(domain)
     return True
 
-def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
+def process_content(lines: list[str]) -> tuple[list[str], list[str], Stats]:
     """Process lines to separate headers and rules, and deduplicate rules."""
     stats = Stats()
     headers = []
@@ -72,17 +72,6 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     stats.removed = stats.original - stats.final
 
     return headers, rules, stats
-
-def write_lines(filepath: Path, lines: list[str]) -> bool:
-    """Write lines to file."""
-    try:
-        with filepath.open('w', encoding='utf-8', newline='\n') as f:
-            for line in lines:
-                f.write(f"{line}\n")
-        return True
-    except Exception as e:
-        print(f"  Error writing {filepath}: {e}", file=sys.stderr)
-        return False
 
 def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
     """Deduplicate entries in a single file"""
