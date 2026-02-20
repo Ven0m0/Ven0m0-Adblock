@@ -1,0 +1,12 @@
+[project]
+name = "ven0m0-adblock"
+version = "1.0.0"
+description = "Ad-blocking filter list utilities"
+requires-python = ">=3.13"
+dependencies = [
+  "aiohttp>=3.13.3",
+  "aiofiles>=25.1.0",
+]
+
+[tool.uv]
+managed = true
