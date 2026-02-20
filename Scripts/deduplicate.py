@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 from dataclasses import dataclass
+from collections.abc import Iterable
 
 # Add current directory to path to allow importing common if run from elsewhere
 if str(Path(__file__).parent) not in sys.path:
@@ -44,13 +45,14 @@ def is_valid_rule(line: str) -> bool:
 
 def process_content(lines: list[str]) -> tuple[list[str], list[str], Stats]:
     """Process lines to separate headers and rules, and deduplicate rules."""
-    stats = Stats(original=len(lines))
+    stats = Stats()
     headers = []
     rules = []
     seen = set()
     in_header = True
   
     for line in lines:
+        stats.original += 1
         if not line:
             if in_header:
                 headers.append('')
@@ -75,11 +77,14 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
     """Deduplicate entries in a single file"""
     print(f"Processing: {filepath}")
 
-    lines = read_lines(filepath)
-    if lines is None:
+    try:
+        with filepath.open('r', encoding='utf-8') as f:
+            lines_gen = (line.rstrip() for line in f)
+            headers, rules, stats = process_content(lines_gen)
+    except Exception as e:
+        print(f"  Error reading {filepath}: {e}", file=sys.stderr)
         return Stats(), []
 
-    headers, rules, stats = process_content(lines)
     final_content = headers + rules
 
     if write_lines(filepath, final_content):
