@@ -159,8 +159,7 @@ async def fetch_list(
             await f.write(chunk)
 
         # Only call process once with the correct filename
-        safe_filename = sanitize_filename(url, filename)
-        result = await process_downloaded_file(tmp_path, url, safe_filename, output_dir, skip_checksum)
+        result = await process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
         return (url, result is not None)
       finally:
         # Ensure cleanup always
