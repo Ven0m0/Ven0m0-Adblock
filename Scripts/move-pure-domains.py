@@ -11,7 +11,7 @@ from collections import defaultdict
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import is_valid_domain, is_adguard_rule, read_lines, write_lines
+from common import is_valid_domain
 
 def is_pure_domain(line: str) -> bool:
     """Check if a line is a pure domain without AdGuard syntax"""
@@ -21,9 +21,6 @@ def is_pure_domain(line: str) -> bool:
     if not line or line.startswith(('!', '#', '[', ';', '|', '@', '$', '^', '*', ']', '~')):
         return False
 
-    # Check for AdGuard syntax indicators
-    if is_adguard_rule(line):
-        return False
 
     # Validate as domain
     return is_valid_domain(line)
