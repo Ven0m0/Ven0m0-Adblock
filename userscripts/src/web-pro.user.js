@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         Web Pro
 // @author       Ven0m0
-// @namespace    https://violentmonkey.github.io/
+// @namespace    http://tampermonkey.net/
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // @version      6.0.0
-// @description  Universal web optimizer: lazy load, URL cleaning, CPU/RAF tamer, network, privacy, perf features.
+// @description  Universal web optimizer: lazy load, URL cleaning, CPU/RAF tamer, network,
+//               privacy, perf features. Merges: Web Pro, Web Performance Optimizer,
+//               Speed up Google Captcha.
 // @match        *://*/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
 // @grant        GM_addStyle
