@@ -82,6 +82,15 @@ def validate_checksum(content: str, name: str = "unknown") -> bool:
 # FILE OPERATIONS
 # ============================================================================
 
+def count_rules(content: str) -> int:
+  """Count active rules in the content."""
+  return sum(
+    1
+    for line in io.StringIO(content)
+    if (stripped := line.strip())
+    and not stripped.startswith(("! ", "#", "["))
+  )
+
 async def process_downloaded_file(
   temp_path: Path,
   url: str,
@@ -97,7 +106,9 @@ async def process_downloaded_file(
       content = await f.read()
 
     if not skip_checksum:
-      if not validate_checksum(content, filename):
+      # Offload CPU-bound checksum validation to a thread
+      is_valid = await asyncio.to_thread(validate_checksum, content, filename)
+      if not is_valid:
         logger.warning(f"Checksum validation failed for {url}")
         # Do not delete temp_path here; the caller's finally block is responsible for cleanup.
         return None
@@ -106,12 +117,8 @@ async def process_downloaded_file(
       logger.error(f"Downloaded file suspiciously small ({len(content)} bytes): {url}")
       return None
     
-    rule_count = sum(
-      1
-      for line in io.StringIO(content)
-      if (stripped := line.strip())
-      and not stripped.startswith(("! ", "#", "["))
-    )
+    # Offload CPU-bound rule counting to a thread
+    rule_count = await asyncio.to_thread(count_rules, content)
     
     async with aiofiles.open(dest_path, mode="w", encoding="utf-8") as f:
       await f.write(content)
