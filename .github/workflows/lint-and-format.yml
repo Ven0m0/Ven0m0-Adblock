@@ -126,10 +126,10 @@ jobs:
           install: true
           cache: true
       - name: Run ShellCheck
-        run: mise exec -- shellcheck Scripts/*.sh build-lists.sh
+        run: mise exec -- shellcheck Scripts/*.sh
         continue-on-error: true
       - name: Run shfmt
-        run: mise exec -- shfmt -d -i2 -bn -s -ln bash *.sh
+        run: mise exec -- shfmt -d -i2 -bn -s -ln bash Scripts/*.sh
         continue-on-error: true
   summary:
     name: Lint Summary

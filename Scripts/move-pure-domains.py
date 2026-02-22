@@ -61,11 +61,8 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
     for adblock_file in sorted(adblock_dir.glob('*.txt')):
         print(f"Scanning: {adblock_file.name}")
 
-        try:
-            with adblock_file.open('r', encoding='utf-8') as f:
-                lines = [line.rstrip() for line in f]
-        except Exception as e:
-            print(f"  Error reading: {e}", file=sys.stderr)
+        lines = read_lines(adblock_file)
+        if lines is None:
             continue
 
         pure_domains = []
@@ -109,44 +106,31 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
         # Read existing hostlist
         existing_domains = set()
         if target_path.exists():
-            try:
-                with target_path.open('r', encoding='utf-8') as f:
-                    for line in f:
-                        stripped = line.strip()
-                        # Only track pure domains, not regex patterns
-                        if stripped and is_valid_domain(stripped):
-                            existing_domains.add(stripped)
-            except Exception as e:
-                print(f"Error reading {target_file}: {e}", file=sys.stderr)
-                # Skip appending to this file if we can't read it (safety)
+            lines = read_lines(target_path)
+            if lines is None:
                 continue
+            for line in lines:
+                stripped = line.strip()
+                # Only track pure domains, not regex patterns
+                if stripped and is_valid_domain(stripped):
+                    existing_domains.add(stripped)
 
         # Filter out duplicates
         new_domains = [d for d in all_domains if d not in existing_domains]
 
         if new_domains:
             # Append new domains
-            try:
-                with target_path.open('a', encoding='utf-8', newline='\n') as f:
-                    for domain in sorted(new_domains):
-                        f.write(f"{domain}\n")
+            if write_lines(target_path, sorted(new_domains), mode='a'):
                 total_moved += len(new_domains)
                 print(f"Appended {len(new_domains)} domains to {target_file}")
-            except Exception as e:
-                print(f"Error writing to {target_file}: {e}", file=sys.stderr)
 
     print("\n" + "="*60)
     print("Updating source adblock files")
     print("="*60 + "\n")
 
     for filepath, new_lines in file_updates.items():
-        try:
-            with filepath.open('w', encoding='utf-8', newline='\n') as f:
-                for line in new_lines:
-                    f.write(f"{line}\n")
+        if write_lines(filepath, new_lines):
             print(f"Updated {filepath.name}")
-        except Exception as e:
-            print(f"Error updating source file {filepath}: {e}", file=sys.stderr)
 
     return total_moved
 
