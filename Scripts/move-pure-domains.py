@@ -54,25 +54,26 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
         domain_moves: dict[target_hostlist_file][source_file] -> list[domains]
         file_updates: dict[filepath] -> list[str] (new content for source file)
     """
-    domain_moves = defaultdict(lambda: defaultdict(list))
+    domain_moves: defaultdict[str, defaultdict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
     file_updates = {}
 
     # sorted glob for consistent order
     for adblock_file in sorted(adblock_dir.glob('*.txt')):
         print(f"Scanning: {adblock_file.name}")
-
-        lines = read_lines(adblock_file)
-        if lines is None:
-            continue
-
         pure_domains = []
         filter_rules = []
 
-        for line in lines:
-            if is_pure_domain(line):
-                pure_domains.append(line.strip())
-            else:
-                filter_rules.append(line)
+        try:
+            with adblock_file.open("r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.rstrip()
+                    if is_pure_domain(line):
+                        pure_domains.append(line.strip())
+                    else:
+                        filter_rules.append(line)
+        except Exception as e:
+            print(f"  Error reading: {e}", file=sys.stderr)
+            continue
 
         if pure_domains:
             print(f"  Found {len(pure_domains)} pure domains")
