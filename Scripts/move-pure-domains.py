@@ -57,7 +57,7 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
         domain_moves: dict[target_hostlist_file][source_file] -> list[domains]
         file_updates: dict[filepath] -> list[str] (new content for source file)
     """
-    domain_moves: dict = defaultdict(lambda: defaultdict(list))
+    domain_moves: defaultdict[str, defaultdict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
     file_updates = {}
 
     # sorted glob for consistent order
