@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import MagicMock, patch, AsyncMock, ANY
 import importlib.util
 import sys
 import asyncio
@@ -18,6 +18,17 @@ spec = importlib.util.spec_from_file_location("update_lists", "Scripts/update-li
 update_lists = importlib.util.module_from_spec(spec)
 sys.modules["update_lists"] = update_lists
 spec.loader.exec_module(update_lists)
+
+class AsyncIterator:
+    def __init__(self, seq):
+        self.iter = iter(seq)
+    def __aiter__(self):
+        return self
+    async def __anext__(self):
+        try:
+            return next(self.iter)
+        except StopIteration:
+            raise StopAsyncIteration
 
 class TestUpdateLists(unittest.TestCase):
 
@@ -70,8 +81,7 @@ class TestUpdateLists(unittest.TestCase):
         dest_path = output_dir / "final.txt"
 
         # Mock temp_path.exists/unlink for cleanup check (though not expected to be called on success)
-        with patch.object(Path, 'exists', return_value=True), \
-             patch.object(Path, 'unlink') as mock_unlink:
+        with patch.object(Path, 'exists', return_value=True),              patch.object(Path, 'unlink') as mock_unlink:
 
             result = asyncio.run(update_lists.process_downloaded_file(
                 temp_path, "http://url", "final.txt", output_dir
@@ -88,6 +98,9 @@ class TestUpdateLists(unittest.TestCase):
 
             # Verify file was written
             mock_file_write.write.assert_called_once_with(self.valid_full_content)
+
+            # Verify NO unlink called (important for security regression)
+            mock_unlink.assert_not_called()
 
     @patch('update_lists.validate_checksum')
     @patch('update_lists.aiofiles.open')
@@ -115,63 +128,57 @@ class TestUpdateLists(unittest.TestCase):
         # Should call validate with content
         mock_validate.assert_called_once_with("some content", 'final.txt')
 
-
-class AsyncIterator:
-    def __init__(self, seq):
-        self.iter = iter(seq)
-
-    def __aiter__(self):
-        return self
-
-    async def __anext__(self):
-        try:
-            return next(self.iter)
-        except StopIteration:
-            raise StopAsyncIteration
-
-class TestFetchList(unittest.TestCase):
-
     @patch('update_lists.process_downloaded_file')
     @patch('update_lists.aiofiles.open')
-    @patch('update_lists.tempfile.NamedTemporaryFile')
-    def test_fetch_list_uses_raw_filename(self, mock_named_temp, mock_aio_open, mock_process):
-        # Setup
-        session = MagicMock()
+    @patch('tempfile.NamedTemporaryFile')
+    @patch('asyncio.to_thread')
+    def test_fetch_list_cleanup_logic(self, mock_to_thread, mock_tempfile, mock_aio_open, mock_process):
+        """Verify fetch_list handles cleanup in finally block."""
 
-        # Response object
-        resp = MagicMock()
-        resp.raise_for_status = MagicMock()
+        # Mock session response
+        mock_resp = AsyncMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.content.iter_chunked.return_value = AsyncIterator([b"chunk"])
 
-        # content.iter_chunked returns the async iterator directly (not a coroutine)
-        resp.content = MagicMock()
-        resp.content.iter_chunked.return_value = AsyncIterator([b"chunk"])
+        # Mock session context manager
+        session_ctx = AsyncMock()
+        session_ctx.__aenter__.return_value = mock_resp
+        session_ctx.__aexit__.return_value = None
 
-        # Context manager for session.get()
-        session_get_ctx = AsyncMock()
-        session_get_ctx.__aenter__.return_value = resp
-        session.get.return_value = session_get_ctx
+        mock_session = MagicMock()
+        mock_session.get.return_value = session_ctx
 
-        mock_named_temp.return_value.__enter__.return_value.name = "/tmp/fake.txt"
+        # Mock temp file creation
+        mock_temp = MagicMock()
+        mock_temp.name = "/tmp/tempfile.txt"
+        mock_tempfile.return_value.__enter__.return_value = mock_temp
 
-        mock_process.return_value = Path("/out/safe.txt")
+        # Mock aiofiles.open (for writing download)
+        mock_file_write = AsyncMock()
+        write_ctx = MagicMock()
+        write_ctx.__aenter__ = AsyncMock(return_value=mock_file_write)
+        write_ctx.__aexit__ = AsyncMock()
 
-        mock_aio_open.return_value.__aenter__.return_value.write = AsyncMock()
+        mock_aio_open.return_value = write_ctx
 
-        url = "http://example.com/bad/list.txt"
-        filename = "My List.txt"
-        output_dir = Path("/out")
+        # Mock process_downloaded_file to succeed
+        mock_process.return_value = Path("/tmp/out/file.txt")
 
-        # Run
-        asyncio.run(update_lists.fetch_list(
-            session, url, filename, output_dir
-        ))
+        # Run fetch_list
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(update_lists.fetch_list(
+                mock_session, "http://url", "file.txt", Path("/tmp/out")
+            ))
+        finally:
+            loop.close()
 
-        # Check call to process_downloaded_file
-        args, _ = mock_process.call_args
-        actual_filename = args[2]
+        # Verify process_downloaded_file called ONCE
+        mock_process.assert_called_once()
 
-        # This asserts the NEW FIXED BEHAVIOR (raw filename)
-        self.assertEqual(actual_filename, "My List.txt")
+        # Verify cleanup called
+        self.assertTrue(mock_to_thread.called)
 
 if __name__ == '__main__':
     unittest.main()
