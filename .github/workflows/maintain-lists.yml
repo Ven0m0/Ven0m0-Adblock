@@ -34,7 +34,7 @@ jobs:
             echo "submodules_updated=true" >> "$GITHUB_ENV"
             git add . gitmodules *
             git config user.name "github-actions[bot]"
-            git config user. email "41898282+github-actions[bot]@users.noreply.github.com"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git commit -m "chore: update submodules" || true
           fi
       - name: Setup Bun
@@ -48,7 +48,7 @@ jobs:
       - name: Remove dead domains
         continue-on-error: true
         run: |
-          dead-domains-linter -a -i "*. txt" --exclude "Lists-todo.txt" || :
+          dead-domains-linter -a -i "*.txt" --exclude "Lists-todo.txt" || :
       - name: Deduplicate files
         continue-on-error: true
         run: |
@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
         run: |
           invalid=0
-          for f in $(find . -type f -name '*. txt' ! -path '*/\.*' ! -name 'Lists-todo.txt'); do
+          for f in $(find . -type f -name '*.txt' ! -path '*/\.*' ! -name 'Lists-todo.txt'); do
             if grep -Ev '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\. )+[a-zA-Z]{2,}$|^$' "$f" &>/dev/null; then
               echo "Invalid entries in: $f"; ((invalid++))
             fi
@@ -91,23 +91,23 @@ jobs:
         if: steps.changelog.outputs.changed == 'true'
         continue-on-error: true
         run: |
-          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github. com"
+          git config user.name "github-actions[bot]"; git config user.email "github-actions[bot]@users.noreply.github.com"
           printf -v date '%(%Y-%m-%d)T' -1
           git commit -m "chore: maintain lists ${date}
           - Removed ${{ steps.changelog.outputs.dels }} dead/duplicate domains
-          - Added ${{ steps.changelog.outputs. adds }} new entries
-          - Processed ${{ steps.changelog.outputs. files }} files"
+          - Added ${{ steps.changelog.outputs.adds }} new entries
+          - Processed ${{ steps.changelog.outputs.files }} files"
           git push
       - name: Create release
-        if: steps.changelog. outputs.changed == 'true'
+        if: steps.changelog.outputs.changed == 'true'
         continue-on-error: true
         run: |
-          printf -v tag 'v%(%Y. %m.%d-%H%M)T' -1
+          printf -v tag 'v%(%Y.%m.%d-%H%M)T' -1
           printf -v date '%(%Y-%m-%d)T' -1
           gh release create "$tag" \
             --title "Lists Update ${date}" \
             --notes "## 📊 Automated Maintenance
-          - **Files:** ${{ steps.changelog.outputs. files }} updated
+          - **Files:** ${{ steps.changelog.outputs.files }} updated
           - **Added:** ${{ steps.changelog.outputs.adds }} entries
           - **Removed:** ${{ steps.changelog.outputs.dels }} entries
           - **Dead domains:** Removed via linter
@@ -122,9 +122,9 @@ jobs:
         run: |
           echo "## 🎯 Maintenance Report" >> "$GITHUB_STEP_SUMMARY"
           if [[ "${{ steps.changelog.outputs.changed }}" == "true" ]]; then
-            echo "✅ **Updated** ${{ steps.changelog.outputs. files }} files" >> "$GITHUB_STEP_SUMMARY"
-            echo "- Added: ${{ steps.changelog.outputs. adds }}" >> "$GITHUB_STEP_SUMMARY"
-            echo "- Removed: ${{ steps. changelog.outputs.dels }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ **Updated** ${{ steps.changelog.outputs.files }} files" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Added: ${{ steps.changelog.outputs.adds }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Removed: ${{ steps.changelog.outputs.dels }}" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "ℹ️ No changes required" >> "$GITHUB_STEP_SUMMARY"
           fi

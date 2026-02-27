@@ -9,7 +9,7 @@ on:
       - "hostlist-config.json"
       - "configuration_popup_filter.json"
       - "ragibkl-config.json"
-      - "build-lists.sh"
+      - "Scripts/build.sh"
       - "mise.toml"
   workflow_dispatch:
   schedule:
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload artifacts
         if: steps.compile.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: adguard-filters
           path: Filters/*.txt
@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload artifacts
         if: steps.compile.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ragibkl-filters
           path: Filters/Ragibkl-Combined.txt
@@ -165,7 +165,7 @@ jobs:
     name: Build Custom Lists
     runs-on: ubuntu-latest
     needs: lint
-    if: hashFiles('build-lists.sh') != ''
+    if: hashFiles('Scripts/build.sh') != ''
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -181,16 +181,16 @@ jobs:
 
       - name: Run build script
         run: |
-          chmod +x build-lists.sh
-          mise exec -- ./build-lists.sh
+          chmod +x Scripts/build.sh
+          mise exec -- ./Scripts/build.sh adblock hosts hostlist
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: custom-filters
           path: lists/releases/*.txt
           retention-days: 30
-s
+
   commit:
     name: Commit Changes
     runs-on: ubuntu-slim
@@ -208,7 +208,7 @@ s
 
       - name: Download AdGuard artifacts
         if: needs.build-adguard.result == 'success'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: adguard-filters
           path: Filters/
@@ -216,7 +216,7 @@ s
 
       - name: Download Ragibkl artifacts
         if: needs.build-ragibkl.result == 'success'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ragibkl-filters
           path: Filters/
@@ -224,7 +224,7 @@ s
 
       - name: Download custom artifacts
         if: needs.build-custom.result == 'success'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: custom-filters
           path: lists/releases/

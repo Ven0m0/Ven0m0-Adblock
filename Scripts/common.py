@@ -1,6 +1,8 @@
 """
 Common utilities and constants for Ven0m0-Adblock scripts.
 """
+import sys
+from pathlib import Path
 import re
 import hashlib
 from typing import Final
@@ -47,3 +49,23 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
     domain = re.search(r'://([^/]+)', url)
     domain_part = domain.group(1).replace('.', '-') if domain else 'list'
     return f"{domain_part}-{url_hash}.txt"
+
+def read_lines(filepath: Path) -> list[str] | None:
+    """Read lines from file. Returns None on error."""
+    try:
+        with filepath.open('r', encoding='utf-8') as f:
+            return [line.rstrip() for line in f]
+    except (OSError, UnicodeError) as e:
+        print(f"  Error reading {filepath}: {e}", file=sys.stderr)
+        return None
+
+def write_lines(filepath: Path, lines: list[str], mode: str = 'w') -> bool:
+    """Write lines to file. Returns True on success."""
+    try:
+        with filepath.open(mode, encoding='utf-8', newline='\n') as f:
+            for line in lines:
+                f.write(f"{line}\n")
+        return True
+    except (OSError, UnicodeError) as e:
+        print(f"  Error writing {filepath}: {e}", file=sys.stderr)
+        return False
