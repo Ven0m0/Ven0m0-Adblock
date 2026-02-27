@@ -9,7 +9,9 @@ import base64
 
 # Import the target module
 # Mock missing dependencies
-sys.modules["aiohttp"] = MagicMock()
+aiohttp_mock = MagicMock()
+aiohttp_mock.ClientError = Exception
+sys.modules["aiohttp"] = aiohttp_mock
 sys.modules["aiofiles"] = MagicMock()
 
 spec = importlib.util.spec_from_file_location("update_lists", "Scripts/update-lists.py")
@@ -112,6 +114,64 @@ class TestUpdateLists(unittest.TestCase):
         temp_path.unlink.assert_not_called()
         # Should call validate with content
         mock_validate.assert_called_once_with("some content", 'final.txt')
+
+
+class AsyncIterator:
+    def __init__(self, seq):
+        self.iter = iter(seq)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            return next(self.iter)
+        except StopIteration:
+            raise StopAsyncIteration
+
+class TestFetchList(unittest.TestCase):
+
+    @patch('update_lists.process_downloaded_file')
+    @patch('update_lists.aiofiles.open')
+    @patch('update_lists.tempfile.NamedTemporaryFile')
+    def test_fetch_list_uses_raw_filename(self, mock_named_temp, mock_aio_open, mock_process):
+        # Setup
+        session = MagicMock()
+
+        # Response object
+        resp = MagicMock()
+        resp.raise_for_status = MagicMock()
+
+        # content.iter_chunked returns the async iterator directly (not a coroutine)
+        resp.content = MagicMock()
+        resp.content.iter_chunked.return_value = AsyncIterator([b"chunk"])
+
+        # Context manager for session.get()
+        session_get_ctx = AsyncMock()
+        session_get_ctx.__aenter__.return_value = resp
+        session.get.return_value = session_get_ctx
+
+        mock_named_temp.return_value.__enter__.return_value.name = "/tmp/fake.txt"
+
+        mock_process.return_value = Path("/out/safe.txt")
+
+        mock_aio_open.return_value.__aenter__.return_value.write = AsyncMock()
+
+        url = "http://example.com/bad/list.txt"
+        filename = "My List.txt"
+        output_dir = Path("/out")
+
+        # Run
+        asyncio.run(update_lists.fetch_list(
+            session, url, filename, output_dir
+        ))
+
+        # Check call to process_downloaded_file
+        args, _ = mock_process.call_args
+        actual_filename = args[2]
+
+        # This asserts the NEW FIXED BEHAVIOR (raw filename)
+        self.assertEqual(actual_filename, "My List.txt")
 
 if __name__ == '__main__':
     unittest.main()

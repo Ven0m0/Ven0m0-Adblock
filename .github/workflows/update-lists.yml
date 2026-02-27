@@ -41,13 +41,12 @@ jobs:
           version: "latest"
           enable-cache: true
           github-token: ${{ github.token || secrets.PAT }}
-      - run: |
-          uv pip install --system -r requirements.txt
+      - run: uv sync
       - name: Run update script
         id: update
         run: |
           set -e; mkdir -p lists/mirror
-          python3 -OO Scripts/update-adlists.py --output-dir lists/mirror --max-concurrent 8
+          uv run python3 -OO Scripts/update-lists.py --output-dir lists/mirror --max-concurrent 8
       - name: Run dead domains linter
         if: success()
         continue-on-error: true
@@ -60,7 +59,7 @@ jobs:
       - name:  Setup Git branch
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply. github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-branches origin adlists-mirror || : 
           git fetch --depth=1 -nq origin adlists-mirror || git checkout -b adlists-mirror
       - name: Commit changes
