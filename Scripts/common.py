@@ -61,11 +61,28 @@ def read_lines(filepath: Path) -> list[str] | None:
 
 def write_lines(filepath: Path, lines: list[str], mode: str = 'w') -> bool:
     """Write lines to file. Returns True on success."""
+    import tempfile
+    import os
     try:
-        with filepath.open(mode, encoding='utf-8', newline='\n') as f:
-            for line in lines:
-                f.write(f"{line}\n")
-        return True
+        if mode == 'a':
+            with filepath.open(mode, encoding='utf-8', newline='\n') as f:
+                for line in lines:
+                    f.write(f"{line}\n")
+            return True
+
+        # Write to a temporary file in the same directory to ensure atomic replace
+        # handles cross-device link issues
+        fd, temp_path = tempfile.mkstemp(dir=filepath.parent, text=True)
+        try:
+            with open(fd, 'w', encoding='utf-8', newline='\n') as f:
+                for line in lines:
+                    f.write(f"{line}\n")
+
+            os.replace(temp_path, filepath)
+            return True
+        except Exception:
+            os.unlink(temp_path)
+            raise
     except (OSError, UnicodeError) as e:
         print(f"  Error writing {filepath}: {e}", file=sys.stderr)
         return False

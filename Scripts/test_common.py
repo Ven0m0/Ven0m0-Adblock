@@ -40,5 +40,30 @@ class TestCommon(unittest.TestCase):
         self.assertTrue(is_adguard_rule("! comment"))
         self.assertFalse(is_adguard_rule("example.com"))
 
+    def test_write_lines_atomic(self):
+        import tempfile
+        import os
+        from common import write_lines
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+            target_file = temp_dir_path / "target.txt"
+
+            # Test write
+            result = write_lines(target_file, ["line1", "line2"])
+            self.assertTrue(result)
+            self.assertTrue(target_file.exists())
+            self.assertEqual(target_file.read_text(encoding='utf-8'), "line1\nline2\n")
+
+            # Test atomic overwrite
+            result = write_lines(target_file, ["line3", "line4"])
+            self.assertTrue(result)
+            self.assertEqual(target_file.read_text(encoding='utf-8'), "line3\nline4\n")
+
+            # Test append
+            result = write_lines(target_file, ["line5"], mode='a')
+            self.assertTrue(result)
+            self.assertEqual(target_file.read_text(encoding='utf-8'), "line3\nline4\nline5\n")
+
 if __name__ == '__main__':
     unittest.main()
