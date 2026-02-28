@@ -10,5 +10,5 @@
 !#include Other.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
-!#include antiadblock.txt
 !#include Youtube.txt
+!#include antiadblock.txt
