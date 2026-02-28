@@ -11,7 +11,7 @@ from collections import defaultdict
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import is_valid_domain
+from common import is_valid_domain, read_lines, write_lines
 
 def is_pure_domain(line: str) -> bool:
     """Check if a line is a pure domain without AdGuard syntax"""
