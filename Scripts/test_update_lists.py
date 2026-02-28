@@ -180,5 +180,22 @@ class TestUpdateLists(unittest.TestCase):
         # Verify cleanup called
         self.assertTrue(mock_to_thread.called)
 
+
+    @patch('update_lists.aiofiles.open')
+    def test_process_downloaded_file_exception(self, mock_aio_open):
+        """Verify exception handling and temp file cleanup when an error occurs."""
+        mock_aio_open.side_effect = Exception("Mocked I/O error")
+
+        temp_path = MagicMock(spec=Path)
+        temp_path.exists.return_value = True
+
+        result = asyncio.run(update_lists.process_downloaded_file(
+            temp_path, "http://url", "final.txt", Path("/tmp/out")
+        ))
+
+        self.assertIsNone(result)
+        temp_path.exists.assert_called_once()
+        temp_path.unlink.assert_called_once()
+
 if __name__ == '__main__':
     unittest.main()
