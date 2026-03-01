@@ -128,6 +128,8 @@ async def process_downloaded_file(
 
   except Exception as e:
     logger.exception(f"Error processing {url}: {e}")
+    if temp_path.exists():
+      temp_path.unlink()
     return None
 
 # ============================================================================

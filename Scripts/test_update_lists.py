@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch, AsyncMock, ANY
 import importlib.util
 import sys
+import json
 import asyncio
 from pathlib import Path
 import hashlib
