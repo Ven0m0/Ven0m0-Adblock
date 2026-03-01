@@ -52,7 +52,7 @@ process(){
   if [[ -n $awk_cmd ]]; then
     local tmp
     tmp=$(mktemp)
-    cleanup_add "rm -f $tmp"
+    cleanup_add rm -f "$tmp"
     awk "$awk_cmd" "$NEW_NAME" > "$tmp" && mv "$tmp" "$NEW_NAME"
     ok "Processed"
   fi
