@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 import re
 import hashlib
+import os
+import tempfile
 from typing import Final
 
 # Regex to match pure domain names (basic validation)
@@ -62,10 +64,39 @@ def read_lines(filepath: Path) -> list[str] | None:
 def write_lines(filepath: Path, lines: list[str], mode: str = 'w') -> bool:
     """Write lines to file. Returns True on success."""
     try:
-        with filepath.open(mode, encoding='utf-8', newline='\n') as f:
-            for line in lines:
-                f.write(f"{line}\n")
-        return True
+        if mode == 'w':
+            dir_path = filepath.parent
+            if dir_path.exists():
+                # Use mkstemp instead of NamedTemporaryFile to avoid permission issues
+                fd, tmp_path = tempfile.mkstemp(dir=dir_path, prefix=".tmp_")
+                try:
+                    with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as f:
+                        for line in lines:
+                            f.write(f"{line}\n")
+                    os.replace(tmp_path, filepath)
+                    return True
+                except Exception:
+                    try:
+                        os.close(fd)
+                    except OSError:
+                        pass
+                    try:
+                        os.unlink(tmp_path)
+                except (OSError, UnicodeError) as e:
+                    os.unlink(tmp_path)
+                    print(f"  Error writing temporary file for {filepath}: {e}", file=sys.stderr)
+                    raise
+            else:
+                # Fallback if dir doesn't exist yet, though it should
+                with filepath.open(mode, encoding='utf-8', newline='\n') as f:
+                    for line in lines:
+                        f.write(f"{line}\n")
+                return True
+        else:
+            with filepath.open(mode, encoding='utf-8', newline='\n') as f:
+                for line in lines:
+                    f.write(f"{line}\n")
+            return True
     except (OSError, UnicodeError) as e:
         print(f"  Error writing {filepath}: {e}", file=sys.stderr)
         return False
