@@ -43,13 +43,14 @@ def is_valid_rule(line: str) -> bool:
         return is_valid_domain(domain)
     return True
 
-def process_content(lines: list[str]) -> tuple[list[str], list[str], Stats]:
-    """Process lines to separate headers and rules, and deduplicate rules."""
+def process_content(lines: list[str] | Iterable[str]) -> tuple[list[str], list[str], Stats]:
+    """Process lines to separate headers and rules, and deduplicate rules while keeping comments attached."""
     stats = Stats()
     headers = []
-    rules = []
+    rules_with_comments: list[tuple[str, list[str]]] = []
     seen = set()
     in_header = True
+    current_comments = []
   
     for line in lines:
         stats.original += 1
@@ -59,14 +60,29 @@ def process_content(lines: list[str]) -> tuple[list[str], list[str], Stats]:
             continue
 
         if is_header(line):
-            headers.append(line)
+            if in_header:
+                headers.append(line)
+            else:
+                current_comments.append(line)
         else:
             in_header = False
             if line not in seen and is_valid_rule(line):
                 seen.add(line)
-                rules.append(line)
+                rules_with_comments.append((line, current_comments))
+                current_comments = []
+            else:
+                # Discard comments for duplicate or invalid rules
+                current_comments = []
 
-    rules.sort()
+    # Sort rules alphabetically by the rule text
+    rules_with_comments.sort(key=lambda x: x[0])
+
+    # Flatten rules and their comments
+    rules = []
+    for rule, comments in rules_with_comments:
+        rules.extend(comments)
+        rules.append(rule)
+
     stats.headers = len(headers)
     stats.final = len(headers) + len(rules)
     stats.removed = stats.original - stats.final

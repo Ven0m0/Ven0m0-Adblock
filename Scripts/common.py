@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 import re
 import hashlib
+import os
+import tempfile
 from typing import Final
 
 # Regex to match pure domain names (basic validation)
