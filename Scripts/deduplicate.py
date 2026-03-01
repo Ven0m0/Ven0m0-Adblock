@@ -43,7 +43,7 @@ def is_valid_rule(line: str) -> bool:
         return is_valid_domain(domain)
     return True
 
-def process_content(lines: list[str] | Iterable[str]) -> tuple[list[str], list[str], Stats]:
+def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     """Process lines to separate headers and rules, and deduplicate rules while keeping comments attached."""
     stats = Stats()
     headers = []
