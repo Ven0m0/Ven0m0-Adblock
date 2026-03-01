@@ -155,7 +155,7 @@
             if (!el) return [];
             return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
           };
-    runReady((isCGPT ? SEL.CGPT.TEXT : SEL.GEMINI.BOX).split(",")[0], () => {
+    runReady((isCGPT ? SEL.CGPT.TEXT : isGem ? SEL.GEMINI.BOX : SEL.CLAUDE.RENDER).split(",")[0], () => {
       applyW(getEls);
       obsW(getEls);
     });
