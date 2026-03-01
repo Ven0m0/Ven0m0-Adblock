@@ -52,9 +52,9 @@ class TestCommon(unittest.TestCase):
         # URL with port
         url = "http://example.com:8080/list.txt"
         filename = sanitize_filename(url)
-        self.assertTrue(filename.startswith("example-com:8080-"))
+        self.assertTrue(filename.startswith("example-com-8080-"))
         expected_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
-        self.assertEqual(filename, f"example-com:8080-{expected_hash}.txt")
+        self.assertEqual(filename, f"example-com-8080-{expected_hash}.txt")
 
     def test_is_valid_domain(self):
         self.assertTrue(is_valid_domain("example.com"))
