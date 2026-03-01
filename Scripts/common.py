@@ -82,8 +82,9 @@ def write_lines(filepath: Path, lines: list[str], mode: str = 'w') -> bool:
                         pass
                     try:
                         os.unlink(tmp_path)
-                    except OSError:
-                        pass
+                except (OSError, UnicodeError) as e:
+                    os.unlink(tmp_path)
+                    print(f"  Error writing temporary file for {filepath}: {e}", file=sys.stderr)
                     raise
             else:
                 # Fallback if dir doesn't exist yet, though it should
