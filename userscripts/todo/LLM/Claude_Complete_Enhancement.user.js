@@ -83,6 +83,7 @@ IMPROVEMENTS OVER ORIGINALS:
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   function saveConfig() {
     GM_setValue("warning_threshold", CONFIG.thresholds.warning);
     GM_setValue("danger_threshold", CONFIG.thresholds.danger);
@@ -1378,6 +1379,7 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     async forkConversationClicked(model, forkButton, modal, useSummary = false) {
+      // eslint-disable-next-line no-unused-vars
       const conversationId = window.location.pathname.split("/").pop();
 
       if (this.originalSettings) {
@@ -1426,6 +1428,7 @@ IMPROVEMENTS OVER ORIGINALS:
     patchFetch() {
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
+        // eslint-disable-next-line no-unused-vars
         const [input, config] = args;
 
         let url = undefined;
@@ -1675,21 +1678,25 @@ IMPROVEMENTS OVER ORIGINALS:
         return;
       }
 
-      list.innerHTML = TokenSaverModule.state.files
-        .map(
-          (file) => `
-        <div class="cts-file-item" data-file="${file}">
-          <div class="cts-file-name">📄 ${file}</div>
-        </div>
-      `
-        )
-        .join("");
+      list.textContent = "";
 
-      list.querySelectorAll(".cts-file-item").forEach((item) => {
+      TokenSaverModule.state.files.forEach((file) => {
+        const item = document.createElement("div");
+        item.className = "cts-file-item";
+        item.dataset.file = file;
+
+        const name = document.createElement("div");
+        name.className = "cts-file-name";
+        name.textContent = `📄 ${file}`;
+
+        item.appendChild(name);
+
         item.addEventListener("click", () => {
           const cmd = `Please use the view tool to read: /mnt/user-data/uploads/${item.dataset.file}\n\nThen process it and create a downloadable output file in /mnt/user-data/outputs/ - do NOT paste content in chat.`;
           TokenSaverModule.copyText(cmd, "📋 Copied!");
         });
+
+        list.appendChild(item);
       });
     },
 
