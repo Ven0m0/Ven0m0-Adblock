@@ -1,15 +1,6 @@
 # Paid Content Links
 
-image2.pubmatic.com
-images.outbrain.com
-images.taboola.com
-log.outbrain.com
-odb.outbrain.com
-trc.taboola.com
-widgets.outbrain.com
-
 # User Suggested Tracking and Malware Hosts
-
 1f2e7.v.fwmrm.net
 a-sjo.1rx.io
 a.pub.network
@@ -200,6 +191,7 @@ idpix.media6degrees.com
 idsync.rlcdn.com
 image2.pubmatic.com
 image6.pubmatic.com
+images.outbrain.com
 images.taboola.com
 img.3lift.com
 imprlatbmp.taboola.com
@@ -227,6 +219,7 @@ live.primis.tech
 load77.exelator.com
 loadm.exelator.com
 loadus.exelator.com
+log.outbrain.com
 m.adnxs.com
 m.fg8dgt.com
 magnetic.t.domdex.com
@@ -250,6 +243,7 @@ morningfinance.com
 mwzeom.zeotap.com
 next.adjust.com
 nr-events.taboola.com
+odb.outbrain.com
 odr.mookie1.com
 oneclickadds.net
 onetag-sys.com
