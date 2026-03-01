@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch, AsyncMock, ANY
 import importlib.util
 import sys
+import json
 import asyncio
 from pathlib import Path
 import hashlib
@@ -179,6 +180,69 @@ class TestUpdateLists(unittest.TestCase):
 
         # Verify cleanup called
         self.assertTrue(mock_to_thread.called)
+
+    def test_load_sources_existing_file(self):
+        mock_path = MagicMock(spec=Path)
+        mock_path.exists.return_value = True
+
+        test_data = {
+            "sources": [
+                {
+                    "url": "https://example.com/list1.txt",
+                    "filename": "custom_name.txt",
+                    "skip_checksum": True,
+                    "enabled": True
+                },
+                {
+                    "url": "https://example.com/list2.txt",
+                    "enabled": False
+                },
+                {
+                    "url": "https://example.com/list3.txt"
+                }
+            ]
+        }
+        mock_path.read_text.return_value = json.dumps(test_data)
+
+        with patch('update_lists.sanitize_filename', return_value="sanitized_name.txt"):
+            result = update_lists.load_sources(mock_path)
+
+        self.assertEqual(len(result), 2)
+
+        self.assertIn("https://example.com/list1.txt", result)
+        self.assertEqual(result["https://example.com/list1.txt"]["filename"], "custom_name.txt")
+        self.assertTrue(result["https://example.com/list1.txt"]["skip_checksum"])
+        self.assertTrue(result["https://example.com/list1.txt"]["enabled"])
+
+        self.assertNotIn("https://example.com/list2.txt", result)
+
+        self.assertIn("https://example.com/list3.txt", result)
+        self.assertEqual(result["https://example.com/list3.txt"]["filename"], "sanitized_name.txt")
+        self.assertFalse(result["https://example.com/list3.txt"]["skip_checksum"])
+        self.assertTrue(result["https://example.com/list3.txt"]["enabled"])
+
+    def test_load_sources_creates_template(self):
+        mock_path = MagicMock(spec=Path)
+        mock_path.exists.return_value = False
+
+        written_data = {}
+        def mock_write_text(data, encoding):
+            written_data['content'] = data
+            mock_path.read_text.return_value = data
+
+        mock_path.write_text.side_effect = mock_write_text
+
+        mock_parent = MagicMock()
+        mock_path.parent = mock_parent
+
+        result = update_lists.load_sources(mock_path)
+
+        mock_parent.mkdir.assert_called_once_with(parents=True, exist_ok=True)
+        mock_path.write_text.assert_called_once()
+        self.assertIn("uBlock-Filters.txt", written_data['content'])
+
+        self.assertIn("https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt", result)
+        self.assertIn("https://easylist.to/easylist/easylist.txt", result)
 
 if __name__ == '__main__':
     unittest.main()
