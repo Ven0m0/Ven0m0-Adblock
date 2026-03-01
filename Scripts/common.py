@@ -70,13 +70,20 @@ def write_lines(filepath: Path, lines: list[str], mode: str = 'w') -> bool:
                 # Use mkstemp instead of NamedTemporaryFile to avoid permission issues
                 fd, tmp_path = tempfile.mkstemp(dir=dir_path, prefix=".tmp_")
                 try:
-                    with open(fd, 'w', encoding='utf-8', newline='\n') as f:
+                    with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as f:
                         for line in lines:
                             f.write(f"{line}\n")
                     os.replace(tmp_path, filepath)
                     return True
                 except Exception:
-                    os.unlink(tmp_path)
+                    try:
+                        os.close(fd)
+                    except OSError:
+                        pass
+                    try:
+                        os.unlink(tmp_path)
+                    except OSError:
+                        pass
                     raise
             else:
                 # Fallback if dir doesn't exist yet, though it should
