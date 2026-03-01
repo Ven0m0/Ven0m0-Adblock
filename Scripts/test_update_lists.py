@@ -11,7 +11,9 @@ import base64
 # Import the target module
 # Mock missing dependencies
 aiohttp_mock = MagicMock()
-aiohttp_mock.ClientError = Exception
+class ClientError(Exception):
+    pass
+aiohttp_mock.ClientError = ClientError
 sys.modules["aiohttp"] = aiohttp_mock
 sys.modules["aiofiles"] = MagicMock()
 
@@ -82,7 +84,8 @@ class TestUpdateLists(unittest.TestCase):
         dest_path = output_dir / "final.txt"
 
         # Mock temp_path.exists/unlink for cleanup check (though not expected to be called on success)
-        with patch.object(Path, 'exists', return_value=True),              patch.object(Path, 'unlink') as mock_unlink:
+        with patch.object(Path, 'exists', return_value=True), \
+             patch.object(Path, 'unlink') as mock_unlink:
 
             result = asyncio.run(update_lists.process_downloaded_file(
                 temp_path, "http://url", "final.txt", output_dir
@@ -139,12 +142,13 @@ class TestUpdateLists(unittest.TestCase):
         # Mock session response
         mock_resp = AsyncMock()
         mock_resp.raise_for_status = MagicMock()
+        mock_resp.content = MagicMock()
         mock_resp.content.iter_chunked.return_value = AsyncIterator([b"chunk"])
 
         # Mock session context manager
-        session_ctx = AsyncMock()
-        session_ctx.__aenter__.return_value = mock_resp
-        session_ctx.__aexit__.return_value = None
+        session_ctx = MagicMock()
+        session_ctx.__aenter__ = AsyncMock(return_value=mock_resp)
+        session_ctx.__aexit__ = AsyncMock()
 
         mock_session = MagicMock()
         mock_session.get.return_value = session_ctx
@@ -166,14 +170,9 @@ class TestUpdateLists(unittest.TestCase):
         mock_process.return_value = Path("/tmp/out/file.txt")
 
         # Run fetch_list
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(update_lists.fetch_list(
-                mock_session, "http://url", "file.txt", Path("/tmp/out")
-            ))
-        finally:
-            loop.close()
+        result = asyncio.run(update_lists.fetch_list(
+            mock_session, "http://url", "file.txt", Path("/tmp/out")
+        ))
 
         # Verify process_downloaded_file called ONCE
         mock_process.assert_called_once()
@@ -181,22 +180,92 @@ class TestUpdateLists(unittest.TestCase):
         # Verify cleanup called
         self.assertTrue(mock_to_thread.called)
 
+        # Verify return value
+        self.assertEqual(result, ("http://url", True))
 
+    @patch('update_lists.process_downloaded_file')
     @patch('update_lists.aiofiles.open')
-    def test_process_downloaded_file_exception(self, mock_aio_open):
-        """Verify exception handling and temp file cleanup when an error occurs."""
-        mock_aio_open.side_effect = Exception("Mocked I/O error")
+    @patch('tempfile.NamedTemporaryFile')
+    @patch('asyncio.to_thread')
+    def test_fetch_list_success(self, mock_to_thread, mock_tempfile, mock_aio_open, mock_process):
+        """Verify fetch_list successful download and process."""
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.content = MagicMock()
+        mock_resp.content.iter_chunked.return_value = AsyncIterator([b"chunk1", b"chunk2"])
 
-        temp_path = MagicMock(spec=Path)
-        temp_path.exists.return_value = True
+        session_ctx = MagicMock()
+        session_ctx.__aenter__ = AsyncMock(return_value=mock_resp)
+        session_ctx.__aexit__ = AsyncMock()
 
-        result = asyncio.run(update_lists.process_downloaded_file(
-            temp_path, "http://url", "final.txt", Path("/tmp/out")
+        mock_session = MagicMock()
+        mock_session.get.return_value = session_ctx
+
+        mock_temp = MagicMock()
+        mock_temp.name = "/tmp/tempfile.txt"
+        mock_tempfile.return_value.__enter__.return_value = mock_temp
+
+        mock_file_write = AsyncMock()
+        write_ctx = MagicMock()
+        write_ctx.__aenter__ = AsyncMock(return_value=mock_file_write)
+        write_ctx.__aexit__ = AsyncMock()
+
+        mock_aio_open.return_value = write_ctx
+
+        mock_process.return_value = Path("/tmp/out/file.txt")
+
+        result = asyncio.run(update_lists.fetch_list(
+            mock_session, "http://url", "file.txt", Path("/tmp/out")
         ))
 
-        self.assertIsNone(result)
-        temp_path.exists.assert_called_once()
-        temp_path.unlink.assert_called_once()
+        self.assertEqual(result, ("http://url", True))
+        self.assertEqual(mock_file_write.write.call_count, 2)
+        mock_session.get.assert_called_once_with(
+            "http://url", timeout=update_lists.TIMEOUT, headers={
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+                "Accept": "text/plain,*/*",
+            }
+        )
+        mock_process.assert_called_once_with(Path("/tmp/tempfile.txt"), "http://url", "file.txt", Path("/tmp/out"), False)
+
+    @patch('update_lists.logger.error')
+    def test_fetch_list_timeout(self, mock_logger_error):
+        """Verify fetch_list handles TimeoutError."""
+        mock_session = MagicMock()
+        mock_session.get.side_effect = asyncio.TimeoutError()
+
+        result = asyncio.run(update_lists.fetch_list(
+            mock_session, "http://url", "file.txt", Path("/tmp/out")
+        ))
+
+        self.assertEqual(result, ("http://url", False))
+        mock_logger_error.assert_called_once_with("✗ Timeout: http://url")
+
+    @patch('update_lists.logger.error')
+    def test_fetch_list_http_error(self, mock_logger_error):
+        """Verify fetch_list handles aiohttp.ClientError."""
+        mock_session = MagicMock()
+        mock_session.get.side_effect = update_lists.aiohttp.ClientError("HTTP failed")
+
+        result = asyncio.run(update_lists.fetch_list(
+            mock_session, "http://url", "file.txt", Path("/tmp/out")
+        ))
+
+        self.assertEqual(result, ("http://url", False))
+        mock_logger_error.assert_called_once_with("✗ HTTP error for http://url: HTTP failed")
+
+    @patch('update_lists.logger.exception')
+    def test_fetch_list_unexpected_error(self, mock_logger_exception):
+        """Verify fetch_list handles unexpected Exception."""
+        mock_session = MagicMock()
+        mock_session.get.side_effect = Exception("Boom")
+
+        result = asyncio.run(update_lists.fetch_list(
+            mock_session, "http://url", "file.txt", Path("/tmp/out")
+        ))
+
+        self.assertEqual(result, ("http://url", False))
+        mock_logger_exception.assert_called_once_with("✗ Unexpected error for http://url: Boom")
 
 if __name__ == '__main__':
     unittest.main()
