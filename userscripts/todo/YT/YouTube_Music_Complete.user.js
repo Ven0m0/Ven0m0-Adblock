@@ -107,7 +107,7 @@ CONSOLIDATED FEATURES:
           const button = document.querySelector(".song-button.style-scope.ytmusic-av-toggle");
           if (button) button.click();
         }
-      } catch (e) {
+      } catch {
         // Silently fail if elements not found
       }
     },
@@ -155,7 +155,6 @@ CONSOLIDATED FEATURES:
           const oldValue = hashMap.get(this);
           Promise.resolve([oldValue, newValue, new Date()]).then(fSet).catch(console.warn);
           hashMap.set(this, newValue);
-          return true;
         }
       });
     },
@@ -296,11 +295,14 @@ CONSOLIDATED FEATURES:
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel {
         display: flex !important;
-        overflow-x: auto !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
       }
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel-item {
         flex: 0 0 auto !important;
+        margin-right: 16px !important;
+        margin-bottom: 16px !important;
       }
     `);
   }
