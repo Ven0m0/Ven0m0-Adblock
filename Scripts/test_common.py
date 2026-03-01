@@ -22,7 +22,7 @@ class TestCommon(unittest.TestCase):
         self.assertTrue(filename.startswith("example-com-"))
         self.assertTrue(filename.endswith(".txt"))
 
-        expected_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
         self.assertIn(expected_hash, filename)
 
 
@@ -39,22 +39,22 @@ class TestCommon(unittest.TestCase):
         filename = sanitize_filename(url)
         self.assertTrue(filename.startswith("list-"))
         self.assertTrue(filename.endswith(".txt"))
-        expected_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
         self.assertEqual(filename, f"list-{expected_hash}.txt")
 
         # Empty string
         url = ""
         filename = sanitize_filename(url)
         self.assertTrue(filename.startswith("list-"))
-        expected_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
         self.assertEqual(filename, f"list-{expected_hash}.txt")
 
         # URL with port
         url = "http://example.com:8080/list.txt"
         filename = sanitize_filename(url)
-        self.assertTrue(filename.startswith("example-com-8080-"))
-        expected_hash = hashlib.md5(url.encode("utf-8")).hexdigest()[:12]
-        self.assertEqual(filename, f"example-com-8080-{expected_hash}.txt")
+        self.assertTrue(filename.startswith("example-com:8080-"))
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
+        self.assertEqual(filename, f"example-com:8080-{expected_hash}.txt")
 
     def test_is_valid_domain(self):
         self.assertTrue(is_valid_domain("example.com"))

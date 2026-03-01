@@ -65,7 +65,7 @@ def validate_checksum(content: str, name: str = "unknown") -> bool:
   declared_checksum = match.group(1)
   data_no_checksum = pattern.sub("", content, 1)
   normalized = data_no_checksum.replace("\r", "").rstrip("\n") + "\n"
-  computed_hash = hashlib.md5(normalized.encode("utf-8")).digest()
+  computed_hash = hashlib.md5(normalized.encode("utf-8"), usedforsecurity=False).digest()
   computed_checksum = base64.b64encode(computed_hash).decode().rstrip("=")
 
   if declared_checksum == computed_checksum:
