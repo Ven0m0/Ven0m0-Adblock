@@ -49,7 +49,7 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
     # This hash is for stable naming only and is not used for security purposes.
     url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
     domain = re.search(r'://([^/]+)', url)
-    domain_part = domain.group(1).replace('.', '-') if domain else 'list'
+    domain_part = domain.group(1).replace('.', '-').replace(':', '-') if domain else 'list'
     return f"{domain_part}-{url_hash}.txt"
 
 def read_lines(filepath: Path) -> list[str] | None:
