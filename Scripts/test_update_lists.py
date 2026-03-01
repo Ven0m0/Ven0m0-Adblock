@@ -38,7 +38,7 @@ class TestUpdateLists(unittest.TestCase):
     def setUp(self):
         self.valid_content_body = "||example.comxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx^\n"
         normalized = self.valid_content_body.replace("\r", "").rstrip("\n") + "\n"
-        computed_hash = hashlib.md5(normalized.encode("utf-8")).digest()
+        computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
         self.checksum = base64.b64encode(computed_hash).decode().rstrip("=")
         self.valid_full_content = f"! checksum: {self.checksum}\n{self.valid_content_body}"
 
