@@ -21,6 +21,8 @@ node_modules/
 *. tmp
 
 # Editors
+!.vscode/extensions.json
+.vscode/*
 .vscode/
 .idea/
 
@@ -39,3 +41,6 @@ coverage/
 *.tar
 *.tgz
 *.zst
+
+.aglintcache
+logs/
