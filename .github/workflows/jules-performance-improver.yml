@@ -1,4 +1,4 @@
-name: Performance Improver Agent
+name: Jules Performance Improver Agent
 on:
   workflow_dispatch:
 jobs:
