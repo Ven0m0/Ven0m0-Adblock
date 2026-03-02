@@ -145,3 +145,18 @@
       "exclusions_sources": ["Filters/exclusions.txt"],
       "transformations": ["RemoveModifiers", "Validate"]
     },
+    {
+      "name": "Additional rules",
+      "source": "Filters/rules.txt",
+      "transformations": ["Validate"],
+      "type": "adblock"
+    },
+    {
+      "name": "Exception rules",
+      "source": "Filters/exceptions.txt",
+      "transformations": ["Validate"],
+      "type": "adblock"
+    }
+  ],
+  "transformations": ["Compress", "Deduplicate"],
+  "exclusions_sources": ["Filters/exclusions.txt"]
