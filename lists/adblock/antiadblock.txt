@@ -1,3 +1,5 @@
+! [Adblock Plus 2.0]
+
 ##.diysdk_webServices_banners1und1MainContent
 #qa-modal-body
 .adblock
