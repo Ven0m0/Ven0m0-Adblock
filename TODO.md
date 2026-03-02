@@ -11,7 +11,8 @@
 - add script on schedule that parses specific lists from [firefox adguard extension filter](https://github.com/AdguardTeam/FiltersrsRegistry/blob/master/platforms/extension/firefox/filters.json), [ublock filter](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/extension/ublock/filters.json) and pretty prints them in a markdown table md file. only adguard-german, no need for parsing all other language filters.
 - https://github.com/ryanbr/fanboy-adblock/blob/master/scripts/ramdisk.sh
 - https://github.com/ryanbr/network-scanner
-
+- https://github.com/ryanbr/cleaner-adblock
+- https://github.com/DandelionSprout/adfilt/tree/master/ClearURLs%20for%20uBo
 
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py
