@@ -12,10 +12,10 @@
     "build:userscripts": "./Scripts/build.sh userscripts",
     "lint": "bun run lint:js && bun run lint:filters && bun run lint:md",
     "lint:js": "eslint .",
-    "lint:filters": "bun x aglint",
+    "lint:filters": "bunx aglint",
     "lint:yaml": "command -v yamllint >/dev/null && yamllint . || { echo 'yamllint not installed. Install with: pip install yamllint' >&2; exit 1; }",
     "lint:md": "bun x markdownlint-cli2 '**/*.md' '#node_modules'",
-    "lint:shell": "shellcheck Scripts/*.sh || true",
+    "lint:shell": "shellcheck Scripts/*.sh || :",
     "lint:eslint": "eslint .",
     "lint:aglint": "bun x aglint",
     "lint:fix": "eslint . --fix && bun x aglint --fix",
@@ -28,7 +28,9 @@
     "clean:cache": "rm -rf node_modules/.cache .eslintcache",
     "clean:all": "bun run clean && bun run clean:cache",
     "precommit": "bun run lint:fix:all",
-    "validate": "bun run test && bun run build"
+    "validate": "bun run test && bun run build",
+    "aglint": "bunx aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\"",
+
   },
   "devDependencies": {
     "@adguard/aglint": "latest",
