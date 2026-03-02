@@ -1,4 +1,4 @@
-[uBlock Origin]
+! [Adblock Plus 2.0]
 ! Title: uBO Lite filters
 ! Last modified: %timestamp%
 ! Expires: 4 days
