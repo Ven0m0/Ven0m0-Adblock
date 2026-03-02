@@ -10,6 +10,7 @@
 - https://github.com/LanikSJ/webannoyances/blob/master/.github/workflows/dead-domains-check.yml
 - add script on schedule that parses specific lists from [firefox adguard extension filter](https://github.com/AdguardTeam/FiltersrsRegistry/blob/master/platforms/extension/firefox/filters.json), [ublock filter](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/extension/ublock/filters.json) and pretty prints them in a markdown table md file. only adguard-german, no need for parsing all other language filters.
 - https://github.com/ryanbr/fanboy-adblock/blob/master/scripts/ramdisk.sh
+- https://github.com/ryanbr/network-scanner
 
 
 ### Manual Review Needed
