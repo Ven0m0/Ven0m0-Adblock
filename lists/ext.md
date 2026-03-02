@@ -15,3 +15,4 @@
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/118_optimized.txt
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/107_optimized.txt
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/101_optimized.txt
+- https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/android/filters/14_optimized.txt
