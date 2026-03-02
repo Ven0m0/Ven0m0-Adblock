@@ -1,4 +1,4 @@
-[uBlock Origin]
+! [Adblock Plus 2.0]
 ! Title: Reddit Annoyances
 ! Description: This list makes Reddit much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
