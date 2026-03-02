@@ -27,3 +27,4 @@
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/android/filters/257_optimized.txt
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/android/filters/11_optimized.txt
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/android/filters/251_optimized.txt
+- https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/refs/heads/master/platforms/android/filters/17_optimized.txt
