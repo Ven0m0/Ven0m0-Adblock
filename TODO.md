@@ -14,6 +14,12 @@
 - https://github.com/ryanbr/cleaner-adblock
 - https://github.com/DandelionSprout/adfilt/tree/master/ClearURLs%20for%20uBo
 
+Fully implememt:
+
+- https://github.com/AdguardTeam/HostlistCompiler
+- https://github.com/AdguardTeam/DeadDomainsLinter
+- https://github.com/AdguardTeam/FiltersCompiler
+
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py
 - Fix AGLint errors in filter lists:
