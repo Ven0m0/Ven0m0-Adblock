@@ -8,7 +8,7 @@
 - https://github.com/StevenBlack/hosts/blob/master/updateHostsFile.py
 - https://github.com/AdguardTeam/Scriptlets
 
-add script on schedule that parses specific lists from [firefox adguard extension filter](https://github.com/AdguardTeam/FiltersrsRegistry/blob/master/platforms/extension/firefox/filters.json), [ublock filter](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/extension/ublock/filters.json) and pretty prints them in a markdown table md file
+add script on schedule that parses specific lists from [firefox adguard extension filter](https://github.com/AdguardTeam/FiltersrsRegistry/blob/master/platforms/extension/firefox/filters.json), [ublock filter](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/extension/ublock/filters.json) and pretty prints them in a markdown table md file. only adguard-german, no need for parsing all other language filters.
 
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py
