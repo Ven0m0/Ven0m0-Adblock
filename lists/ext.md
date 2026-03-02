@@ -1,0 +1,6 @@
+- https://github.com/ShadowWhisperer/BlockLists
+- https://github.com/AdguardTeam/AdGuardFilters
+- https://github.com/easylist
+- https://github.com/brave
+- https://github.com/hagezi
+- https://github.com/StevenBlack
