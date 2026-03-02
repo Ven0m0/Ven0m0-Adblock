@@ -1,6 +1,6 @@
 name: 🔄 Update AdLists Mirror
 on:
-  schedule: [{cron: "0 23 * * 0"}] # Once a week at midnight UTC+1
+  #schedule: [{cron: "0 23 * * 0"}] # Once a week at midnight UTC+1
   workflow_dispatch:
     inputs:
       force_update:
