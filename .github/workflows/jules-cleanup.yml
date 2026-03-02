@@ -1,4 +1,4 @@
-name: Weekly Codebase Cleanup
+name: Jules Codebase Cleanup
 on:
   workflow_dispatch:
 jobs:
