@@ -10,6 +10,8 @@
 - https://github.com/StevenBlack/hosts/blob/master/updateHostsFile.py
 - https://github.com/AdguardTeam/Scriptlets
 
+add script on schedule that parses specific lists from [filters.json](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/android/filters.json) and pretty prints them in a markdown table md file
+
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py
 - Fix AGLint errors in filter lists:
