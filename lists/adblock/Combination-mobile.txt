@@ -14,3 +14,4 @@
 !#include fanboy_sounds_thirdparty.txt
 !#include resource-abuse.txt
 !#include https://filters.adtidy.org/extension/ublock/filters/251_optimized.txt
+!#include https://filters.adtidy.org/adtidy.org/extension/ublock/filters/1_optimized.txttxt
