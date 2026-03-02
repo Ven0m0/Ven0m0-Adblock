@@ -25,7 +25,7 @@ bun = "latest"
 lefthook = "latest"
 
 [env]
-NODE_ENV = "development"
+NODE_ENV = "production"
 NODE_SKIP_PLATFORM_CHECK = "1"
 NODE_NO_WARNINGS = "1"
 MISE_NPM_BUN = "1"
@@ -37,7 +37,7 @@ PYTHONUTF8 = "1"
 PYTHONIOENCODING = "UTF-8" 
 UV_LINK_MODE = "hardlink"
 DO_NOT_TRACK = "1"
-CARGO_NET_GIT_FETCH_WITH_CLI = "true"
+CARGO_NET_GIT_FETCH_WITH_CLI = "false"
 CARGO_HTTP_MULTIPLEXING = "true"
 BINSTALL_DISABLE_TELEMETRY = "true"
 
