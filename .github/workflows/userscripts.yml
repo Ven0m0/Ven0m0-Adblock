@@ -13,8 +13,8 @@ on:
     paths:
       - "userscripts/src/**/*.js"
       - "userscripts/src/**/*.user.js"
-  schedule:
-    - cron: "0 0 * * 1"
+  #schedule:
+    #- cron: "0 0 * * 1"
   workflow_dispatch:
     inputs:
       force_rebuild:
