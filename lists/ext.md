@@ -4,3 +4,4 @@
 - https://github.com/brave
 - https://github.com/hagezi
 - https://github.com/StevenBlack
+- https://github.com/DandelionSprout/adfilt
