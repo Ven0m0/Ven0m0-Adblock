@@ -2,12 +2,12 @@
 
 ## Maintenance Tasks
 
-### Completed ✅
-- ✅ Added uBlockOrigin resource-abuse.txt filter to `lists/sources-urls.json`
-- ✅ Added adguard-extra userscript to `userscripts/list.txt`
-- ✅ Ran deduplicate.py (found 348 cross-file duplicates for manual review)
-- ✅ Ran format command (formatted 26 files, fixed 15)
-- ✅ Ran lint:fix command (ESLint passed, AGLint found 133 issues)
+### Research
+
+**Look into these and integrate them:**
+
+- https://github.com/StevenBlack/hosts/blob/master/updateReadme.py
+- https://github.com/StevenBlack/hosts/blob/master/updateHostsFile.py
 
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py
