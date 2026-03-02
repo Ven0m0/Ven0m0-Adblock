@@ -1,4 +1,4 @@
-[uBlock Origin]
+! [Adblock Plus 2.0]
 ! Title: Spotify Blocklist
 ! Description: Block spotify stuff
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
