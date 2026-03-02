@@ -1,9 +1,8 @@
-[uBlock Origin]
+! [Adblock Plus 2.0]
 ! Title: Experimental filters
 ! Description: This list might not be fully stable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 ! License: MIT
-
 
 ! JavaScript Filters
 ! Disable Accelerated Mobile Pages
