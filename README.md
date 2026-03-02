@@ -6,6 +6,8 @@
 
 - Build userscripts with `bun run build:userscripts` and submit or install the generated `.user.js` files from `userscripts/dist` on GreasyFork for automatic updates.
 
+- https://www.userscript.zone
+
 ### Tools
 
 - [Userscript compile](https://github.com/FiorenMas/Userscripts)
