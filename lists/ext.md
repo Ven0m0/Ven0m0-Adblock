@@ -10,7 +10,7 @@
 
 ---
 
-# optimized lists
+### optimized lists
 
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/118_optimized.txt
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/107_optimized.txt
