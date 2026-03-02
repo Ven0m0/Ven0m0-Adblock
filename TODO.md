@@ -8,6 +8,7 @@
 
 - https://github.com/StevenBlack/hosts/blob/master/updateReadme.py
 - https://github.com/StevenBlack/hosts/blob/master/updateHostsFile.py
+- https://github.com/AdguardTeam/Scriptlets
 
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py
