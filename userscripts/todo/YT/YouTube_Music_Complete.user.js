@@ -29,9 +29,7 @@ CONSOLIDATED FEATURES:
 7. UI Enhancements - Minor cosmetic improvements
 */
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_ytmusic_complete") === "1") {
     console.warn("[YT Music Complete]: Disabled by user");

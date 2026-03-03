@@ -37,13 +37,11 @@
 // @updateURL https://update.greasyfork.org/scripts/560869/SponsorBlock%20Lite.meta.js
 // ==/UserScript==
 
-(function () {
-  "use strict";
-
+(() => {
   // ==================== CONSTANTS ====================
 
   // Platform detection (must be first for other constants to use)
-  const IS_BILIBILI = (function () {
+  const IS_BILIBILI = (() => {
     const hostname = window.location.hostname;
     return hostname === "bilibili.com" || hostname.endsWith(".bilibili.com");
   })();
@@ -81,9 +79,9 @@
   let currentSegmentIndex = 0;
   let videoChangeDebounce = null;
   let previewBarContainer = null;
-  let videoDuration = 0;
+  let _videoDuration = 0;
   let lastUrl = location.href;
-  let urlPollInterval = null;
+  let _urlPollInterval = null;
   let videoObserver = null;
   let rafSkipId = null; // For requestAnimationFrame-based skipping
   let lastVideoSrc = null; // Track video element replacement
@@ -255,7 +253,7 @@
       if (match) {
         let videoId = match[1];
         if (!videoId.startsWith("BV")) {
-          videoId = "BV" + videoId;
+          videoId = `BV${videoId}`;
         }
         return videoId;
       }
@@ -366,7 +364,7 @@
     if (!video || targetTime === undefined) return false;
 
     const maxRetries = 3;
-    const previousTime = video.currentTime;
+    const _previousTime = video.currentTime;
 
     try {
       video.currentTime = targetTime;
@@ -600,7 +598,7 @@
     const duration = getVideoDuration();
     if (!duration || duration <= 0) return;
 
-    videoDuration = duration;
+    _videoDuration = duration;
 
     // Get or create container
     if (!previewBarContainer) {
@@ -749,7 +747,7 @@
     video.setAttribute("data-sb-lite-initialized", currentVideoID);
     lastVideoSrc = currentSrc;
 
-    log("Setting up video listeners" + (IS_VINEGAR ? " (Vinegar mode)" : ""));
+    log(`Setting up video listeners${IS_VINEGAR ? " (Vinegar mode)" : ""}`);
 
     // Remove any existing listeners by cloning (for Vinegar video replacement scenario)
     // We'll use named functions and track them instead
@@ -893,7 +891,7 @@
       videoObserver.disconnect();
     }
 
-    videoObserver = new MutationObserver((mutations) => {
+    videoObserver = new MutationObserver((_mutations) => {
       // Check if video element was added or replaced
       const currentVideo = document.querySelector("video");
 
@@ -931,7 +929,7 @@
     skippableSegments = [];
     lastSkippedUUID = null;
     currentSegmentIndex = 0;
-    videoDuration = 0;
+    _videoDuration = 0;
     lastVideoSrc = null;
 
     if (skipScheduleTimer) {
@@ -1060,7 +1058,7 @@
     });
 
     // URL polling fallback (essential for mobile and Vinegar)
-    urlPollInterval = setInterval(() => {
+    _urlPollInterval = setInterval(() => {
       if (location.href !== lastUrl) {
         log("URL change detected via polling:", location.href);
         lastUrl = location.href;

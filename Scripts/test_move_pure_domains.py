@@ -1,10 +1,10 @@
 import unittest
 import importlib.util
 from pathlib import Path
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, mock_open
 
 # Import the module dynamically
-file_path = Path(__file__).parent / 'move-pure-domains.py'
+file_path = Path(__file__).parent / "move-pure-domains.py"
 spec = importlib.util.spec_from_file_location("move_pure_domains", file_path)
 if spec is None or spec.loader is None:
     raise ImportError("Could not load module")
@@ -12,6 +12,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 is_pure_domain = module.is_pure_domain
 scan_adblock_files = module.scan_adblock_files
+
 
 class TestIsPureDomain(unittest.TestCase):
     def test_pure_domains(self):
@@ -41,7 +42,7 @@ class TestIsPureDomain(unittest.TestCase):
             "example.com#@#.ad",
             "/pattern/",
             "http://example.com",  # URL, not pure domain
-            "https://example.com", # URL
+            "https://example.com",  # URL
         ]
         for line in invalid_lines:
             with self.subTest(line=line):
@@ -54,8 +55,9 @@ class TestIsPureDomain(unittest.TestCase):
         self.assertFalse(is_pure_domain("-start-dash.com"))
 
         # Regex expects end with .[a-z]{2,}
-        self.assertFalse(is_pure_domain("example.c")) # 1 char TLD
-        self.assertFalse(is_pure_domain("example.123")) # numeric TLD
+        self.assertFalse(is_pure_domain("example.c"))  # 1 char TLD
+        self.assertFalse(is_pure_domain("example.123"))  # numeric TLD
+
 
 class TestScanAdblockFiles(unittest.TestCase):
     def test_scan_adblock_files_logic(self):
@@ -86,8 +88,8 @@ another-pure.net
 
         # 1. Check if pure domains were identified and moved
         # Categorization logic defaults to 'Other.txt' unless filename matches
-        self.assertIn('Other.txt', domain_moves)
-        moved_domains = domain_moves['Other.txt']['test_list.txt']
+        self.assertIn("Other.txt", domain_moves)
+        moved_domains = domain_moves["Other.txt"]["test_list.txt"]
         self.assertIn("pure-domain.com", moved_domains)
         self.assertIn("another-pure.net", moved_domains)
         self.assertEqual(len(moved_domains), 2)
@@ -119,9 +121,12 @@ another-pure.net
         domain_moves, _ = scan_adblock_files(mock_dir)
 
         # Should be categorized into Spotify.txt based on filename
-        self.assertIn('Spotify.txt', domain_moves)
-        if 'Spotify.txt' in domain_moves:
-             self.assertIn("spotify-tracker.com", domain_moves['Spotify.txt']['spotify_ads.txt'])
+        self.assertIn("Spotify.txt", domain_moves)
+        if "Spotify.txt" in domain_moves:
+            self.assertIn(
+                "spotify-tracker.com", domain_moves["Spotify.txt"]["spotify_ads.txt"]
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

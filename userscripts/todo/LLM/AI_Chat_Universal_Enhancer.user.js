@@ -46,9 +46,7 @@ CONSOLIDATED FEATURES:
 5. Multi-language Support - English, Chinese (Simplified/Traditional)
 */
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_ai_chat_enhancer") === "1") {
     console.warn("[AI Chat Enhancer]: Disabled by user");
@@ -367,7 +365,7 @@ CONSOLIDATED FEATURES:
                 let candidateUrl = linkText;
                 // If the text looks like a bare domain (contains "www." but no scheme), prepend https://
                 if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(candidateUrl) && candidateUrl.includes("www.")) {
-                  candidateUrl = "https://" + candidateUrl.replace(/^\/*/, "");
+                  candidateUrl = `https://${candidateUrl.replace(/^\/*/, "")}`;
                 }
                 try {
                   const url = new URL(candidateUrl, window.location.origin);
@@ -376,7 +374,7 @@ CONSOLIDATED FEATURES:
                     link.target = "_blank";
                     link.rel = "noopener noreferrer";
                   }
-                } catch (e) {
+                } catch (_e) {
                   // Ignore invalid URLs derived from innerText
                 }
               }
@@ -495,7 +493,7 @@ CONSOLIDATED FEATURES:
     }
 
     const os = detectOS();
-    const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 
     const colors = {
       background: isDark ? "#2d2d2d" : "#ffffff",

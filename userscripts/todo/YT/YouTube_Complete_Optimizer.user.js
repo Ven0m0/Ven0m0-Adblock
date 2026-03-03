@@ -34,8 +34,6 @@ IMPROVEMENTS OVER ORIGINALS:
 */
 
 (function () {
-  "use strict";
-
   // Emergency disable
   if (localStorage.getItem("disable_yt_complete_optimizer") === "1") {
     console.warn("[YouTube Complete Optimizer]: Disabled by user");
@@ -70,7 +68,7 @@ IMPROVEMENTS OVER ORIGINALS:
     blockTracking: GM_getValue("yt_block_tracking", true)
   };
 
-  function saveConfig() {
+  function _saveConfig() {
     GM_setValue("yt_block_av1", CONFIG.blockAV1);
     GM_setValue("yt_cpu_tamer", CONFIG.enableCPUTamer);
     GM_setValue("yt_resource_opt", CONFIG.enableResourceOptimization);
@@ -146,8 +144,14 @@ IMPROVEMENTS OVER ORIGINALS:
 
   if (CONFIG.enableCPUTamer) {
     ((o) => {
-      const [setTimeout_, setInterval_, requestAnimationFrame_, clearTimeout_, clearInterval_, cancelAnimationFrame_] =
-        o;
+      const [
+        _setTimeout_,
+        _setInterval_,
+        requestAnimationFrame_,
+        _clearTimeout_,
+        _clearInterval_,
+        _cancelAnimationFrame_
+      ] = o;
       const win = this instanceof Window ? this : window;
 
       // Duplicate detection
@@ -160,7 +164,7 @@ IMPROVEMENTS OVER ORIGINALS:
         try {
           const canvas = document.createElement("canvas");
           return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
-        } catch (e) {
+        } catch (_e) {
           return false;
         }
       })();
@@ -175,7 +179,7 @@ IMPROVEMENTS OVER ORIGINALS:
         window.lastTimeUpdate = 1;
         document.addEventListener(
           "timeupdate",
-          function () {
+          () => {
             window.lastTimeUpdate = Date.now();
           },
           true
@@ -184,26 +188,18 @@ IMPROVEMENTS OVER ORIGINALS:
         try {
           topLastTimeUpdate = top.lastTimeUpdate;
         } catch {}
-        return topLastTimeUpdate >= 1
-          ? function () {
-              return top.lastTimeUpdate;
-            }
-          : function () {
-              return window.lastTimeUpdate;
-            };
+        return topLastTimeUpdate >= 1 ? () => top.lastTimeUpdate : () => window.lastTimeUpdate;
       })();
 
-      const PromiseConstructor = function (executor) {
-        return new Promise(executor);
-      };
+      const PromiseConstructor = (executor) => new Promise(executor);
 
       const ExternalPromise = (() => {
         let resolve_, reject_;
-        const handler = function (resolve, reject) {
+        const handler = (resolve, reject) => {
           resolve_ = resolve;
           reject_ = reject;
         };
-        const PromiseExternal = function (cb) {
+        const PromiseExternal = (cb) => {
           cb = cb || handler;
           const promise = new PromiseConstructor(cb);
           if (cb === handler) {
@@ -216,8 +212,8 @@ IMPROVEMENTS OVER ORIGINALS:
       })();
 
       // Initialize isolated iframe context
-      const initializeContext = function (win) {
-        return new PromiseConstructor(function (resolve) {
+      const initializeContext = (win) =>
+        new PromiseConstructor((resolve) => {
           const waitForFrame = requestAnimationFrame_;
           let maxRetries = 16;
           const frameId = "yt-optimizer-iframe-v1";
@@ -242,17 +238,17 @@ IMPROVEMENTS OVER ORIGINALS:
               const root = document.documentElement;
               root.appendChild(noscriptElement);
               if (blobURL)
-                PromiseConstructor.resolve().then(function () {
+                PromiseConstructor.resolve().then(() => {
                   URL.revokeObjectURL(blobURL);
                 });
 
-              removeFrame = function (setTimeout) {
-                const removeFrameWhenReady = function (e) {
+              removeFrame = (setTimeout) => {
+                const removeFrameWhenReady = (e) => {
                   if (e) win.removeEventListener("DOMContentLoaded", removeFrameWhenReady, false);
                   e = noscriptElement;
                   noscriptElement = win = removeFrame = 0;
                   if (setTimeout) {
-                    setTimeout(function () {
+                    setTimeout(() => {
                       e.remove();
                     }, 200);
                   } else {
@@ -280,31 +276,30 @@ IMPROVEMENTS OVER ORIGINALS:
               for (const key in boundFunctions) boundFunctions[key] = boundFunctions[key].bind(win);
               if (removeFrame) PromiseConstructor.resolve(boundFunctions.setTimeout).then(removeFrame);
               resolve(boundFunctions);
-            } catch (e) {
+            } catch (_e) {
               if (removeFrame) removeFrame();
               resolve(null);
             }
           })();
         });
-      };
 
-      initializeContext(win).then(function (context) {
+      initializeContext(win).then((context) => {
         if (!context) return null;
 
         const { requestAnimationFrame, setTimeout, setInterval, clearTimeout, clearInterval } = context;
         let animationFrameInterrupter = null;
 
-        const createRAFHelper = function () {
+        const createRAFHelper = () => {
           const animationElement = document.createElement("a-f");
           if (!("onanimationiteration" in animationElement)) {
-            return function (resolve) {
+            return (resolve) => {
               animationFrameInterrupter = resolve;
               requestAnimationFrame(resolve);
             };
           }
           animationElement.id = "a-f";
           let animationQueue = null;
-          animationElement.onanimationiteration = function () {
+          animationElement.onanimationiteration = () => {
             if (animationQueue !== null) {
               animationQueue();
               animationQueue = null;
@@ -339,7 +334,7 @@ IMPROVEMENTS OVER ORIGINALS:
             (document.head || document.documentElement).appendChild(style);
           }
           document.documentElement.insertBefore(animationElement, document.documentElement.firstChild);
-          return function (resolve) {
+          return (resolve) => {
             animationQueue = resolve;
             animationFrameInterrupter = resolve;
           };
@@ -352,27 +347,26 @@ IMPROVEMENTS OVER ORIGINALS:
           afPromisePrimary = afPromiseSecondary = { resolved: true };
           let afIndex = 0;
 
-          const resolveRAF = function (rafPromise) {
-            return new PromiseConstructor(function (resolve) {
+          const resolveRAF = (rafPromise) =>
+            new PromiseConstructor((resolve) => {
               rafHelper(resolve);
-            }).then(function () {
+            }).then(() => {
               rafPromise.resolved = true;
               const time = ++afIndex;
               if (time > 9e9) afIndex = 9;
               rafPromise.resolve(time);
               return time;
             });
-          };
 
-          const executeRAF = function () {
-            return new PromiseConstructor(function (resolve) {
+          const executeRAF = () =>
+            new PromiseConstructor((resolve) => {
               const pendingPrimary = !afPromisePrimary.resolved ? afPromisePrimary : null;
               const pendingSecondary = !afPromiseSecondary.resolved ? afPromiseSecondary : null;
               let time = 0;
 
               if (pendingPrimary && pendingSecondary) {
                 resolve(
-                  PromiseConstructor.all([pendingPrimary, pendingSecondary]).then(function (times) {
+                  PromiseConstructor.all([pendingPrimary, pendingSecondary]).then((times) => {
                     const t1 = times[0];
                     const t2 = times[1];
                     time = t1 > t2 && t1 - t2 < 8e9 ? t1 : t2;
@@ -383,12 +377,12 @@ IMPROVEMENTS OVER ORIGINALS:
                 const newPrimary = !pendingPrimary ? (afPromisePrimary = new ExternalPromise()) : null;
                 const newSecondary = !pendingSecondary ? (afPromiseSecondary = new ExternalPromise()) : null;
 
-                const executeSecondary = function () {
+                const executeSecondary = () => {
                   if (newPrimary) {
-                    resolveRAF(newPrimary).then(function (t) {
+                    resolveRAF(newPrimary).then((t) => {
                       time = t;
                       if (newSecondary) {
-                        resolveRAF(newSecondary).then(function (t2) {
+                        resolveRAF(newSecondary).then((t2) => {
                           time = t2;
                           resolve(time);
                         });
@@ -397,7 +391,7 @@ IMPROVEMENTS OVER ORIGINALS:
                       }
                     });
                   } else if (newSecondary) {
-                    resolveRAF(newSecondary).then(function (t) {
+                    resolveRAF(newSecondary).then((t) => {
                       time = t;
                       resolve(time);
                     });
@@ -407,11 +401,11 @@ IMPROVEMENTS OVER ORIGINALS:
                 };
 
                 if (pendingSecondary) {
-                  pendingSecondary.then(function () {
+                  pendingSecondary.then(() => {
                     executeSecondary();
                   });
                 } else if (pendingPrimary) {
-                  pendingPrimary.then(function () {
+                  pendingPrimary.then(() => {
                     executeSecondary();
                   });
                 } else {
@@ -419,51 +413,44 @@ IMPROVEMENTS OVER ORIGINALS:
                 }
               }
             });
-          };
 
           const executingTasks = new Set();
 
-          const wrapFunction = function (handler, store) {
-            return function () {
-              const currentTime = Date.now();
-              if (currentTime - getTimeUpdate() < 800 && currentTime - store.lastTime < 800) {
-                const id = store.id;
-                executingTasks.add(id);
-                executeRAF().then(function (time) {
-                  const isNotRemoved = executingTasks.delete(id);
-                  if (!isNotRemoved || time === store.lastExecution) return;
-                  store.lastExecution = time;
-                  store.lastTime = currentTime;
-                  handler();
-                });
-              } else {
+          const wrapFunction = (handler, store) => () => {
+            const currentTime = Date.now();
+            if (currentTime - getTimeUpdate() < 800 && currentTime - store.lastTime < 800) {
+              const id = store.id;
+              executingTasks.add(id);
+              executeRAF().then((time) => {
+                const isNotRemoved = executingTasks.delete(id);
+                if (!isNotRemoved || time === store.lastExecution) return;
+                store.lastExecution = time;
                 store.lastTime = currentTime;
                 handler();
-              }
-            };
+              });
+            } else {
+              store.lastTime = currentTime;
+              handler();
+            }
           };
 
-          const createFunctionWrapper = function (originalFunction) {
-            return function (func, ms) {
-              if (ms === undefined) ms = 0;
-              if (typeof func === "function") {
-                const store = { lastTime: Date.now() };
-                const wrappedFunc = wrapFunction(func, store);
-                store.id = originalFunction(wrappedFunc, ms);
-                return store.id;
-              } else {
-                return originalFunction(func, ms);
-              }
-            };
+          const createFunctionWrapper = (originalFunction) => (func, ms) => {
+            if (ms === undefined) ms = 0;
+            if (typeof func === "function") {
+              const store = { lastTime: Date.now() };
+              const wrappedFunc = wrapFunction(func, store);
+              store.id = originalFunction(wrappedFunc, ms);
+              return store.id;
+            } else {
+              return originalFunction(func, ms);
+            }
           };
 
           win.setTimeout = createFunctionWrapper(setTimeout);
           win.setInterval = createFunctionWrapper(setInterval);
 
-          const clearFunctionWrapper = function (originalFunction) {
-            return function (id) {
-              if (id) executingTasks.delete(id) || originalFunction(id);
-            };
+          const clearFunctionWrapper = (originalFunction) => (id) => {
+            if (id) executingTasks.delete(id) || originalFunction(id);
           };
 
           win.clearTimeout = clearFunctionWrapper(clearTimeout);
@@ -474,11 +461,11 @@ IMPROVEMENTS OVER ORIGINALS:
             win.setInterval.toString = setInterval.toString.bind(setInterval);
             win.clearTimeout.toString = clearTimeout.toString.bind(clearTimeout);
             win.clearInterval.toString = clearInterval.toString.bind(clearInterval);
-          } catch (e) {}
+          } catch (_e) {}
         })();
 
         let intervalInterrupter = null;
-        setInterval(function () {
+        setInterval(() => {
           if (intervalInterrupter === animationFrameInterrupter) {
             if (intervalInterrupter !== null) {
               animationFrameInterrupter();
@@ -501,25 +488,23 @@ IMPROVEMENTS OVER ORIGINALS:
   if (CONFIG.enableResourceOptimization) {
     // Disable WebLock (experimental feature that can block tabs)
     if (navigator.locks) {
-      const locksQuery_ = navigator.locks.query;
-      const locksRequest_ = navigator.locks.request;
+      const _locksQuery_ = navigator.locks.query;
+      const _locksRequest_ = navigator.locks.request;
 
-      navigator.locks.query = function () {
-        return new Promise((resolve) => {
+      navigator.locks.query = () =>
+        new Promise((resolve) => {
           resolve({ held: [], pending: [] });
         });
-      };
 
-      navigator.locks.request = function () {
-        return new Promise((resolve) => {
+      navigator.locks.request = () =>
+        new Promise((resolve) => {
           resolve();
         });
-      };
     }
 
     // IndexedDB lifecycle management - auto-close after 18s idle
     if (window.indexedDB) {
-      const idbOpen_ = window.indexedDB.open;
+      const _idbOpen_ = window.indexedDB.open;
       const openKey = Symbol();
       const dbSet = new Set();
       let openCount = 0;
@@ -621,7 +606,7 @@ IMPROVEMENTS OVER ORIGINALS:
   if (CONFIG.instantNavigation) {
     document.addEventListener(
       "mouseover",
-      function (e) {
+      (e) => {
         const link = e.target.closest('a[href^="/watch"]');
         if (link && !link.dataset.prefetched) {
           const preload = document.createElement("link");

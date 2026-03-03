@@ -6,6 +6,7 @@ Deduplicate and optimize blocklist files
 - Sorts entries for better compression
 - Validates domain syntax
 """
+
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -16,7 +17,8 @@ from collections.abc import Iterable
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import is_valid_domain, read_lines, write_lines
+from common import is_valid_domain, write_lines
+
 
 @dataclass(slots=True)
 class Stats:
@@ -24,24 +26,27 @@ class Stats:
     headers: int = 0
     final: int = 0
     removed: int = 0
-  
+
     @property
     def compression_ratio(self) -> float:
         return (1 - self.final / self.original) * 100 if self.original > 0 else 0.0
 
+
 def is_header(line: str) -> bool:
     """Check if line is a header/metadata line"""
-    return line.startswith(('! ', '#', '[', ';')) or not line
+    return line.startswith(("! ", "#", "[", ";")) or not line
+
 
 def is_valid_rule(line: str) -> bool:
     """Basic validation for filter rules"""
     if not line or len(line) > 2048:
         return False
-    if line.startswith(('||', '@@||')):
+    if line.startswith(("||", "@@||")):
         # Extract domain part: remove || or @@||, stop at ^ or $ or options separator
-        domain = line.split('^')[0].lstrip('|@')
+        domain = line.split("^")[0].lstrip("|@")
         return is_valid_domain(domain)
     return True
+
 
 def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     """Process lines to separate headers and rules, and deduplicate rules while keeping comments attached."""
@@ -51,12 +56,12 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     seen = set()
     in_header = True
     current_comments = []
-  
+
     for line in lines:
         stats.original += 1
         if not line:
             if in_header:
-                headers.append('')
+                headers.append("")
             continue
 
         if is_header(line):
@@ -89,12 +94,13 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
 
     return headers, rules, stats
 
+
 def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
     """Deduplicate entries in a single file"""
     print(f"Processing: {filepath}")
 
     try:
-        with filepath.open('r', encoding='utf-8') as f:
+        with filepath.open("r", encoding="utf-8") as f:
             lines_gen = (line.rstrip() for line in f)
             headers, rules, stats = process_content(lines_gen)
     except Exception as e:
@@ -104,12 +110,17 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
     final_content = headers + rules
 
     if write_lines(filepath, final_content):
-        print(f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)")
+        print(
+            f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)"
+        )
         return stats, rules
-    
+
     return Stats(), []
 
-def find_cross_file_duplicates(file_rules: dict[str, list[str]]) -> dict[str, list[str]]:
+
+def find_cross_file_duplicates(
+    file_rules: dict[str, list[str]],
+) -> dict[str, list[str]]:
     """Find entries appearing in multiple files"""
     entry_locations = defaultdict(list)
 
@@ -121,6 +132,7 @@ def find_cross_file_duplicates(file_rules: dict[str, list[str]]) -> dict[str, li
 
     return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
 
+
 def main() -> int:
     script_dir = Path(__file__).parent
     repo_dir = script_dir.parent
@@ -128,13 +140,13 @@ def main() -> int:
     if len(sys.argv) > 1:
         lists_dir = Path(sys.argv[1])
     else:
-        lists_dir = repo_dir / 'lists'
-    
+        lists_dir = repo_dir / "lists"
+
     if not lists_dir.exists():
         print(f"Error: Lists directory not found at {lists_dir}", file=sys.stderr)
         return 1
 
-    txt_files = sorted(lists_dir.glob('**/*.txt'))
+    txt_files = sorted(lists_dir.glob("**/*.txt"))
     if not txt_files:
         print("No .txt files found in lists directory", file=sys.stderr)
         return 1
@@ -150,11 +162,13 @@ def main() -> int:
         total_stats.final += stats.final
         total_stats.removed += stats.removed
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Total: {total_stats.original} → {total_stats.final} lines")
-    print(f"Removed: {total_stats.removed} ({total_stats.compression_ratio:.1f}% reduction)")
+    print(
+        f"Removed: {total_stats.removed} ({total_stats.compression_ratio:.1f}% reduction)"
+    )
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("Checking for cross-file duplicates...")
     duplicates = find_cross_file_duplicates(file_rules)
 
@@ -175,5 +189,6 @@ def main() -> int:
 
     return 0
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())

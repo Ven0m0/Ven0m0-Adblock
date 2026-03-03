@@ -31,9 +31,7 @@ IMPROVEMENTS OVER ORIGINALS:
 - OPTIMIZED CSS injection (theme at document-start, functional CSS at document-end)
 */
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_claude_complete") === "1") {
     console.warn("[Claude Complete]: Disabled by user");
@@ -84,7 +82,7 @@ IMPROVEMENTS OVER ORIGINALS:
   };
 
   // eslint-disable-next-line no-unused-vars
-  function saveConfig() {
+  function _saveConfig() {
     GM_setValue("warning_threshold", CONFIG.thresholds.warning);
     GM_setValue("danger_threshold", CONFIG.thresholds.danger);
     GM_setValue("cc_default_collapsed", CONFIG.codeCollapser.defaultCollapsed);
@@ -166,7 +164,7 @@ IMPROVEMENTS OVER ORIGINALS:
     // Fix paste handler (newlines)
     document.addEventListener(
       "paste",
-      function (e) {
+      (e) => {
         const textarea = document.activeElement;
         if (textarea && textarea.tagName === "TEXTAREA") {
           e.stopImmediatePropagation();
@@ -181,7 +179,7 @@ IMPROVEMENTS OVER ORIGINALS:
     // Override ctrl+shift+i to open devtools
     document.addEventListener(
       "keydown",
-      function (e) {
+      (e) => {
         if (e.ctrlKey && e.shiftKey && e.key === "I") {
           e.stopImmediatePropagation();
         }
@@ -1380,7 +1378,7 @@ IMPROVEMENTS OVER ORIGINALS:
 
     async forkConversationClicked(model, forkButton, modal, useSummary = false) {
       // eslint-disable-next-line no-unused-vars
-      const conversationId = window.location.pathname.split("/").pop();
+      const _conversationId = window.location.pathname.split("/").pop();
 
       if (this.originalSettings) {
         const newSettings = { ...this.originalSettings };
@@ -1429,9 +1427,9 @@ IMPROVEMENTS OVER ORIGINALS:
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
         // eslint-disable-next-line no-unused-vars
-        const [input, config] = args;
+        const [input, _config] = args;
 
-        let url = undefined;
+        let url;
         if (input instanceof URL) {
           url = input.href;
         } else if (typeof input === "string") {
@@ -1440,7 +1438,7 @@ IMPROVEMENTS OVER ORIGINALS:
           url = input.url;
         }
 
-        if (url && url.includes("/retry_completion") && this.pendingForkModel) {
+        if (url?.includes("/retry_completion") && this.pendingForkModel) {
           // Fork conversation logic (simplified - full implementation available in original)
           console.log("[Fork] Intercepted retry request");
           // ... (fork implementation details omitted for brevity)
@@ -1476,11 +1474,11 @@ IMPROVEMENTS OVER ORIGINALS:
       miniBtn.textContent = "⚡";
 
       if (pos.left !== undefined) {
-        miniBtn.style.left = pos.left + "px";
-        miniBtn.style.top = (pos.top || 100) + "px";
+        miniBtn.style.left = `${pos.left}px`;
+        miniBtn.style.top = `${pos.top || 100}px`;
       } else {
-        miniBtn.style.bottom = (pos.bottom || 100) + "px";
-        miniBtn.style.right = (pos.right || 20) + "px";
+        miniBtn.style.bottom = `${pos.bottom || 100}px`;
+        miniBtn.style.right = `${pos.right || 20}px`;
       }
 
       if (!CONFIG.ui.minimized) {
@@ -1495,11 +1493,11 @@ IMPROVEMENTS OVER ORIGINALS:
       panel.id = "claude-unified-panel";
 
       if (pos.left !== undefined) {
-        panel.style.left = Math.max(10, pos.left - 480) + "px";
-        panel.style.top = (pos.top || 100) + "px";
+        panel.style.left = `${Math.max(10, pos.left - 480)}px`;
+        panel.style.top = `${pos.top || 100}px`;
       } else {
-        panel.style.bottom = (pos.bottom || 100) + "px";
-        panel.style.right = (pos.right || 20) + "px";
+        panel.style.bottom = `${pos.bottom || 100}px`;
+        panel.style.right = `${pos.right || 20}px`;
       }
 
       if (!CONFIG.ui.minimized) {
@@ -1645,8 +1643,8 @@ IMPROVEMENTS OVER ORIGINALS:
         panelX = Math.max(10, Math.min(panelX, window.innerWidth - 550));
         panelY = Math.max(10, Math.min(panelY, window.innerHeight - 300));
 
-        panel.style.left = panelX + "px";
-        panel.style.top = panelY + "px";
+        panel.style.left = `${panelX}px`;
+        panel.style.top = `${panelY}px`;
         panel.style.right = "auto";
         panel.style.bottom = "auto";
         panel.classList.add("visible");
@@ -1657,8 +1655,8 @@ IMPROVEMENTS OVER ORIGINALS:
 
         panel.classList.remove("visible");
 
-        miniBtn.style.left = panelRect.right - 60 + "px";
-        miniBtn.style.top = panelRect.top + "px";
+        miniBtn.style.left = `${panelRect.right - 60}px`;
+        miniBtn.style.top = `${panelRect.top}px`;
         miniBtn.style.right = "auto";
         miniBtn.style.bottom = "auto";
         miniBtn.style.display = "flex";
@@ -1839,8 +1837,8 @@ IMPROVEMENTS OVER ORIGINALS:
           newX = Math.max(0, Math.min(newX, window.innerWidth - w));
           newY = Math.max(0, Math.min(newY, window.innerHeight - h));
 
-          element.style.left = newX + "px";
-          element.style.top = newY + "px";
+          element.style.left = `${newX}px`;
+          element.style.top = `${newY}px`;
           element.style.right = "auto";
           element.style.bottom = "auto";
         }

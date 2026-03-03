@@ -9,11 +9,18 @@ if str(Path(__file__).parent) not in sys.path:
 
 from common import sanitize_filename, is_valid_domain, is_adguard_rule
 
+
 class TestCommon(unittest.TestCase):
     def test_sanitize_filename_with_name(self):
-        self.assertEqual(sanitize_filename("http://example.com", "My List"), "My-List.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "My List.txt"), "My-List.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "safe-name"), "safe-name.txt")
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My List"), "My-List.txt"
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My List.txt"), "My-List.txt"
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", "safe-name"), "safe-name.txt"
+        )
 
     def test_sanitize_filename_without_name(self):
         url = "https://example.com/list.txt"
@@ -25,13 +32,22 @@ class TestCommon(unittest.TestCase):
         expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
         self.assertIn(expected_hash, filename)
 
-
     def test_sanitize_filename_with_name_special_chars(self):
-        self.assertEqual(sanitize_filename("http://example.com", "My!@#$%^&*()_+=List"), "My----------_--List.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "a/b\\c:d*e?f\"g<h>i|j"), "a-b-c-d-e-f-g-h-i-j.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "My List.txt"), "My-List.txt")
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My!@#$%^&*()_+=List"),
+            "My----------_--List.txt",
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", 'a/b\\c:d*e?f"g<h>i|j'),
+            "a-b-c-d-e-f-g-h-i-j.txt",
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My List.txt"), "My-List.txt"
+        )
         self.assertEqual(sanitize_filename("http://example.com", "a/b.txt"), "a-b.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "c.txt.txt"), "c.txt.txt")
+        self.assertEqual(
+            sanitize_filename("http://example.com", "c.txt.txt"), "c.txt.txt"
+        )
 
     def test_sanitize_filename_without_name_special_urls(self):
         # Missing scheme (no ://)
@@ -73,7 +89,6 @@ class TestCommon(unittest.TestCase):
 
     def test_write_lines_atomic(self):
         import tempfile
-        import os
         from common import write_lines
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -84,17 +99,20 @@ class TestCommon(unittest.TestCase):
             result = write_lines(target_file, ["line1", "line2"])
             self.assertTrue(result)
             self.assertTrue(target_file.exists())
-            self.assertEqual(target_file.read_text(encoding='utf-8'), "line1\nline2\n")
+            self.assertEqual(target_file.read_text(encoding="utf-8"), "line1\nline2\n")
 
             # Test atomic overwrite
             result = write_lines(target_file, ["line3", "line4"])
             self.assertTrue(result)
-            self.assertEqual(target_file.read_text(encoding='utf-8'), "line3\nline4\n")
+            self.assertEqual(target_file.read_text(encoding="utf-8"), "line3\nline4\n")
 
             # Test append
-            result = write_lines(target_file, ["line5"], mode='a')
+            result = write_lines(target_file, ["line5"], mode="a")
             self.assertTrue(result)
-            self.assertEqual(target_file.read_text(encoding='utf-8'), "line3\nline4\nline5\n")
+            self.assertEqual(
+                target_file.read_text(encoding="utf-8"), "line3\nline4\nline5\n"
+            )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

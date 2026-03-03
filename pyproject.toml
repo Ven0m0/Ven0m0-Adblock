@@ -10,3 +10,9 @@ dependencies = [
 
 [tool.uv]
 managed = true
+
+[dependency-groups]
+dev = [
+    "prek>=0.3.4",
+    "ruff>=0.15.4",
+]

@@ -93,9 +93,7 @@
 // @updateURL https://update.greasyfork.org/scripts/520298/Add%20Copy%20Button%20to%20Chat%20Messages%20on%20Github%20Copilot%20web%20page.meta.js
 // ==/UserScript==
 
-(function () {
-  "use strict";
-
+(() => {
   // Update these if class names change
   const MESSAGE_CONTENT_CLASS = "UserMessage-module__container--cAvvK";
   const CHAT_MESSAGE_CONTENT_CLASS = "ChatMessage-module__content--MYneF";
@@ -194,7 +192,7 @@
         if (mutation.type === "childList") {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-              if (node.classList && node.classList.contains(CHAT_MESSAGE_CONTENT_CLASS)) {
+              if (node.classList?.contains(CHAT_MESSAGE_CONTENT_CLASS)) {
                 addCopyButton(node);
               }
               const nestedMessages = node.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);

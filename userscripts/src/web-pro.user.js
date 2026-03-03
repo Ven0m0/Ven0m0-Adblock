@@ -20,9 +20,7 @@
 // @license      MIT
 // ==/UserScript==
 (() => {
-  "use strict";
-
-  const SITE_KEY = "webpro:disable:" + location.hostname;
+  const SITE_KEY = `webpro:disable:${location.hostname}`;
   if (localStorage.getItem(SITE_KEY) === "1") return;
 
   const HKEY = "__webpro_v6__";
@@ -242,7 +240,7 @@
   // Google Captcha speedup
   if (cfg.captchaSpeed && /\/recaptcha\/(api2|enterprise)\/bframe/.test(location.href)) {
     const origST = setTimeout;
-    setTimeout = function (fn, dur) {
+    setTimeout = function (_fn, dur) {
       if (dur === 4000 || dur === 50) dur = 0;
       return origST.apply(this, arguments);
     };
@@ -1125,5 +1123,5 @@
       : addToggle();
   }
 
-  log("Web Pro v6.0 loaded (mode=" + MODE + ")");
+  log(`Web Pro v6.0 loaded (mode=${MODE})`);
 })();

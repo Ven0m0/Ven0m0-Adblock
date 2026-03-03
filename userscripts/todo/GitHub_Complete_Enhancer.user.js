@@ -13,9 +13,7 @@
 // @updateURL    https://update.greasyfork.org/scripts/[ID]/GitHub%20Complete%20Enhancer.meta.js
 // ==/UserScript==
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_github_enhancer") === "1") {
     console.warn("[GitHub Enhancer]: Disabled by user");
@@ -67,7 +65,7 @@
       const forkBtn = document.getElementById("repo-network-counter");
       if (!forkBtn) return; // Not on a repository page
 
-      const forksAmount = parseInt(forkBtn.textContent);
+      const forksAmount = parseInt(forkBtn.textContent, 10);
       if (forksAmount < 1) return; // No forks
 
       const parentLi = forkBtn.closest("li");

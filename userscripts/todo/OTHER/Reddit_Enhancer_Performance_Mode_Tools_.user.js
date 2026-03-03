@@ -12,9 +12,7 @@
 // @updateURL https://update.greasyfork.org/scripts/537999/Reddit%20Enhancer%20%28Performance%20Mode%20%2B%20Tools%29.meta.js
 // ==/UserScript==
 
-(function () {
-  "use strict";
-
+(() => {
   const settingsKey = "redditEnhancerSettings";
   const positionKey = "redditEnhancerPosition";
 
@@ -115,8 +113,8 @@
     const menu = document.createElement("div");
     menu.id = "reddit-enhancer-menu";
     if (savedPos.top && savedPos.left) {
-      menu.style.top = savedPos.top + "px";
-      menu.style.left = savedPos.left + "px";
+      menu.style.top = `${savedPos.top}px`;
+      menu.style.left = `${savedPos.left}px`;
       menu.style.right = "auto";
       menu.style.bottom = "auto";
     }
@@ -137,7 +135,7 @@
       input.type = "checkbox";
       input.id = id;
       label.appendChild(input);
-      label.appendChild(document.createTextNode(" " + labelText));
+      label.appendChild(document.createTextNode(` ${labelText}`));
       panel.appendChild(label);
       panel.appendChild(document.createElement("br"));
     }
@@ -152,7 +150,7 @@
 
     function addTextInput(id, labelText) {
       const label = document.createElement("label");
-      label.appendChild(document.createTextNode(labelText + ": "));
+      label.appendChild(document.createTextNode(`${labelText}: `));
       const input = document.createElement("input");
       input.type = "text";
       input.id = id;
@@ -224,12 +222,12 @@
 
     document.getElementById("re-import-file").addEventListener("change", function () {
       const reader = new FileReader();
-      reader.onload = function () {
+      reader.onload = () => {
         try {
           settings = JSON.parse(reader.result);
           saveSettings();
           location.reload();
-        } catch (e) {
+        } catch (_e) {
           alert("Invalid settings file.");
         }
       };
@@ -260,8 +258,8 @@
       if (isDragging) {
         const x = Math.max(0, e.clientX - offsetX);
         const y = Math.max(0, e.clientY - offsetY);
-        menu.style.left = x + "px";
-        menu.style.top = y + "px";
+        menu.style.left = `${x}px`;
+        menu.style.top = `${y}px`;
         menu.style.right = "auto";
         menu.style.bottom = "auto";
       }
@@ -272,8 +270,8 @@
         localStorage.setItem(
           positionKey,
           JSON.stringify({
-            top: parseInt(menu.style.top),
-            left: parseInt(menu.style.left)
+            top: parseInt(menu.style.top, 10),
+            left: parseInt(menu.style.left, 10)
           })
         );
       }
