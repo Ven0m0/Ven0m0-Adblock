@@ -29,16 +29,13 @@
     "clean:all": "bun run clean && bun run clean:cache",
     "precommit": "bun run lint:fix:all",
     "validate": "bun run test && bun run build",
-    "aglint": "bunx aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\"",
-
+    "aglint": "bunx aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\""
   },
   "devDependencies": {
     "@adguard/aglint": "latest",
     "@adguard/dead-domains-linter": "latest",
     "@adguard/hostlist-compiler": "latest",
-    "@biomejs/biome": "latest",
-    "oxfmt": "latest",
-    "oxlint": "latest",
+    "@biomejs/biome": "2.4.6",
     "@eslint/js": "latest",
     "@microsoft/eslint-formatter-sarif": "latest",
     "@types/bun": "latest",
@@ -46,6 +43,8 @@
     "eslint": "latest",
     "globals": "latest",
     "markdownlint-cli2": "latest",
+    "oxfmt": "latest",
+    "oxlint": "latest",
     "terser": "latest"
   },
   "engines": {

@@ -9,14 +9,7 @@
       "source": "https://adguardteam.github.io/AdguardFilters/BaseFilter/sections/adservers.txt",
       "type": "adblock",
       "exclusions_sources": ["Filters/exclusions.txt"],
-      "transformations": [
-        "RemoveModifiers",
-        "ValidateAllowIp",
-        "Validate",
-        "RemoveComments",
-        "Deduplicate",
-        "Compress"
-      ]
+      "transformations": ["RemoveModifiers", "ValidateAllowIp", "Validate", "RemoveComments", "Deduplicate", "Compress"]
     },
     {
       "name": "AdGuard Base filter ad servers first-party",
