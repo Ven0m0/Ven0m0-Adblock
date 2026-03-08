@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import Mock, mock_open
 
 # Import the module dynamically
-file_path = Path(__file__).parent / "move-pure-domains.py"
+file_path = Path(__file__).parent / "move_pure_domains.py"
 spec = importlib.util.spec_from_file_location("move_pure_domains", file_path)
 if spec is None or spec.loader is None:
     raise ImportError("Could not load module")
