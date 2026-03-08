@@ -128,6 +128,31 @@ class TestUpdateLists(unittest.TestCase):
         # Should call validate with content
         mock_validate.assert_called_once_with("some content", 'final.txt')
 
+
+    @patch('update_lists.validate_checksum')
+    @patch('update_lists.aiofiles.open')
+    def test_process_downloaded_file_suspiciously_small(self, mock_aio_open, mock_validate):
+        mock_validate.return_value = True
+
+        mock_file_read = AsyncMock()
+        mock_file_read.read.return_value = "short content"  # < 100 bytes
+
+        mock_aio_open.return_value = MagicMock(
+            __aenter__=AsyncMock(return_value=mock_file_read),
+            __aexit__=AsyncMock()
+        )
+
+        temp_path = MagicMock(spec=Path)
+        temp_path.exists.return_value = True
+
+        result = asyncio.run(update_lists.process_downloaded_file(
+            temp_path, "http://url", "final.txt", Path("/tmp/out")
+        ))
+
+        self.assertIsNone(result)
+        temp_path.unlink.assert_called_once()
+        mock_validate.assert_called_once_with("short content", 'final.txt')
+
     @patch('update_lists.process_downloaded_file')
     @patch('update_lists.aiofiles.open')
     @patch('tempfile.NamedTemporaryFile')

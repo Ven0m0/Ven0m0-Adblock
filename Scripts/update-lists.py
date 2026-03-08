@@ -115,6 +115,7 @@ async def process_downloaded_file(
     
     if len(content) < 100:
       logger.error(f"Downloaded file suspiciously small ({len(content)} bytes): {url}")
+      temp_path.unlink()
       return None
     
     # Offload CPU-bound rule counting to a thread
