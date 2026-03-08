@@ -1,11 +1,7 @@
 import unittest
-import sys
 from pathlib import Path
 import hashlib
 
-# Add current directory to path
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
 
 from common import sanitize_filename, is_valid_domain, is_adguard_rule
 

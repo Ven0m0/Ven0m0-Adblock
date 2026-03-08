@@ -1,12 +1,6 @@
 import unittest
-import sys
-from pathlib import Path
 import importlib
 
-# Add Scripts to path
-scripts_dir = Path(__file__).parent
-if str(scripts_dir) not in sys.path:
-    sys.path.append(str(scripts_dir))
 
 # Import ADGUARD_INDICATORS from common
 from common import ADGUARD_INDICATORS
