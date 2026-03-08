@@ -9,8 +9,6 @@ from pathlib import Path
 from collections import defaultdict
 
 # Import common utilities
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
 
 from common import is_valid_domain, read_lines, write_lines
 

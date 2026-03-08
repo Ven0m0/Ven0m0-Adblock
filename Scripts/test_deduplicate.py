@@ -2,9 +2,6 @@ import unittest
 import sys
 from pathlib import Path
 
-# Add current directory to path to allow importing deduplicate
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
 
 from deduplicate import process_content
 
