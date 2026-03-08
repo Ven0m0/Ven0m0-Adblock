@@ -19,6 +19,8 @@ if str(Path(__file__).parent) not in sys.path:
 
 from common import is_valid_domain, write_lines
 
+HEADER_PREFIXES = ("! ", "#", "[", ";")
+
 
 @dataclass(slots=True)
 class Stats:
@@ -34,7 +36,7 @@ class Stats:
 
 def is_header(line: str) -> bool:
     """Check if line is a header/metadata line"""
-    return line.startswith(("! ", "#", "[", ";")) or not line
+    return line.startswith(HEADER_PREFIXES) or not line
 
 
 def is_valid_rule(line: str) -> bool:
