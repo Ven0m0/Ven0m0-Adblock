@@ -1,0 +1,122 @@
+! [Adblock Plus 2.0]
+! Title: uBO Lite filters
+! Last modified: %timestamp%
+! Expires: 4 days
+! Description: Filters optimized for uBO Lite
+! Homepage: https://github.com/uBlockOrigin/uAssets
+! License: https://github.com/uBlockOrigin/uAssets/blob/master/LICENSE
+! GitHub issues: https://github.com/uBlockOrigin/uAssets/issues
+! GitHub pull requests: https://github.com/uBlockOrigin/uAssets/pulls
+! URL Parameter Filters
+! START: Specific cosmetic filters
+! https://github.com/uBlockOrigin/uBOL-home/issues/250
+! https://github.com/uBlockOrigin/uAssets/issues/26839
+! https://github.com/uBlockOrigin/uAssets/issues/31008
+! END: Specific cosmetic filters
+! START: Safari's issues
+! redirect
+! https://github.com/uBlockOrigin/uBOL-home/issues/434
+! block doc on Safari
+! https://www.reddit.com/r/uBlockOrigin/comments/1ntc3nt/why_was_strict_blocking_removed_from_ubo_lite/
+! others
+! https://github.com/uBlockOrigin/uAssets/issues/29624
+! https://github.com/uBlockOrigin/uBOL-home/issues/445
+! https://github.com/uBlockOrigin/uAssets/issues/30281
+! END: Safari's issues
+! https://github.com/uBlockOrigin/uBOL-issues/issues/8
+! popular sites addressed by entity filters
+! problems by $redirect-rule
+! CHP
+! /ads-api. in EL
+! BAB
+! https://github.com/orgs/uBlockOrigin/teams/ublock-filters-volunteers/discussions/377
+! setNptTechAdblockerCookie
+! https://github.com/uBlockOrigin/uAssets/discussions/25653
+! https://github.com/uBlockOrigin/uBOL-issues/issues/26
+! https://github.com/uBlockOrigin/uBOL-issues/issues/30
+! https://github.com/uBlockOrigin/uAssets/issues/25274
+! https://github.com/uBlockOrigin/uAssets/issues/25518
+! https://github.com/uBlockOrigin/uAssets/commit/db8427f62bf1b9d17d62cf5eec0e871d33d72419
+! https://github.com/uBlockOrigin/uAssets/issues/26585
+! https://github.com/uBlockOrigin/uAssets/issues/26586
+! https://github.com/uBlockOrigin/uAssets/issues/26753
+! https://github.com/uBlockOrigin/uAssets/issues/26815
+! https://github.com/uBlockOrigin/uAssets/issues/26837
+! https://www.reddit.com/r/uBlockOrigin/comments/1i1ow2n/cant_scrub_in_video/
+! https://github.com/uBlockOrigin/uAssets/issues/26885
+! https://github.com/uBlockOrigin/uAssets/issues/27174
+! https://github.com/uBlockOrigin/uAssets/issues/27556
+! https://github.com/AdguardTeam/AdguardFilters/issues/198021
+! https://lepomisprinted .shop/thRPFjI0rSrv5TNE/10879
+! https://github.com/uBlockOrigin/uAssets/issues/27679
+! https://github.com/uBlockOrigin/uAssets/issues/7900
+! /^https:\/\/(?:cdn77\.)?aj\d{4}\.bid\/[^?]{30,}\?/$xhr,3p,to=bid,method=get
+! https://github.com/uBlockOrigin/uAssets/discussions/17361#discussioncomment-11656652
+! https://github.com/uBlockOrigin/uAssets/issues/26591
+! https://github.com/uBlockOrigin/uAssets/issues/26645
+! https://github.com/uBlockOrigin/uAssets/issues/26758
+! https://github.com/uBlockOrigin/uAssets/issues/26790
+! https://github.com/uBlockOrigin/uAssets/issues/26943
+! https://github.com/uBlockOrigin/uBOL-home/issues/293
+! @@*$media,domain=open.spotify.com
+! popups
+! /^https?:\/\/(?:www\.|[a-z0-9]{7,10}\.)?[a-z0-9-]{5,}\.(?:com|bid|link|live|online|top|club)\/\/?(?:[a-z0-9]{2}\/){2,3}[a-f0-9]{32}\.js/$script,3p,redirect=noopjs
+! Ad-Shield (regex workaround for MV3)
+! Admiral
+! https://github.com/uBlockOrigin/uAssets/issues/29566
+! StevenBlack/hosts issue
+! https://github.com/uBlockOrigin/uAssets/issues/28512
+! https://github.com/uBlockOrigin/uAssets/issues/25323
+!#endif
+!#if env_safari
+$removeparam=/^utm_/,domain=music.apple.com|reddit.com|spotify.com
+$removeparam=cmpid,domain=coupons.albertsons.com|coupons.safeway.com
+*$script,3p,denyallow=cloudfront.net|disqus.com|disquscdn.com|fastlylb.net|widgetlogic.org,domain=manganinja.com
+*$script,3p,denyallow=googleapis.com|datatables.net|jsdelivr.net|cloudflare.net,domain=rarbg.proxyninja.org
+/^https:\/\/(?:[a-z]{2}\.)?[a-z]{7,14}\.[a-z]{3,7}\/[a-z][0-9A-Za-z]{10,16}\/[A-Za-z]{5}(?:\?_=\d+)?$/$script,3p,match-case
+/^https:\/\/(?:cdn77\.)?aj\d{4}\.bid\/.+\?/$xhr,3p,to=bid,method=get
+/^https:\/\/[a-z]{2}\.[a-z]+\.com\/r[0-9A-Za-z]{17,26}\/\d{4,6}$/$script,3p,match-case,to=com
+/^https?:\/\/(?:[a-z]{2}\.)?[0-9a-z]{5,16}\.[a-z]{3,7}\//$script,3p,domain=animixplay.st|d0000d.com|d000d.com|d0o0d.com|do0od.com|doods.pro|dooodster.com|ds2play.com|ds2video.com|edgedeliverynetwork.com|flamecomics.xyz|ghbrisk.com|kshow123.tv|mixdrop.ps|nxbrew.net|pobreflixtv.uno|readcominonline.li|sussyscan.com|sussytoons.site|veporn.com
+/^https?:\/\/[-a-z]{5,12}\.[a-z]{3,6}\/[0-9a-h]{1,17}\?[0-9a-zA-Z]{1,21}=/$xhr,3p,match-case,method=get,from=extreme-down.tools,to=~com|~net
+/sbar.json?key=
+://ads.$object,redirect=noopframe,domain=rtl.hr
+://www.*.xyz/script/*.de.js|$script,3p
+://www.*.xyz/script/*.jp.js|$script,3p
+ebay.*##+js(href-sanitizer, li.nav--list > a[href^="http://"], +https)
+fuqster.com##a[href^="https://landing.brazzersnetwork.com/"]
+histalk2.com###header_ad
+playeriframe.lol,stream.hownetwork.xyz###adyes
+playeriframe.lol,stream.hownetwork.xyz###donate > a[href][style][onclick="thank_you()"][target="_blank"][rel="nofollow"]
+pornhub.com###pb_block
+pornhub.com###relatedVideosCenter > .wrapVideoBlock
+pornhub.com##+js(set, page_params.holiday_promo, true)
+post-gazette.com##+js(aopr, setNptTechAdblockerCookie)
+right.com.cn##.wp.a_t
+spankbang.com,spankbang.mov##+js(nowoif)
+stbturbo.xyz###pop.div_pop
+turboplayers.xyz###pop.div_pop:remove()
+upn.one##+js(trusted-override-element-method, HTMLAnchorElement.prototype.click, a[target="_blank"])
+upn.one##div[style^="position: fixed; inset: 0px; z-index: 2147483647; background: black; opacity: 0.01; cursor: pointer;"]
+||instant-dl.pages.dev^$doc,csp=script-src 'self' 'unsafe-inline'
+||music.apple.com^$removeparam=/^ign-/
+||music.apple.com^$removeparam=app
+||music.apple.com^$removeparam=at
+||music.apple.com^$removeparam=cId
+||music.apple.com^$removeparam=cc
+||music.apple.com^$removeparam=ct
+||music.apple.com^$removeparam=itscg
+||music.apple.com^$removeparam=itsct
+||music.apple.com^$removeparam=lId
+||music.apple.com^$removeparam=ls
+||music.apple.com^$removeparam=sr
+||music.apple.com^$removeparam=src
+||music.apple.com^$removeparam=uo
+||old.reddit.com^$removeparam=rdt
+||open.spotify.com^$removeparam=dlsi
+||open.spotify.com^$removeparam=flow_ctx
+||open.spotify.com^$removeparam=flow_id
+||open.spotify.com^$removeparam=go
+||open.spotify.com^$removeparam=nd
+||open.spotify.com^$removeparam=referral
+||open.spotify.com^$removeparam=si
+||open.spotify.com^$removeparam=sp_cid

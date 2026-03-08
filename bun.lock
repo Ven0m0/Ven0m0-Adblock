@@ -5,20 +5,20 @@
     "": {
       "name": "ven0m0-adblock",
       "devDependencies": {
-        "@adguard/aglint": "latest",
-        "@adguard/dead-domains-linter": "latest",
-        "@adguard/hostlist-compiler": "latest",
-        "@biomejs/biome": "2.4.6",
-        "@eslint/js": "latest",
-        "@microsoft/eslint-formatter-sarif": "latest",
-        "@types/bun": "latest",
-        "esbuild": "latest",
-        "eslint": "latest",
-        "globals": "latest",
-        "markdownlint-cli2": "latest",
-        "oxfmt": "latest",
-        "oxlint": "latest",
-        "terser": "latest",
+        "@adguard/aglint": "*",
+        "@adguard/dead-domains-linter": "*",
+        "@adguard/hostlist-compiler": "*",
+        "@biomejs/biome": "*",
+        "@eslint/js": "*",
+        "@microsoft/eslint-formatter-sarif": "*",
+        "@types/bun": "*",
+        "esbuild": "*",
+        "eslint": "*",
+        "globals": "*",
+        "markdownlint-cli2": "*",
+        "oxfmt": "*",
+        "oxlint": "*",
+        "terser": "*",
       },
     },
   },
@@ -439,7 +439,7 @@
 
     "flat-cache": ["flat-cache@4.0.1", "", { "dependencies": { "flatted": "^3.2.9", "keyv": "^4.5.4" } }, "sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw=="],
 
-    "flatted": ["flatted@3.3.4", "", {}, "sha512-3+mMldrTAPdta5kjX2G2J7iX4zxtnwpdA8Tr2ZSjkyPSanvbZAcy6flmtnXbEybHrDcU9641lxrMfFuUxVz9vA=="],
+    "flatted": ["flatted@3.4.0", "", {}, "sha512-kC6Bb+ooptOIvWj5B63EQWkF0FEnNjV2ZNkLMLZRDDduIiWeFF4iKnslwhiWxjAdbg4NzTNo6h0qLuvFrcx+Sw=="],
 
     "follow-redirects": ["follow-redirects@1.5.10", "", { "dependencies": { "debug": "=3.1.0" } }, "sha512-0V5l4Cizzvqt5D44aTXbFZz+FtyXV1vrDN6qrelxtfYQKW0KO0W2T/hkE8xvGa/540LkZlkaUjO4ailYTFtHVQ=="],
 
@@ -549,7 +549,7 @@
 
     "jsonpointer": ["jsonpointer@4.1.0", "", {}, "sha512-CXcRvMyTlnR53xMcKnuMzfCA5i/nfblTnnr74CZb6C4vG39eu6w51t7nKmU5MfLfbTgGItliNyjO/ciNPDqClg=="],
 
-    "katex": ["katex@0.16.37", "", { "dependencies": { "commander": "^8.3.0" }, "bin": { "katex": "cli.js" } }, "sha512-TIGjO2cCGYono+uUzgkE7RFF329mLLWGuHUlSr6cwIVj9O8f0VQZ783rsanmJpFUo32vvtj7XT04NGRPh+SZFg=="],
+    "katex": ["katex@0.16.38", "", { "dependencies": { "commander": "^8.3.0" }, "bin": { "katex": "cli.js" } }, "sha512-cjHooZUmIAUmDsHBN+1n8LaZdpmbj03LtYeYPyuYB7OuloiaeaV6N4LcfjcnHVzGWjVQmKrxxTrpDcmSzEZQwQ=="],
 
     "keyv": ["keyv@4.5.4", "", { "dependencies": { "json-buffer": "3.0.1" } }, "sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw=="],
 

@@ -1,0 +1,16 @@
+! [Adblock Plus 2.0]
+
+##.diysdk_webServices_banners1und1MainContent
+#qa-modal-body
+.adblock
+#adblock_tooltip
+.adblock-killme-overlay
+.adblock__container
+.adblock_subtitle
+.adblock_title
+.dialog-overlay
+.inactivity
+.protection
+.unblocker
+.unblocker-wrapper
+usgang.ch###rectangle-wrapper

@@ -25,6 +25,10 @@ update_lists = importlib.util.module_from_spec(spec)
 sys.modules["update_lists"] = update_lists
 spec.loader.exec_module(update_lists)
 
+# Import specific functions to test
+count_rules = update_lists.count_rules
+load_sources = update_lists.load_sources
+
 
 class AsyncIterator:
     def __init__(self, seq):
@@ -307,6 +311,106 @@ class TestUpdateLists(unittest.TestCase):
         mock_logger_exception.assert_called_once_with(
             "✗ Unexpected error for http://url: Boom"
         )
+
+    def test_count_rules(self):
+        # Empty content
+        self.assertEqual(count_rules(""), 0)
+
+        # Only headers
+        content = "! Header 1\n! Header 2\n# Comment\n[Adblock Plus]\n"
+        self.assertEqual(count_rules(content), 0)
+
+        # Mixed content
+        content = """! Header
+||example.com^
+example.com##.ad
+domain.com
+# Another comment
+||ads.example.com^
+"""
+        # Should count: ||example.com^, example.com##.ad, domain.com, ||ads.example.com^ = 4
+        self.assertEqual(count_rules(content), 4)
+
+        # Content with empty lines
+        content = "rule1.com\n\nrule2.com\n\n"
+        self.assertEqual(count_rules(content), 2)
+
+        # Windows line endings should be handled
+        content = "rule1.com\r\nrule2.com\r\n"
+        self.assertEqual(count_rules(content), 2)
+
+    def test_count_rules_with_whitespace(self):
+        # Lines with only whitespace should not count
+        content = "rule1.com\n   \n\trule2.com\n"
+        self.assertEqual(count_rules(content), 2)
+
+    def test_load_sources_template_creation(self):
+        """Test load_sources creates template when config doesn't exist."""
+        import tempfile
+        import json
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_path = Path(temp_dir) / "sources-urls.json"
+
+            # Call load_sources - should create template
+            sources = load_sources(config_path)
+
+            # Verify template was created
+            self.assertTrue(config_path.exists())
+
+            # Verify it loads the created template
+            data = json.loads(config_path.read_text())
+            self.assertIn("sources", data)
+
+            # Verify sources is a dict with expected keys
+            self.assertIsInstance(sources, dict)
+            for url, config in sources.items():
+                self.assertIn("filename", config)
+                self.assertIn("skip_checksum", config)
+                self.assertIn("enabled", config)
+                self.assertTrue(config["enabled"])
+
+    def test_load_sources_existing_config(self):
+        """Test load_sources loads existing config correctly."""
+        import tempfile
+        import json
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_path = Path(temp_dir) / "sources-urls.json"
+
+            # Create a test config
+            config_data = {
+                "sources": [
+                    {
+                        "url": "https://example.com/list1.txt",
+                        "filename": "custom-name.txt",
+                        "skip_checksum": True,
+                        "enabled": True,
+                    },
+                    {
+                        "url": "https://example.com/list2.txt",
+                        "enabled": False,  # Should be filtered out
+                    },
+                    {
+                        "url": "https://example.com/list3.txt",
+                        "enabled": True,
+                    },
+                ]
+            }
+            config_path.write_text(json.dumps(config_data))
+
+            sources = load_sources(config_path)
+
+            # Should have 2 sources (list2 is disabled)
+            self.assertEqual(len(sources), 2)
+
+            # Verify list1
+            self.assertIn("https://example.com/list1.txt", sources)
+            self.assertEqual(sources["https://example.com/list1.txt"]["filename"], "custom-name.txt")
+            self.assertTrue(sources["https://example.com/list1.txt"]["skip_checksum"])
+
+            # Verify list3 (no filename provided - should use sanitize)
+            self.assertIn("https://example.com/list3.txt", sources)
 
 
 if __name__ == "__main__":
