@@ -49,7 +49,17 @@ BINSTALL_DISABLE_TELEMETRY = "true"
 
 [tasks.install]
 description = "Install all dependencies"
-run = "mise install && bun install"
+run = "mise install && bun install && uv sync"
+
+[tasks."precommit:install"]
+description = "Install prek as git pre-commit hook"
+run = "uv run prek install --overwrite"
+depends = ["install"]
+
+[tasks."precommit:run"]
+description = "Run pre-commit hooks on all files"
+run = "uv run prek run --all-files"
+depends = ["install"]
 
 [tasks.build]
 description = "Build all lists"
