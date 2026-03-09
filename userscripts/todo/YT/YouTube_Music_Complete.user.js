@@ -37,7 +37,7 @@ CONSOLIDATED FEATURES:
   }
 
   // Promise isolation (YouTube Music hacks Promise in some browsers)
-  const Promise = (async () => {})().constructor;
+  const _CustomPromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -262,7 +262,9 @@ CONSOLIDATED FEATURES:
 
       // Observe thumbnails
       const observeImages = () => {
-        document.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+        document.querySelectorAll("img[data-src]").forEach((img) => {
+          observer.observe(img);
+        });
       };
 
       // Initial observation

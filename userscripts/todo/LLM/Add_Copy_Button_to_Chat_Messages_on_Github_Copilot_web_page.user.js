@@ -177,7 +177,9 @@
    */
   function processExistingMessages() {
     const messageElements = document.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-    messageElements.forEach((messageElement) => addCopyButton(messageElement));
+    messageElements.forEach((messageElement) => {
+      addCopyButton(messageElement);
+    });
   }
 
   /**
@@ -196,7 +198,9 @@
                 addCopyButton(node);
               }
               const nestedMessages = node.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-              nestedMessages.forEach((nestedNode) => addCopyButton(nestedNode));
+              nestedMessages.forEach((nestedNode) => {
+                addCopyButton(nestedNode);
+              });
             }
           });
         }
