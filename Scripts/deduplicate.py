@@ -13,7 +13,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from collections.abc import Iterable
 
-
+# Add current directory to path to allow importing common if run from elsewhere
 from common import is_valid_domain, write_lines
 
 HEADER_PREFIXES = ("! ", "#", "[", ";")

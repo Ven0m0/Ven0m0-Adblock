@@ -1,7 +1,16 @@
 import unittest
 import importlib
 
+<<<<<<< HEAD
 
+||||||| 7ae0716
+# Add Scripts to path
+scripts_dir = Path(__file__).parent
+if str(scripts_dir) not in sys.path:
+    sys.path.append(str(scripts_dir))
+
+=======
+>>>>>>> origin/code-health-remove-sys-path-boilerplate-4625015370076301560
 # Import ADGUARD_INDICATORS from common
 from common import ADGUARD_INDICATORS
 

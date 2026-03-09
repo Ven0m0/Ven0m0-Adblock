@@ -6,7 +6,7 @@ from pathlib import Path
 import hashlib
 from unittest.mock import patch
 
-
+# Add current directory to path
 from common import sanitize_filename, is_valid_domain, is_adguard_rule, read_lines
 
 

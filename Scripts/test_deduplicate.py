@@ -1,5 +1,6 @@
 import unittest
 
+# Add current directory to path to allow importing deduplicate
 from deduplicate import process_content, is_header, is_valid_rule
 
 
