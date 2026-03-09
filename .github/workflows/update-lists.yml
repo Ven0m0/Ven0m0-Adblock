@@ -22,7 +22,7 @@ env:
   PYTHON_COLORS: 0
   LC_ALL: C
   GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-jobs: 
+jobs:
   update-mirror:
     name: Download & Mirror AdLists
     runs-on:  ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-branches origin adlists-mirror || : 
+          git remote set-branches origin adlists-mirror || :
           git fetch --depth=1 -nq origin adlists-mirror || git checkout -b adlists-mirror
       - name: Commit changes
         id: commit
