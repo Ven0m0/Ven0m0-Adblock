@@ -1,22 +1,11 @@
 import unittest
 import importlib
 
-<<<<<<< HEAD
-
-||||||| 7ae0716
-# Add Scripts to path
-scripts_dir = Path(__file__).parent
-if str(scripts_dir) not in sys.path:
-    sys.path.append(str(scripts_dir))
-
-=======
->>>>>>> origin/code-health-remove-sys-path-boilerplate-4625015370076301560
 # Import ADGUARD_INDICATORS from common
-from common import ADGUARD_INDICATORS
+from Scripts.common import ADGUARD_INDICATORS
 
 # Import is_pure_domain from move-pure-domains
-move_pure_domains = importlib.import_module("move-pure-domains")
-is_pure_domain = move_pure_domains.is_pure_domain
+from Scripts.move_pure_domains import is_pure_domain
 
 
 class TestIsPureDomain(unittest.TestCase):

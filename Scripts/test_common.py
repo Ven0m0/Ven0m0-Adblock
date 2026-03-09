@@ -6,8 +6,7 @@ from pathlib import Path
 import hashlib
 from unittest.mock import patch
 
-# Add current directory to path
-from common import sanitize_filename, is_valid_domain, is_adguard_rule, read_lines
+from Scripts.common import sanitize_filename, is_valid_domain, is_adguard_rule, read_lines
 
 
 class TestCommon(unittest.TestCase):
@@ -107,7 +106,7 @@ class TestCommon(unittest.TestCase):
                 self.assertIn(f"Error reading {non_existent}", mock_stderr.getvalue())
 
     def test_write_lines_atomic(self):
-        from common import write_lines
+        from Scripts.common import write_lines
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)
