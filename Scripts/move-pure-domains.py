@@ -9,7 +9,6 @@ from pathlib import Path
 from collections import defaultdict
 
 # Import common utilities
-
 from common import is_valid_domain, read_lines, write_lines
 
 

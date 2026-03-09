@@ -1,7 +1,4 @@
 import unittest
-import sys
-from pathlib import Path
-
 
 from deduplicate import process_content, is_header, is_valid_rule
 
