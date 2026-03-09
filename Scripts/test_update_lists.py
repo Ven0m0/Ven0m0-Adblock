@@ -20,7 +20,8 @@ aiohttp_mock.ClientError = ClientError
 sys.modules["aiohttp"] = aiohttp_mock
 sys.modules["aiofiles"] = MagicMock()
 
-spec = importlib.util.spec_from_file_location("update_lists", "Scripts/update-lists.py")
+spec = importlib.util.spec_from_file_location("update_lists", "Scripts/update_lists.py")
+>>>>>>> origin/jules/fix-sys-path-boilerplate-6564146397324574189
 update_lists = importlib.util.module_from_spec(spec)
 sys.modules["update_lists"] = update_lists
 spec.loader.exec_module(update_lists)

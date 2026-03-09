@@ -13,8 +13,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from collections.abc import Iterable
 
-
-from common import is_valid_domain, write_lines
+from Scripts.common import is_valid_domain, write_lines
 
 HEADER_PREFIXES = ("! ", "#", "[", ";")
 

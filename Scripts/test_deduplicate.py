@@ -1,9 +1,7 @@
 import unittest
-import sys
-from pathlib import Path
 
-
-from deduplicate import process_content, is_header, is_valid_rule
+# Add current directory to path to allow importing deduplicate
+from Scripts.deduplicate import process_content, is_header, is_valid_rule
 
 
 class TestDeduplicate(unittest.TestCase):

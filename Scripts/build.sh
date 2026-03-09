@@ -104,7 +104,7 @@ build_hostlist(){
   }
   [[ -f configuration_popup_filter.json ]] && {
     hostlist-compiler -c configuration_popup_filter.json -o "$FILTER_OUT/adguard_popup_filter.txt" --verbose || warn "Popup filter compilation failed"
-    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILTER_OUT/adguard_popup_filter.txt" || : 
+    [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILTER_OUT/adguard_popup_filter.txt" || :
   }
 }
 
@@ -179,15 +179,15 @@ build_userscripts(){
     mapfile -t files < <(find "$SCRIPT_SRC" -type f -name "*.js" 2>/dev/null)
   (( ${#files[@]} == 0 )) && { log userscripts "No files in $SCRIPT_SRC"; return 0; }
   log userscripts "Processing ${#files[@]} files"
-  has eslint && eslint --fix --quiet --no-warn-ignored "${files[@]}" 2>/dev/null || : 
+  has eslint && eslint --fix --quiet --no-warn-ignored "${files[@]}" 2>/dev/null || :
   export -f _process_js ok err warn
   export REPO SCRIPT_OUT R G Y N RUNNER
   RUNNER=$(runner)
   if [[ -n $(par) ]] && (( ${#files[@]} > 1 )); then
-    printf '%s\n' "${files[@]}" | "$(par)" -j "$(jobs)" --bar _process_js {} 2>/dev/null || : 
+    printf '%s\n' "${files[@]}" | "$(par)" -j "$(jobs)" --bar _process_js {} 2>/dev/null || :
   else
     for f in "${files[@]}"; do
-      _process_js "$f" || : 
+      _process_js "$f" || :
     done
   fi
   [[ -f $SCRIPT_LIST ]] && cp "$SCRIPT_LIST" "$SCRIPT_OUT/README.md"

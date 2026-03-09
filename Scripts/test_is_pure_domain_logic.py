@@ -1,15 +1,11 @@
 import unittest
-import sys
-from pathlib import Path
 import importlib
 
-
 # Import ADGUARD_INDICATORS from common
-from common import ADGUARD_INDICATORS
+from Scripts.common import ADGUARD_INDICATORS
 
 # Import is_pure_domain from move-pure-domains
-move_pure_domains = importlib.import_module("move-pure-domains")
-is_pure_domain = move_pure_domains.is_pure_domain
+from Scripts.move_pure_domains import is_pure_domain
 
 
 class TestIsPureDomain(unittest.TestCase):
