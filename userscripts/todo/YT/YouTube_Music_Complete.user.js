@@ -37,7 +37,7 @@ CONSOLIDATED FEATURES:
   }
 
   // Promise isolation (YouTube Music hacks Promise in some browsers)
-  const _CustomPromise = (async () => {})().constructor;
+  const NativePromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
