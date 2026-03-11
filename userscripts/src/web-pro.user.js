@@ -619,7 +619,7 @@
             if (u.origin === location.origin) continue;
             if (stripTracking(u)) a.href = u.href;
           } catch (e) {
-            log("Link clean error", e);
+            if (cfg.log) log("Link clean error", e);
           }
         }
         if (i < links.length) idle(step);
