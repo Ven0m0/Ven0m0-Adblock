@@ -55,8 +55,9 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     in_header = True
     current_comments = []
 
-    for line in lines:
+    for raw_line in lines:
         stats.original += 1
+        line = raw_line.strip()
         if not line:
             if in_header:
                 headers.append("")
@@ -124,9 +125,7 @@ def find_cross_file_duplicates(
 
     for filename, rules in file_rules.items():
         for rule in rules:
-            stripped = rule.strip()
-            if stripped:
-                entry_locations[stripped].append(filename)
+            entry_locations[rule].append(filename)
 
     return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
 
