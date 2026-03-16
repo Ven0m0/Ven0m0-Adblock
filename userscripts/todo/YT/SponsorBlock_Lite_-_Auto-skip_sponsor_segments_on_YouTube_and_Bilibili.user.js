@@ -79,8 +79,10 @@
   let currentSegmentIndex = 0;
   let videoChangeDebounce = null;
   let previewBarContainer = null;
+  // eslint-disable-next-line no-unused-vars
   let _videoDuration = 0;
   let lastUrl = location.href;
+  // eslint-disable-next-line no-unused-vars
   let _urlPollInterval = null;
   let videoObserver = null;
   let rafSkipId = null; // For requestAnimationFrame-based skipping
@@ -93,12 +95,17 @@
   // Vinegar detection - now a function that's called when needed
   let IS_VINEGAR = false;
 
-  function updateVinegarDetection() {
-    const hasVideo = document.querySelector("video") !== null;
+  function updateVinegarDetection(videoElement = null) {
+    if (IS_VINEGAR) return true;
+
+    const hasVideo = videoElement !== null || document.querySelector("video") !== null;
+    if (!hasVideo) return false;
+
     const hasYouTubePlayer = document.querySelector("#movie_player, ytm-player, #player") !== null;
+    if (hasYouTubePlayer) return false;
+
     const hasYouTubeProgressBar = document.querySelector(".ytp-progress-bar, .progress-bar-line") !== null;
-    // Vinegar: video exists but no YouTube player components
-    const detected = hasVideo && !hasYouTubePlayer && !hasYouTubeProgressBar;
+    const detected = !hasYouTubeProgressBar;
 
     if (detected && !IS_VINEGAR) {
       IS_VINEGAR = true;
@@ -312,7 +319,9 @@
   // ==================== API FUNCTIONS ====================
 
   function fetchSegments(videoID) {
-    return new Promise(async (resolve) => {
+    return new Promise(
+      // eslint-disable-next-line no-async-promise-executor
+      async (resolve) => {
       try {
         const hashPrefix = await getHashPrefix(videoID);
         const params = new URLSearchParams({
@@ -364,6 +373,7 @@
     if (!video || targetTime === undefined) return false;
 
     const maxRetries = 3;
+    // eslint-disable-next-line no-unused-vars
     const _previousTime = video.currentTime;
 
     try {
@@ -663,6 +673,7 @@
       pill = createCategoryPill();
     }
 
+    // eslint-disable-next-line no-useless-assignment
     let titleContainer = null;
 
     if (IS_BILIBILI) {
@@ -736,7 +747,7 @@
     if (!video) return;
 
     // Re-check Vinegar detection now that we have a video
-    updateVinegarDetection();
+    updateVinegarDetection(typeof video !== "undefined" ? video : null);
 
     const videoId = video.getAttribute("data-sb-lite-initialized");
     const currentSrc = video.currentSrc || video.src;
@@ -900,7 +911,7 @@
         video = currentVideo;
 
         // Re-check Vinegar status
-        updateVinegarDetection();
+        updateVinegarDetection(typeof video !== "undefined" ? video : null);
 
         if (currentVideoID) {
           setupVideoListeners();
@@ -991,7 +1002,7 @@
       attempts++;
 
       // Re-check Vinegar detection on each attempt
-      updateVinegarDetection();
+      updateVinegarDetection(typeof video !== "undefined" ? video : null);
 
       if (findVideoElement()) {
         clearInterval(checkVideo);
@@ -1084,7 +1095,7 @@
     log("Initializing SponsorBlock Lite");
 
     // Initial Vinegar detection (may update later when video loads)
-    updateVinegarDetection();
+    updateVinegarDetection(typeof video !== "undefined" ? video : null);
 
     log(
       "Platform:",
@@ -1117,7 +1128,7 @@
 
     // For Vinegar: also retry after longer delays since the player loads differently
     setTimeout(() => {
-      updateVinegarDetection();
+      updateVinegarDetection(typeof video !== "undefined" ? video : null);
       if (IS_VINEGAR) {
         log("Late Vinegar detection check");
         handleVideoChange();
