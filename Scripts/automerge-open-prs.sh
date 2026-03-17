@@ -2,9 +2,11 @@
 set -Eeuo pipefail
 
 readonly BASE_BRANCH="${BASE_BRANCH:-main}"
-readonly MAX_CYCLES="${MAX_CYCLES:-200}"
+readonly MAX_CYCLES="${MAX_CYCLES:-100}"
 readonly BOT_NAME="${BOT_NAME:-github-actions[bot]}"
 readonly BOT_EMAIL="${BOT_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
+readonly CONFLICT_STRATEGY="${CONFLICT_STRATEGY:-ours}"
+readonly ALLOW_ADMIN_MERGE="${ALLOW_ADMIN_MERGE:-true}"
 
 command -v gh >/dev/null || { printf 'gh is required\n' >&2; exit 1; }
 command -v git >/dev/null || { printf 'git is required\n' >&2; exit 1; }
@@ -46,7 +48,7 @@ sync_branch() {
   printf 'Updating PR #%s branch with %s\n' "$number" "$BASE_BRANCH"
   refresh_main
   gh pr checkout "$number"
-  if ! git merge --no-edit -X ours "origin/$BASE_BRANCH"; then
+  if ! git merge --no-edit -X "$CONFLICT_STRATEGY" "origin/$BASE_BRANCH"; then
     git merge --abort || :
     return 1
   fi
@@ -57,8 +59,14 @@ merge_pr() {
   local number=$1
 
   printf 'Merging PR #%s\n' "$number"
-  gh pr merge "$number" --squash --delete-branch ||
+  if gh pr merge "$number" --squash --delete-branch; then
+    return 0
+  fi
+  if [[ $ALLOW_ADMIN_MERGE == "true" ]]; then
     gh pr merge "$number" --admin --squash --delete-branch
+    return $?
+  fi
+  return 1
 }
 
 for ((cycle=1; cycle<=MAX_CYCLES; cycle++)); do
@@ -72,6 +80,7 @@ for ((cycle=1; cycle<=MAX_CYCLES; cycle++)); do
   fi
 
   progress_made=false
+  blocked_prs=()
 
   while IFS= read -r pr; do
     [[ -n $pr ]] || continue
@@ -91,34 +100,42 @@ for ((cycle=1; cycle<=MAX_CYCLES; cycle++)); do
     if [[ $is_draft == "true" ]]; then
       mark_ready "$number"
       progress_made=true
-      break
+      continue
     fi
 
     if [[ -z $head_ref || -z $head_owner || -z $head_repo ]]; then
-      printf '::error::PR #%s is missing branch metadata required for auto-merge\n' "$number" >&2
-      exit 1
+      blocked_prs+=("PR #$number is missing branch metadata required for auto-merge")
+      continue
     fi
 
     if [[ $merge_state == "DIRTY" || $merge_state == "BEHIND" ]]; then
       if [[ $is_cross_repo == "true" && $maintainer_can_modify != "true" ]]; then
-        printf '::error::PR #%s cannot be updated because maintainer edits are disabled\n' "$number" >&2
-        exit 1
+        blocked_prs+=("PR #$number cannot be updated because maintainer edits are disabled")
+        continue
       fi
 
-      sync_branch "$number" "$head_ref" "$head_owner" "$head_repo"
-      progress_made=true
-      break
+      if sync_branch "$number" "$head_ref" "$head_owner" "$head_repo"; then
+        progress_made=true
+        continue
+      fi
+      blocked_prs+=("PR #$number could not be updated against $BASE_BRANCH")
+      continue
     fi
 
     if merge_pr "$number"; then
       progress_made=true
       break
     fi
+    blocked_prs+=("PR #$number could not be merged in its current state")
   done < <(jq -c 'sort_by(.number)[]' <<< "$prs_json")
 
   if [[ $progress_made != "true" ]]; then
     printf '::error::Unable to make merge progress. Remaining pull requests:\n' >&2
     jq -r '.[] | "  #\(.number) \(.title) [draft=\(.isDraft) state=\(.mergeStateStatus)]"' <<< "$prs_json" >&2
+    if (( ${#blocked_prs[@]} > 0 )); then
+      printf '::error::Blocking conditions:\n' >&2
+      printf '  %s\n' "${blocked_prs[@]}" >&2
+    fi
     exit 1
   fi
 done
