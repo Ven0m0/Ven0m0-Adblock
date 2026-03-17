@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export LC_ALL=C
 
 readonly BASE_BRANCH="${BASE_BRANCH:-main}"
 readonly MAX_CYCLES="${MAX_CYCLES:-100}"
