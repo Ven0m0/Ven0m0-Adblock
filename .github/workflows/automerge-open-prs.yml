@@ -1,6 +1,6 @@
 name: 🔀 Auto-merge Open PRs
 
-"on":
+on:
   push:
     branches: [main]
   schedule:
