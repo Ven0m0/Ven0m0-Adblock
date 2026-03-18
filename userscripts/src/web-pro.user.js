@@ -240,9 +240,9 @@
   // Google Captcha speedup
   if (cfg.captchaSpeed && /\/recaptcha\/(api2|enterprise)\/bframe/.test(location.href)) {
     const origST = setTimeout;
-    setTimeout = function (_fn, dur) {
-      if (dur === 4000 || dur === 50) dur = 0;
-      return origST.apply(this, arguments);
+    window.setTimeout = function (fn, dur, ...args) {
+      const d = dur === 4000 || dur === 50 ? 0 : dur;
+      return origST.call(this, fn, d, ...args);
     };
     document.head.appendChild(document.createElement("style")).textContent = "*{transition:none!important}";
   }
@@ -269,7 +269,11 @@
       HTMLCanvasElement.prototype.getContext = function (type, ...a) {
         return type === "webgl" || type === "webgl2" ? null : orig.call(this, type, ...a);
       };
-    } catch {}
+    } catch (e) {
+      if (cfg.log) {
+        log("WebGL block error:", e);
+      }
+    }
   }
 
   // CPU tamer / RAF tamer
@@ -325,28 +329,38 @@
 
     if (cfg.cpuTamer) {
       window.setTimeout = (fn, d = 0, ...a) => {
-        let id;
+        let tid; // eslint-disable-line prefer-const
         const w =
           typeof fn === "function"
-            ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+            ? (...x) => {
+                awaitTO(tid)
+                  .then((v) => {
+                    if (v) {
+                      fn(...x);
+                    }
+                  })
+                  .catch(throwE);
+              }
             : fn;
-        id = nTO(w, Math.max(d, cfg.minTimeout), ...a);
-        return id;
+        tid = nTO(w, Math.max(d, cfg.minTimeout), ...a);
+        return tid;
       };
       window.setInterval = (fn, d = 0, ...a) => {
-        let id;
+        let iid; // eslint-disable-line prefer-const
         const w =
           typeof fn === "function"
-            ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+            ? (...x) => {
+                awaitTO(iid)
+                  .then((v) => {
+                    if (v) {
+                      fn(...x);
+                    }
+                  })
+                  .catch(throwE);
+              }
             : fn;
-        id = nSI(w, Math.max(d, cfg.minInterval), ...a);
-        return id;
+        iid = nSI(w, Math.max(d, cfg.minInterval), ...a);
+        return iid;
       };
       window.clearTimeout = (id) => {
         toSet.delete(id);
@@ -376,25 +390,29 @@
       let lastFrame = 0;
 
       window.requestAnimationFrame = (fn) => {
-        let id;
+        let rid; // eslint-disable-line prefer-const
         const q = p;
         const w = (ts) => {
           if (frameMs) {
             const now = Date.now();
             if (now - lastFrame < frameMs) {
-              nCAF(id);
+              nCAF(rid);
               return;
             }
             lastFrame = now;
           }
           const s = tl.currentTime;
-          awaitRAF(id, q)
-            .then((v) => v && fn(ts + (tl.currentTime - s)))
+          awaitRAF(rid, q)
+            .then((v) => {
+              if (v) {
+                fn(ts + (tl.currentTime - s));
+              }
+            })
             .catch(throwE);
         };
         if (last !== p) micro(trig);
-        id = nRAF(w);
-        return id;
+        rid = nRAF(w);
+        return rid;
       };
       window.cancelAnimationFrame = (id) => {
         rafSet.delete(id);
@@ -564,9 +582,17 @@
       const url = new URL(location.href.replace("/ref=", "?ref="));
       if (canonicalAmazon(url)) return;
       let c = stripTracking(url);
-      for (const h of HASH) if (url.hash.startsWith(`#${h}`)) c = 1;
+      for (const h of HASH) {
+        if (url.hash.startsWith(`#${h}`)) {
+          c = 1;
+        }
+      }
       if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
-    } catch {}
+    } catch (e) {
+      if (cfg.log) {
+        log("URL clean error", e);
+      }
+    }
   }
 
   const cleanLinks = (() => {
@@ -592,7 +618,9 @@
             const u = new URL(h);
             if (u.origin === location.origin) continue;
             if (stripTracking(u)) a.href = u.href;
-          } catch {}
+          } catch (e) {
+            if (cfg.log) log("Link clean error", e);
+          }
         }
         if (i < links.length) idle(step);
         else busy = 0;
@@ -720,7 +748,9 @@
         { rootMargin: C.IO_MARGIN }
       );
     }
-    vids.forEach((v) => state.videoObserver.observe(v));
+    vids.forEach((v) => {
+      state.videoObserver.observe(v);
+    });
   }
 
   function optimizeVids() {
@@ -819,10 +849,14 @@
     if (state.interactionBound) return;
     const cb = () => {
       idle(() => restoreScripts(), 500);
-      UE.forEach((e) => window.removeEventListener(e, cb, { passive: true }));
+      UE.forEach((e) => {
+        window.removeEventListener(e, cb, { passive: true });
+      });
       state.interactionBound = 0;
     };
-    UE.forEach((e) => window.addEventListener(e, cb, { passive: true, once: true }));
+    UE.forEach((e) => {
+      window.addEventListener(e, cb, { passive: true, once: true });
+    });
     state.interactionBound = 1;
   }
 
@@ -855,7 +889,11 @@
             state.origins.add(url.origin);
             addHint("preconnect", url.origin);
           }
-        } catch {}
+        } catch (e) {
+          if (cfg.log) {
+            log("Origin extract error", e);
+          }
+        }
       });
   }
 
@@ -891,7 +929,9 @@
     if (!cfg.blockPrefetchLinks) return;
     document
       .querySelectorAll('link[rel="prefetch"]:not([data-wp-hint]),link[rel="preload"]:not([data-wp-hint])')
-      .forEach((l) => l.remove());
+      .forEach((l) => {
+        l.remove();
+      });
   }
 
   // YouTube privacy
@@ -916,7 +956,9 @@
       const src = s.getAttribute("src");
       if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) s.remove();
     });
-    document.querySelectorAll("noscript").forEach((n) => n.remove());
+    document.querySelectorAll("noscript").forEach((n) => {
+      n.remove();
+    });
     document.querySelectorAll("p").forEach((p) => {
       if (p.innerHTML.trim() === "&nbsp;") p.remove();
     });

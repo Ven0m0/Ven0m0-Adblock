@@ -17,6 +17,8 @@ from Scripts.common import is_valid_domain, write_lines
 
 HEADER_PREFIXES = ("! ", "#", "[", ";")
 
+HEADER_PREFIXES = ("! ", "#", "[", ";")
+
 
 @dataclass(slots=True)
 class Stats:
