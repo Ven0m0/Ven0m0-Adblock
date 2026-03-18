@@ -161,17 +161,33 @@ Why Both?
 
         if (!shouldIntercept(url)) return res;
 
-        const clone = res.clone();
-        const ct = clone.headers.get("content-type") || "";
+        const ct = res.headers.get("content-type") || "";
         if (!ct.includes("application/json")) return res;
 
-        const data = await clone.json();
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          return new w.Response(text, {
+            status: res.status,
+            statusText: res.statusText,
+            headers: res.headers
+          });
+        }
+
         const trimmed = trimConversationPayload(data, keepLastNow);
 
         // Only replace if actually trimmed
         if (data?.mapping && trimmed?.mapping) {
           const sameSize = Object.keys(data.mapping).length === Object.keys(trimmed.mapping).length;
-          if (sameSize) return res;
+          if (sameSize) {
+            return new w.Response(text, {
+              status: res.status,
+              statusText: res.statusText,
+              headers: res.headers
+            });
+          }
         }
 
         const body = JSON.stringify(trimmed);

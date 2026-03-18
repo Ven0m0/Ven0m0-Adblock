@@ -17,6 +17,8 @@ from Scripts.common import is_valid_domain, write_lines
 
 HEADER_PREFIXES = ("! ", "#", "[", ";")
 
+HEADER_PREFIXES = ("! ", "#", "[", ";")
+
 
 @dataclass(slots=True)
 class Stats:
@@ -55,8 +57,9 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     in_header = True
     current_comments = []
 
-    for line in lines:
+    for raw_line in lines:
         stats.original += 1
+        line = raw_line.strip()
         if not line:
             if in_header:
                 headers.append("")
@@ -99,7 +102,7 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
 
     try:
         with filepath.open("r", encoding="utf-8") as f:
-            lines_gen = (line.rstrip() for line in f)
+            lines_gen = (line.strip() for line in f)
             headers, rules, stats = process_content(lines_gen)
     except Exception as e:
         print(f"  Error reading {filepath}: {e}", file=sys.stderr)
@@ -124,9 +127,8 @@ def find_cross_file_duplicates(
 
     for filename, rules in file_rules.items():
         for rule in rules:
-            stripped = rule.strip()
-            if stripped:
-                entry_locations[stripped].append(filename)
+            if rule:
+                entry_locations[rule].append(filename)
 
     return {entry: files for entry, files in entry_locations.items() if len(files) > 1}
 

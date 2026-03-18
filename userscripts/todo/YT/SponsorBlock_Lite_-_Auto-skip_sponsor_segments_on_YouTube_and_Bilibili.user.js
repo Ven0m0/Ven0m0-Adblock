@@ -329,6 +329,7 @@
           actionTypes: JSON.stringify(ACTION_TYPES)
         });
 
+      return new Promise((resolve) => {
         GM_xmlhttpRequest({
           method: "GET",
           url: `${API_BASE}/api/skipSegments/${hashPrefix}?${params}`,
@@ -352,10 +353,10 @@
             resolve([]);
           }
         });
-      } catch {
-        resolve([]);
-      }
-    });
+      });
+    } catch {
+      return [];
+    }
   }
 
   // ==================== SKIP LOGIC ====================
@@ -848,10 +849,17 @@
   function findVideoElement() {
     // Bilibili selectors
     if (IS_BILIBILI) {
-      video =
-        document.querySelector(".bpx-player-video-area video") ||
-        document.querySelector(".bilibili-player video") ||
-        document.querySelector("video");
+      const vids = document.getElementsByTagName("video");
+      video = null;
+      if (vids.length > 0) {
+        if (vids.length === 1) {
+          video = vids[0];
+        } else {
+          video = Array.prototype.find.call(vids, v =>
+            v.closest(".bpx-player-video-area, .bilibili-player")
+          ) || vids[0];
+        }
+      }
       return video;
     }
 

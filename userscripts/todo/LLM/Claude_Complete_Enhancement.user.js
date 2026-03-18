@@ -1017,10 +1017,17 @@ IMPROVEMENTS OVER ORIGINALS:
 
       const info = document.createElement("div");
       info.className = "ccb-info";
-      info.innerHTML = `
-        <div class="ccb-title">${lang}</div>
-        <span class="ccb-lang">${lang.toUpperCase()}</span>
-      `;
+
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "ccb-title";
+      titleDiv.textContent = lang;
+
+      const langSpan = document.createElement("span");
+      langSpan.className = "ccb-lang";
+      langSpan.textContent = lang.toUpperCase();
+
+      info.appendChild(titleDiv);
+      info.appendChild(langSpan);
 
       header.appendChild(copyBtn);
       header.appendChild(downloadBtn);
