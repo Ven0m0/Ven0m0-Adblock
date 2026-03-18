@@ -1,0 +1,75 @@
+# prek / pre-commit configuration
+# Install: uv run prek install --overwrite
+# Run: uv run prek run --all-files
+# See https://github.com/jdx/prek and https://pre-commit.com
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(lists/(releases|external)/|Filters/|userscripts/dist/)
+      - id: end-of-file-fixer
+        exclude: ^(lists/(releases|external)/|Filters/|userscripts/dist/)
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  - repo: local
+    hooks:
+      # Python: ruff linter (auto-fix)
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+
+      # Python: ruff formatter
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+
+      # Python: unit tests (run when Scripts/*.py files change)
+      - id: python-tests
+        name: Python unit tests
+        entry: python3 -m unittest discover -s Scripts/ -p test_*.py
+        language: system
+        pass_filenames: false
+        files: ^Scripts/.*\.py$
+
+      # JavaScript: ESLint
+      - id: eslint
+        name: ESLint
+        entry: bun run lint:eslint
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: false
+
+      # JavaScript/JSON: Biome formatter
+      - id: biome
+        name: Biome format
+        entry: bun run format
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json]
+        pass_filenames: false
+
+      # Filter lists: AGLint
+      - id: aglint
+        name: AGLint
+        entry: bun run lint:aglint
+        language: system
+        files: ^lists/(sources|adblock|hostlist)/.*\.txt$
+        pass_filenames: false
+
+      # Shell: shellcheck
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        types: [shell]
+        args: [--severity=warning]

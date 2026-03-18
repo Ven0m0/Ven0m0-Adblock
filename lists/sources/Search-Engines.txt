@@ -1,0 +1,95 @@
+! [Adblock Plus 2.0]
+! Title: Ven0m0's Adblocking Filter
+! Description: Combination List of multiple filters to make the internet comfortable
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/Google.txt
+
+! Generics (any page)
+##iframe[src*="mellowads"]
+##iframe[id^=openwrap-ad-]
+##*[class*="Advert"]
+##*[class*="teads-"]
+###gwd-ad
+##ins.adsbygoogle
+##.mv-ad-box
+##iframe[src*="4dsbanner"]
+##img[src*="digiadsply"]
+##.bstn-ad-rail--expanded.bstn-ad-rail
+
+! Google map ads on Search
+! Generic hide for Google Ads
+##ins[id*="aswift"] > iframe
+###google_image_div
+###mys-content
+##div[data-adtags-width]
+##.premium-promo--wrapper
+##*[id^="sponsored"]
+##.GoogleActiveViewClass
+##.head-ad
+##DIV[id*="adcontent"]
+! Popup
+! Scroll
+! Block ad blocker detector
+! trying to better collect google ads #1906
+#@#.adsbygoogle
+#@#.ads_1
+! Brave search browser ad
+! Example searches
+! AI buttons
+! Settings feedback
+! Feedback button
+! Rerank button
+! Bottom bloat
+! Google Search - AI Overview
+! Removing miles from dual-unit distance measurements in Google Maps (uBO and AdGuard only)
+! Removes imperial measurements from multi-unit displays
+!#endif
+!#if !adguard_ext_android_cb
+!#if !env_mv3
+!#if !ext_ubol
+*###ads_1:style(height: 1px !important)
+*##.adsbygoogle:style(height: 1px !important)
+.teads-inread
+://www.google.*/async/folsrch?*&async=_basejs:*,_basecomb:*&q=$xhr
+gismeteo.de##.ifnoie
+google.*##.mnr-c.rl-qs-crs-t._Db > ._gt:has(._mB)
+google.*##div[data-lhcontainer="1"][id][data-hveid] > div[data-mcpr][data-mg-cp][data-mcp]
+google.*##div[data-q][data-al]
+google.*##html:not([lang$=US], [lang=en]) #ruler span:nth-of-type(2)
+google.*##html[lang$=US] #ruler span:first-of-type
+google.*##html[lang=en] #ruler span:first-of-type
+google.com###footer
+google.com###lb:has-text(Stay signed out)
+google.com###stUuGf
+google.com##.torspo_view__follow-button
+google.com##.zU3lCe
+google.com##body:style(overflow: auto !important; position: static !important;)
+google.com##div[aria-label="Navigation drawer"][role="menu"] > a[href^="https://search.app.goo.gl/"][role="menuitem"]
+google.com##div[class="HyoXdf Pk5QZ"][jsname="lC3xKd"]
+google.com##div[class="HyoXdf VZPqNb"][jsname="lC3xKd"]
+google.com##div[class="rKJOcDNwrHj__pb-dfr rKJOcDNwrHj__pb-s"][jsname="ORHb"]
+google.com##div[jsaction="JdMZaf:ot0Etb;rcuQ6b:npT2md;ZUAQIc:aziXvf"][jscontroller="Kby1he"][jsname="Ycs7vc"]:has-text(Give feedback on the result above?)
+google.com##div[jsaction="KIgGGb;rcuQ6b:npT2md"][jscontroller="dJBiMd"][jsname="suEOdc"]
+google.com##div[jsaction="Y2XUzc:Fs7Xzc"][jscontroller="dve5w"][jsname="hK5Dwd"]
+google.com##div[jsaction="f2nbFb"][jsname="rLQONe"][role="button"]
+google.com##div[jsaction="rcuQ6b:npT2md"][jscontroller="JlIvbd"][jsname="xy3Vt"]
+google.com##div[jsaction="rcuQ6b:npT2md"][jscontroller="OPwjEf"][role="section"]
+google.com##div[jsaction="rcuQ6b:npT2md"][jscontroller="R87u2"]
+google.com##ios-safari-home-screen-icon-banner
+google.com##promo-bottom-tout
+google.com##span[jsaction^="I9owB"][jsname="EFexIf"]
+holiday-weather.com#?#.distance_data_container > :has-text(miles)
+holiday-weather.com#?#.temperature_data_container > :has-text(°F)
+lematin.ma##.meteo-bloc span
+search.brave.com###main > .svelte-6sdecn
+search.brave.com###quick-goggles-button
+search.brave.com##.headerless.svelte-9ouv38.card > .layout-row.svelte-5r82hb
+search.brave.com##.svelte-1avqjm8.download-cta
+search.brave.com##.svelte-1avqjm8.noscript-hide.noscrollbar.example-searches
+search.brave.com##.svelte-1tjerau.subutton
+search.brave.com##.svelte-1yt5tdo.primary-right
+search.brave.com##.svelte-rany9i.llm.t-secondary.desktop-large-regular.suggestion
+sveip.no##.wmsb_f
+weather.gov###myfcst-tempf
+weather.gov#?#p[class^=myforecast-current-]:has-text(°F)
+||fundingchoicesmessages.google.com^$script,important

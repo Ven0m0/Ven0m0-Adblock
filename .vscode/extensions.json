@@ -3,6 +3,7 @@
         "adguard.adblock",
         "davidanson.vscode-markdownlint",
         "github.vscode-github-actions",
-        "exodiusstudios.comment-anchors"
+        "exodiusstudios.comment-anchors",
+        "biomejs.biome"
     ]
 }

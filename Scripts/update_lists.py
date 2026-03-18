@@ -21,10 +21,7 @@ import aiohttp
 import aiofiles
 
 # Import common utilities
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
-
-from common import sanitize_filename
+from Scripts.common import sanitize_filename
 
 # ============================================================================
 # CONFIGURATION

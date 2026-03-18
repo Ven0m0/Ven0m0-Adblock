@@ -9,7 +9,7 @@ Filters/
 *.pyc
 __pycache__/
 venv/
-. venv/
+.venv/
 
 # Node/Bun
 node_modules/
@@ -18,11 +18,10 @@ node_modules/
 
 # Logs
 *.log
-*. tmp
+*.tmp
 
 # Editors
 !.vscode/extensions.json
-.vscode/*
 .vscode/
 .idea/
 
@@ -44,3 +43,4 @@ coverage/
 
 .aglintcache
 logs/
+.serena/
