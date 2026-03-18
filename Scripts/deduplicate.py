@@ -17,6 +17,8 @@ from Scripts.common import is_valid_domain, write_lines
 
 HEADER_PREFIXES = ("! ", "#", "[", ";")
 
+HEADER_PREFIXES = ("! ", "#", "[", ";")
+
 
 @dataclass(slots=True)
 class Stats:
@@ -55,8 +57,9 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     in_header = True
     current_comments = []
 
-    for line in lines:
+    for raw_line in lines:
         stats.original += 1
+        line = raw_line.strip()
         if not line:
             if in_header:
                 headers.append("")

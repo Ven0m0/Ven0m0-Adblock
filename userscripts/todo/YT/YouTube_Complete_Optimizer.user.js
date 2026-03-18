@@ -41,7 +41,7 @@ IMPROVEMENTS OVER ORIGINALS:
   }
 
   // Promise isolation (YouTube hacks Promise in some browsers)
-  const Promise = (async () => {})().constructor;
+  const PromiseConstructor = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -144,14 +144,7 @@ IMPROVEMENTS OVER ORIGINALS:
 
   if (CONFIG.enableCPUTamer) {
     ((o) => {
-      const [
-        _setTimeout_,
-        _setInterval_,
-        requestAnimationFrame_,
-        _clearTimeout_,
-        _clearInterval_,
-        _cancelAnimationFrame_
-      ] = o;
+      const [_setTimeout_, _setInterval_, requestAnimationFrame_, _clearTimeout_, _clearInterval_] = o;
       const win = this instanceof Window ? this : window;
 
       // Duplicate detection
@@ -191,8 +184,6 @@ IMPROVEMENTS OVER ORIGINALS:
         return topLastTimeUpdate >= 1 ? () => top.lastTimeUpdate : () => window.lastTimeUpdate;
       })();
 
-      const PromiseConstructor = (executor) => new Promise(executor);
-
       const ExternalPromise = (() => {
         let resolve_, reject_;
         const handler = (resolve, reject) => {
@@ -223,10 +214,11 @@ IMPROVEMENTS OVER ORIGINALS:
           if (!frame) {
             frame = document.createElement("iframe");
             frame.id = frameId;
-            const blobURL =
-              typeof webkitCancelAnimationFrame === "function" && typeof kagi === "undefined"
-                ? (frame.src = URL.createObjectURL(new Blob([], { type: "text/html" })))
-                : null;
+            let blobURL = null;
+            if (typeof webkitCancelAnimationFrame === "function" && typeof kagi === "undefined") {
+              blobURL = URL.createObjectURL(new Blob([], { type: "text/html" }));
+              frame.src = blobURL;
+            }
             frame.sandbox = "allow-same-origin";
             let noscriptElement = document.createElement("noscript");
             noscriptElement.appendChild(frame);
@@ -374,8 +366,16 @@ IMPROVEMENTS OVER ORIGINALS:
                   })
                 );
               } else {
-                const newPrimary = !pendingPrimary ? (afPromisePrimary = new ExternalPromise()) : null;
-                const newSecondary = !pendingSecondary ? (afPromiseSecondary = new ExternalPromise()) : null;
+                let newPrimary = null;
+                if (!pendingPrimary) {
+                  afPromisePrimary = new ExternalPromise();
+                  newPrimary = afPromisePrimary;
+                }
+                let newSecondary = null;
+                if (!pendingSecondary) {
+                  afPromiseSecondary = new ExternalPromise();
+                  newSecondary = afPromiseSecondary;
+                }
 
                 const executeSecondary = () => {
                   if (newPrimary) {

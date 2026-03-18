@@ -311,15 +311,15 @@
 
   // ==================== API FUNCTIONS ====================
 
-  function fetchSegments(videoID) {
-    return new Promise(async (resolve) => {
-      try {
-        const hashPrefix = await getHashPrefix(videoID);
-        const params = new URLSearchParams({
-          categories: JSON.stringify(CATEGORIES),
-          actionTypes: JSON.stringify(ACTION_TYPES)
-        });
+  async function fetchSegments(videoID) {
+    try {
+      const hashPrefix = await getHashPrefix(videoID);
+      const params = new URLSearchParams({
+        categories: JSON.stringify(CATEGORIES),
+        actionTypes: JSON.stringify(ACTION_TYPES)
+      });
 
+      return new Promise((resolve) => {
         GM_xmlhttpRequest({
           method: "GET",
           url: `${API_BASE}/api/skipSegments/${hashPrefix}?${params}`,
@@ -343,10 +343,10 @@
             resolve([]);
           }
         });
-      } catch {
-        resolve([]);
-      }
-    });
+      });
+    } catch {
+      return [];
+    }
   }
 
   // ==================== SKIP LOGIC ====================
