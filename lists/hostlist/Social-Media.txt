@@ -1,3 +1,4 @@
+! aglint-disable
 (\.|^)fb-analytics\.com$
 (\.|^)snapads\.com$
 \b(?:\w*-)*location(?:-\w+)*\.tiktokcdn\.\w+\b

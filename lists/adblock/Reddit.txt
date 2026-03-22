@@ -38,7 +38,6 @@
 ! LOGGED IN rules
 ! LOGGED OUT rules
 !!!reddit.com,~old.reddit.com##faceplate-batch > .block:is([score="0"],[score="1"],[score="2"],[score="3"],[score="4"],[score="5"],[score="6"],[score="7"],[score="8"],[score="9"],:not([score]))
-!#endif
 !#if !adguard
 !/\/[0-9a-z]{8,10}\?key=[0-9a-f]{32}/$doc,domain=~duckduckgo.com|~paypal.com
 /\/[0-9a-z]{8,10}\?key=[0-9a-f]{32}/$doc,domain=~duckduckgo.com,badfilter
@@ -203,3 +202,4 @@ www.reddit.com##shreddit-app[pagetype="all"] .main-container
 www.reddit.com##shreddit-app[pagetype="home"] .main-container
 www.reddit.com##shreddit-app[pagetype="popular"] #subgrid-container
 www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
+!#endif

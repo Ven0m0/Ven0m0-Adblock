@@ -1,3 +1,4 @@
+! aglint-disable
 (\.|^)log[0-9]*\.spotify\.com$
 00.audio-ak.cdn.spotify.com
 00.video-ak.cdn.spotify.com

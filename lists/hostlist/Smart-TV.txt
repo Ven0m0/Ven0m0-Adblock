@@ -1,3 +1,4 @@
+! aglint-disable
 (\.|^)secure-geolocation.premiumtv.co\.\w+\b
 (^|\.)giraffic\.com$
 (^|\.)ibs\.lgappstv\.com
