@@ -614,7 +614,8 @@
           mark(a, "data-wp-cl");
           try {
             const h = a.href;
-            if (!h || h.startsWith("javascript:")) continue;
+            const hl = h && h.toLowerCase();
+            if (!hl || hl.startsWith("javascript:") || hl.startsWith("data:") || hl.startsWith("vbscript:")) continue;
             const u = new URL(h);
             if (u.origin === location.origin) continue;
             if (stripTracking(u)) a.href = u.href;
