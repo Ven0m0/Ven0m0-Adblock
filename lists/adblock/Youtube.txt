@@ -28,8 +28,7 @@
 ! www.youtube.com##+js(trusted-json-edit-fetch-request, .context.client+={"clientScreen":"ADUNIT"}, /get_watch?)
 ! www.youtube.com##+js(trusted-replace-outbound-text, JSON.stringify, "params":", "params":"yAEB, condition, /("contentPlaybackContext":{".*\,"params":"|"params":".*"contentPlaybackContext":{")/)
 ! www.youtube.com##+js(trusted-replace-outbound-text, JSON.stringify, "contentCheckOk":false, "params":"yAEB"\,"contentCheckOk":false, condition, /^(?=.*"contentPlaybackContext":{")(?!.*"params":").*$/)
-!!#endif
-!!#if cap_html_filtering
+!#if cap_html_filtering
 !#else
 !#endif
 !#if !cap_html_filtering
@@ -101,7 +100,7 @@ youtube.com##.ytp-paid-content-overlay-link
 youtube.com##ad-interrupting
 youtube.com##div.ytp-tooltip-bg
 youtube.com##div.ytp-tooltip-image
-youtube.com##div.ytp-tooltip:style(border-radius:0px;!important)
+youtube.com##div.ytp-tooltip:style(border-radius:0px !important)
 youtube.com##tp-yt-app-header[id="header"]:style(position: static !important;)
 youtube.com##tp-yt-paper-dialog.ytd-popup-container:has-text(/following Premium|Choose all that apply|Become a member|Free trial|How are your|How interested|Live TV|Wish videos|background play|better TV|cable box|cable reimagined|hidden fees|of YouTube TV|on YouTube TV|unlimited DVR|with YouTube TV|without the ads|try this feature|Terms apply/)
 youtube.com##video-ads
@@ -160,3 +159,7 @@ youtube.com#@##player-ads
 youtube.com#@#+js(trusted-rpnt, script, (function serverContract(), (()=>{if("YOUTUBE_PREMIUM_LOGO"===ytInitialData?.topbar?.desktopTopbarRenderer?.logo?.topbarLogoRenderer?.iconImage?.iconType||location.href.startsWith("https://youtube.com/tv#/")||location.href.startsWith("https://youtube.com/embed/"))return;document.addEventListener("DOMContentLoaded"\,(function(){const t=()=>{const t=document.getElementById("movie_player");if(!t)return;if(!t.getStatsForNerds?.()?.debug_info?.startsWith?.("SSAP\, AD"))return;const e=t.getProgressState?.();e&&e.duration>0&&(e.loaded<e.duration||e.duration-e.current>1)&&t.seekTo?.(e.duration)};t()\,new MutationObserver((()=>{t()})).observe(document\,{childList:!0\,subtree:!0})}));const t={apply:(t\,e\,o)=>{const n=o[0];return"function"==typeof n&&n.toString().includes("onAbnormalityDetected")&&(o[0]=function(){})\,Reflect.apply(t\,e\,o)}};window.Promise.prototype.then=new Proxy(window.Promise.prototype.then\,t)})();(function serverContract(), sedCount, 1)
 youtube.com#@#.sparkles-light-cta
 youtube.com#@#ytd-promoted-sparkles-web-renderer
+!#endif
+!#endif
+!#endif
+!#endif
