@@ -275,6 +275,7 @@
           const ck = () => (f.contentWindow?.setTimeout ? r() : setTimeout(ck, K.TIMER_CHECK));
           ck();
         });
+        f.remove();
         timers = {
           setTimeout: f.contentWindow.setTimeout.bind(f.contentWindow),
           clearTimeout: f.contentWindow.clearTimeout.bind(f.contentWindow),
@@ -458,7 +459,7 @@
       if (rs.indexOf(res) < rs.indexOf(cur)) {
         let nb = Math.max(rs.indexOf(res), 0);
         const av = y.getAvailableQualityLevels();
-        while (av.indexOf(rs[nb]) === -1 && nb < rs.length - 1) ++nb;
+        while (av.indexOf(rs[nb]) === -1 && nb < rs.length) ++nb;
         if (!useBtn && CFG.quality.flushBuffer && cur !== rs[nb]) {
           const id = getVid(y);
           if (id && !id.includes("ERROR")) {

@@ -1,7 +1,7 @@
 import unittest
 import importlib.util
 from pathlib import Path
-from unittest.mock import Mock, mock_open
+from unittest.mock import Mock
 
 # Import the module dynamically
 file_path = Path(__file__).parent / "move_pure_domains.py"

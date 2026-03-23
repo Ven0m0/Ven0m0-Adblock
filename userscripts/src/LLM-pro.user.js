@@ -169,7 +169,7 @@
       const msgs = document.querySelectorAll(SEL.CGPT.TURN);
       if (msgs.length > CFG.CHATGPT.MAX) {
         msgs.forEach((el, i) => {
-          if (i < msgs.length - CFG.CHATGPT.MAX) {
+          if (i >= CFG.CHATGPT.MAX) {
             el.remove();
           }
         });
@@ -266,7 +266,9 @@
         }
       };
     })();
-    init().then(() => setInterval(loop, 700));
+    init()
+      .then(() => setInterval(loop, 700))
+      .catch(() => {});
   }
   if (isCl) {
     const clean = () => {
@@ -274,7 +276,7 @@
       const m = document.querySelectorAll(SEL.CLAUDE.RENDER);
       if (m.length > CFG.CLAUDE.MAX) {
         m.forEach((el, i) => {
-          if (i < m.length - CFG.CLAUDE.MAX) {
+          if (i >= CFG.CLAUDE.MAX) {
             el.remove();
           }
         });

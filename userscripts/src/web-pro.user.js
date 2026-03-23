@@ -601,32 +601,32 @@
     return throttle(() => {
       if (busy) return;
       busy = 1;
-      const links = document.querySelectorAll("a[href]:not([data-wp-cl])");
-      if (!links.length) {
-        busy = 0;
-        return;
-      }
-      let i = 0;
-      const step = () => {
-        const end = Math.min(i + C.BATCH, links.length);
-        for (; i < end; i++) {
-          const a = links[i];
-          mark(a, "data-wp-cl");
-          try {
-            const h = a.href;
-            const hl = h && h.toLowerCase();
-            if (!hl || hl.startsWith("javascript:") || hl.startsWith("data:") || hl.startsWith("vbscript:")) continue;
-            const u = new URL(h);
-            if (u.origin === location.origin) continue;
-            if (stripTracking(u)) a.href = u.href;
-          } catch (e) {
-            if (cfg.log) log("Link clean error", e);
+      try {
+        const links = document.querySelectorAll("a[href]:not([data-wp-cl])");
+        if (!links.length) return;
+        let i = 0;
+        const step = () => {
+          const end = Math.min(i + C.BATCH, links.length);
+          for (; i < end; i++) {
+            const a = links[i];
+            mark(a, "data-wp-cl");
+            try {
+              const h = a.href;
+              const hl = h?.toLowerCase();
+              if (!hl || hl.startsWith("javascript:") || hl.startsWith("data:") || hl.startsWith("vbscript:")) continue;
+              const u = new URL(h);
+              if (u.origin === location.origin) continue;
+              if (stripTracking(u)) a.href = u.href;
+            } catch (e) {
+              if (cfg.log) log("Link clean error", e);
+            }
           }
-        }
-        if (i < links.length) idle(step);
-        else busy = 0;
-      };
-      step();
+          if (i < links.length) idle(step);
+        };
+        step();
+      } finally {
+        busy = 0;
+      }
     }, C.TIME.THR_CLEAN);
   })();
 
