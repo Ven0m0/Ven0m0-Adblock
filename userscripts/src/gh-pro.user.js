@@ -23,7 +23,7 @@
       URL_DELAY: 1200,
       THR: 800,
       KB: 1024 * 1024,
-      MB: 1024 * 1024 * 1024,
+      MB: 1048576,
       API: "https://api.github.com/repos"
     }
   };

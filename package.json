@@ -73,5 +73,11 @@
     "web-enhancement"
   ],
   "author": "Ven0m0",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "overrides": {
+    "axios": ">=1.6.0",
+    "follow-redirects": ">=1.15.11",
+    "tldts": "6.1.86",
+    "tldts-core": "6.1.86"
+  }
 }
