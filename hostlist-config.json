@@ -28,7 +28,6 @@
     "TrimLines",
     "Validate",
     "Deduplicate",
-    "Sort",
     "Compress",
     "InsertFinalNewLine",
     "ConvertToAscii"
