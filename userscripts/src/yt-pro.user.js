@@ -527,7 +527,7 @@
         recent = vid;
         setRes(y, rs);
         const stored = localStorage.getItem("yt-player-quality");
-        if (!stored || !stored.includes(CFG.quality.targetRes)) {
+        if (!stored?.includes(CFG.quality.targetRes)) {
           const tc = Date.now();
           const te = tc + K.QUALITY_EXP;
           localStorage.setItem(
