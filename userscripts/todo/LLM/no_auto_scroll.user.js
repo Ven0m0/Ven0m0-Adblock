@@ -20,15 +20,13 @@
 // @updateURL https://update.greasyfork.org/scripts/536216/no%20auto%20scroll.meta.js
 // ==/UserScript==
 
-(function () {
-  "use strict";
-
+(() => {
   // Override scroll-related functions to no-ops
-  Element.prototype.scrollIntoView = function () {};
-  Element.prototype.scrollIntoViewIfNeeded = function () {};
-  Element.prototype.scrollTo = function () {};
-  window.scrollTo = function () {};
-  window.scrollBy = function () {};
+  Element.prototype.scrollIntoView = () => {};
+  Element.prototype.scrollIntoViewIfNeeded = () => {};
+  Element.prototype.scrollTo = () => {};
+  window.scrollTo = () => {};
+  window.scrollBy = () => {};
 
   // Block scrollTop assignments (what falcon.tii uses)
   Object.defineProperty(HTMLElement.prototype, "scrollTop", {

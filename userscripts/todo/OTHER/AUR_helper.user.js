@@ -12,7 +12,7 @@
 
 addEventListener(
   "DOMContentLoaded",
-  function () {
+  () => {
     let ul = document.getElementById("actionlist").getElementsByTagName("ul");
     if (ul.length === 0) return;
 
@@ -21,7 +21,7 @@ addEventListener(
     const firstLink = ul.getElementsByTagName("a")[0];
     if (!firstLink) return;
 
-    const match = firstLink.href.match(/\/cgit\/aur\.git\/tree\/PKGBUILD\?h=([-_\w\d\.]+)/);
+    const match = firstLink.href.match(/\/cgit\/aur\.git\/tree\/PKGBUILD\?h=([-_\w\d.]+)/);
     if (!match || !match[1]) return;
 
     const pkgName = match[1];
@@ -30,8 +30,8 @@ addEventListener(
     li.appendChild(link);
     ul.insertBefore(li, ul.firstChild);
 
-    link.textContent = "安装软件包 (yay -S " + pkgName + ")";
-    link.href = "yay://" + pkgName;
+    link.textContent = `安装软件包 (yay -S ${pkgName})`;
+    link.href = `yay://${pkgName}`;
   },
   false
 );

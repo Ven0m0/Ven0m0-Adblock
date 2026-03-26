@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck enable=all shell=bash source-path=SCRIPTDIR
 # Hosts file creator and updater
 # Downloads, processes, and installs system-wide hosts file for ad-blocking
-# shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
 readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -48,11 +48,11 @@ process(){
   [[ ${RM_COMMENTS:-1} == 1 ]] && awk_cmd="!/^#/"
   [[ ${RM_TRAILING_SPACES:-1} == 1 ]] && awk_cmd="${awk_cmd:+$awk_cmd && }{gsub(/^ +| +$/,\"\");print}"
   [[ ${RM_DUPLICATE_LINES:-1} == 1 ]] && awk_cmd="${awk_cmd:+$awk_cmd && }! seen[\$0]++"
-  
+
   if [[ -n $awk_cmd ]]; then
     local tmp
     tmp=$(mktemp)
-    cleanup_add "rm -f $tmp"
+    cleanup_add rm -f "$tmp"
     awk "$awk_cmd" "$NEW_NAME" > "$tmp" && mv "$tmp" "$NEW_NAME"
     ok "Processed"
   fi

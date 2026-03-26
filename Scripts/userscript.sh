@@ -12,7 +12,7 @@ if has biome; then
   biome check --fix --unsafe --skip-parse-errors --no-errors-on-unmatched --html-formatter-line-width=120 --css-formatter-line-width=120 --json-formatter-line-width=120 \
   --use-editorconfig=true --indent-style=space --format-with-errors=true --files-ignore-unknown=true --vcs-use-ignore-file=false "$PWD"
 fi
-if has ruff; then 
+if has ruff; then
   ruff format --line-length 120 --target-version py311 "$PWD"
 fi
 has yamlfmt && { yamlfmt -continue_on_error "*.yaml"; yamlfmt -continue_on_error "*.yml"; }

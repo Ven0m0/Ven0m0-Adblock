@@ -13,9 +13,7 @@
 // @updateURL    https://update.greasyfork.org/scripts/[ID]/GitHub%20Complete%20Enhancer.meta.js
 // ==/UserScript==
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_github_enhancer") === "1") {
     console.warn("[GitHub Enhancer]: Disabled by user");
@@ -67,7 +65,7 @@
       const forkBtn = document.getElementById("repo-network-counter");
       if (!forkBtn) return; // Not on a repository page
 
-      const forksAmount = parseInt(forkBtn.textContent);
+      const forksAmount = parseInt(forkBtn.textContent, 10);
       if (forksAmount < 1) return; // No forks
 
       const parentLi = forkBtn.closest("li");
@@ -174,9 +172,8 @@
   const ImagePreviewModule = {
     init() {
       // Inject CSS
-      document.head.insertAdjacentHTML(
-        "beforeend",
-        `<style>
+      const styleEl = document.createElement("style");
+      styleEl.textContent = `
         #gh-img-preview-mask {
           position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);
           z-index: 999999; display: none; align-items: center; justify-content: center;
@@ -226,30 +223,93 @@
           #gh-img-preview-prev, #gh-img-preview-next { width: 48px; height: 48px; }
           #gh-img-preview-prev { left: 15px; } #gh-img-preview-next { right: 15px; }
         }
-      </style>`
-      );
+      `;
+      document.head.appendChild(styleEl);
 
       // Inject DOM
-      document.body.insertAdjacentHTML(
-        "beforeend",
-        `
-        <div id="gh-img-preview-mask">
-          <div id="gh-img-preview-container">
-            <img id="gh-img-preview-img" alt="Preview">
-          </div>
-          <div id="gh-img-preview-controls">
-            <div id="gh-img-preview-download" title="Download">
-              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-            </div>
-            <div id="gh-img-preview-close" title="Close (Esc)">
-              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </div>
-          </div>
-          <div id="gh-img-preview-prev" title="Previous (←)"><svg viewBox="0 0 24 24"><line x1="15" y1="18" x2="9" y2="12"/><line x1="15" y1="6" x2="9" y2="12"/></svg></div>
-          <div id="gh-img-preview-next" title="Next (→)"><svg viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="12"/><line x1="9" y1="6" x2="15" y2="12"/></svg></div>
-        </div>
-      `
-      );
+      const maskEl = document.createElement("div");
+      maskEl.id = "gh-img-preview-mask";
+
+      const containerEl = document.createElement("div");
+      containerEl.id = "gh-img-preview-container";
+
+      const imgEl = document.createElement("img");
+      imgEl.id = "gh-img-preview-img";
+      imgEl.setAttribute("alt", "Preview");
+
+      containerEl.appendChild(imgEl);
+
+      const controlsEl = document.createElement("div");
+      controlsEl.id = "gh-img-preview-controls";
+
+      const downloadEl = document.createElement("div");
+      downloadEl.id = "gh-img-preview-download";
+      downloadEl.setAttribute("title", "Download");
+      const downloadSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      downloadSvg.setAttribute("viewBox", "0 0 24 24");
+      const downloadLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      downloadLine.setAttribute("x1", "12"); downloadLine.setAttribute("y1", "5");
+      downloadLine.setAttribute("x2", "12"); downloadLine.setAttribute("y2", "19");
+      const downloadPoly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      downloadPoly.setAttribute("points", "19 12 12 19 5 12");
+      downloadSvg.appendChild(downloadLine);
+      downloadSvg.appendChild(downloadPoly);
+      downloadEl.appendChild(downloadSvg);
+
+      const closeEl = document.createElement("div");
+      closeEl.id = "gh-img-preview-close";
+      closeEl.setAttribute("title", "Close (Esc)");
+      const closeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      closeSvg.setAttribute("viewBox", "0 0 24 24");
+      const closeLine1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      closeLine1.setAttribute("x1", "18"); closeLine1.setAttribute("y1", "6");
+      closeLine1.setAttribute("x2", "6"); closeLine1.setAttribute("y2", "18");
+      const closeLine2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      closeLine2.setAttribute("x1", "6"); closeLine2.setAttribute("y1", "6");
+      closeLine2.setAttribute("x2", "18"); closeLine2.setAttribute("y2", "18");
+      closeSvg.appendChild(closeLine1);
+      closeSvg.appendChild(closeLine2);
+      closeEl.appendChild(closeSvg);
+
+      controlsEl.appendChild(downloadEl);
+      controlsEl.appendChild(closeEl);
+
+      const prevEl = document.createElement("div");
+      prevEl.id = "gh-img-preview-prev";
+      prevEl.setAttribute("title", "Previous (←)");
+      const prevSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      prevSvg.setAttribute("viewBox", "0 0 24 24");
+      const prevLine1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      prevLine1.setAttribute("x1", "15"); prevLine1.setAttribute("y1", "18");
+      prevLine1.setAttribute("x2", "9"); prevLine1.setAttribute("y2", "12");
+      const prevLine2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      prevLine2.setAttribute("x1", "15"); prevLine2.setAttribute("y1", "6");
+      prevLine2.setAttribute("x2", "9"); prevLine2.setAttribute("y2", "12");
+      prevSvg.appendChild(prevLine1);
+      prevSvg.appendChild(prevLine2);
+      prevEl.appendChild(prevSvg);
+
+      const nextEl = document.createElement("div");
+      nextEl.id = "gh-img-preview-next";
+      nextEl.setAttribute("title", "Next (→)");
+      const nextSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      nextSvg.setAttribute("viewBox", "0 0 24 24");
+      const nextLine1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      nextLine1.setAttribute("x1", "9"); nextLine1.setAttribute("y1", "18");
+      nextLine1.setAttribute("x2", "15"); nextLine1.setAttribute("y2", "12");
+      const nextLine2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      nextLine2.setAttribute("x1", "9"); nextLine2.setAttribute("y1", "6");
+      nextLine2.setAttribute("x2", "15"); nextLine2.setAttribute("y2", "12");
+      nextSvg.appendChild(nextLine1);
+      nextSvg.appendChild(nextLine2);
+      nextEl.appendChild(nextSvg);
+
+      maskEl.appendChild(containerEl);
+      maskEl.appendChild(controlsEl);
+      maskEl.appendChild(prevEl);
+      maskEl.appendChild(nextEl);
+
+      document.body.appendChild(maskEl);
 
       const mask = document.getElementById("gh-img-preview-mask");
       const container = document.getElementById("gh-img-preview-container");
@@ -265,7 +325,9 @@
         rafId = null;
       let images = [],
         currentIdx = 0,
-        clickTimer = null;
+        clickTimer = null,
+        // eslint-disable-next-line no-unused-vars
+        dragging = false;
 
       const reset = () => {
         scale = 1;
@@ -351,6 +413,7 @@
       container.onmousedown = (e) => {
         if (e.button !== 0) return;
         e.preventDefault();
+
         dragging = true;
         const startX = e.clientX - tx;
         const startY = e.clientY - ty;
@@ -366,6 +429,7 @@
         };
 
         const up = () => {
+
           dragging = false;
           container.style.cursor = "move";
           document.removeEventListener("mousemove", move);

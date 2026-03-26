@@ -68,7 +68,9 @@
     const els = get();
     if (!els.length) return;
     els.forEach((el) => {
-      if (el.style.maxWidth !== CFG.WIDTH.MAX) el.style.cssText += `;max-width:${CFG.WIDTH.MAX}!important`;
+      if (el.style.maxWidth !== CFG.WIDTH.MAX) {
+        el.style.cssText += `;max-width:${CFG.WIDTH.MAX}!important`;
+      }
     });
   };
   const obsW = (get) => {
@@ -89,10 +91,11 @@
   };
   if (isCGPT) {
     const of = window.fetch;
-    window.fetch = function (i, _n) {
+    window.fetch = function (...args) {
+      const i = args[0];
       const u = typeof i === "string" ? i : i.url;
-      if (!CFG.CHATGPT.API.test(u)) return of.apply(this, arguments);
-      return of.apply(this, arguments).then(async (r) => {
+      if (!CFG.CHATGPT.API.test(u)) return of.apply(this, args);
+      return of.apply(this, args).then(async (r) => {
         try {
           const d = await r.clone().json();
           const nm = [];
@@ -155,7 +158,7 @@
             if (!el) return [];
             return [el.parentElement, el.parentElement?.parentElement].filter(Boolean);
           };
-    runReady((isCGPT ? SEL.CGPT.TEXT : SEL.GEMINI.BOX).split(",")[0], () => {
+    runReady((isCGPT ? SEL.CGPT.TEXT : isGem ? SEL.GEMINI.BOX : SEL.CLAUDE.RENDER).split(",")[0], () => {
       applyW(getEls);
       obsW(getEls);
     });
@@ -164,7 +167,13 @@
     const cleanup = () => {
       if (document.visibilityState !== "visible") return;
       const msgs = document.querySelectorAll(SEL.CGPT.TURN);
-      if (msgs.length > CFG.CHATGPT.MAX) msgs.forEach((el, i) => i < msgs.length - CFG.CHATGPT.MAX && el.remove());
+      if (msgs.length > CFG.CHATGPT.MAX) {
+        msgs.forEach((el, i) => {
+          if (i >= CFG.CHATGPT.MAX) {
+            el.remove();
+          }
+        });
+      }
     };
     let int = null;
     const sched = (i) => {
@@ -196,9 +205,18 @@
       attributes: true,
       attributeFilter: ["data-testid"]
     });
-    const getTx = () => tx || (tx = document.querySelector(SEL.CGPT.TX));
-    const getStop = () => stop || (stop = document.querySelector(SEL.CGPT.STOP));
-    const getSend = () => send || (send = document.querySelector(SEL.CGPT.SEND));
+    const getTx = () => {
+      if (!tx) tx = document.querySelector(SEL.CGPT.TX);
+      return tx;
+    };
+    const getStop = () => {
+      if (!stop) stop = document.querySelector(SEL.CGPT.STOP);
+      return stop;
+    };
+    const getSend = () => {
+      if (!send) send = document.querySelector(SEL.CGPT.SEND);
+      return send;
+    };
     const isGen = () => getStop() || getSend()?.firstElementChild?.childElementCount === 3;
     const getCont = () =>
       [...document.querySelectorAll(SEL.CGPT.CONT)].find((b) => b.textContent?.includes("Continue"));
@@ -248,13 +266,21 @@
         }
       };
     })();
-    init().then(() => setInterval(loop, 700));
+    init()
+      .then(() => setInterval(loop, 700))
+      .catch(() => {});
   }
   if (isCl) {
     const clean = () => {
       if (document.visibilityState !== "visible") return;
       const m = document.querySelectorAll(SEL.CLAUDE.RENDER);
-      if (m.length > CFG.CLAUDE.MAX) m.forEach((el, i) => i < m.length - CFG.CLAUDE.MAX && el.remove());
+      if (m.length > CFG.CLAUDE.MAX) {
+        m.forEach((el, i) => {
+          if (i >= CFG.CLAUDE.MAX) {
+            el.remove();
+          }
+        });
+      }
     };
     setInterval(clean, CFG.CLAUDE.CLEAN);
   }

@@ -1,7 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**/*.js", "**/*.mjs", "**/*.cjs", "**/*.json"],
     "ignoreUnknown": true
   },
   "vcs": {
@@ -15,7 +14,7 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineEnding": "lf",
-    "lineWidth": 100
+    "lineWidth": 120
   },
   "javascript": {
     "formatter": {
@@ -47,6 +46,9 @@
         "noAccumulatingSpread": "warn"
       }
     }
+  },
+  "assist": {
+    "enabled": true
   },
   "overrides": [
     {

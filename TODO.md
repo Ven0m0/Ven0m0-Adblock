@@ -1,13 +1,24 @@
 # TODO
 
-## Maintenance Tasks
+### Research
 
-### Completed ✅
-- ✅ Added uBlockOrigin resource-abuse.txt filter to `lists/sources-urls.json`
-- ✅ Added adguard-extra userscript to `userscripts/list.txt`
-- ✅ Ran deduplicate.py (found 348 cross-file duplicates for manual review)
-- ✅ Ran format command (formatted 26 files, fixed 15)
-- ✅ Ran lint:fix command (ESLint passed, AGLint found 133 issues)
+**Look into these and integrate them:**
+
+- https://github.com/StevenBlack/hosts/blob/master/updateReadme.py
+- https://github.com/StevenBlack/hosts/blob/master/updateHostsFile.py
+- https://github.com/AdguardTeam/Scriptlets
+- https://github.com/LanikSJ/webannoyances/blob/master/.github/workflows/dead-domains-check.yml
+- add script on schedule that parses specific lists from [firefox adguard extension filter](https://github.com/AdguardTeam/FiltersrsRegistry/blob/master/platforms/extension/firefox/filters.json), [ublock filter](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/extension/ublock/filters.json) and pretty prints them in a markdown table md file. only adguard-german, no need for parsing all other language filters.
+- https://github.com/ryanbr/fanboy-adblock/blob/master/scripts/ramdisk.sh
+- https://github.com/ryanbr/network-scanner
+- https://github.com/ryanbr/cleaner-adblock
+- https://github.com/DandelionSprout/adfilt/tree/master/ClearURLs%20for%20uBo
+
+Fully implememt:
+
+- https://github.com/AdguardTeam/HostlistCompiler
+- https://github.com/AdguardTeam/DeadDomainsLinter
+- https://github.com/AdguardTeam/FiltersCompiler
 
 ### Manual Review Needed
 - Review and consolidate 348 cross-file duplicates found by deduplicate.py

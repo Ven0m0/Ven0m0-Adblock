@@ -12,8 +12,8 @@ on:
       - "Scripts/build.sh"
       - "mise.toml"
   workflow_dispatch:
-  schedule:
-    - cron: "0 7 * * *"
+  #schedule:
+    #- cron: "0 7 * * *"
 
 permissions:
   contents: write
@@ -29,23 +29,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           install: true
           cache: true
           experimental: true
-
       - name: Verify mise tools
         run: |
           mise doctor
           mise list
-
+          mise up -y
       - name: Run AGLint
-        run: mise exec -- bunx aglint --fix
+        run: mise exec -- bunx --bun aglint --fix
         continue-on-error: true
-
       - name: Commit lint fixes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
@@ -63,30 +60,25 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
-
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           install: true
           cache: true
           experimental: true
-
       - name: Compile AdGuard lists
         id: compile
         run: |
           set -e
           mkdir -p Filters lists/releases
-
           if [[ -f hostlist-config.json ]]; then
             printf 'Compiling with config...\n'
             mise exec -- bunx hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
           fi
-
           declare -a compiler_args=()
           while IFS= read -r file; do
             compiler_args+=("-i" "$file")
           done < <(find lists/sources -type f -name "*.txt" 2>/dev/null || true)
-
           if (( ${#compiler_args[@]} > 0 )); then
             printf 'Compiling combined list...\n'
             mise exec -- bunx hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
@@ -95,7 +87,6 @@ jobs:
             printf 'No source files found\n'
             printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
           fi
-
       - name: Clean with DeadDomainsLinter
         if: steps.compile.outputs.has_changes == 'true'
         run: |
@@ -104,7 +95,6 @@ jobs:
             printf 'Cleaning: %s\n' "$file"
             mise exec -- bunx dead-domains-linter -i "$file" -o "$file" || printf 'Failed to clean %s\n' "$file"
           done
-
       - name: Upload artifacts
         if: steps.compile.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v7
@@ -112,7 +102,6 @@ jobs:
           name: adguard-filters
           path: Filters/*.txt
           retention-days: 30
-
   build-ragibkl:
     name: Build Ragibkl Lists
     runs-on: ubuntu-latest
@@ -123,22 +112,18 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
-
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           install: true
           cache: true
           experimental: true
-
       - name: Clone adblock-list-compiler
         run: git clone --depth=1 https://github.com/ragibkl/adblock-list-compiler.git compiler
-
       - name: Install Python dependencies
         run: |
           cd compiler
           mise exec -- python -m pip install -r requirements.txt
-
       - name: Compile lists
         id: compile
         run: |
@@ -146,13 +131,11 @@ jobs:
           mise exec -- python compiler/main.py \
             --config ragibkl-config.json \
             --output Filters/Ragibkl-Combined.txt
-
           if [[ -s Filters/Ragibkl-Combined.txt ]]; then
             printf 'has_changes=true\n' >> "$GITHUB_OUTPUT"
           else
             printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
           fi
-
       - name: Upload artifacts
         if: steps.compile.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v7
@@ -160,7 +143,6 @@ jobs:
           name: ragibkl-filters
           path: Filters/Ragibkl-Combined.txt
           retention-days: 30
-
   build-custom:
     name: Build Custom Lists
     runs-on: ubuntu-latest
@@ -171,26 +153,22 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
-
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           install: true
           cache: true
           experimental: true
-
       - name: Run build script
         run: |
           chmod +x Scripts/build.sh
           mise exec -- ./Scripts/build.sh adblock hosts hostlist
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: custom-filters
           path: lists/releases/*.txt
           retention-days: 30
-
   commit:
     name: Commit Changes
     runs-on: ubuntu-slim
@@ -205,7 +183,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
-
       - name: Download AdGuard artifacts
         if: needs.build-adguard.result == 'success'
         uses: actions/download-artifact@v8
@@ -213,7 +190,6 @@ jobs:
           name: adguard-filters
           path: Filters/
         continue-on-error: true
-
       - name: Download Ragibkl artifacts
         if: needs.build-ragibkl.result == 'success'
         uses: actions/download-artifact@v8
@@ -221,7 +197,6 @@ jobs:
           name: ragibkl-filters
           path: Filters/
         continue-on-error: true
-
       - name: Download custom artifacts
         if: needs.build-custom.result == 'success'
         uses: actions/download-artifact@v8
@@ -229,7 +204,6 @@ jobs:
           name: custom-filters
           path: lists/releases/
         continue-on-error: true
-
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
@@ -238,7 +212,6 @@ jobs:
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           skip_dirty_check: false
-
   convert:
     name: Convert Lists
     runs-on: ubuntu-latest
@@ -249,20 +222,17 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
-
       - name: Setup mise
-        uses: jdx/mise-action@v3
+        uses: jdx/mise-action@v4
         with:
           install: true
           cache: true
-
       - name: Run conversion
         run: |
           chmod +x convert.sh
           mise exec -- bash convert.sh
         env:
           repository: ${{ github.repository }}
-
       - name: Push to release branch
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
@@ -273,7 +243,6 @@ jobs:
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           create_branch: true
           push_options: "--force"
-
   cleanup:
     name: Cleanup
     runs-on: ubuntu-slim

@@ -65,7 +65,9 @@
   };
 
   const observe = () => {
+    let timeoutId = null;
     const mo = new MutationObserver((mutations) => {
+      let shouldScan = false;
       for (const m of mutations) {
         for (const n of m.addedNodes) {
           if (!isElement(n)) continue;
@@ -73,7 +75,20 @@
             fixAnchor(n);
             continue;
           }
-          scan(n);
+          shouldScan = true;
+        }
+      }
+      if (shouldScan && !timeoutId) {
+        if (typeof requestAnimationFrame !== "undefined") {
+          timeoutId = requestAnimationFrame(() => {
+            timeoutId = null;
+            scan(document);
+          });
+        } else {
+          timeoutId = setTimeout(() => {
+            timeoutId = null;
+            scan(document);
+          }, 100);
         }
       }
     });

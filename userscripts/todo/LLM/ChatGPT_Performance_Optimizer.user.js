@@ -34,9 +34,7 @@ Why Both?
 - Together they address both memory and rendering bottlenecks
 */
 
-(function () {
-  "use strict";
-
+(() => {
   const w = unsafeWindow;
   const DEBUG = false;
 
@@ -163,17 +161,33 @@ Why Both?
 
         if (!shouldIntercept(url)) return res;
 
-        const clone = res.clone();
-        const ct = clone.headers.get("content-type") || "";
+        const ct = res.headers.get("content-type") || "";
         if (!ct.includes("application/json")) return res;
 
-        const data = await clone.json();
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          return new w.Response(text, {
+            status: res.status,
+            statusText: res.statusText,
+            headers: res.headers
+          });
+        }
+
         const trimmed = trimConversationPayload(data, keepLastNow);
 
         // Only replace if actually trimmed
         if (data?.mapping && trimmed?.mapping) {
           const sameSize = Object.keys(data.mapping).length === Object.keys(trimmed.mapping).length;
-          if (sameSize) return res;
+          if (sameSize) {
+            return new w.Response(text, {
+              status: res.status,
+              statusText: res.statusText,
+              headers: res.headers
+            });
+          }
         }
 
         const body = JSON.stringify(trimmed);
@@ -213,13 +227,13 @@ Why Both?
       if (all.length === 0) return;
 
       const lastAttr = all[all.length - 1].getAttribute("data-testid");
-      const last = parseInt(lastAttr?.split("-")[2]);
+      const last = parseInt(lastAttr?.split("-")[2], 10);
 
-      if (!isNaN(last)) {
+      if (!Number.isNaN(last)) {
         let removed = 0;
         all.forEach((item) => {
-          const idx = parseInt(item.getAttribute("data-testid")?.split("-")[2]);
-          if (!isNaN(idx) && idx < last - leaveOnly) {
+          const idx = parseInt(item.getAttribute("data-testid")?.split("-")[2], 10);
+          if (!Number.isNaN(idx) && idx < last - leaveOnly) {
             item.remove();
             removed++;
           }
@@ -240,8 +254,8 @@ Why Both?
 
     // Load settings
     const domSettings = {
-      leaveOnly: parseInt(localStorage.getItem(DOM_CONFIG.KEY_LEAVE_ONLY)) || DOM_CONFIG.DEFAULT_LEAVE_ONLY,
-      intervalSec: parseInt(localStorage.getItem(DOM_CONFIG.KEY_INTERVAL_SEC)) || DOM_CONFIG.DEFAULT_INTERVAL_SEC,
+      leaveOnly: parseInt(localStorage.getItem(DOM_CONFIG.KEY_LEAVE_ONLY), 10) || DOM_CONFIG.DEFAULT_LEAVE_ONLY,
+      intervalSec: parseInt(localStorage.getItem(DOM_CONFIG.KEY_INTERVAL_SEC), 10) || DOM_CONFIG.DEFAULT_INTERVAL_SEC,
       enabled: localStorage.getItem(DOM_CONFIG.KEY_ENABLED) !== "false"
     };
 
@@ -366,7 +380,7 @@ Why Both?
     const loadOlderBtn = panel.querySelector("#cgpt-load-older");
     const resetFastBtn = panel.querySelector("#cgpt-reset-fast");
     const fullHistoryBtn = panel.querySelector("#cgpt-full-history");
-    const keepDisplay = panel.querySelector("#cgpt-keep-display");
+    const _keepDisplay = panel.querySelector("#cgpt-keep-display");
     const leaveDisplay = panel.querySelector("#cgpt-leave-display");
 
     // State
@@ -408,8 +422,8 @@ Why Both?
     };
 
     domKeepInput.oninput = () => {
-      const val = parseInt(domKeepInput.value);
-      if (!isNaN(val) && val > 0) {
+      const val = parseInt(domKeepInput.value, 10);
+      if (!Number.isNaN(val) && val > 0) {
         currentLeaveOnly = val;
         localStorage.setItem(DOM_CONFIG.KEY_LEAVE_ONLY, val);
         leaveDisplay.textContent = val;
@@ -418,8 +432,8 @@ Why Both?
     };
 
     domIntervalInput.oninput = () => {
-      const val = parseInt(domIntervalInput.value);
-      if (!isNaN(val) && val >= DOM_CONFIG.MIN_INTERVAL_SEC) {
+      const val = parseInt(domIntervalInput.value, 10);
+      if (!Number.isNaN(val) && val >= DOM_CONFIG.MIN_INTERVAL_SEC) {
         currentIntervalMs = Math.max(2000, val * 1000);
         localStorage.setItem(DOM_CONFIG.KEY_INTERVAL_SEC, val);
         startDOMCleaner();

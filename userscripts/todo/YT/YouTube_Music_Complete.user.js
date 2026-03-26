@@ -29,9 +29,7 @@ CONSOLIDATED FEATURES:
 7. UI Enhancements - Minor cosmetic improvements
 */
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_ytmusic_complete") === "1") {
     console.warn("[YT Music Complete]: Disabled by user");
@@ -39,7 +37,7 @@ CONSOLIDATED FEATURES:
   }
 
   // Promise isolation (YouTube Music hacks Promise in some browsers)
-  const Promise = (async () => {})().constructor;
+  const NativePromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -107,7 +105,7 @@ CONSOLIDATED FEATURES:
           const button = document.querySelector(".song-button.style-scope.ytmusic-av-toggle");
           if (button) button.click();
         }
-      } catch (e) {
+      } catch {
         // Silently fail if elements not found
       }
     },
@@ -155,7 +153,6 @@ CONSOLIDATED FEATURES:
           const oldValue = hashMap.get(this);
           Promise.resolve([oldValue, newValue, new Date()]).then(fSet).catch(console.warn);
           hashMap.set(this, newValue);
-          return true;
         }
       });
     },
@@ -265,7 +262,9 @@ CONSOLIDATED FEATURES:
 
       // Observe thumbnails
       const observeImages = () => {
-        document.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+        document.querySelectorAll("img[data-src]").forEach((img) => {
+          observer.observe(img);
+        });
       };
 
       // Initial observation
@@ -275,8 +274,46 @@ CONSOLIDATED FEATURES:
         window.addEventListener("load", observeImages);
       }
 
-      // Observe dynamic content
-      new MutationObserver(observeImages).observe(document.body, {
+      const queuedNodes = new Set();
+      let isScheduled = false;
+
+      const processQueuedNodes = () => {
+        isScheduled = false;
+        const nodesToProcess = Array.from(queuedNodes);
+        queuedNodes.clear();
+
+        // Deduplicate: Remove nodes that are descendants of other nodes in the queue
+        const rootNodes = nodesToProcess.filter(
+          (node) => !nodesToProcess.some((otherNode) => otherNode !== node && otherNode.contains(node))
+        );
+
+        rootNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.tagName === "IMG" && node.dataset.src) {
+              observer.observe(node);
+            }
+            node.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+          }
+        });
+      };
+
+      // Observe dynamic content efficiently
+      new MutationObserver((mutations) => {
+        let hasNewNodes = false;
+        for (const mutation of mutations) {
+          for (const node of mutation.addedNodes) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              queuedNodes.add(node);
+              hasNewNodes = true;
+            }
+          }
+        }
+
+        if (hasNewNodes && !isScheduled) {
+          isScheduled = true;
+          requestAnimationFrame(processQueuedNodes);
+        }
+      }).observe(document.body, {
         childList: true,
         subtree: true
       });
@@ -296,11 +333,14 @@ CONSOLIDATED FEATURES:
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel {
         display: flex !important;
-        overflow-x: auto !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
       }
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel-item {
         flex: 0 0 auto !important;
+        margin-right: 16px !important;
+        margin-bottom: 16px !important;
       }
     `);
   }

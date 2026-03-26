@@ -275,6 +275,7 @@
           const ck = () => (f.contentWindow?.setTimeout ? r() : setTimeout(ck, K.TIMER_CHECK));
           ck();
         });
+        f.remove();
         timers = {
           setTimeout: f.contentWindow.setTimeout.bind(f.contentWindow),
           clearTimeout: f.contentWindow.clearTimeout.bind(f.contentWindow),
@@ -312,7 +313,9 @@
             log("Idle OFF");
           }
         }, K.IDLE_THROTTLE);
-        actEv.forEach((ev) => window.addEventListener(ev, thAct, { capture: true, passive: true }));
+        actEv.forEach((ev) => {
+          window.addEventListener(ev, thAct, { capture: true, passive: true });
+        });
         setInterval(() => {
           if (document.visibilityState !== "visible") return;
           const now = performance.now();
@@ -393,19 +396,34 @@
       },
       { rootMargin: K.LAZY_THUMB_MARGIN }
     );
-    const lazy = () => {
-      document
-        .querySelectorAll(
-          "ytd-rich-item-renderer:not([data-lazy-opt]),ytd-compact-video-renderer:not([data-lazy-opt]),ytd-thumbnail:not([data-lazy-opt])"
-        )
-        .forEach((e) => {
-          e.dataset.lazyOpt = "1";
-          e.style.display = "none";
-          obs.observe(e);
-        });
+    const sel =
+      "ytd-rich-item-renderer:not([data-lazy-opt]),ytd-compact-video-renderer:not([data-lazy-opt]),ytd-thumbnail:not([data-lazy-opt])";
+    const processNode = (e) => {
+      e.dataset.lazyOpt = "1";
+      e.style.display = "none";
+      obs.observe(e);
     };
-    const tl = throttle(lazy, 500);
-    new MutationObserver(tl).observe(document.body || document.documentElement, { childList: true, subtree: true });
+    const lazy = () => document.querySelectorAll(sel).forEach(processNode);
+    const mo = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        for (const node of m.addedNodes) {
+          if (node.nodeType === 1) {
+            const n = node.nodeName;
+            if (
+              (n === "YTD-RICH-ITEM-RENDERER" || n === "YTD-COMPACT-VIDEO-RENDERER" || n === "YTD-THUMBNAIL") &&
+              !node.dataset.lazyOpt
+            ) {
+              processNode(node);
+            }
+            if (node.querySelectorAll) {
+              const els = node.querySelectorAll(sel);
+              for (let i = 0; i < els.length; i++) processNode(els[i]);
+            }
+          }
+        }
+      }
+    });
+    mo.observe(document.body || document.documentElement, { childList: true, subtree: true });
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", lazy) : setTimeout(lazy, 120);
   }
   if (CFG.ui.instantNav) {
@@ -441,7 +459,7 @@
       if (rs.indexOf(res) < rs.indexOf(cur)) {
         let nb = Math.max(rs.indexOf(res), 0);
         const av = y.getAvailableQualityLevels();
-        while (av.indexOf(rs[nb]) === -1 && nb < rs.length - 1) ++nb;
+        while (av.indexOf(rs[nb]) === -1 && nb < rs.length) ++nb;
         if (!useBtn && CFG.quality.flushBuffer && cur !== rs[nb]) {
           const id = getVid(y);
           if (id && !id.includes("ERROR")) {

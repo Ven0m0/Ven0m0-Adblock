@@ -31,9 +31,7 @@ IMPROVEMENTS OVER ORIGINALS:
 - OPTIMIZED CSS injection (theme at document-start, functional CSS at document-end)
 */
 
-(function () {
-  "use strict";
-
+(() => {
   // Emergency disable
   if (localStorage.getItem("disable_claude_complete") === "1") {
     console.warn("[Claude Complete]: Disabled by user");
@@ -83,7 +81,8 @@ IMPROVEMENTS OVER ORIGINALS:
     }
   };
 
-  function saveConfig() {
+  // eslint-disable-next-line no-unused-vars
+  function _saveConfig() {
     GM_setValue("warning_threshold", CONFIG.thresholds.warning);
     GM_setValue("danger_threshold", CONFIG.thresholds.danger);
     GM_setValue("cc_default_collapsed", CONFIG.codeCollapser.defaultCollapsed);
@@ -165,7 +164,7 @@ IMPROVEMENTS OVER ORIGINALS:
     // Fix paste handler (newlines)
     document.addEventListener(
       "paste",
-      function (e) {
+      (e) => {
         const textarea = document.activeElement;
         if (textarea && textarea.tagName === "TEXTAREA") {
           e.stopImmediatePropagation();
@@ -180,7 +179,7 @@ IMPROVEMENTS OVER ORIGINALS:
     // Override ctrl+shift+i to open devtools
     document.addEventListener(
       "keydown",
-      function (e) {
+      (e) => {
         if (e.ctrlKey && e.shiftKey && e.key === "I") {
           e.stopImmediatePropagation();
         }
@@ -1018,10 +1017,17 @@ IMPROVEMENTS OVER ORIGINALS:
 
       const info = document.createElement("div");
       info.className = "ccb-info";
-      info.innerHTML = `
-        <div class="ccb-title">${lang}</div>
-        <span class="ccb-lang">${lang.toUpperCase()}</span>
-      `;
+
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "ccb-title";
+      titleDiv.textContent = lang;
+
+      const langSpan = document.createElement("span");
+      langSpan.className = "ccb-lang";
+      langSpan.textContent = lang.toUpperCase();
+
+      info.appendChild(titleDiv);
+      info.appendChild(langSpan);
 
       header.appendChild(copyBtn);
       header.appendChild(downloadBtn);
@@ -1378,7 +1384,8 @@ IMPROVEMENTS OVER ORIGINALS:
     },
 
     async forkConversationClicked(model, forkButton, modal, useSummary = false) {
-      const conversationId = window.location.pathname.split("/").pop();
+      // eslint-disable-next-line no-unused-vars
+      const _conversationId = window.location.pathname.split("/").pop();
 
       if (this.originalSettings) {
         const newSettings = { ...this.originalSettings };
@@ -1426,9 +1433,10 @@ IMPROVEMENTS OVER ORIGINALS:
     patchFetch() {
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
-        const [input, config] = args;
+        // eslint-disable-next-line no-unused-vars
+        const [input, _config] = args;
 
-        let url = undefined;
+        let url;
         if (input instanceof URL) {
           url = input.href;
         } else if (typeof input === "string") {
@@ -1437,7 +1445,7 @@ IMPROVEMENTS OVER ORIGINALS:
           url = input.url;
         }
 
-        if (url && url.includes("/retry_completion") && this.pendingForkModel) {
+        if (url?.includes("/retry_completion") && this.pendingForkModel) {
           // Fork conversation logic (simplified - full implementation available in original)
           console.log("[Fork] Intercepted retry request");
           // ... (fork implementation details omitted for brevity)
@@ -1473,11 +1481,11 @@ IMPROVEMENTS OVER ORIGINALS:
       miniBtn.textContent = "⚡";
 
       if (pos.left !== undefined) {
-        miniBtn.style.left = pos.left + "px";
-        miniBtn.style.top = (pos.top || 100) + "px";
+        miniBtn.style.left = `${pos.left}px`;
+        miniBtn.style.top = `${pos.top || 100}px`;
       } else {
-        miniBtn.style.bottom = (pos.bottom || 100) + "px";
-        miniBtn.style.right = (pos.right || 20) + "px";
+        miniBtn.style.bottom = `${pos.bottom || 100}px`;
+        miniBtn.style.right = `${pos.right || 20}px`;
       }
 
       if (!CONFIG.ui.minimized) {
@@ -1492,11 +1500,11 @@ IMPROVEMENTS OVER ORIGINALS:
       panel.id = "claude-unified-panel";
 
       if (pos.left !== undefined) {
-        panel.style.left = Math.max(10, pos.left - 480) + "px";
-        panel.style.top = (pos.top || 100) + "px";
+        panel.style.left = `${Math.max(10, pos.left - 480)}px`;
+        panel.style.top = `${pos.top || 100}px`;
       } else {
-        panel.style.bottom = (pos.bottom || 100) + "px";
-        panel.style.right = (pos.right || 20) + "px";
+        panel.style.bottom = `${pos.bottom || 100}px`;
+        panel.style.right = `${pos.right || 20}px`;
       }
 
       if (!CONFIG.ui.minimized) {
@@ -1642,8 +1650,8 @@ IMPROVEMENTS OVER ORIGINALS:
         panelX = Math.max(10, Math.min(panelX, window.innerWidth - 550));
         panelY = Math.max(10, Math.min(panelY, window.innerHeight - 300));
 
-        panel.style.left = panelX + "px";
-        panel.style.top = panelY + "px";
+        panel.style.left = `${panelX}px`;
+        panel.style.top = `${panelY}px`;
         panel.style.right = "auto";
         panel.style.bottom = "auto";
         panel.classList.add("visible");
@@ -1654,8 +1662,8 @@ IMPROVEMENTS OVER ORIGINALS:
 
         panel.classList.remove("visible");
 
-        miniBtn.style.left = panelRect.right - 60 + "px";
-        miniBtn.style.top = panelRect.top + "px";
+        miniBtn.style.left = `${panelRect.right - 60}px`;
+        miniBtn.style.top = `${panelRect.top}px`;
         miniBtn.style.right = "auto";
         miniBtn.style.bottom = "auto";
         miniBtn.style.display = "flex";
@@ -1675,21 +1683,25 @@ IMPROVEMENTS OVER ORIGINALS:
         return;
       }
 
-      list.innerHTML = TokenSaverModule.state.files
-        .map(
-          (file) => `
-        <div class="cts-file-item" data-file="${file}">
-          <div class="cts-file-name">📄 ${file}</div>
-        </div>
-      `
-        )
-        .join("");
+      list.textContent = "";
 
-      list.querySelectorAll(".cts-file-item").forEach((item) => {
+      TokenSaverModule.state.files.forEach((file) => {
+        const item = document.createElement("div");
+        item.className = "cts-file-item";
+        item.dataset.file = file;
+
+        const name = document.createElement("div");
+        name.className = "cts-file-name";
+        name.textContent = `📄 ${file}`;
+
+        item.appendChild(name);
+
         item.addEventListener("click", () => {
           const cmd = `Please use the view tool to read: /mnt/user-data/uploads/${item.dataset.file}\n\nThen process it and create a downloadable output file in /mnt/user-data/outputs/ - do NOT paste content in chat.`;
           TokenSaverModule.copyText(cmd, "📋 Copied!");
         });
+
+        list.appendChild(item);
       });
     },
 
@@ -1832,8 +1844,8 @@ IMPROVEMENTS OVER ORIGINALS:
           newX = Math.max(0, Math.min(newX, window.innerWidth - w));
           newY = Math.max(0, Math.min(newY, window.innerHeight - h));
 
-          element.style.left = newX + "px";
-          element.style.top = newY + "px";
+          element.style.left = `${newX}px`;
+          element.style.top = `${newY}px`;
           element.style.right = "auto";
           element.style.bottom = "auto";
         }

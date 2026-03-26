@@ -42,6 +42,18 @@ ts_read() { TZ=UTC printf '%(%Y-%m-%d %H:%M:%S UTC)T\n' -1; }
 # CLEANUP HOOKS
 # ============================================================================
 _cleanup_hooks=()
-cleanup_add() { _cleanup_hooks+=("$1"); }
-cleanup_run() { local h; for h in "${_cleanup_hooks[@]}"; do eval "$h" || :; done; }
+cleanup_add() { _cleanup_hooks+=("$@" "__CLEANUP_DELIM__"); }
+cleanup_run() {
+  local cmd=() arg
+  for arg in "${_cleanup_hooks[@]}"; do
+    if [[ "$arg" == "__CLEANUP_DELIM__" ]]; then
+      if (( ${#cmd[@]} > 0 )); then
+        "${cmd[@]}" || :
+        cmd=()
+      fi
+    else
+      cmd+=("$arg")
+    fi
+  done
+}
 trap cleanup_run EXIT INT TERM

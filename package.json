@@ -12,10 +12,10 @@
     "build:userscripts": "./Scripts/build.sh userscripts",
     "lint": "bun run lint:js && bun run lint:filters && bun run lint:md",
     "lint:js": "eslint .",
-    "lint:filters": "bun x aglint",
+    "lint:filters": "bunx aglint",
     "lint:yaml": "command -v yamllint >/dev/null && yamllint . || { echo 'yamllint not installed. Install with: pip install yamllint' >&2; exit 1; }",
     "lint:md": "bun x markdownlint-cli2 '**/*.md' '#node_modules'",
-    "lint:shell": "shellcheck Scripts/*.sh || true",
+    "lint:shell": "shellcheck Scripts/*.sh || :",
     "lint:eslint": "eslint .",
     "lint:aglint": "bun x aglint",
     "lint:fix": "eslint . --fix && bun x aglint --fix",
@@ -28,23 +28,24 @@
     "clean:cache": "rm -rf node_modules/.cache .eslintcache",
     "clean:all": "bun run clean && bun run clean:cache",
     "precommit": "bun run lint:fix:all",
-    "validate": "bun run test && bun run build"
+    "validate": "bun run test && bun run build",
+    "aglint": "bunx aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\""
   },
   "devDependencies": {
-    "@adguard/aglint": "latest",
-    "@adguard/dead-domains-linter": "latest",
-    "@adguard/hostlist-compiler": "latest",
-    "@biomejs/biome": "latest",
-    "oxfmt": "latest",
-    "oxlint": "latest",
-    "@eslint/js": "latest",
-    "@microsoft/eslint-formatter-sarif": "latest",
-    "@types/bun": "latest",
-    "esbuild": "latest",
-    "eslint": "latest",
-    "globals": "latest",
-    "markdownlint-cli2": "latest",
-    "terser": "latest"
+    "@adguard/aglint": "*",
+    "@adguard/dead-domains-linter": "*",
+    "@adguard/hostlist-compiler": "*",
+    "@biomejs/biome": "*",
+    "@eslint/js": "*",
+    "@microsoft/eslint-formatter-sarif": "*",
+    "@types/bun": "*",
+    "esbuild": "*",
+    "eslint": "*",
+    "globals": "*",
+    "markdownlint-cli2": "*",
+    "oxfmt": "*",
+    "oxlint": "*",
+    "terser": "*"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -72,5 +73,11 @@
     "web-enhancement"
   ],
   "author": "Ven0m0",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "overrides": {
+    "axios": ">=1.6.0",
+    "follow-redirects": ">=1.15.11",
+    "tldts": "7.0.27",
+    "tldts-core": "7.0.27"
+  }
 }

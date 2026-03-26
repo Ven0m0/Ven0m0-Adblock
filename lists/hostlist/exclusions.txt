@@ -1,0 +1,1 @@
+https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/refs/heads/master/Filters/exclusions.txt

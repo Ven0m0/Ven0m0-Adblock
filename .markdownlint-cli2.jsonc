@@ -11,10 +11,5 @@
     "MD046": false
   },
   "globs": ["**/*.md"],
-  "ignores": [
-    "node_modules/**",
-    "dist/**",
-    "Filters/**",
-    "lists/mirror/**"
-  ]
+  "ignores": ["node_modules/**", "dist/**", "Filters/**", "lists/mirror/**"]
 }

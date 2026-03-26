@@ -1,3 +1,0 @@
-! fanboy_sounds_thirdparty.txt
-! 3rd-party sounds
-||tars-file-upload.s3.amazonaws.com^$media

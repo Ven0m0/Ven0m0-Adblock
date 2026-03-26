@@ -5,53 +5,53 @@
 **Ven0m0-Adblock** is an ad-blocking filter list and userscript project.
 
 - **License:** GPL-3.0
-- **Stack:** Bun, Mise, JavaScript (ES2020), AdGuard filter syntax
+- **Stack:** Bun, Mise, JavaScript (ES2020), Python 3.13+, AdGuard filter syntax
 - **Build Tools:** esbuild, terser, AGLint, HostlistCompiler
-- **Quality:** ESLint (flat config), Biome, Oxlint, Prettier, shellcheck
+- **Quality:** ESLint (flat config), Biome, Oxlint, ruff, shellcheck
 
 ## Critical Rules
 
-### File Operations
+### Source vs Generated Files
 
-**ALWAYS edit source files:**
-- `lists/sources/*.txt` - Hand-edited filter rules
-- `userscripts/src/Mine/*.user.js` - Source userscripts
-- `Scripts/*.sh` - Build scripts
+**EDIT source files only:**
+
+| Type | Path |
+|------|------|
+| Adblock filter rules | `lists/adblock/*.txt` |
+| Hostlist/DNS rules | `lists/hostlist/*.txt` |
+| Userscript sources | `userscripts/src/*.user.js` |
+| Build/utility scripts | `Scripts/*.sh`, `Scripts/*.py` |
 
 **NEVER modify generated files:**
-- `dist/` - Built userscripts (regenerated)
-- `Filters/` - Compiled filters (regenerated)
-- `lists/releases/` - Built filter lists (regenerated)
 
-### Before Making Changes
-
-1. **Read files first** - Never propose changes to code you haven't read
-2. **Validate syntax** - Run appropriate linters before committing
-3. **Test builds** - Ensure builds succeed locally
-4. **Follow conventions** - Match existing code patterns
+| Path | Reason |
+|------|--------|
+| `lists/releases/` | Rebuilt from `lists/adblock/` |
+| `lists/sources/` | Auto-normalized mirrors of adblock sources |
+| `lists/external/` | Downloaded from upstream |
+| `userscripts/dist/` | Rebuilt from `userscripts/src/` |
+| `Filters/` | Compiled from `lists/hostlist/` |
 
 ### Code Style
 
-**JavaScript/TypeScript:**
-- 2-space indentation
-- Double quotes for strings
-- Semicolons required
-- Use `const` over `let`, never `var`
-- Use `===` over `==`
-- No trailing commas
+**JavaScript:**
+- 2-space indentation, double quotes, semicolons required
+- `const` over `let`, never `var`; `===` over `==`
 - Line width: 100 characters
+
+**Python:**
+- Python 3.13+, managed with UV
+- Formatting and linting enforced by ruff
+- Script names use `snake_case.py` (e.g. `update_lists.py`, `move_pure_domains.py`)
 
 **Shell Scripts:**
 - Bash strict mode: `set -Eeuo pipefail`
 - Quote all variables: `"$var"`
-- Use `readonly` for constants
-- Prefer `[[` over `[` for conditionals
+- Use `readonly` for constants; `[[` over `[`
 
 **Filter Lists (AdGuard/uBlock syntax):**
-- One rule per line
-- Use `!` for comments
-- Group related rules together
-- Follow uBlock Origin syntax
+- One rule per line; `!` for comments
+- Group related rules; check for duplicates with `rg` before adding
 
 **UserScript Headers:**
 ```javascript
@@ -64,191 +64,160 @@
 // ==/UserScript==
 ```
 
-### Commit Message Convention
+### Commit Messages
 
-Follow Conventional Commits:
-- `feat:` - New features
-- `fix:` - Bug fixes
-- `ci:` - CI/CD changes
-- `style:` - Formatting/linting
-- `docs:` - Documentation
-- `refactor:` - Code refactoring
-- `test:` - Testing
-- `chore:` - Maintenance
+Follow Conventional Commits (max 72 chars):
+
+| Prefix | Use for |
+|--------|---------|
+| `feat:` | New features |
+| `fix:` | Bug fixes |
+| `ci:` | CI/CD changes |
+| `style:` | Formatting/linting |
+| `docs:` | Documentation |
+| `refactor:` | Code refactoring |
+| `chore:` | Maintenance |
+
+## Build Commands
+
+```bash
+bun run build               # Adblock filter lists
+bun run build:adblock       # Adblock lists only
+bun run build:hosts         # Hosts/DNS lists only
+bun run build:userscripts   # Userscripts only
+bun run build:all           # Everything
+```
+
+## Quality Commands
+
+```bash
+bun run lint                # All linters (JS + filters + markdown)
+bun run lint:filters        # AGLint filters only
+bun run lint:fix:all        # Auto-fix JS + filters + format
+bun run format              # Biome format
+bun run validate            # lint + build (use before committing)
+
+# Python
+ruff check --fix .
+ruff format .
+python3 -m unittest discover Scripts/ 'test_*.py'
+```
 
 ## Common Tasks
 
 ### Add Filter Rule
 
-```bash
-# 1. Edit appropriate source file
-# lists/sources/Youtube.txt, Reddit.txt, etc.
+```
+# Check for duplicates first
+rg "example.com" lists/adblock/
 
-# 2. Add rule following AdGuard syntax
+# Edit: lists/adblock/Youtube.txt (or appropriate file)
 ! Block example ads
 ||example.com/ads/*
 example.com##.ad-container
 
-# 3. Validate
-bun run lint:aglint
+# Validate, then build
+bun run lint:filters
+bun run build:adblock
+```
 
-# 4. Build
-bun run build
+### Add Hostlist/DNS Rule
 
-# 5. Commit
-git commit -m "feat: block new ad element"
+```
+# Check for duplicates first
+rg "example.com" lists/hostlist/
+
+# Edit: lists/hostlist/Ads.txt (or appropriate file)
+||trackers.example.com^
+
+bun run lint:filters
+bun run build:hosts
 ```
 
 ### Create Userscript
 
-```bash
-# 1. Create in userscripts/src/Mine/
-touch userscripts/src/Mine/script-optimized.user.js
+```javascript
+// Create: userscripts/src/my-script.user.js
+// ==UserScript==
+// @name         My Script
+// @version      1.0
+// @description  Description
+// @match        https://example.com/*
+// @grant        none
+// ==/UserScript==
 
-# 2. Add proper header + code
-# (Include ==UserScript== metadata block)
+// ... script code here
 
-# 3. Build
-bun run build:userscripts
-
-# 4. Test output in dist/
+// Then build:
+// bun run build:userscripts -> output: userscripts/dist/my-script.user.js
 ```
 
-### Fix Linting Errors
-
-```bash
-# Auto-fix everything
-bun run lint:fix:all
-
-# Individual fixes
-eslint . --fix                # JavaScript
-bunx aglint --fix             # Filters
-bun run format                # Format all
-```
-
-### Build Commands
+## Setup
 
 ```bash
-bun run build                 # Filter lists only
-bun run build:userscripts     # Userscripts only
-bun run build:all             # Everything
-bun run validate              # Test + build
+mise install && bun install   # Install all tools and dependencies
+uv sync                       # Install Python dependencies
 ```
 
-## Essential Commands Reference
-
-```bash
-# Setup
-mise install && bun install
-
-# Quality Checks
-bun run lint                  # All linters
-bun run lint:fix              # Auto-fix ESLint + AGLint
-bun run format                # Biome format
-bun run test                  # Lint + format check
-
-# Clean
-bun run clean                 # Remove build artifacts
-bun run clean:all             # Nuclear clean
-```
-
-## File Structure
+## Repository Structure
 
 ```
-lists/sources/*.txt           # Source filter rules (EDIT)
-userscripts/src/Mine/*.user.js # Source userscripts (EDIT)
-Scripts/*.sh                  # Build scripts (EDIT)
+lists/adblock/     # Adblock filter sources (EDIT)
+lists/hostlist/    # DNS/hostlist sources (EDIT)
+lists/releases/    # Built adblock filters (GENERATED)
+lists/sources/     # Normalized source mirrors (GENERATED)
+lists/external/    # Downloaded external lists (GENERATED)
 
-lists/releases/               # Built filters (GENERATED)
-dist/                         # Built userscripts (GENERATED)
-Filters/                      # Compiled filters (GENERATED)
+userscripts/src/   # Userscript sources (EDIT)
+userscripts/dist/  # Built userscripts (GENERATED)
+
+Scripts/           # Build and utility scripts (EDIT)
+Filters/           # Compiled hostlist output (GENERATED)
 ```
 
-## Configuration Files
-
-- `@package.json` - NPM scripts, dependencies
-- `@mise.toml` - Tool versions, tasks
-- `@eslint.config.mjs` - ESLint flat config
-- `@biome.json` - Biome linter/formatter
-- `@.aglintrc.yml` - Filter list linting
-- `@esbuild.config.js` - Bundler config
-- `@hostlist-config.json` - Filter compilation
-- `@.lefthook.yml` - Git hooks
-
-## Development Workflow
-
-1. **Setup:** `mise install && bun install`
-2. **Make changes:** Edit source files only
-3. **Validate:** `bun run lint`
-4. **Build:** `bun run build`
-5. **Test:** `bun run validate`
-6. **Commit:** Follow conventional commits
-7. **Push:** CI will run automated checks
-
-## CI/CD Integration
-
-- **build-filter-lists.yml** - Runs daily, builds filters
-- **lint-and-format.yml** - Runs on push/PR
-- **userscripts.yml** - Weekly builds, manual triggers
-- All workflows use Mise for tool management
-- Automated commits by `github-actions[bot]`
-
-## Best Practices
-
-### DO ✅
-
-- Edit source files in `lists/sources/`, `userscripts/src/`
-- Run linters after every change
-- Match existing code style and patterns
-- Check for duplicate filter rules before adding
-- Preserve explanatory comments
-- Test builds before committing
-- Use feature branches (not main)
-- Follow conventional commit messages
-
-### DON'T ❌
-
-- Modify generated files in `dist/`, `Filters/`, `lists/releases/`
-- Skip validation or linting steps
-- Make bulk changes without testing
-- Ignore existing code style
-- Remove comments without understanding context
-- Commit directly to main branch
-- Create unnecessary documentation files
-
-## Linters & Tools
+## Linters
 
 - **JavaScript:** ESLint (flat config), Biome, Oxlint
-- **Filters:** AGLint (uBlock Origin syntax)
+- **Python:** ruff
+- **Filters:** AGLint (uBlock Origin / AdGuard syntax)
 - **Markdown:** markdownlint-cli2
 - **YAML:** yamllint
 - **Shell:** shellcheck, shfmt
-- **Git Hooks:** Lefthook (pre-commit, commit-msg, pre-push)
+- **Git hooks:** prek
 
-## Dependencies
+## CI/CD Workflows
 
-**Runtimes:** Bun (latest), Node.js (LTS)
-**Build:** esbuild, terser
-**AdBlock:** @adguard/aglint, @adguard/hostlist-compiler, @adguard/dead-domains-linter
-**Quality:** eslint, @biomejs/biome, markdownlint-cli2
+- `aglint.yml` — Filter lint on push/PR
+- `build-filter-lists.yml` — Daily filter builds (push to main + 7:00 UTC)
+- `lint-and-format.yml` — Code quality on push/PR
+- `userscripts.yml` — Weekly userscript builds (Monday 00:00 UTC)
+- `automerge-open-prs.yml` — Auto-merge eligible PRs
+- `dependabot-auto-merge.yml` — Auto-merge Dependabot updates
+- All workflows use Mise for tool management
 
-## External Resources
+## Best Practices
 
-- [AdGuard Filters Syntax](https://adguard.com/kb/general/ad-filtering/create-own-filters/)
-- [AGLint Documentation](https://github.com/AdguardTeam/AGLint)
-- [Mise Documentation](https://mise.jdx.dev/)
-- [Bun Documentation](https://bun.sh/docs)
-- [ESLint Flat Config](https://eslint.org/docs/latest/use/configure/configuration-files)
+**DO:**
+- Read files before proposing changes
+- Use `rg` to check for duplicate rules before adding
+- Run `bun run lint` after filter edits
+- Use feature branches (never commit to `main`)
+- Follow conventional commit messages
+- Run `bun run validate` before committing
 
-## Quick Tips
+**DON'T:**
+- Edit generated directories (`lists/releases/`, `lists/sources/`, `lists/external/`, `userscripts/dist/`, `Filters/`)
+- Skip validation or linting
+- Remove comments without understanding their purpose
+- Add error handling for scenarios that can't happen
+- Over-engineer or add unnecessary abstractions
 
-1. **Filter syntax:** Use AGLint-recommended patterns
-2. **Userscripts:** Always include proper metadata headers
-3. **Testing:** Run `bun run validate` before committing
-4. **Debugging:** Check `bun run lint` output for issues
-5. **Performance:** Prefer Biome for fast formatting
-6. **Security:** Never commit sensitive data or credentials
+## References
 
----
+- [AdGuard Filter Syntax](https://adguard.com/kb/general/ad-filtering/create-own-filters/)
+- [AGLint Docs](https://github.com/AdguardTeam/AGLint)
+- [Bun Docs](https://bun.sh/docs)
+- [UV Docs](https://docs.astral.sh/uv/)
+- [Mise Docs](https://mise.jdx.dev/)
 
-**For more details, see:** `CLAUDE.md`, `AGENTS.md`, or `README.md`
+**See also:** `AGENTS.md` (full reference), `README.md`
