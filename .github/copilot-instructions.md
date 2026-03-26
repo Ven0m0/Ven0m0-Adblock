@@ -1,5 +1,7 @@
 # GitHub Copilot Instructions - Ven0m0-Adblock
 
+@../AGENTS.md
+
 ## Project Overview
 
 **Ven0m0-Adblock** is an ad-blocking filter list and userscript project.
