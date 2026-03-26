@@ -1,5 +1,9 @@
 # TODO
 
+finish the @adguard/hostlist-compiler configs at @hostlist-config.json and @lists/conf.json based on this example [adguard-config](https://github.com/AdguardTeam/AdGuardSDNSFilter/blob/master/configuration.json) and the [repo](https://github.com/AdguardTeam/HostlistCompiler)
+
+@PLAN.md 
+
 ### Research - Completed
 
 **Reviewed and integrated where applicable:**
