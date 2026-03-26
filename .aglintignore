@@ -1,1 +1,18 @@
-# Todo: add proper ignore file
+# Hostlist files - regex patterns with $ end anchors
+lists/hostlist/Ads.txt
+lists/hostlist/Games.txt
+lists/hostlist/Native.txt
+lists/hostlist/Regex.txt
+lists/hostlist/Smart-TV.txt
+lists/hostlist/Social-Media.txt
+lists/hostlist/Spotify.txt
+lists/hostlist/extra.txt
+lists/hostlist/spy.txt
+
+# Uses ipaddress modifier and IPv6 domain values
+lists/adblock/lan-block.txt
+lists/sources/lan-block.txt
+
+# Uses $network modifier
+lists/adblock/Other.txt
+lists/sources/Other.txt

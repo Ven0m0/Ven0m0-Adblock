@@ -275,6 +275,7 @@
           const ck = () => (f.contentWindow?.setTimeout ? r() : setTimeout(ck, K.TIMER_CHECK));
           ck();
         });
+        f.remove();
         timers = {
           setTimeout: f.contentWindow.setTimeout.bind(f.contentWindow),
           clearTimeout: f.contentWindow.clearTimeout.bind(f.contentWindow),
@@ -285,13 +286,15 @@
       const wrapTO =
         (impl) =>
         (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
+          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setTimeout for security.");
+          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
           return impl(() => fn(...a), d);
         };
       const wrapIV =
         (impl) =>
         (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
+          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setInterval for security.");
+          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
           return impl(() => fn(...a), d);
         };
       window.setTimeout = wrapTO(timers.setTimeout);
@@ -312,7 +315,9 @@
             log("Idle OFF");
           }
         }, K.IDLE_THROTTLE);
-        actEv.forEach((ev) => window.addEventListener(ev, thAct, { capture: true, passive: true }));
+        actEv.forEach((ev) => {
+          window.addEventListener(ev, thAct, { capture: true, passive: true });
+        });
         setInterval(() => {
           if (document.visibilityState !== "visible") return;
           const now = performance.now();
@@ -456,7 +461,7 @@
       if (rs.indexOf(res) < rs.indexOf(cur)) {
         let nb = Math.max(rs.indexOf(res), 0);
         const av = y.getAvailableQualityLevels();
-        while (av.indexOf(rs[nb]) === -1 && nb < rs.length - 1) ++nb;
+        while (av.indexOf(rs[nb]) === -1 && nb < rs.length) ++nb;
         if (!useBtn && CFG.quality.flushBuffer && cur !== rs[nb]) {
           const id = getVid(y);
           if (id && !id.includes("ERROR")) {

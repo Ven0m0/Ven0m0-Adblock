@@ -1,3 +1,4 @@
+! aglint-disable
 ^(?:.*\.)?telemetry[-.]?(?:.*\.)?nvidia\.com$
 a8270235338.cdn.optimizely.com
 accounts.nvgs.nvidia.cn

@@ -1,4 +1,5 @@
 ! [Adblock Plus 2.0]
+! aglint-disable
 ! Title: Block Outsider Intrusion into LAN
 ! Last modified: Sat, 22 Nov 2025 07:33:01 +0000
 ! Expires: 29 days
@@ -28,7 +29,6 @@
 ! Required to sign into Mozilla VPN app (goes through browser)
 ! https://github.com/uBlockOrigin/uAssets/pull/30430
 ! https://github.com/uBlockOrigin/uAssets/issues/30660
-!#endif
 !#if !cap_ipaddress
 !#if cap_ipaddress
 *$strict3p,ipaddress=lan,domain=~localhost|~127.0.0.1|~[::1]|~0.0.0.0|~[::]|~local
@@ -50,3 +50,5 @@
 ||router.synology.com^$3p,domain=~localhost|~127.0.0.1|~[::1]|~0.0.0.0|~[::]|~local
 ||web.setup.home^$3p,domain=~localhost|~127.0.0.1|~[::1]|~0.0.0.0|~[::]|~local
 ||www.wyzerouter.com^$3p,domain=~localhost|~127.0.0.1|~[::1]|~0.0.0.0|~[::]|~local
+!#endif
+!#endif

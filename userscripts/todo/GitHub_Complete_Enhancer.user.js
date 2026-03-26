@@ -342,7 +342,9 @@
         rafId = null;
       let images = [],
         currentIdx = 0,
-        clickTimer = null;
+        clickTimer = null,
+        // eslint-disable-next-line no-unused-vars
+        dragging = false;
 
       const reset = () => {
         scale = 1;

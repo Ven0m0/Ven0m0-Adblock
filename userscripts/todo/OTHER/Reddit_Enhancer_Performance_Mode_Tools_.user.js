@@ -65,9 +65,9 @@
   function performanceCleanup() {
     try {
       // Remove iframes and slow footers
-      document
-        .querySelectorAll('iframe, .premium-banner-outer, footer, .bottom-bar, [id*="ad-"]')
-        .forEach((el) => el.remove());
+      document.querySelectorAll('iframe, .premium-banner-outer, footer, .bottom-bar, [id*="ad-"]').forEach((el) => {
+        el.remove();
+      });
 
       // Kill observers
       if (window.ResizeObserver)
@@ -100,7 +100,9 @@
     const buttons = isOldReddit
       ? document.querySelectorAll(".morecomments a")
       : document.querySelectorAll('button[data-testid="comment_expand_button"]');
-    buttons.forEach((btn) => btn.click());
+    buttons.forEach((btn) => {
+      btn.click();
+    });
   }
 
   function autoRefreshFeed() {
