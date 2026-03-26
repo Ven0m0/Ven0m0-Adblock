@@ -73,7 +73,7 @@ jobs:
           mkdir -p Filters lists/releases
           if [[ -f hostlist-config.json ]]; then
             printf 'Compiling with config...\n'
-            mise exec -- bunx hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
+            mise exec -- bunx @adguard/hostlist-compiler -c hostlist-config.json -o Filters/filter.txt
           fi
           declare -a compiler_args=()
           while IFS= read -r file; do
@@ -81,7 +81,7 @@ jobs:
           done < <(find lists/sources -type f -name "*.txt" 2>/dev/null || true)
           if (( ${#compiler_args[@]} > 0 )); then
             printf 'Compiling combined list...\n'
-            mise exec -- bunx hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
+            mise exec -- bunx @adguard/hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose
             printf 'has_changes=true\n' >> "$GITHUB_OUTPUT"
           else
             printf 'No source files found\n'
@@ -122,7 +122,9 @@ jobs:
       - name: Install Python dependencies
         run: |
           cd compiler
-          mise exec -- python -m pip install -r requirements.txt
+          if [[ -f requirements.txt ]]; then
+            mise exec -- python -m pip install -r requirements.txt
+          fi
       - name: Compile lists
         id: compile
         run: |

@@ -29,7 +29,9 @@ jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
 runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RUNNER"; }; }
 
 ensure_tool(){
-  local -r name=$1 url=$2 dest="${BIN}/${name}"
+  local -r name="${1:?Missing tool name}"
+  local -r url="${2:?Missing tool URL}"
+  local -r dest="${BIN}/${name}"
   [[ -x $dest ]] && return 0
   log tool "Installing $name"
   mkdir -p "$BIN" || die "Cannot create $BIN"
