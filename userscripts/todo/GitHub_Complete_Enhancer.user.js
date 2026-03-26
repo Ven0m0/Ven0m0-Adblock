@@ -51,13 +51,15 @@
       btn.setAttribute("aria-describedby", this.UI_IDS.tip);
 
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("aria-hidden", "true");
-      svg.setAttribute("height", "16");
-      svg.setAttribute("viewBox", "0 0 16 16");
-      svg.setAttribute("version", "1.1");
-      svg.setAttribute("width", "16");
-      svg.setAttribute("data-view-component", "true");
-      svg.setAttribute("class", "octicon octicon-search");
+      Object.entries({
+        "aria-hidden": "true",
+        "height": "16",
+        "viewBox": "0 0 16 16",
+        "version": "1.1",
+        "width": "16",
+        "data-view-component": "true",
+        "class": "octicon octicon-search",
+      }).forEach(([key, value]) => svg.setAttribute(key, value));
 
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute(
