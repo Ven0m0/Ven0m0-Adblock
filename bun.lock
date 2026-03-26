@@ -5,7 +5,7 @@
     "": {
       "name": "ven0m0-adblock",
       "devDependencies": {
-        "@adguard/aglint": "*",
+        "@adguard/aglint": "^3.0.2",
         "@adguard/dead-domains-linter": "*",
         "@adguard/hostlist-compiler": "*",
         "@biomejs/biome": "*",

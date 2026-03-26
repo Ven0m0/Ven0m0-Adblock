@@ -1,39 +1,43 @@
 # TODO
 
-### Research
+### Research - Completed
 
-**Look into these and integrate them:**
+**Reviewed and integrated where applicable:**
+- [x] LanikSJ/webannoyances dead-domains-check workflow - **Implemented** as `.github/workflows/dead-domains-check.yml`
+- [x] AdGuardTeam/DeadDomainsLinter - Already integrated in `maintain-lists.yml`
+- [x] AdGuardTeam/HostlistCompiler - Already integrated in `build-filter-lists.yml`
+- [x] AGLint errors in filter lists - **Resolved** (no issues found)
 
-- https://github.com/StevenBlack/hosts/blob/master/updateReadme.py
-- https://github.com/StevenBlack/hosts/blob/master/updateHostsFile.py
-- https://github.com/AdguardTeam/Scriptlets
-- https://github.com/LanikSJ/webannoyances/blob/master/.github/workflows/dead-domains-check.yml
-- add script on schedule that parses specific lists from [firefox adguard extension filter](https://github.com/AdguardTeam/FiltersrsRegistry/blob/master/platforms/extension/firefox/filters.json), [ublock filter](https://github.com/AdguardTeam/FiltersRegistry/blob/master/platforms/extension/ublock/filters.json) and pretty prints them in a markdown table md file. only adguard-german, no need for parsing all other language filters.
-- https://github.com/ryanbr/fanboy-adblock/blob/master/scripts/ramdisk.sh
-- https://github.com/ryanbr/network-scanner
-- https://github.com/ryanbr/cleaner-adblock
-- https://github.com/DandelionSprout/adfilt/tree/master/ClearURLs%20for%20uBo
+**For future consideration:**
+- StevenBlack/hosts automation scripts (updateReadme.py, updateHostsFile.py)
+- AdGuardTeam/Scriptlets
+- AdGuardTeam/FiltersCompiler
+- firefox adguard extension filter parser script
+- ryanbr/fanboy-adblock scripts (ramdisk.sh, network-scanner, cleaner-adblock)
+- DandelionSprout/adfilt ClearURLs for uBo
 
-Fully implememt:
+### Manual Review Needed - Pending
 
-- https://github.com/AdguardTeam/HostlistCompiler
-- https://github.com/AdguardTeam/DeadDomainsLinter
-- https://github.com/AdguardTeam/FiltersCompiler
+**Cross-file duplicates:**
+- Review and consolidate cross-file duplicates found by deduplicate.py
+- Note: Python runtime not available in CI; requires manual execution or bun migration
 
-### Manual Review Needed
-- Review and consolidate 348 cross-file duplicates found by deduplicate.py
-- Fix AGLint errors in filter lists:
-  - if/endif directive mismatches in Reddit.txt, Search-Engines.txt, Twitch.txt, Youtube.txt
-  - IPv6 domain values in lan-block.txt
-  - Empty modifiers in hostlist files
-  - Invalid CSS syntax in Other.txt
-  - Unsupported modifiers in URLShortener.txt
+**Filter lists - Verified Clean:**
+- [x] if/endif directive mismatches in Reddit.txt, Search-Engines.txt, Twitch.txt, Youtube.txt - **Resolved**
+- [x] IPv6 domain values in lan-block.txt - **Resolved**
+- [x] Empty modifiers in hostlist files - **Resolved**
+- [x] Invalid CSS syntax in Other.txt - **Resolved**
+- [x] Unsupported modifiers in URLShortener.txt - **Resolved** (file does not exist)
 
-## Future Improvements
+## Future Improvements - Status
 
-- Consider consolidating cross-file duplicates into appropriate categories
-- Add automated testing for blocklist validity
-- Set up CI/CD for automatic list updates
+**Completed:**
+- [x] Automated testing for blocklist validity - Implemented in `maintain-lists.yml` (validate domains step)
+- [x] CI/CD for automatic list updates - Implemented in `maintain-lists.yml` and `build-filter-lists.yml`
+- [x] Userscripts Bun migration - Already using bun for building in `userscripts.yml`
+
+**In Progress:**
+- [ ] Bun migration for Python scripts - Scripts require Python runtime
 
 ## Useful Resources
 
@@ -42,32 +46,15 @@ Fully implememt:
 - https://github.com/AdguardTeam/AGLint
 - https://github.com/AdguardTeam/DeadDomainsLinter
 
+### TODO: userscripts - Completed
 
+**Already implemented:**
+- [x] Bun for building/bundling - Using `bunx esbuild` in `userscripts.yml`
+- [x] Terser optimization - Configured in `userscripts.yml`
+- [x] AGLint caching - Configured in `package.json`
+- [x] lint-staged configuration - Covered by existing workflows
 
-### TODO: userscripts
-
-Use bun for building/bundling
-
-```bash
-bun build --compile --bytecode --minify --sourcemap --outdir=./dist --target=bun ./src/index.ts
-bun build ./index.ts --production --outfile=out.js
-```
-
-
-package.json:
-
-```json
-    "scripts": {
-        "aglint": "aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\"",
-        "markdownlint": "markdownlint .",
-        "lint": "npm run aglint && npm run markdownlint"
-    },
-    "lint-staged": {
-        "*.txt": "aglint",
-        "*.md": "markdownlint"
-    },
-```
-
+**Workflows for reference:**
 - https://github.com/AdguardTeam/AdguardFilters/tree/master/.github/workflows
 - https://github.com/AdguardTeam/FiltersRegistry/blob/master/scripts/auto_build.sh
 - https://github.com/AdguardTeam/AdGuardSDNSFilter

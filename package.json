@@ -32,7 +32,7 @@
     "aglint": "bunx aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\""
   },
   "devDependencies": {
-    "@adguard/aglint": "*",
+    "@adguard/aglint": "^3.0.2",
     "@adguard/dead-domains-linter": "*",
     "@adguard/hostlist-compiler": "*",
     "@biomejs/biome": "*",

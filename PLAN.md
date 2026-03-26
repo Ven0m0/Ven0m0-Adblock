@@ -1,93 +1,107 @@
 # Implementation Plan
-_Generated: 2026-03-26T00:00:00Z · 0 tasks · Est. LOC: 0_
+_Generated: 2026-03-26T00:00:00Z · 2 tasks · Est. LOC: 150_
 
 ## Legend
-<!-- severity: 🔴 critical 🟠 high 🟡 medium 🔵 low -->
+<!-- severity: critical high medium low -->
 <!-- category: bug perf refactor feature security debt docs -->
 
 ## Summary
-This codebase contains **no significant TODO/FIXME/HACK/XXX/WARN/DEPRECATED markers** in actual source code. The repository primarily consists of:
+The codebase is well-maintained with most TODO.md items already implemented. A new **dead-domains-check workflow** has been created to automate dead domain detection and PR creation. AGLint validation passes on all filter lists.
 
-- **Filter lists** (adblock syntax `.txt` files) — uses `!` comments, not code markers
-- **Python build scripts** — clean, well-structured, minimal comments
-- **Shell scripts** — POSIX-compliant with proper error handling
-- **Userscripts** — header-based metadata, no inline TODOs
-- **GitHub Actions** — YAML configuration, no code markers
+### Items Implemented:
+- [x] Dead domains check workflow created (`.github/workflows/dead-domains-check.yml`)
+- [x] AGLint errors resolved (all filter lists pass validation)
+- [x] Automated blocklist validity testing in `maintain-lists.yml`
+- [x] CI/CD for automatic list updates in `build-filter-lists.yml`
+- [x] Userscripts Bun migration already complete
 
-### Items Found (non-actionable):
+### Items Remaining:
+- Cross-file duplicates review (requires Python runtime)
+- Bun migration for Python scripts
 
-| Location | Marker | Type | Notes |
-|----------|--------|------|-------|
-| `mise.toml:36` | `NODE_NO_WARNINGS = "1"` | Config | Environment variable, NOT a TODO |
-| `TODO.md:1,47` | `# TODO` | Doc | Planning document, not code marker |
-| `lists/ext.md:1` | `### TODO:` | Doc | External sources research notes |
-| `lists/adblock/Other.txt:21` | `! NOTE: Blogroll generic` | Filter | Adblock comment syntax |
-| `lists/sources/Other.txt:21` | `! NOTE: Blogroll generic` | Filter | Generated/source mirror |
-| `Scripts/test_update_lists.py:58` | `# NOTE:` | Test | Test assumption note (see below) |
+---
+
+## Task Index (topological order)
+
+| # | ID | Title | Sev | Cat | Size | Blocks |
+|---|-----|-------|-----|-----|------|--------|
+| 1 | T001 | Dead domains check workflow | medium | feature | M | - |
+| 2 | T002 | Migrate Python scripts to Bun/JS | low | refactor | L | - |
 
 ---
 
 ## Tasks
 
-_No tasks generated._
-
-### T001 · Clarify test assumption for validate_checksum refactor
-**File:** `Scripts/test_update_lists.py:58`
-**Severity:** 🔵 low · **Category:** docs · **Size:** S
-**Blocks:** —  **Blocked by:** —
+### T001 - Implement dead domains check workflow
+**File:** `.github/workflows/dead-domains-check.yml`
+**Severity:** medium - **Category:** feature - **Size:** M
+**Blocks:** -  **Blocked by:** -
 
 **Context:**
-```python
-# NOTE: This test assumes validate_checksum has been refactored to accept string
-```
+TODO.md mentioned adding dead-domains-check workflow from LanikSJ/webannoyances
 
-**Intent:** Documents that `validate_checksum()` was refactored to accept a string parameter instead of a file path. This is a **completed** refactor — the function at `Scripts/update_lists.py:52` already accepts `(content: str, name: str)`.
+**Intent:** Automate detection of dead domains in filter lists and create PRs for review
 
 **Acceptance criteria:**
-- [x] Function signature confirmed: `def validate_checksum(content: str, name: str = "unknown") -> bool`
-- [x] All tests pass with string input
+- [ ] Workflow runs on schedule (Monday 8 AM UTC)
+- [ ] Workflow can be triggered manually via workflow_dispatch
+- [ ] Dead domains are exported and logged
+- [ ] Previous automated PRs are closed before creating new ones
+- [ ] New branch `feature/dead-domains` is created
+- [ ] Changes are committed and pushed
+- [ ] PR is created with 'dead website' label
 
 **Implementation:**
-_Not applicable — this NOTE documents a past refactor that is already complete._
+Created `.github/workflows/dead-domains-check.yml` based on LanikSJ/workflow with adaptations:
+- Uses `oven-sh/setup-bun@v2` for Bun runtime
+- Uses `jdx/mise-action@v4` for mise tool management
+- Scans `lists/adblock/*.txt` and `lists/hostlist/*.txt`
+- Uses `@adguard/dead-domains-linter` for detection
+- Creates PR with automated review notes
 
 ---
 
-## Notes for Future Development
+### T002 - Migrate Python scripts to Bun/JS for CI portability
+**File:** `Scripts/*.py`
+**Severity:** low - **Category:** refactor - **Size:** L
+**Blocks:** -  **Blocked by:** -
 
-The `TODO.md` file contains planning items that could be turned into future tasks:
+**Context:**
+Python scripts (`update_lists.py`, `deduplicate.py`, `move_pure_domains.py`, `common.py`) require Python runtime not available in current CI environment
 
-1. **Research/Integration items:**
-   - Integrate StevenBlack/hosts automation scripts
-   - Implement AdGuardTeam/Scriptlets
-   - Add dead-domains-check workflow from LanikSJ/webannoyances
+**Intent:** Enable CI portability by converting Python scripts to JavaScript/TypeScript
 
-2. **Manual Review Needed:**
-   - Review 348 cross-file duplicates found by `deduplicate.py`
-   - Fix AGLint errors in filter lists:
-     - if/endif directive mismatches (Reddit.txt, Search-Engines.txt, Twitch.txt, Youtube.txt)
-     - IPv6 domain values in lan-block.txt
-     - Empty modifiers in hostlist files
-     - Invalid CSS syntax in Other.txt
-     - Unsupported modifiers in URLShortener.txt
+**Acceptance criteria:**
+- [ ] Scripts rewritten in JS/TS
+- [ ] Scripts work with Bun runtime
+- [ ] All existing functionality preserved
+- [ ] Tests migrated to Bun test format
+- [ ] Scripts can be executed in CI without Python
 
-3. **Future Improvements:**
-   - Consolidate cross-file duplicates
-   - Add automated blocklist validity testing
-   - Set up CI/CD for automatic list updates
+**Implementation:**
+Files to convert:
+- `Scripts/update_lists.py` -> `Scripts/update_lists.ts` (async HTTP, file ops)
+- `Scripts/deduplicate.py` -> `Scripts/deduplicate.ts` (text processing, deduplication)
+- `Scripts/move_pure_domains.py` -> `Scripts/move_pure_domains.ts` (domain categorization)
+- `Scripts/common.py` -> `Scripts/common.ts` (shared utilities)
 
-4. **Userscripts:**
-   - Bun migration for building/bundling documented in TODO.md
+Use Bun's native APIs:
+- `Bun.file()` for file reading/writing
+- `fetch()` for HTTP requests
+- `async/await` for concurrency
 
 ---
 
-## Deprecation & Technical Debt Assessment
+## Verification
 
-**None identified.** This codebase exhibits:
-- ✅ No deprecated API usage
-- ✅ No security-sensitive TODOs
-- ✅ No known bug markers (FIXME/HACK/XXX)
-- ✅ Clean error handling throughout
-- ✅ Transactional file operations (see `Scripts/common.py:95-107`)
+All filter lists pass AGLint validation:
+```bash
+$ ./node_modules/.bin/aglint lists/adblock/*.txt
+No problems found!
+
+$ ./node_modules/.bin/aglint lists/hostlist/*.txt
+No problems found!
+```
 
 ---
 
