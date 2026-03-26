@@ -286,13 +286,15 @@
       const wrapTO =
         (impl) =>
         (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
+          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setTimeout for security.");
+          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
           return impl(() => fn(...a), d);
         };
       const wrapIV =
         (impl) =>
         (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
+          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setInterval for security.");
+          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
           return impl(() => fn(...a), d);
         };
       window.setTimeout = wrapTO(timers.setTimeout);
