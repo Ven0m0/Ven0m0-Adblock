@@ -130,8 +130,13 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
     print("="*60 + "\n")
 
     for filepath, new_lines in file_updates.items():
-        if write_lines(filepath, new_lines):
+        tmp_path = filepath.with_name(filepath.name + '.tmp')
+        if write_lines(tmp_path, new_lines):
+            tmp_path.replace(filepath)
             print(f"Updated {filepath.name}")
+        else:
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     return total_moved
 
