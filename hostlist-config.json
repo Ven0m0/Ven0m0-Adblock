@@ -8,20 +8,19 @@
     {
       "source": "lists/sources/Other.txt",
       "type": "adblock",
-      "description": "Miscellaneous blocking rules"
+      "name": "Miscellaneous blocking rules"
     },
     {
       "source": "lists/sources/Search-Engines.txt",
       "type": "adblock",
-      "description": "Search engine tracking and ads"
+      "name": "Search engine tracking and ads"
     },
     {
       "source": "lists/sources/TwitterAnnoyances.txt",
       "type": "adblock",
-      "description": "Twitter/X annoyances and tracking"
+      "name": "Twitter/X annoyances and tracking"
     }
   ],
-  "output": "lists/releases/hosts.txt",
   "transformations": [
     "RemoveComments",
     "RemoveModifiers",
@@ -29,7 +28,6 @@
     "TrimLines",
     "Validate",
     "Deduplicate",
-    "Sort",
     "Compress",
     "InsertFinalNewLine",
     "ConvertToAscii"
