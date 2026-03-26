@@ -14,12 +14,6 @@ readonly FILTER_OUT="lists/releases"
 readonly SCRIPT_SRC="userscripts/src"
 readonly SCRIPT_OUT="userscripts/dist"
 readonly SCRIPT_LIST="userscripts/list.txt"
-readonly BIN="${HOME}/.local/bin"
-
-declare -rA TOOLS=(
-  [aglint]="https://github.com/AdguardTeam/AGLint/releases/latest/download/aglint-linux-amd64"
-  [hostlist-compiler]="https://github.com/AdguardTeam/HostlistCompiler/releases/latest/download/HostlistCompiler-linux-amd64"
-)
 
 _FD= _RG= _PAR= _JOBS= _RUNNER=
 fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
@@ -27,27 +21,6 @@ rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo grep); e
 par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }
 jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
 runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RUNNER"; }; }
-
-ensure_tool(){
-  local -r name="${1:?Missing tool name}"
-  local -r url="${2:?Missing tool URL}"
-  local -r dest="${BIN}/${name}"
-  [[ -x $dest ]] && return 0
-  log tool "Installing $name"
-  mkdir -p "$BIN" || die "Cannot create $BIN"
-  curl -fsSL "$url" -o "$dest" || die "Download failed: $name"
-  chmod +x "$dest" || die "chmod failed: $name"
-}
-
-setup_tools(){
-  if has mise; then
-    eval "$(mise activate bash --shims)" 2>/dev/null || :
-  fi
-  export PATH="${BIN}:${PATH}"
-  for tool in "${!TOOLS[@]}"; do
-    ensure_tool "$tool" "${TOOLS[$tool]}"
-  done
-}
 
 build_adblock(){
   local -a src=(Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
@@ -221,7 +194,6 @@ EOF
 main(){
   local -a tasks=("${@:-all}")
   if [[ " ${tasks[*]} " =~ " -h " || " ${tasks[*]} " =~ " --help " || " ${tasks[*]} " =~ " help " ]]; then usage; exit 0; fi
-  setup_tools
   for task in "${tasks[@]}"; do
     case $task in
       adblock) build_adblock;;
