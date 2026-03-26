@@ -42,7 +42,7 @@ setup_tools(){
     eval "$(mise activate bash --shims)" 2>/dev/null || :
   fi
   export PATH="${BIN}:${PATH}"
-  for tool in "${! TOOLS[@]}"; do
+  for tool in "${!TOOLS[@]}"; do
     ensure_tool "$tool" "${TOOLS[$tool]}"
   done
 }
