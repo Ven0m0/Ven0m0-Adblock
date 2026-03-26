@@ -41,19 +41,45 @@
     createButton() {
       const li = document.createElement("li");
       li.id = this.UI_IDS.li;
-      li.innerHTML = `
-        <div class="float-left">
-          <button id="${this.UI_IDS.btn}" class="btn-sm btn" aria-describedby="${this.UI_IDS.tip}">
-            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-search">
-              <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z"></path>
-            </svg>
-            Useful
-          </button>
-          <tool-tip for="${this.UI_IDS.btn}" id="${this.UI_IDS.tip}" popover="manual" class="position-absolute sr-only">
-            Search for useful forks in a new tab
-          </tool-tip>
-        </div>
-      `;
+
+      const div = document.createElement("div");
+      div.className = "float-left";
+
+      const btn = document.createElement("button");
+      btn.id = this.UI_IDS.btn;
+      btn.className = "btn-sm btn";
+      btn.setAttribute("aria-describedby", this.UI_IDS.tip);
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("height", "16");
+      svg.setAttribute("viewBox", "0 0 16 16");
+      svg.setAttribute("version", "1.1");
+      svg.setAttribute("width", "16");
+      svg.setAttribute("data-view-component", "true");
+      svg.setAttribute("class", "octicon octicon-search");
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute(
+        "d",
+        "M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z"
+      );
+
+      svg.appendChild(path);
+      btn.appendChild(svg);
+      btn.appendChild(document.createTextNode(" Useful"));
+
+      const toolTip = document.createElement("tool-tip");
+      toolTip.setAttribute("for", this.UI_IDS.btn);
+      toolTip.id = this.UI_IDS.tip;
+      toolTip.setAttribute("popover", "manual");
+      toolTip.className = "position-absolute sr-only";
+      toolTip.textContent = "Search for useful forks in a new tab";
+
+      div.appendChild(btn);
+      div.appendChild(toolTip);
+      li.appendChild(div);
+
       return li;
     },
 
@@ -172,9 +198,8 @@
   const ImagePreviewModule = {
     init() {
       // Inject CSS
-      document.head.insertAdjacentHTML(
-        "beforeend",
-        `<style>
+      const style = document.createElement("style");
+      style.textContent = `
         #gh-img-preview-mask {
           position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px);
           z-index: 999999; display: none; align-items: center; justify-content: center;
@@ -224,38 +249,92 @@
           #gh-img-preview-prev, #gh-img-preview-next { width: 48px; height: 48px; }
           #gh-img-preview-prev { left: 15px; } #gh-img-preview-next { right: 15px; }
         }
-      </style>`
-      );
+      `;
+      document.head.appendChild(style);
 
       // Inject DOM
-      document.body.insertAdjacentHTML(
-        "beforeend",
-        `
-        <div id="gh-img-preview-mask">
-          <div id="gh-img-preview-container">
-            <img id="gh-img-preview-img" alt="Preview">
-          </div>
-          <div id="gh-img-preview-controls">
-            <div id="gh-img-preview-download" title="Download">
-              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-            </div>
-            <div id="gh-img-preview-close" title="Close (Esc)">
-              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </div>
-          </div>
-          <div id="gh-img-preview-prev" title="Previous (←)"><svg viewBox="0 0 24 24"><line x1="15" y1="18" x2="9" y2="12"/><line x1="15" y1="6" x2="9" y2="12"/></svg></div>
-          <div id="gh-img-preview-next" title="Next (→)"><svg viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="12"/><line x1="9" y1="6" x2="15" y2="12"/></svg></div>
-        </div>
-      `
-      );
+      const mask = document.createElement("div");
+      mask.id = "gh-img-preview-mask";
 
-      const mask = document.getElementById("gh-img-preview-mask");
-      const container = document.getElementById("gh-img-preview-container");
-      const img = document.getElementById("gh-img-preview-img");
-      const closeBtn = document.getElementById("gh-img-preview-close");
-      const downloadBtn = document.getElementById("gh-img-preview-download");
-      const prevBtn = document.getElementById("gh-img-preview-prev");
-      const nextBtn = document.getElementById("gh-img-preview-next");
+      const container = document.createElement("div");
+      container.id = "gh-img-preview-container";
+
+      const img = document.createElement("img");
+      img.id = "gh-img-preview-img";
+      img.alt = "Preview";
+      container.appendChild(img);
+
+      const controls = document.createElement("div");
+      controls.id = "gh-img-preview-controls";
+
+      const downloadBtn = document.createElement("div");
+      downloadBtn.id = "gh-img-preview-download";
+      downloadBtn.title = "Download";
+      const svgDownload = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svgDownload.setAttribute("viewBox", "0 0 24 24");
+      const line1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line1.setAttribute("x1", "12"); line1.setAttribute("y1", "5");
+      line1.setAttribute("x2", "12"); line1.setAttribute("y2", "19");
+      const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+      polyline.setAttribute("points", "19 12 12 19 5 12");
+      svgDownload.appendChild(line1);
+      svgDownload.appendChild(polyline);
+      downloadBtn.appendChild(svgDownload);
+
+      const closeBtn = document.createElement("div");
+      closeBtn.id = "gh-img-preview-close";
+      closeBtn.title = "Close (Esc)";
+      const svgClose = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svgClose.setAttribute("viewBox", "0 0 24 24");
+      const line2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line2.setAttribute("x1", "18"); line2.setAttribute("y1", "6");
+      line2.setAttribute("x2", "6"); line2.setAttribute("y2", "18");
+      const line3 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line3.setAttribute("x1", "6"); line3.setAttribute("y1", "6");
+      line3.setAttribute("x2", "18"); line3.setAttribute("y2", "18");
+      svgClose.appendChild(line2);
+      svgClose.appendChild(line3);
+      closeBtn.appendChild(svgClose);
+
+      controls.appendChild(downloadBtn);
+      controls.appendChild(closeBtn);
+
+      const prevBtn = document.createElement("div");
+      prevBtn.id = "gh-img-preview-prev";
+      prevBtn.title = "Previous (←)";
+      const svgPrev = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svgPrev.setAttribute("viewBox", "0 0 24 24");
+      const line4 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line4.setAttribute("x1", "15"); line4.setAttribute("y1", "18");
+      line4.setAttribute("x2", "9"); line4.setAttribute("y2", "12");
+      const line5 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line5.setAttribute("x1", "15"); line5.setAttribute("y1", "6");
+      line5.setAttribute("x2", "9"); line5.setAttribute("y2", "12");
+      svgPrev.appendChild(line4);
+      svgPrev.appendChild(line5);
+      prevBtn.appendChild(svgPrev);
+
+      const nextBtn = document.createElement("div");
+      nextBtn.id = "gh-img-preview-next";
+      nextBtn.title = "Next (→)";
+      const svgNext = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svgNext.setAttribute("viewBox", "0 0 24 24");
+      const line6 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line6.setAttribute("x1", "9"); line6.setAttribute("y1", "18");
+      line6.setAttribute("x2", "15"); line6.setAttribute("y2", "12");
+      const line7 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line7.setAttribute("x1", "9"); line7.setAttribute("y1", "6");
+      line7.setAttribute("x2", "15"); line7.setAttribute("y2", "12");
+      svgNext.appendChild(line6);
+      svgNext.appendChild(line7);
+      nextBtn.appendChild(svgNext);
+
+      mask.appendChild(container);
+      mask.appendChild(controls);
+      mask.appendChild(prevBtn);
+      mask.appendChild(nextBtn);
+
+      document.body.appendChild(mask);
 
       let scale = 1,
         tx = 0,
@@ -349,7 +428,6 @@
       container.onmousedown = (e) => {
         if (e.button !== 0) return;
         e.preventDefault();
-        dragging = true;
         const startX = e.clientX - tx;
         const startY = e.clientY - ty;
         container.style.cursor = "grabbing";
@@ -364,7 +442,6 @@
         };
 
         const up = () => {
-          dragging = false;
           container.style.cursor = "move";
           document.removeEventListener("mousemove", move);
           document.removeEventListener("mouseup", up);
