@@ -1,7 +1,8 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignoreUnknown": true
+    "ignoreUnknown": true,
+    "includes": ["**/*.js", "**/*.json", "**/*.yml", "**/*.yaml", "**/*.md", "!userscripts/todo"]
   },
   "vcs": {
     "enabled": true,
@@ -52,7 +53,7 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.user.js", "userscripts/**/*.js"],
+      "includes": ["**/*.user.js", "userscripts/**/*.js", "!userscripts/todo"],
       "javascript": {
         "formatter": {
           "lineWidth": 120
