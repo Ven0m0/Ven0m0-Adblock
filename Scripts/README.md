@@ -21,7 +21,7 @@ python3 -m Scripts.deduplicate
 - Sorts entries alphabetically
 - Preserves LF line endings
 
-### deduplicate.py
+### deduplicate.py duplicate reporting
 
 Checks for and reports duplicate entries within and across different blocklist files.
 

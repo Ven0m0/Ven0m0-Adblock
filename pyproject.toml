@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "ven0m0-adblock"
 version = "1.0.0"
@@ -12,6 +16,9 @@ dependencies = [
 adblock-deduplicate = "Scripts.deduplicate:main"
 adblock-update = "Scripts.update_lists:main_sync"
 adblock-move-domains = "Scripts.move_pure_domains:main"
+
+[tool.setuptools]
+packages = ["Scripts"]
 
 [tool.uv]
 managed = true
