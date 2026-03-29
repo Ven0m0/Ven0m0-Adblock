@@ -382,14 +382,18 @@
           if (frameMs) {
             const now = Date.now();
             if (now - lastFrame < frameMs) {
-              nCAF(id);
+              nCAF(rid);
               return;
             }
             lastFrame = now;
           }
           const s = tl.currentTime;
-          awaitRAF(id, q)
-            .then((v) => v && fn(ts + (tl.currentTime - s)))
+          awaitRAF(rid, q)
+            .then((v) => {
+              if (v) {
+                fn(ts + (tl.currentTime - s));
+              }
+            })
             .catch(throwE);
         });
         if (last !== p) micro(trig);
@@ -572,7 +576,11 @@
       const url = new URL(location.href.replace("/ref=", "?ref="));
       if (canonicalAmazon(url)) return;
       let c = stripTracking(url);
-      for (const h of HASH) if (url.hash.startsWith(`#${h}`)) c = 1;
+      for (const h of HASH) {
+        if (url.hash.startsWith(`#${h}`)) {
+          c = 1;
+        }
+      }
       if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
     } catch (e) {
       log("URL clean error:", e);
@@ -585,10 +593,31 @@
     return throttle(() => {
       if (busy) return;
       busy = 1;
-      const links = document.querySelectorAll("a[href]:not([data-wp-cl])");
-      if (!links.length) {
+      try {
+        const links = document.querySelectorAll("a[href]:not([data-wp-cl])");
+        if (!links.length) return;
+        let i = 0;
+        const step = () => {
+          const end = Math.min(i + C.BATCH, links.length);
+          for (; i < end; i++) {
+            const a = links[i];
+            mark(a, "data-wp-cl");
+            try {
+              const h = a.href;
+              const hl = h?.toLowerCase();
+              if (!hl || hl.startsWith("javascript:") || hl.startsWith("data:") || hl.startsWith("vbscript:")) continue;
+              const u = new URL(h);
+              if (u.origin === location.origin) continue;
+              if (stripTracking(u)) a.href = u.href;
+            } catch (e) {
+              if (cfg.log) log("Link clean error", e);
+            }
+          }
+          if (i < links.length) idle(step);
+        };
+        step();
+      } finally {
         busy = 0;
-        return;
       }
       let i = 0;
       const step = () => {
@@ -1075,6 +1104,23 @@
   function showUI() {
     const ID = "wp-panel";
     if (document.getElementById(ID)) return;
+
+    const panel = document.createElement("div");
+    panel.id = ID;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      #${ID}{font-family:sans-serif;position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(4px)}
+      .wp-modal{background:#1e1e1e;color:#eee;border-radius:10px;padding:20px;max-width:480px;width:92%;max-height:85vh;overflow-y:auto}
+      .wp-modal h2{margin:0 0 14px;font-size:1.05em;border-bottom:1px solid #444;padding-bottom:8px}
+      .wp-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;cursor:pointer;font-size:.88em;line-height:1.4}
+      .wp-row input{margin-top:2px;flex-shrink:0}
+      .wp-note{font-size:.78em;color:#888;margin:6px 0 0}
+      .wp-modal button{background:#0070f3;color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;padding:8px;margin-top:10px;font-size:.9em}
+      .wp-modal button:hover{background:#0058c4}
+    `;
+    panel.appendChild(style);
+
     const LABELS = {
       log: "Debug logging",
       lazy: "Lazy-load images",
@@ -1109,34 +1155,47 @@
       pauseGIFs: "Freeze GIF animations",
       siteToggle: "Show per-site disable button"
     };
-    const rows = Object.entries(LABELS)
-      .map(
-        ([k, label]) =>
-          `<label class="wp-row"><input type="checkbox" data-k="${k}" ${cfg[k] ? "checked" : ""}><span>${label}</span></label>`
-      )
-      .join("");
 
-    const panel = document.createElement("div");
-    panel.id = ID;
-    panel.innerHTML = `<style>
-#${ID}{font-family:sans-serif;position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(4px)}
-.wp-modal{background:#1e1e1e;color:#eee;border-radius:10px;padding:20px;max-width:480px;width:92%;max-height:85vh;overflow-y:auto}
-.wp-modal h2{margin:0 0 14px;font-size:1.05em;border-bottom:1px solid #444;padding-bottom:8px}
-.wp-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;cursor:pointer;font-size:.88em;line-height:1.4}
-.wp-row input{margin-top:2px;flex-shrink:0}
-.wp-note{font-size:.78em;color:#888;margin:6px 0 0}
-.wp-modal button{background:#0070f3;color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;padding:8px;margin-top:10px;font-size:.9em}
-.wp-modal button:hover{background:#0058c4}
-</style><div class="wp-modal"><h2>⚡ Web Pro v6</h2>${rows}<p class="wp-note">Changes take effect on next page load.</p><button id="wp-close">Close</button></div>`;
+    const modal = document.createElement("div");
+    modal.className = "wp-modal";
 
-    document.body.appendChild(panel);
-    panel.querySelector("#wp-close").onclick = () => panel.remove();
-    panel.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+    const h2 = document.createElement("h2");
+    h2.textContent = "⚡ Web Pro v6";
+    modal.appendChild(h2);
+
+    Object.entries(LABELS).forEach(([k, label]) => {
+      const row = document.createElement("label");
+      row.className = "wp-row";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.dataset.k = k;
+      cb.checked = !!cfg[k];
       cb.onchange = (e) => {
         cfg[e.target.dataset.k] = e.target.checked ? 1 : 0;
         saveCfg();
       };
+
+      const span = document.createElement("span");
+      span.textContent = label;
+
+      row.append(cb, span);
+      modal.appendChild(row);
     });
+
+    const note = document.createElement("p");
+    note.className = "wp-note";
+    note.textContent = "Changes take effect on next page load.";
+    modal.appendChild(note);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.id = "wp-close";
+    closeBtn.textContent = "Close";
+    closeBtn.onclick = () => panel.remove();
+    modal.appendChild(closeBtn);
+
+    panel.appendChild(modal);
+    document.body.appendChild(panel);
   }
 
   // Per-site toggle

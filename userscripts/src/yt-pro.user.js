@@ -275,6 +275,7 @@
           const ck = () => (f.contentWindow?.setTimeout ? r() : setTimeout(ck, K.TIMER_CHECK));
           ck();
         });
+        f.remove();
         timers = {
           setTimeout: f.contentWindow.setTimeout.bind(f.contentWindow),
           clearTimeout: f.contentWindow.clearTimeout.bind(f.contentWindow),
@@ -285,13 +286,15 @@
       const wrapTO =
         (impl) =>
         (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
+          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setTimeout for security.");
+          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
           return impl(() => fn(...a), d);
         };
       const wrapIV =
         (impl) =>
         (fn, d = 0, ...a) => {
-          if (typeof fn !== "function" || isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
+          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setInterval for security.");
+          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
           return impl(() => fn(...a), d);
         };
       window.setTimeout = wrapTO(timers.setTimeout);
@@ -458,7 +461,7 @@
       if (rs.indexOf(res) < rs.indexOf(cur)) {
         let nb = Math.max(rs.indexOf(res), 0);
         const av = y.getAvailableQualityLevels();
-        while (av.indexOf(rs[nb]) === -1 && nb < rs.length - 1) ++nb;
+        while (av.indexOf(rs[nb]) === -1 && nb < rs.length) ++nb;
         if (!useBtn && CFG.quality.flushBuffer && cur !== rs[nb]) {
           const id = getVid(y);
           if (id && !id.includes("ERROR")) {
@@ -524,7 +527,7 @@
         recent = vid;
         setRes(y, rs);
         const stored = localStorage.getItem("yt-player-quality");
-        if (!stored || !stored.includes(CFG.quality.targetRes)) {
+        if (!stored?.includes(CFG.quality.targetRes)) {
           const tc = Date.now();
           const te = tc + K.QUALITY_EXP;
           localStorage.setItem(
@@ -576,14 +579,15 @@
     try {
       const saved = await getStored("settingsSaved", false);
       if (CFG.quality.overwriteStoredSettings || !saved) {
-        for (const [k, v] of Object.entries(CFG.quality)) await setStored(`quality_${k}`, v);
+        await Promise.all(Object.entries(CFG.quality).map(([k, v]) => setStored(`quality_${k}`, v)));
         await setStored("settingsSaved", true);
         log("Settings saved");
       } else {
-        for (const k of Object.keys(CFG.quality)) {
-          const nv = await getStored(`quality_${k}`, CFG.quality[k]);
-          if (k !== "overwriteStoredSettings") CFG.quality[k] = nv;
-        }
+        const keys = Object.keys(CFG.quality);
+        const vals = await Promise.all(keys.map((k) => getStored(`quality_${k}`, CFG.quality[k])));
+        keys.forEach((k, i) => {
+          if (k !== "overwriteStoredSettings") CFG.quality[k] = vals[i];
+        });
         log("Settings loaded");
       }
     } catch (e) {

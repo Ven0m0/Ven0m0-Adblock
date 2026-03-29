@@ -21,10 +21,7 @@ import aiohttp
 import aiofiles
 
 # Import common utilities
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
-
-from common import sanitize_filename
+from Scripts.common import sanitize_filename
 
 # ============================================================================
 # CONFIGURATION
@@ -32,6 +29,7 @@ from common import sanitize_filename
 SOURCES_CONFIG: Final[str] = "lists/sources-urls.json"
 DEFAULT_OUTPUT: Final[str] = "lists/sources"
 METADATA_FILE: Final[str] = "lists/sources-metadata.json"
+HEADER_PREFIXES: Final[tuple[str, ...]] = ("! ", "#", "[")
 TIMEOUT: Final[int] = 60
 CHUNK_SIZE: Final[int] = 65536
 MAX_CONCURRENT: Final[int] = 10
@@ -90,7 +88,7 @@ def count_rules(content: str) -> int:
     return sum(
         1
         for line in io.StringIO(content)
-        if (stripped := line.strip()) and not stripped.startswith(("! ", "#", "["))
+        if (stripped := line.strip()) and not stripped.startswith(HEADER_PREFIXES)
     )
 
 

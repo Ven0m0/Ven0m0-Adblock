@@ -9,10 +9,7 @@ from pathlib import Path
 from collections import defaultdict
 
 # Import common utilities
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
-
-from common import is_valid_domain, read_lines, write_lines
+from Scripts.common import is_valid_domain, read_lines, write_lines
 
 
 def is_pure_domain(line: str) -> bool:
@@ -77,13 +74,12 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
         filter_rules = []
 
         try:
-            with adblock_file.open("r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.rstrip()
-                    if is_pure_domain(line):
-                        pure_domains.append(line.strip())
-                    else:
-                        filter_rules.append(line)
+            content = adblock_file.read_text(encoding="utf-8")
+            for line in content.splitlines():
+                if is_pure_domain(line):
+                    pure_domains.append(line.strip())
+                else:
+                    filter_rules.append(line)
         except Exception as e:
             print(f"  Error reading: {e}", file=sys.stderr)
             continue
@@ -144,8 +140,13 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
     print("=" * 60 + "\n")
 
     for filepath, new_lines in file_updates.items():
-        if write_lines(filepath, new_lines):
+        tmp_path = filepath.with_name(filepath.name + '.tmp')
+        if write_lines(tmp_path, new_lines):
+            tmp_path.replace(filepath)
             print(f"Updated {filepath.name}")
+        else:
+            if tmp_path.exists():
+                tmp_path.unlink()
 
     return total_moved
 

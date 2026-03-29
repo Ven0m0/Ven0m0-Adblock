@@ -68,7 +68,9 @@
     const els = get();
     if (!els.length) return;
     els.forEach((el) => {
-      if (el.style.maxWidth !== CFG.WIDTH.MAX) el.style.cssText += `;max-width:${CFG.WIDTH.MAX}!important`;
+      if (el.style.maxWidth !== CFG.WIDTH.MAX) {
+        el.style.cssText += `;max-width:${CFG.WIDTH.MAX}!important`;
+      }
     });
   };
   const obsW = (get) => {
@@ -263,7 +265,9 @@
         }
       };
     })();
-    init().then(() => setInterval(loop, 700));
+    init()
+      .then(() => setInterval(loop, 700))
+      .catch(() => {});
   }
   if (isCl) {
     const clean = () => {

@@ -189,6 +189,9 @@
     const targetNode = document.body;
     const config = { childList: true, subtree: true };
 
+    let nodesToProcess = [];
+    let updateScheduled = false;
+
     const callback = (mutationsList) => {
       for (const mutation of mutationsList) {
         if (mutation.type === "childList") {
@@ -204,6 +207,31 @@
             }
           }
         }
+      }
+
+      if (nodesToProcess.length > 0 && !updateScheduled) {
+        updateScheduled = true;
+        const scheduleUpdate = window.requestAnimationFrame || ((cb) => setTimeout(cb, 16));
+
+        scheduleUpdate(() => {
+          const currentNodes = nodesToProcess;
+          nodesToProcess = [];
+          updateScheduled = false;
+
+          // Deduplicate: if a node's ancestor is also in the list, we don't need to process it
+          // because the ancestor's querySelectorAll will already find the child's content.
+          const filteredNodes = currentNodes.filter((node) => {
+            return !currentNodes.some((other) => other !== node && other.contains(node));
+          });
+
+          filteredNodes.forEach((node) => {
+            if (node.classList?.contains(CHAT_MESSAGE_CONTENT_CLASS)) {
+              addCopyButton(node);
+            }
+            const nestedMessages = node.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
+            nestedMessages.forEach((nestedNode) => addCopyButton(nestedNode));
+          });
+        });
       }
     };
 

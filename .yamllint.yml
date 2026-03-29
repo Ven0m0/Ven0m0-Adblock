@@ -2,7 +2,7 @@
 extends: default
 
 rules:
-  line-length: 
+  line-length:
     max: 120
     level: warning
   indentation:
@@ -10,7 +10,7 @@ rules:
   comments:
     min-spaces-from-content: 1
   document-start: disable
-  truthy: 
+  truthy:
     allowed-values: ["true", "false"]
   braces:
     max-spaces-inside: 0

@@ -1,3 +1,4 @@
+! aglint-disable
 ^(.+[_.-])?adse?rv(er?|ice)?s?[0-9]*[_.-]
 ^(.+[_.-])?telemetry[_.-]
 ^.+\.(work|fit|surf|review|asia|tokyo|monster|info|ad)$

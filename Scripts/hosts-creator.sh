@@ -39,7 +39,7 @@ download(){
   for url in ${HOSTS:-}; do
     ((n++))
     printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
-    "$DL" -fsSL "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed: $url"
+    "$DL" -fsSL -- "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed: $url"
   done
 }
 
@@ -48,7 +48,7 @@ process(){
   [[ ${RM_COMMENTS:-1} == 1 ]] && awk_cmd="!/^#/"
   [[ ${RM_TRAILING_SPACES:-1} == 1 ]] && awk_cmd="${awk_cmd:+$awk_cmd && }{gsub(/^ +| +$/,\"\");print}"
   [[ ${RM_DUPLICATE_LINES:-1} == 1 ]] && awk_cmd="${awk_cmd:+$awk_cmd && }! seen[\$0]++"
-  
+
   if [[ -n $awk_cmd ]]; then
     local tmp
     tmp=$(mktemp)

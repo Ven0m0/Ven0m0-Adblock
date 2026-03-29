@@ -1,0 +1,45 @@
+! [Adblock Plus 2.0]
+! Title: General rules (Optimized)
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! Raw: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/General.txt
+! Last modified: %timestamp%
+! License: https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE
+
+! Cosmetic Filters
+###cookies
+###onetrust-consent-sdk
+##.cookieConsent
+##.js-consent-banner
+##.outbrain
+##.outbrain-container
+##div[aria-label="Cookie Consent Banner"]
+##div[aria-label="cookieconsent"]
+
+! Remove common tracking params (dedupe, sort)
+! Block telemetry/analytics/metrics/diagnostics/crash/error-report
+! https://github.com/AdguardTeam/AdguardFilters/issues/204150
+! Adb track
+! Major social trackers (sorted, deduped)
+! Google & Firebase (sorted, deduped, key exceptions up top)
+! Google Custom Search fixes
+! Cloudflare challenge
+! GitHub and browser error noise
+! Extra recaptcha safety for site breakage
+! Allow doc/clients exceptions for YouTube etc
+!! Smartblock Embed Placeholders
+!--- Prevent AdFender detection ---
+$removeparam=utm_campaign
+$removeparam=utm_content
+$removeparam=utm_medium
+$removeparam=utm_source
+$removeparam=utm_term
+://yandex.*/images/_$xhr,method=post
+@@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
+@@||apis.google.com^
+@@||clients1.google.com^
+@@||consent.google.com^$subdocument
+@@||smartblock.firefox.etp^
+||accounts.google.com^$3p
+||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
+||challenges.cloudflare.com^$3p
+||www.google.com^$3p,subdocument
