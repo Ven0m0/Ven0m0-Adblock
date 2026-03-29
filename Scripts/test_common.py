@@ -10,7 +10,7 @@ from unittest.mock import patch
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import sanitize_filename, is_valid_domain, is_adguard_rule, read_lines
+from common import sanitize_filename, is_valid_domain, read_lines
 
 
 class TestCommon(unittest.TestCase):
