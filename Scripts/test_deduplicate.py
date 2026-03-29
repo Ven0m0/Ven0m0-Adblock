@@ -1,7 +1,12 @@
 import unittest
 
 # Add current directory to path to allow importing deduplicate
-from Scripts.deduplicate import process_content, is_header, is_valid_rule
+from Scripts.deduplicate import (
+    process_content,
+    is_header,
+    is_valid_rule,
+    find_cross_file_duplicates,
+)
 
 
 class TestDeduplicate(unittest.TestCase):
@@ -76,6 +81,31 @@ class TestDeduplicate(unittest.TestCase):
         self.assertFalse(is_valid_rule("||invalid^"))
         self.assertFalse(is_valid_rule("||-start.com^"))
         self.assertFalse(is_valid_rule("||end-.com^"))
+
+    def test_find_cross_file_duplicates(self):
+        file_rules = {
+            "file1.txt": ["rule1.com", "rule2.com", "  rule3.com  "],
+            "file2.txt": ["rule2.com", "rule4.com"],
+            "file3.txt": ["rule3.com", "rule5.com", "  "],
+        }
+
+        duplicates = find_cross_file_duplicates(file_rules)
+
+        # rule2.com is in file1 and file2
+        # rule3.com is in file1 and file3 (due to stripping)
+        expected = {
+            "rule2.com": ["file1.txt", "file2.txt"],
+            "rule3.com": ["file1.txt", "file3.txt"],
+        }
+
+        self.assertEqual(duplicates, expected)
+
+        # Test no duplicates
+        no_dupes = {"f1": ["a"], "f2": ["b"]}
+        self.assertEqual(find_cross_file_duplicates(no_dupes), {})
+
+        # Test empty input
+        self.assertEqual(find_cross_file_duplicates({}), {})
 
 
 if __name__ == "__main__":
