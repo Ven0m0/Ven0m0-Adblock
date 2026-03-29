@@ -312,40 +312,42 @@
   // ==================== API FUNCTIONS ====================
 
   function fetchSegments(videoID) {
-    return new Promise(async (resolve) => {
-      try {
-        const hashPrefix = await getHashPrefix(videoID);
-        const params = new URLSearchParams({
-          categories: JSON.stringify(CATEGORIES),
-          actionTypes: JSON.stringify(ACTION_TYPES)
-        });
+    return new Promise((resolve) => {
+      (async () => {
+        try {
+          const hashPrefix = await getHashPrefix(videoID);
+          const params = new URLSearchParams({
+            categories: JSON.stringify(CATEGORIES),
+            actionTypes: JSON.stringify(ACTION_TYPES)
+          });
 
-        GM_xmlhttpRequest({
-          method: "GET",
-          url: `${API_BASE}/api/skipSegments/${hashPrefix}?${params}`,
-          headers: { Accept: "application/json" },
-          onload(response) {
-            if (response.status === 200) {
-              try {
-                const data = JSON.parse(response.responseText);
-                const videoData = data.find((v) => v.videoID === videoID);
-                const segs = videoData?.segments || [];
-                segs.sort((a, b) => a.segment[0] - b.segment[0]);
-                resolve(segs);
-              } catch {
+          GM_xmlhttpRequest({
+            method: "GET",
+            url: `${API_BASE}/api/skipSegments/${hashPrefix}?${params}`,
+            headers: { Accept: "application/json" },
+            onload(response) {
+              if (response.status === 200) {
+                try {
+                  const data = JSON.parse(response.responseText);
+                  const videoData = data.find((v) => v.videoID === videoID);
+                  const segs = videoData?.segments || [];
+                  segs.sort((a, b) => a.segment[0] - b.segment[0]);
+                  resolve(segs);
+                } catch {
+                  resolve([]);
+                }
+              } else {
                 resolve([]);
               }
-            } else {
+            },
+            onerror() {
               resolve([]);
             }
-          },
-          onerror() {
-            resolve([]);
-          }
-        });
-      } catch {
-        resolve([]);
-      }
+          });
+        } catch {
+          resolve([]);
+        }
+      })();
     });
   }
 

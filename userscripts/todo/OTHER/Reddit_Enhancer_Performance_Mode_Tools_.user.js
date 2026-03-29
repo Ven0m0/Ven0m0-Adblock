@@ -46,28 +46,32 @@
     const isOldReddit = location.hostname.startsWith("old.");
     if (settings.hidePromoted) {
       const promos = isOldReddit ? document.querySelectorAll(".promotedlink") : document.querySelectorAll("span");
-      promos.forEach((el) => {
+      for (const el of promos) {
         if (el.textContent.toLowerCase().includes("promoted")) {
           el.closest('div[data-testid="post-container"]')?.remove();
           el.closest(".promotedlink")?.remove();
         }
-      });
+      }
     }
 
     if (settings.hideSuggested) {
-      document.querySelectorAll('div[data-testid="post-container"], .thing').forEach((el) => {
+      const suggested = document.querySelectorAll('div[data-testid="post-container"], .thing');
+      for (const el of suggested) {
         const txt = el.innerText.toLowerCase();
-        if (txt.includes("because you follow") || txt.includes("suggested")) el.remove();
-      });
+        if (txt.includes("because you follow") || txt.includes("suggested")) {
+          el.remove();
+        }
+      }
     }
   }
 
   function performanceCleanup() {
     try {
       // Remove iframes and slow footers
-      document
-        .querySelectorAll('iframe, .premium-banner-outer, footer, .bottom-bar, [id*="ad-"]')
-        .forEach((el) => el.remove());
+      const elements = document.querySelectorAll('iframe, .premium-banner-outer, footer, .bottom-bar, [id*="ad-"]');
+      for (const el of elements) {
+        el.remove();
+      }
 
       // Kill observers
       if (window.ResizeObserver)
@@ -100,7 +104,9 @@
     const buttons = isOldReddit
       ? document.querySelectorAll(".morecomments a")
       : document.querySelectorAll('button[data-testid="comment_expand_button"]');
-    buttons.forEach((btn) => btn.click());
+    for (const btn of buttons) {
+      btn.click();
+    }
   }
 
   function autoRefreshFeed() {

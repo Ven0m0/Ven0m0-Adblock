@@ -41,7 +41,7 @@ IMPROVEMENTS OVER ORIGINALS:
   }
 
   // Promise isolation (YouTube hacks Promise in some browsers)
-  const Promise = (async () => {})().constructor;
+  const IsolatedPromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -191,18 +191,19 @@ IMPROVEMENTS OVER ORIGINALS:
         return topLastTimeUpdate >= 1 ? () => top.lastTimeUpdate : () => window.lastTimeUpdate;
       })();
 
-      const PromiseConstructor = (executor) => new Promise(executor);
+      const PromiseConstructor = (executor) => new IsolatedPromise(executor);
 
       const ExternalPromise = (() => {
-        let resolve_, reject_;
+        let resolve_;
+        let reject_;
         const handler = (resolve, reject) => {
           resolve_ = resolve;
           reject_ = reject;
         };
         const PromiseExternal = (cb) => {
-          cb = cb || handler;
-          const promise = new PromiseConstructor(cb);
-          if (cb === handler) {
+          const callback = cb || handler;
+          const promise = new PromiseConstructor(callback);
+          if (callback === handler) {
             promise.resolve = resolve_;
             promise.reject = reject_;
           }
@@ -223,10 +224,11 @@ IMPROVEMENTS OVER ORIGINALS:
           if (!frame) {
             frame = document.createElement("iframe");
             frame.id = frameId;
-            const blobURL =
-              typeof webkitCancelAnimationFrame === "function" && typeof kagi === "undefined"
-                ? (frame.src = URL.createObjectURL(new Blob([], { type: "text/html" })))
-                : null;
+            let blobURL = null;
+            if (typeof webkitCancelAnimationFrame === "function" && typeof kagi === "undefined") {
+              blobURL = URL.createObjectURL(new Blob([], { type: "text/html" }));
+              frame.src = blobURL;
+            }
             frame.sandbox = "allow-same-origin";
             let noscriptElement = document.createElement("noscript");
             noscriptElement.appendChild(frame);
@@ -237,10 +239,11 @@ IMPROVEMENTS OVER ORIGINALS:
               }
               const root = document.documentElement;
               root.appendChild(noscriptElement);
-              if (blobURL)
+              if (blobURL) {
                 PromiseConstructor.resolve().then(() => {
                   URL.revokeObjectURL(blobURL);
                 });
+              }
 
               removeFrame = (setTimeout) => {
                 const removeFrameWhenReady = (e) => {
@@ -374,8 +377,16 @@ IMPROVEMENTS OVER ORIGINALS:
                   })
                 );
               } else {
-                const newPrimary = !pendingPrimary ? (afPromisePrimary = new ExternalPromise()) : null;
-                const newSecondary = !pendingSecondary ? (afPromiseSecondary = new ExternalPromise()) : null;
+                let newPrimary = null;
+                if (!pendingPrimary) {
+                  afPromisePrimary = new ExternalPromise();
+                  newPrimary = afPromisePrimary;
+                }
+                let newSecondary = null;
+                if (!pendingSecondary) {
+                  afPromiseSecondary = new ExternalPromise();
+                  newSecondary = afPromiseSecondary;
+                }
 
                 const executeSecondary = () => {
                   if (newPrimary) {
@@ -492,12 +503,12 @@ IMPROVEMENTS OVER ORIGINALS:
       const _locksRequest_ = navigator.locks.request;
 
       navigator.locks.query = () =>
-        new Promise((resolve) => {
+        new IsolatedPromise((resolve) => {
           resolve({ held: [], pending: [] });
         });
 
       navigator.locks.request = () =>
-        new Promise((resolve) => {
+        new IsolatedPromise((resolve) => {
           resolve();
         });
     }
@@ -634,7 +645,7 @@ IMPROVEMENTS OVER ORIGINALS:
           url.includes("/beacon/") ||
           url.includes("/ptracking"))
       ) {
-        return Promise.reject(new Error("Blocked by YouTube Optimizer"));
+        return IsolatedPromise.reject(new Error("Blocked by YouTube Optimizer"));
       }
       return originalFetch.apply(this, args);
     };

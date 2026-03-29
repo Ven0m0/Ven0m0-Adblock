@@ -240,9 +240,10 @@
   // Google Captcha speedup
   if (cfg.captchaSpeed && /\/recaptcha\/(api2|enterprise)\/bframe/.test(location.href)) {
     const origST = setTimeout;
-    setTimeout = function (_fn, dur) {
-      if (dur === 4000 || dur === 50) dur = 0;
-      return origST.apply(this, arguments);
+    window.setTimeout = function (fn, dur, ...args) {
+      let d = dur;
+      if (d === 4000 || d === 50) d = 0;
+      return origST.call(this, fn, d, ...args);
     };
     document.head.appendChild(document.createElement("style")).textContent = "*{transition:none!important}";
   }
@@ -269,7 +270,9 @@
       HTMLCanvasElement.prototype.getContext = function (type, ...a) {
         return type === "webgl" || type === "webgl2" ? null : orig.call(this, type, ...a);
       };
-    } catch {}
+    } catch (e) {
+      log("WebGL block error:", e);
+    }
   }
 
   // CPU tamer / RAF tamer
@@ -325,28 +328,26 @@
 
     if (cfg.cpuTamer) {
       window.setTimeout = (fn, d = 0, ...a) => {
-        let id;
-        const w =
+        const h =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(id)
+                awaitTO(res)
                   .then((v) => v && fn(...x))
                   .catch(throwE)
             : fn;
-        id = nTO(w, Math.max(d, cfg.minTimeout), ...a);
-        return id;
+        const res = nTO(h, Math.max(d, cfg.minTimeout), ...a);
+        return res;
       };
       window.setInterval = (fn, d = 0, ...a) => {
-        let id;
-        const w =
+        const h =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(id)
+                awaitTO(res)
                   .then((v) => v && fn(...x))
                   .catch(throwE)
             : fn;
-        id = nSI(w, Math.max(d, cfg.minInterval), ...a);
-        return id;
+        const res = nSI(h, Math.max(d, cfg.minInterval), ...a);
+        return res;
       };
       window.clearTimeout = (id) => {
         toSet.delete(id);
@@ -376,9 +377,8 @@
       let lastFrame = 0;
 
       window.requestAnimationFrame = (fn) => {
-        let id;
         const q = p;
-        const w = (ts) => {
+        const id = nRAF((ts) => {
           if (frameMs) {
             const now = Date.now();
             if (now - lastFrame < frameMs) {
@@ -391,9 +391,8 @@
           awaitRAF(id, q)
             .then((v) => v && fn(ts + (tl.currentTime - s)))
             .catch(throwE);
-        };
+        });
         if (last !== p) micro(trig);
-        id = nRAF(w);
         return id;
       };
       window.cancelAnimationFrame = (id) => {
@@ -469,7 +468,10 @@
   if (cfg.xhrBlock) {
     const origOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url, ...args) {
-      if (typeof url === "string" && isTracker(url)) return;
+      if (typeof url === "string" && isTracker(url)) {
+        log("XHR blocked:", url);
+        return;
+      }
       return origOpen.call(this, method, url, ...args);
     };
   }
@@ -497,7 +499,10 @@
     const origFetch = window.fetch;
     window.fetch = function (u, ...a) {
       if (typeof u === "string") {
-        if (isTracker(u)) return new Promise(() => {});
+        if (isTracker(u)) {
+          log("Fetch blocked:", u);
+          return new Promise(() => {});
+        }
         if (rx(u)) {
           const c = cGet(u);
           if (c) return Promise.resolve(new Response(c));
@@ -512,7 +517,10 @@
                 cSet(u, t);
                 return new Response(t, { status: r.status, statusText: r.statusText, headers: r.headers });
               })
-              .catch(() => r);
+              .catch((e) => {
+                log("Fetch clone error:", e);
+                return r;
+              });
           });
         }
       }
@@ -566,7 +574,9 @@
       let c = stripTracking(url);
       for (const h of HASH) if (url.hash.startsWith(`#${h}`)) c = 1;
       if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
-    } catch {}
+    } catch (e) {
+      log("URL clean error:", e);
+    }
   }
 
   const cleanLinks = (() => {
@@ -592,7 +602,9 @@
             const u = new URL(h);
             if (u.origin === location.origin) continue;
             if (stripTracking(u)) a.href = u.href;
-          } catch {}
+          } catch (e) {
+            log("Link clean error:", e);
+          }
         }
         if (i < links.length) idle(step);
         else busy = 0;
@@ -630,7 +642,9 @@
     throttle(() => {
       document.querySelectorAll("button,input[type=button]").forEach((b) => {
         const t = (b.innerText || b.value || "").toLowerCase();
-        if (/accept|agree|allow/.test(t)) b.click();
+        if (/accept|agree|allow/.test(t)) {
+          b.click();
+        }
       });
     }, C.TIME.THR_COOKIE)();
   }
@@ -697,8 +711,8 @@
     if (!state.videoObserver) {
       state.videoObserver = new IntersectionObserver(
         (es, obs) => {
-          es.forEach((e) => {
-            if (!e.isIntersecting) return;
+          for (const e of es) {
+            if (!e.isIntersecting) continue;
             const v = e.target;
             if (!state.loaded.has(v)) {
               v.querySelectorAll("source[data-src]").forEach((s) => {
@@ -715,12 +729,14 @@
               state.loaded.add(v);
             }
             obs.unobserve(v);
-          });
+          }
         },
         { rootMargin: C.IO_MARGIN }
       );
     }
-    vids.forEach((v) => state.videoObserver.observe(v));
+    for (const v of vids) {
+      state.videoObserver.observe(v);
+    }
   }
 
   function optimizeVids() {
@@ -749,13 +765,18 @@
         c.title = "Click to play GIF";
         try {
           c.getContext("2d").drawImage(img, 0, 0);
-        } catch {
+        } catch (e) {
+          log("GIF snap error:", e);
           return;
         }
         c.onclick = () => c.replaceWith(img);
         img.replaceWith(c);
       };
-      img.complete ? snap() : img.addEventListener("load", snap, { once: true });
+      if (img.complete) {
+        snap();
+      } else {
+        img.addEventListener("load", snap, { once: true });
+      }
     });
   }
 
@@ -819,10 +840,14 @@
     if (state.interactionBound) return;
     const cb = () => {
       idle(() => restoreScripts(), 500);
-      UE.forEach((e) => window.removeEventListener(e, cb, { passive: true }));
+      for (const e of UE) {
+        window.removeEventListener(e, cb, { passive: true });
+      }
       state.interactionBound = 0;
     };
-    UE.forEach((e) => window.addEventListener(e, cb, { passive: true, once: true }));
+    for (const e of UE) {
+      window.addEventListener(e, cb, { passive: true, once: true });
+    }
     state.interactionBound = 1;
   }
 
@@ -855,7 +880,9 @@
             state.origins.add(url.origin);
             addHint("preconnect", url.origin);
           }
-        } catch {}
+        } catch (e) {
+          log("Origin extract error:", e);
+        }
       });
   }
 
@@ -891,7 +918,9 @@
     if (!cfg.blockPrefetchLinks) return;
     document
       .querySelectorAll('link[rel="prefetch"]:not([data-wp-hint]),link[rel="preload"]:not([data-wp-hint])')
-      .forEach((l) => l.remove());
+      .forEach((l) => {
+        l.remove();
+      });
   }
 
   // YouTube privacy
@@ -910,15 +939,23 @@
     document.querySelectorAll("meta").forEach((meta) => {
       const name = (meta.getAttribute("name") || "").toLowerCase();
       const prop = meta.getAttribute("property") || "";
-      if (C.TRACKER_META.some((t) => name.includes(t)) || prop.startsWith("fb:")) meta.remove();
+      if (C.TRACKER_META.some((t) => name.includes(t)) || prop.startsWith("fb:")) {
+        meta.remove();
+      }
     });
     document.querySelectorAll("script").forEach((s) => {
       const src = s.getAttribute("src");
-      if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) s.remove();
+      if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) {
+        s.remove();
+      }
     });
-    document.querySelectorAll("noscript").forEach((n) => n.remove());
+    document.querySelectorAll("noscript").forEach((n) => {
+      n.remove();
+    });
     document.querySelectorAll("p").forEach((p) => {
-      if (p.innerHTML.trim() === "&nbsp;") p.remove();
+      if (p.innerHTML.trim() === "&nbsp;") {
+        p.remove();
+      }
     });
   }
 

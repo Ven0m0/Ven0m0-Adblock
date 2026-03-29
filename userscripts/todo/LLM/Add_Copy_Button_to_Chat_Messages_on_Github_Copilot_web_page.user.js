@@ -177,7 +177,9 @@
    */
   function processExistingMessages() {
     const messageElements = document.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-    messageElements.forEach((messageElement) => addCopyButton(messageElement));
+    for (const messageElement of messageElements) {
+      addCopyButton(messageElement);
+    }
   }
 
   /**
@@ -190,15 +192,17 @@
     const callback = (mutationsList) => {
       for (const mutation of mutationsList) {
         if (mutation.type === "childList") {
-          mutation.addedNodes.forEach((node) => {
+          for (const node of mutation.addedNodes) {
             if (node.nodeType === Node.ELEMENT_NODE) {
               if (node.classList?.contains(CHAT_MESSAGE_CONTENT_CLASS)) {
                 addCopyButton(node);
               }
               const nestedMessages = node.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-              nestedMessages.forEach((nestedNode) => addCopyButton(nestedNode));
+              for (const nestedNode of nestedMessages) {
+                addCopyButton(nestedNode);
+              }
             }
-          });
+          }
         }
       }
     };

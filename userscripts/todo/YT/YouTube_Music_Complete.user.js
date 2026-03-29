@@ -37,7 +37,7 @@ CONSOLIDATED FEATURES:
   }
 
   // Promise isolation (YouTube Music hacks Promise in some browsers)
-  const Promise = (async () => {})().constructor;
+  const IsolatedPromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -144,14 +144,14 @@ CONSOLIDATED FEATURES:
         enumerable: true,
         configurable: true,
         get() {
-          Promise.resolve(new Date()).then(fGet).catch(console.warn);
+          IsolatedPromise.resolve(new Date()).then(fGet).catch(console.warn);
           const ret = constVal;
           if (retType === 2) return `${ret}`;
           return ret;
         },
         set(newValue) {
           const oldValue = hashMap.get(this);
-          Promise.resolve([oldValue, newValue, new Date()]).then(fSet).catch(console.warn);
+          IsolatedPromise.resolve([oldValue, newValue, new Date()]).then(fSet).catch(console.warn);
           hashMap.set(this, newValue);
         }
       });
@@ -262,7 +262,9 @@ CONSOLIDATED FEATURES:
 
       // Observe thumbnails
       const observeImages = () => {
-        document.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+        document.querySelectorAll("img[data-src]").forEach((img) => {
+          observer.observe(img);
+        });
       };
 
       // Initial observation

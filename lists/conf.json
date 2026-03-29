@@ -160,3 +160,4 @@
   ],
   "transformations": ["Compress", "Deduplicate", "RemoveModifiers", "RemoveComments"],
   "exclusions_sources": ["Filters/exclusions.txt"]
+}
