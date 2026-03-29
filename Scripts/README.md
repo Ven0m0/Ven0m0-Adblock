@@ -6,7 +6,7 @@ Utility scripts for maintaining the Pi-hole blocklists.
 
 ### deduplicate.py
 
-Deduplicates entries within each blocklist file.
+Deduplicates entries within blocklist files and, in the same run, reports duplicates across files.
 
 **Usage:**
 
@@ -20,19 +20,6 @@ python3 -m Scripts.deduplicate
 - Removes empty lines and whitespace-only lines
 - Sorts entries alphabetically
 - Preserves LF line endings
-
-### deduplicate.py duplicate reporting
-
-Checks for and reports duplicate entries within and across different blocklist files.
-
-**Usage:**
-
-```bash
-python3 -m Scripts.deduplicate
-```
-
-**Features:**
-
 - Scans all `.txt` files in the `lists/` directory
 - Reports entries that appear in multiple files
 - Groups duplicates by file combinations
