@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: ven0m0-adblock
-Version: 1.0.0
-Summary: Ad-blocking filter list utilities
-Requires-Python: >=3.13
-License-File: LICENSE
-Requires-Dist: aiohttp>=3.13.3
-Requires-Dist: aiofiles>=25.1.0
-Dynamic: license-file

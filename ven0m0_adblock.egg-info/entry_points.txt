@@ -1,4 +1,0 @@
-[console_scripts]
-adblock-deduplicate = Scripts.deduplicate:main
-adblock-move-domains = Scripts.move_pure_domains:main
-adblock-update = Scripts.update_lists:main_sync
