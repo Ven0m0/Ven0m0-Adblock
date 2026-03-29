@@ -20,11 +20,7 @@ from typing import Final
 import aiohttp
 import aiofiles
 
-# Import common utilities
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
-
-from common import sanitize_filename
+from Scripts.common import sanitize_filename
 
 # ============================================================================
 # CONFIGURATION
@@ -356,5 +352,10 @@ async def main() -> int:
     return 0 if success_count == len(sources) else 1
 
 
+def main_sync() -> int:
+    """Synchronous entry point for the script."""
+    return asyncio.run(main())
+
+
 if __name__ == "__main__":
-    sys.exit(asyncio.run(main()))
+    sys.exit(main_sync())

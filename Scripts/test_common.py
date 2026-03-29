@@ -1,13 +1,8 @@
 import unittest
-import sys
-from pathlib import Path
 import hashlib
+from pathlib import Path
 
-# Add current directory to path
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
-
-from common import sanitize_filename, is_valid_domain, is_adguard_rule
+from Scripts.common import sanitize_filename, is_valid_domain, is_adguard_rule
 
 
 class TestCommon(unittest.TestCase):
@@ -68,9 +63,9 @@ class TestCommon(unittest.TestCase):
         # URL with port
         url = "http://example.com:8080/list.txt"
         filename = sanitize_filename(url)
-        self.assertTrue(filename.startswith("example-com:8080-"))
+        self.assertTrue(filename.startswith("example-com-8080-"))
         expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
-        self.assertEqual(filename, f"example-com:8080-{expected_hash}.txt")
+        self.assertEqual(filename, f"example-com-8080-{expected_hash}.txt")
 
     def test_is_valid_domain(self):
         self.assertTrue(is_valid_domain("example.com"))
@@ -89,7 +84,7 @@ class TestCommon(unittest.TestCase):
 
     def test_write_lines_atomic(self):
         import tempfile
-        from common import write_lines
+        from Scripts.common import write_lines
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)

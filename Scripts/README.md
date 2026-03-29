@@ -11,7 +11,7 @@ Deduplicates entries within each blocklist file.
 **Usage:**
 
 ```bash
-python3 Scripts/deduplicate.py
+python3 -m Scripts.deduplicate
 ```
 
 **Features:**
@@ -21,14 +21,14 @@ python3 Scripts/deduplicate.py
 - Sorts entries alphabetically
 - Preserves LF line endings
 
-### deduplicate_across_files.py
+### deduplicate.py
 
-Checks for and reports duplicate entries across different blocklist files.
+Checks for and reports duplicate entries within and across different blocklist files.
 
 **Usage:**
 
 ```bash
-python3 Scripts/deduplicate_across_files.py
+python3 -m Scripts.deduplicate
 ```
 
 **Features:**

@@ -1,13 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, patch, AsyncMock
-import importlib.util
 import sys
 import asyncio
-from pathlib import Path
 import hashlib
 import base64
+from pathlib import Path
 
-# Import the target module
 # Mock missing dependencies
 aiohttp_mock = MagicMock()
 
@@ -20,10 +18,7 @@ aiohttp_mock.ClientError = ClientError
 sys.modules["aiohttp"] = aiohttp_mock
 sys.modules["aiofiles"] = MagicMock()
 
-spec = importlib.util.spec_from_file_location("update_lists", "Scripts/update-lists.py")
-update_lists = importlib.util.module_from_spec(spec)
-sys.modules["update_lists"] = update_lists
-spec.loader.exec_module(update_lists)
+from Scripts import update_lists
 
 
 class AsyncIterator:
@@ -66,8 +61,8 @@ class TestUpdateLists(unittest.TestCase):
         result = update_lists.validate_checksum(content)
         self.assertTrue(result)
 
-    @patch("update_lists.validate_checksum")
-    @patch("update_lists.aiofiles.open")
+    @patch("Scripts.update_lists.validate_checksum")
+    @patch("Scripts.update_lists.aiofiles.open")
     def test_process_downloaded_file_success(self, mock_aio_open, mock_validate):
         # Setup mocks
         mock_validate.return_value = True
@@ -122,8 +117,8 @@ class TestUpdateLists(unittest.TestCase):
             # Verify NO unlink called (important for security regression)
             mock_unlink.assert_not_called()
 
-    @patch("update_lists.validate_checksum")
-    @patch("update_lists.aiofiles.open")
+    @patch("Scripts.update_lists.validate_checksum")
+    @patch("Scripts.update_lists.aiofiles.open")
     def test_process_downloaded_file_checksum_fail(self, mock_aio_open, mock_validate):
         mock_validate.return_value = False
 
@@ -149,8 +144,8 @@ class TestUpdateLists(unittest.TestCase):
         # Should call validate with content
         mock_validate.assert_called_once_with("some content", "final.txt")
 
-    @patch("update_lists.process_downloaded_file")
-    @patch("update_lists.aiofiles.open")
+    @patch("Scripts.update_lists.process_downloaded_file")
+    @patch("Scripts.update_lists.aiofiles.open")
     @patch("tempfile.NamedTemporaryFile")
     @patch("asyncio.to_thread")
     def test_fetch_list_cleanup_logic(
@@ -204,8 +199,8 @@ class TestUpdateLists(unittest.TestCase):
         # Verify return value
         self.assertEqual(result, ("http://url", True))
 
-    @patch("update_lists.process_downloaded_file")
-    @patch("update_lists.aiofiles.open")
+    @patch("Scripts.update_lists.process_downloaded_file")
+    @patch("Scripts.update_lists.aiofiles.open")
     @patch("tempfile.NamedTemporaryFile")
     @patch("asyncio.to_thread")
     def test_fetch_list_success(
@@ -259,7 +254,7 @@ class TestUpdateLists(unittest.TestCase):
             Path("/tmp/tempfile.txt"), "http://url", "file.txt", Path("/tmp/out"), False
         )
 
-    @patch("update_lists.logger.error")
+    @patch("Scripts.update_lists.logger.error")
     def test_fetch_list_timeout(self, mock_logger_error):
         """Verify fetch_list handles TimeoutError."""
         mock_session = MagicMock()
@@ -274,7 +269,7 @@ class TestUpdateLists(unittest.TestCase):
         self.assertEqual(result, ("http://url", False))
         mock_logger_error.assert_called_once_with("✗ Timeout: http://url")
 
-    @patch("update_lists.logger.error")
+    @patch("Scripts.update_lists.logger.error")
     def test_fetch_list_http_error(self, mock_logger_error):
         """Verify fetch_list handles aiohttp.ClientError."""
         mock_session = MagicMock()
@@ -291,7 +286,7 @@ class TestUpdateLists(unittest.TestCase):
             "✗ HTTP error for http://url: HTTP failed"
         )
 
-    @patch("update_lists.logger.exception")
+    @patch("Scripts.update_lists.logger.exception")
     def test_fetch_list_unexpected_error(self, mock_logger_exception):
         """Verify fetch_list handles unexpected Exception."""
         mock_session = MagicMock()

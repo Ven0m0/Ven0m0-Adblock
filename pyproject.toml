@@ -8,6 +8,11 @@ dependencies = [
   "aiofiles>=25.1.0",
 ]
 
+[project.scripts]
+adblock-deduplicate = "Scripts.deduplicate:main"
+adblock-update = "Scripts.update_lists:main_sync"
+adblock-move-domains = "Scripts.move_pure_domains:main"
+
 [tool.uv]
 managed = true
 

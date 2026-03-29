@@ -1,17 +1,8 @@
 import unittest
-import importlib.util
 from pathlib import Path
 from unittest.mock import Mock, mock_open
 
-# Import the module dynamically
-file_path = Path(__file__).parent / "move-pure-domains.py"
-spec = importlib.util.spec_from_file_location("move_pure_domains", file_path)
-if spec is None or spec.loader is None:
-    raise ImportError("Could not load module")
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
-is_pure_domain = module.is_pure_domain
-scan_adblock_files = module.scan_adblock_files
+from Scripts.move_pure_domains import is_pure_domain, scan_adblock_files
 
 
 class TestIsPureDomain(unittest.TestCase):

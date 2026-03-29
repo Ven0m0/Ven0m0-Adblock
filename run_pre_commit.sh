@@ -2,4 +2,4 @@
 python3 -m unittest discover Scripts/ 'test_*.py'
 
 # Test actual script
-python3 Scripts/deduplicate.py
+python3 -m Scripts.deduplicate

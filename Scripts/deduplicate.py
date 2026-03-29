@@ -13,11 +13,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from collections.abc import Iterable
 
-# Add current directory to path to allow importing common if run from elsewhere
-if str(Path(__file__).parent) not in sys.path:
-    sys.path.append(str(Path(__file__).parent))
-
-from common import is_valid_domain, write_lines
+from Scripts.common import is_valid_domain, write_lines
 
 
 @dataclass(slots=True)
