@@ -12,6 +12,7 @@ module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 is_pure_domain = module.is_pure_domain
 scan_adblock_files = module.scan_adblock_files
+categorize_domain = module.categorize_domain
 
 
 class TestIsPureDomain(unittest.TestCase):
@@ -124,6 +125,66 @@ another-pure.net
             self.assertIn(
                 "spotify-tracker.com", domain_moves["Spotify.txt"]["spotify_ads.txt"]
             )
+
+
+class TestCategorizeDomain(unittest.TestCase):
+    def test_source_file_matching(self):
+        # Match by source file name
+        self.assertEqual(
+            categorize_domain("example.com", "spotify_filters.txt"), "Spotify.txt"
+        )
+        self.assertEqual(
+            categorize_domain("example.com", "YouTube-Ads.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("example.com", "twitch_adblock.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("example.com", "reddit_promoted.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("example.com", "TWITTER.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("example.com", "game_servers.txt"), "Games.txt"
+        )
+
+    def test_domain_keyword_matching_ads(self):
+        # Match by domain keywords (Ads)
+        self.assertEqual(categorize_domain("ad.example.com", "unknown.txt"), "Ads.txt")
+        self.assertEqual(categorize_domain("google-ads.com", "unknown.txt"), "Ads.txt")
+        self.assertEqual(
+            categorize_domain("analytics.google.com", "unknown.txt"), "Ads.txt"
+        )
+        self.assertEqual(
+            categorize_domain("tracking.example.net", "unknown.txt"), "Ads.txt"
+        )
+        self.assertEqual(
+            categorize_domain("telemetry.microsoft.com", "unknown.txt"), "Ads.txt"
+        )
+        self.assertEqual(
+            categorize_domain("metrics.apple.com", "unknown.txt"), "Ads.txt"
+        )
+
+    def test_domain_keyword_matching_social(self):
+        # Match by domain keywords (Social Media)
+        self.assertEqual(
+            categorize_domain("social.network.com", "unknown.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("api.facebook.com", "unknown.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("cdn.twitter.com", "unknown.txt"), "Social-Media.txt"
+        )
+        self.assertEqual(
+            categorize_domain("instagram-images.net", "unknown.txt"), "Social-Media.txt"
+        )
+
+    def test_fallback_category(self):
+        # Match fallback
+        self.assertEqual(categorize_domain("example.com", "unknown.txt"), "Other.txt")
+        self.assertEqual(categorize_domain("randomsite.org", "filter.txt"), "Other.txt")
 
 
 if __name__ == "__main__":
