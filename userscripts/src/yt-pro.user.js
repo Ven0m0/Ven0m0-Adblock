@@ -315,9 +315,9 @@
             log("Idle OFF");
           }
         }, K.IDLE_THROTTLE);
-        actEv.forEach((ev) => {
+        for (const ev of actEv) {
           window.addEventListener(ev, thAct, { capture: true, passive: true });
-        });
+        }
         setInterval(() => {
           if (document.visibilityState !== "visible") return;
           const now = performance.now();

@@ -241,7 +241,8 @@
   if (cfg.captchaSpeed && /\/recaptcha\/(api2|enterprise)\/bframe/.test(location.href)) {
     const origST = setTimeout;
     window.setTimeout = function (fn, dur, ...args) {
-      const d = dur === 4000 || dur === 50 ? 0 : dur;
+      let d = dur;
+      if (d === 4000 || d === 50) d = 0;
       return origST.call(this, fn, d, ...args);
     };
     document.head.appendChild(document.createElement("style")).textContent = "*{transition:none!important}";
@@ -270,9 +271,7 @@
         return type === "webgl" || type === "webgl2" ? null : orig.call(this, type, ...a);
       };
     } catch (e) {
-      if (cfg.log) {
-        log("WebGL block error:", e);
-      }
+      log("WebGL block error:", e);
     }
   }
 
@@ -329,38 +328,26 @@
 
     if (cfg.cpuTamer) {
       window.setTimeout = (fn, d = 0, ...a) => {
-        let tid; // eslint-disable-line prefer-const
-        const w =
+        const h =
           typeof fn === "function"
-            ? (...x) => {
-                awaitTO(tid)
-                  .then((v) => {
-                    if (v) {
-                      fn(...x);
-                    }
-                  })
-                  .catch(throwE);
-              }
+            ? (...x) =>
+                awaitTO(res)
+                  .then((v) => v && fn(...x))
+                  .catch(throwE)
             : fn;
-        tid = nTO(w, Math.max(d, cfg.minTimeout), ...a);
-        return tid;
+        const res = nTO(h, Math.max(d, cfg.minTimeout), ...a);
+        return res;
       };
       window.setInterval = (fn, d = 0, ...a) => {
-        let iid; // eslint-disable-line prefer-const
-        const w =
+        const h =
           typeof fn === "function"
-            ? (...x) => {
-                awaitTO(iid)
-                  .then((v) => {
-                    if (v) {
-                      fn(...x);
-                    }
-                  })
-                  .catch(throwE);
-              }
+            ? (...x) =>
+                awaitTO(res)
+                  .then((v) => v && fn(...x))
+                  .catch(throwE)
             : fn;
-        iid = nSI(w, Math.max(d, cfg.minInterval), ...a);
-        return iid;
+        const res = nSI(h, Math.max(d, cfg.minInterval), ...a);
+        return res;
       };
       window.clearTimeout = (id) => {
         toSet.delete(id);
@@ -390,9 +377,8 @@
       let lastFrame = 0;
 
       window.requestAnimationFrame = (fn) => {
-        let rid; // eslint-disable-line prefer-const
         const q = p;
-        const w = (ts) => {
+        const id = nRAF((ts) => {
           if (frameMs) {
             const now = Date.now();
             if (now - lastFrame < frameMs) {
@@ -409,10 +395,9 @@
               }
             })
             .catch(throwE);
-        };
+        });
         if (last !== p) micro(trig);
-        rid = nRAF(w);
-        return rid;
+        return id;
       };
       window.cancelAnimationFrame = (id) => {
         rafSet.delete(id);
@@ -487,7 +472,10 @@
   if (cfg.xhrBlock) {
     const origOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function (method, url, ...args) {
-      if (typeof url === "string" && isTracker(url)) return;
+      if (typeof url === "string" && isTracker(url)) {
+        log("XHR blocked:", url);
+        return;
+      }
       return origOpen.call(this, method, url, ...args);
     };
   }
@@ -515,7 +503,10 @@
     const origFetch = window.fetch;
     window.fetch = function (u, ...a) {
       if (typeof u === "string") {
-        if (isTracker(u)) return new Promise(() => {});
+        if (isTracker(u)) {
+          log("Fetch blocked:", u);
+          return new Promise(() => {});
+        }
         if (rx(u)) {
           const c = cGet(u);
           if (c) return Promise.resolve(new Response(c));
@@ -530,7 +521,10 @@
                 cSet(u, t);
                 return new Response(t, { status: r.status, statusText: r.statusText, headers: r.headers });
               })
-              .catch(() => r);
+              .catch((e) => {
+                log("Fetch clone error:", e);
+                return r;
+              });
           });
         }
       }
@@ -589,9 +583,7 @@
       }
       if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
     } catch (e) {
-      if (cfg.log) {
-        log("URL clean error", e);
-      }
+      log("URL clean error:", e);
     }
   }
 
@@ -627,6 +619,26 @@
       } finally {
         busy = 0;
       }
+      let i = 0;
+      const step = () => {
+        const end = Math.min(i + C.BATCH, links.length);
+        for (; i < end; i++) {
+          const a = links[i];
+          mark(a, "data-wp-cl");
+          try {
+            const h = a.href;
+            if (!h || h.startsWith("javascript:")) continue;
+            const u = new URL(h);
+            if (u.origin === location.origin) continue;
+            if (stripTracking(u)) a.href = u.href;
+          } catch (e) {
+            log("Link clean error:", e);
+          }
+        }
+        if (i < links.length) idle(step);
+        else busy = 0;
+      };
+      step();
     }, C.TIME.THR_CLEAN);
   })();
 
@@ -659,7 +671,9 @@
     throttle(() => {
       document.querySelectorAll("button,input[type=button]").forEach((b) => {
         const t = (b.innerText || b.value || "").toLowerCase();
-        if (/accept|agree|allow/.test(t)) b.click();
+        if (/accept|agree|allow/.test(t)) {
+          b.click();
+        }
       });
     }, C.TIME.THR_COOKIE)();
   }
@@ -726,8 +740,8 @@
     if (!state.videoObserver) {
       state.videoObserver = new IntersectionObserver(
         (es, obs) => {
-          es.forEach((e) => {
-            if (!e.isIntersecting) return;
+          for (const e of es) {
+            if (!e.isIntersecting) continue;
             const v = e.target;
             if (!state.loaded.has(v)) {
               v.querySelectorAll("source[data-src]").forEach((s) => {
@@ -744,14 +758,14 @@
               state.loaded.add(v);
             }
             obs.unobserve(v);
-          });
+          }
         },
         { rootMargin: C.IO_MARGIN }
       );
     }
-    vids.forEach((v) => {
+    for (const v of vids) {
       state.videoObserver.observe(v);
-    });
+    }
   }
 
   function optimizeVids() {
@@ -780,13 +794,18 @@
         c.title = "Click to play GIF";
         try {
           c.getContext("2d").drawImage(img, 0, 0);
-        } catch {
+        } catch (e) {
+          log("GIF snap error:", e);
           return;
         }
         c.onclick = () => c.replaceWith(img);
         img.replaceWith(c);
       };
-      img.complete ? snap() : img.addEventListener("load", snap, { once: true });
+      if (img.complete) {
+        snap();
+      } else {
+        img.addEventListener("load", snap, { once: true });
+      }
     });
   }
 
@@ -850,14 +869,14 @@
     if (state.interactionBound) return;
     const cb = () => {
       idle(() => restoreScripts(), 500);
-      UE.forEach((e) => {
+      for (const e of UE) {
         window.removeEventListener(e, cb, { passive: true });
-      });
+      }
       state.interactionBound = 0;
     };
-    UE.forEach((e) => {
+    for (const e of UE) {
       window.addEventListener(e, cb, { passive: true, once: true });
-    });
+    }
     state.interactionBound = 1;
   }
 
@@ -891,9 +910,7 @@
             addHint("preconnect", url.origin);
           }
         } catch (e) {
-          if (cfg.log) {
-            log("Origin extract error", e);
-          }
+          log("Origin extract error:", e);
         }
       });
   }
@@ -951,17 +968,23 @@
     document.querySelectorAll("meta").forEach((meta) => {
       const name = (meta.getAttribute("name") || "").toLowerCase();
       const prop = meta.getAttribute("property") || "";
-      if (C.TRACKER_META.some((t) => name.includes(t)) || prop.startsWith("fb:")) meta.remove();
+      if (C.TRACKER_META.some((t) => name.includes(t)) || prop.startsWith("fb:")) {
+        meta.remove();
+      }
     });
     document.querySelectorAll("script").forEach((s) => {
       const src = s.getAttribute("src");
-      if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) s.remove();
+      if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) {
+        s.remove();
+      }
     });
     document.querySelectorAll("noscript").forEach((n) => {
       n.remove();
     });
     document.querySelectorAll("p").forEach((p) => {
-      if (p.innerHTML.trim() === "&nbsp;") p.remove();
+      if (p.innerHTML.trim() === "&nbsp;") {
+        p.remove();
+      }
     });
   }
 

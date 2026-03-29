@@ -1,11 +1,16 @@
 import unittest
+import sys
 import io
 import tempfile
 from pathlib import Path
 import hashlib
 from unittest.mock import patch
 
-from Scripts.common import sanitize_filename, is_valid_domain, read_lines
+# Add current directory to path
+if str(Path(__file__).parent) not in sys.path:
+    sys.path.append(str(Path(__file__).parent))
+
+from common import sanitize_filename, is_valid_domain, is_adguard_rule, read_lines
 
 
 class TestCommon(unittest.TestCase):
@@ -98,8 +103,27 @@ class TestCommon(unittest.TestCase):
                 self.assertIsNone(lines)
                 self.assertIn(f"Error reading {non_existent}", mock_stderr.getvalue())
 
+    def test_read_lines(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+            target_file = temp_dir_path / "test.txt"
+            target_file.write_text("line1 \nline2\r\nline3", encoding="utf-8")
+
+            lines = read_lines(target_file)
+            self.assertEqual(lines, ["line1", "line2", "line3"])
+
+    def test_read_lines_file_not_found(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+            non_existent = temp_dir_path / "missing.txt"
+
+            with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
+                lines = read_lines(non_existent)
+                self.assertIsNone(lines)
+                self.assertIn(f"Error reading {non_existent}", mock_stderr.getvalue())
+
     def test_write_lines_atomic(self):
-        from Scripts.common import write_lines
+        from common import write_lines
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)

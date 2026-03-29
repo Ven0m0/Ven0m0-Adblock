@@ -44,21 +44,7 @@ IMPROVEMENTS OVER ORIGINALS:
   }
 
   // Promise isolation (YouTube hacks Promise in some browsers)
-  const PromiseConstructor = (async () => {})().constructor;
-
-  // Polymer Engine Flags Optimization
-  function _updateEngineFlags() {
-    const flags = window.yt?.config_?.EXPERIMENT_FLAGS || window.ytcfg?.get("EXPERIMENT_FLAGS");
-    if (flags) {
-      if (CONFIG.disableAnimations) {
-        flags.polymer_animations_disabled = true;
-        flags.web_supports_animations_api = false;
-      }
-      // Speed up component loading
-      flags.kevlar_tuna_streaming_initial_data = true;
-      flags.kevlar_early_data_prefetch = true;
-    }
-  }
+  const IsolatedPromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -194,16 +180,19 @@ IMPROVEMENTS OVER ORIGINALS:
         return topLastTimeUpdate >= 1 ? () => top.lastTimeUpdate : () => window.lastTimeUpdate;
       })();
 
+      const PromiseConstructor = (executor) => new IsolatedPromise(executor);
+
       const ExternalPromise = (() => {
-        let resolve_, reject_;
+        let resolve_;
+        let reject_;
         const handler = (resolve, reject) => {
           resolve_ = resolve;
           reject_ = reject;
         };
         const PromiseExternal = (cb) => {
-          cb = cb || handler;
-          const promise = new PromiseConstructor(cb);
-          if (cb === handler) {
+          const callback = cb || handler;
+          const promise = new PromiseConstructor(callback);
+          if (callback === handler) {
             promise.resolve = resolve_;
             promise.reject = reject_;
           }
@@ -238,11 +227,12 @@ IMPROVEMENTS OVER ORIGINALS:
                 return new PromiseConstructor(waitForFrame).then(waitForDocument);
               }
               const root = document.documentElement;
-            if (root) root.appendChild(noscriptElement);
-              if (blobURL)
+              root.appendChild(noscriptElement);
+              if (blobURL) {
                 PromiseConstructor.resolve().then(() => {
                   URL.revokeObjectURL(blobURL);
                 });
+              }
 
               removeFrame = (setTimeout) => {
                 const removeFrameWhenReady = (e) => {
@@ -501,12 +491,12 @@ IMPROVEMENTS OVER ORIGINALS:
     // Disable WebLock (experimental feature that can block tabs)
     if (navigator.locks) {
       navigator.locks.query = () =>
-        new Promise((resolve) => {
+        new IsolatedPromise((resolve) => {
           resolve({ held: [], pending: [] });
         });
 
       navigator.locks.request = () =>
-        new Promise((resolve) => {
+        new IsolatedPromise((resolve) => {
           resolve();
         });
     }
@@ -661,7 +651,7 @@ IMPROVEMENTS OVER ORIGINALS:
           url.includes("/beacon/") ||
           url.includes("/ptracking"))
       ) {
-        return Promise.reject(new Error("Blocked by YouTube Optimizer"));
+        return IsolatedPromise.reject(new Error("Blocked by YouTube Optimizer"));
       }
       return originalFetch.apply(this, args);
     };

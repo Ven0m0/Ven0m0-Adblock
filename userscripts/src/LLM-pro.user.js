@@ -91,11 +91,10 @@
   };
   if (isCGPT) {
     const of = window.fetch;
-    window.fetch = function (...args) {
-      const i = args[0];
+    window.fetch = function (i, ...args) {
       const u = typeof i === "string" ? i : i.url;
-      if (!CFG.CHATGPT.API.test(u)) return of.apply(this, args);
-      return of.apply(this, args).then(async (r) => {
+      if (!CFG.CHATGPT.API.test(u)) return of.call(this, i, ...args);
+      return of.call(this, i, ...args).then(async (r) => {
         try {
           const d = await r.clone().json();
           const nm = [];
@@ -169,7 +168,7 @@
       const msgs = document.querySelectorAll(SEL.CGPT.TURN);
       if (msgs.length > CFG.CHATGPT.MAX) {
         msgs.forEach((el, i) => {
-          if (i >= CFG.CHATGPT.MAX) {
+          if (i < msgs.length - CFG.CHATGPT.MAX) {
             el.remove();
           }
         });
@@ -276,7 +275,7 @@
       const m = document.querySelectorAll(SEL.CLAUDE.RENDER);
       if (m.length > CFG.CLAUDE.MAX) {
         m.forEach((el, i) => {
-          if (i >= CFG.CLAUDE.MAX) {
+          if (i < m.length - CFG.CLAUDE.MAX) {
             el.remove();
           }
         });
