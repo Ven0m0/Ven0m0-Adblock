@@ -1,4 +1,7 @@
 name: AGLint
+permissions:
+  contents: read
+  packages: read
 env:
   NODE_VERSION: 25
 

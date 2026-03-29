@@ -1,7 +1,12 @@
 import unittest
 
 # Add current directory to path to allow importing deduplicate
-from Scripts.deduplicate import process_content, is_header, is_valid_rule
+from Scripts.deduplicate import (
+    process_content,
+    is_header,
+    is_valid_rule,
+    find_cross_file_duplicates,
+)
 
 
 class TestDeduplicate(unittest.TestCase):
@@ -76,6 +81,42 @@ class TestDeduplicate(unittest.TestCase):
         self.assertFalse(is_valid_rule("||invalid^"))
         self.assertFalse(is_valid_rule("||-start.com^"))
         self.assertFalse(is_valid_rule("||end-.com^"))
+
+    def test_find_cross_file_duplicates(self):
+        file_rules = {
+            "file1.txt": ["rule1", "rule2", "rule3"],
+            "file2.txt": ["rule2", "rule4"],
+            "file3.txt": ["rule3", "rule4", "rule1", ""],
+        }
+
+        duplicates = find_cross_file_duplicates(file_rules)
+
+        # rule1: file1, file3
+        # rule2: file1, file2
+        # rule3: file1, file3
+        # rule4: file2, file3
+        # "" should be ignored
+
+        self.assertIn("rule1", duplicates)
+        self.assertEqual(sorted(duplicates["rule1"]), ["file1.txt", "file3.txt"])
+
+        self.assertIn("rule2", duplicates)
+        self.assertEqual(sorted(duplicates["rule2"]), ["file1.txt", "file2.txt"])
+
+        self.assertIn("rule3", duplicates)
+        self.assertEqual(sorted(duplicates["rule3"]), ["file1.txt", "file3.txt"])
+
+        self.assertIn("rule4", duplicates)
+        self.assertEqual(sorted(duplicates["rule4"]), ["file2.txt", "file3.txt"])
+
+        self.assertEqual(len(duplicates), 4)
+
+        # Case with no duplicates
+        file_rules_no_dupes = {
+            "file1.txt": ["a", "b"],
+            "file2.txt": ["c", "d"],
+        }
+        self.assertEqual(find_cross_file_duplicates(file_rules_no_dupes), {})
 
 
 if __name__ == "__main__":

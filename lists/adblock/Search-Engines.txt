@@ -43,7 +43,6 @@
 ! Google Search - AI Overview
 ! Removing miles from dual-unit distance measurements in Google Maps (uBO and AdGuard only)
 ! Removes imperial measurements from multi-unit displays
-!#endif
 !#if !adguard_ext_android_cb
 !#if !env_mv3
 !#if !ext_ubol
@@ -93,3 +92,6 @@ sveip.no##.wmsb_f
 weather.gov###myfcst-tempf
 weather.gov#?#p[class^=myforecast-current-]:has-text(°F)
 ||fundingchoicesmessages.google.com^$script,important
+!#endif
+!#endif
+!#endif

@@ -1,5 +1,4 @@
 import unittest
-import importlib
 
 # Import ADGUARD_INDICATORS from common
 from Scripts.common import ADGUARD_INDICATORS

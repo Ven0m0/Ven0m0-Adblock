@@ -1,5 +1,7 @@
 # GitHub Copilot Instructions - Ven0m0-Adblock
 
+@../AGENTS.md
+
 ## Project Overview
 
 **Ven0m0-Adblock** is an ad-blocking filter list and userscript project.
@@ -27,6 +29,7 @@
 | Path | Reason |
 |------|--------|
 | `lists/releases/` | Rebuilt from `lists/adblock/` |
+| `lists/sources/` | Auto-normalized mirrors of adblock sources |
 | `lists/external/` | Downloaded from upstream |
 | `userscripts/dist/` | Rebuilt from `userscripts/src/` |
 | `Filters/` | Compiled from `lists/hostlist/` |
@@ -41,6 +44,7 @@
 **Python:**
 - Python 3.13+, managed with UV
 - Formatting and linting enforced by ruff
+- Script names use `snake_case.py` (e.g. `update_lists.py`, `move_pure_domains.py`)
 
 **Shell Scripts:**
 - Bash strict mode: `set -Eeuo pipefail`
@@ -49,7 +53,7 @@
 
 **Filter Lists (AdGuard/uBlock syntax):**
 - One rule per line; `!` for comments
-- Group related rules; check for duplicates before adding
+- Group related rules; check for duplicates with `rg` before adding
 
 **UserScript Headers:**
 ```javascript
@@ -106,6 +110,9 @@ python3 -m unittest discover Scripts/ 'test_*.py'
 ### Add Filter Rule
 
 ```
+# Check for duplicates first
+rg "example.com" lists/adblock/
+
 # Edit: lists/adblock/Youtube.txt (or appropriate file)
 ! Block example ads
 ||example.com/ads/*
@@ -119,6 +126,9 @@ bun run build:adblock
 ### Add Hostlist/DNS Rule
 
 ```
+# Check for duplicates first
+rg "example.com" lists/hostlist/
+
 # Edit: lists/hostlist/Ads.txt (or appropriate file)
 ||trackers.example.com^
 
@@ -148,7 +158,7 @@ bun run build:hosts
 
 ```bash
 mise install && bun install   # Install all tools and dependencies
-uv sync                        # Install Python dependencies
+uv sync                       # Install Python dependencies
 ```
 
 ## Repository Structure
@@ -157,6 +167,7 @@ uv sync                        # Install Python dependencies
 lists/adblock/     # Adblock filter sources (EDIT)
 lists/hostlist/    # DNS/hostlist sources (EDIT)
 lists/releases/    # Built adblock filters (GENERATED)
+lists/sources/     # Normalized source mirrors (GENERATED)
 lists/external/    # Downloaded external lists (GENERATED)
 
 userscripts/src/   # Userscript sources (EDIT)
@@ -176,26 +187,28 @@ Filters/           # Compiled hostlist output (GENERATED)
 - **Shell:** shellcheck, shfmt
 - **Git hooks:** prek
 
-## CI/CD
+## CI/CD Workflows
 
 - `aglint.yml` — Filter lint on push/PR
-- `build-filter-lists.yml` — Daily filter builds
+- `build-filter-lists.yml` — Daily filter builds (push to main + 7:00 UTC)
 - `lint-and-format.yml` — Code quality on push/PR
-- `userscripts.yml` — Weekly userscript builds
+- `userscripts.yml` — Weekly userscript builds (Monday 00:00 UTC)
+- `automerge-open-prs.yml` — Auto-merge eligible PRs
+- `dependabot-auto-merge.yml` — Auto-merge Dependabot updates
 - All workflows use Mise for tool management
 
 ## Best Practices
 
 **DO:**
 - Read files before proposing changes
+- Use `rg` to check for duplicate rules before adding
 - Run `bun run lint` after filter edits
-- Check for duplicate rules before adding
 - Use feature branches (never commit to `main`)
 - Follow conventional commit messages
 - Run `bun run validate` before committing
 
 **DON'T:**
-- Edit generated directories (`lists/releases/`, `lists/external/`, `userscripts/dist/`, `Filters/`)
+- Edit generated directories (`lists/releases/`, `lists/sources/`, `lists/external/`, `userscripts/dist/`, `Filters/`)
 - Skip validation or linting
 - Remove comments without understanding their purpose
 - Add error handling for scenarios that can't happen

@@ -89,7 +89,7 @@ jobs:
             grep -oP 'https?://[^\s"]+\.user\.js' userscripts/list.txt | while IFS= read -r url; do
               filename=$(basename "$url" | tr -cd '[:alnum:]._-')
               printf 'Fetching: %s from %s\n' "$filename" "$url"
-              curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/src/$filename" "$url" || printf 'Failed to fetch %s\n' "$url"
+              curl -fsSL -A "Mozilla/5.0 Firefox/124.0" -o "userscripts/src/$filename" -- "$url" || printf 'Failed to fetch %s\n' "$url"
             done
           fi
       - name: Build userscripts
