@@ -116,7 +116,7 @@ download_userscripts(){
     dbg "Downloading $fn from $url"
     curl -fsSL -A "Mozilla/5.0 (Android 14; Mobile; rv:138.0) Gecko/138.0 Firefox/138.0" \
       -H "Accept-Language: en-US,en;q=0.9" \
-      -m 30 "$url" -o "$SCRIPT_SRC/$fn" || warn "Failed to download: $url"
+      -m 30 -o "$SCRIPT_SRC/$fn" -- "$url" || warn "Failed to download: $url"
   done < "$SCRIPT_LIST"
   ok "Downloaded to $SCRIPT_SRC/"
 }
