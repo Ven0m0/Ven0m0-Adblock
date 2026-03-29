@@ -165,12 +165,24 @@ IMPROVEMENTS OVER ORIGINALS:
     document.addEventListener(
       "paste",
       (e) => {
-        const textarea = document.activeElement;
-        if (textarea && textarea.tagName === "TEXTAREA") {
+        const active = document.activeElement;
+        const isTextInput = active && (active.tagName === "TEXTAREA" || active.tagName === "INPUT" || active.isContentEditable);
+        if (!isTextInput) return;
+
+        const dt = e.clipboardData;
+        if (!dt) return;
+
+        // Only modify plain text paste
+        if (dt.types.includes('text/plain') && !dt.types.includes('text/html')) {
           e.stopImmediatePropagation();
-          const text = e.clipboardData.getData("text/plain");
-          document.execCommand("insertText", false, text);
-          e.preventDefault();
+          let text = dt.getData('text/plain');
+
+          // Preserve multiple newlines better than default behavior
+          if (text.includes('\n')) {
+            text = text.replace(/\r\n/g, '\n');
+            document.execCommand("insertText", false, text);
+            e.preventDefault();
+          }
         }
       },
       true
