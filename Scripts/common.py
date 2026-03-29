@@ -75,8 +75,8 @@ def write_lines(filepath: Path, lines: list[str], mode: str = "w") -> bool:
     try:
         if mode == "a":
             with filepath.open(mode, encoding="utf-8", newline="\n") as f:
-                for line in lines:
-                    f.write(f"{line}\n")
+                if lines:
+                    f.write("\n".join(lines) + "\n")
             return True
 
         # Write to a temporary file in the same directory to ensure atomic replace
@@ -84,8 +84,8 @@ def write_lines(filepath: Path, lines: list[str], mode: str = "w") -> bool:
         fd, temp_path = tempfile.mkstemp(dir=filepath.parent, text=True)
         try:
             with open(fd, "w", encoding="utf-8", newline="\n") as f:
-                for line in lines:
-                    f.write(f"{line}\n")
+                if lines:
+                    f.write("\n".join(lines) + "\n")
 
             os.replace(temp_path, filepath)
             return True
