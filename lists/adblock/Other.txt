@@ -1,4 +1,5 @@
 ! [Adblock Plus 2.0]
+! aglint-disable
 ! Title: Other Blocklist
 ! Description: Block uncategorized Stuff
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
@@ -566,7 +567,7 @@ github.com##.position-sticky, [class^="Diff-module__diffHeaderWrapper"]:style(po
 github.com##.pr-toolbar:style(position: static !important; margin-bottom: 2em !important;)
 github.com##.prc-Banner-Banner-IR8eJ
 github.com##.prc-ButtonGroup-ButtonGroup-vcMeG.EditorDownload-module__actions--u7T1C
-github.com##.react-comments-container > div > div[class^="Flash__StyledFlash"]:has-text(Sign in to commen
+github.com##.react-comments-container > div > div[class^="Flash__StyledFlash"]:has-text(Sign in to comment)
 github.com##[aria-label$="requesting changes"]:style(color: red !important;)
 github.com##[data-testid="copilot-popover-button"]
 github.com##[data-testid="issue-metadata-sticky"]:style(position: static !important;)

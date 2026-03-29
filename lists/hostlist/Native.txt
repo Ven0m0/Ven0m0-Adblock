@@ -1,3 +1,4 @@
+! aglint-disable
 (\.|^)getpocket\.com$
 (\.|^)openthread\.thread\.home\.arpa$
 (\.|^)relay\.mozilla\.org$

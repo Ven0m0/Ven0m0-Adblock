@@ -39,7 +39,7 @@ download(){
   for url in ${HOSTS:-}; do
     ((n++))
     printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
-    "$DL" -fsSL "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed: $url"
+    "$DL" -fsSL -- "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed: $url"
   done
 }
 

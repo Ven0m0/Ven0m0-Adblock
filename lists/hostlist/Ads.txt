@@ -1,3 +1,4 @@
+! aglint-disable
 (\.|^)*-alert*\.
 (\.|^)*-alerts?\.
 (\.|^)*-analytic*\.

@@ -240,9 +240,9 @@
   // Google Captcha speedup
   if (cfg.captchaSpeed && /\/recaptcha\/(api2|enterprise)\/bframe/.test(location.href)) {
     const origST = setTimeout;
-    setTimeout = function (_fn, dur) {
-      if (dur === 4000 || dur === 50) dur = 0;
-      return origST.apply(this, arguments);
+    window.setTimeout = function (fn, dur, ...args) {
+      const d = dur === 4000 || dur === 50 ? 0 : dur;
+      return origST.call(this, fn, d, ...args);
     };
     document.head.appendChild(document.createElement("style")).textContent = "*{transition:none!important}";
   }
@@ -269,7 +269,11 @@
       HTMLCanvasElement.prototype.getContext = function (type, ...a) {
         return type === "webgl" || type === "webgl2" ? null : orig.call(this, type, ...a);
       };
-    } catch {}
+    } catch (e) {
+      if (cfg.log) {
+        log("WebGL block error:", e);
+      }
+    }
   }
 
   // CPU tamer / RAF tamer
@@ -325,28 +329,38 @@
 
     if (cfg.cpuTamer) {
       window.setTimeout = (fn, d = 0, ...a) => {
-        let id;
+        let tid; // eslint-disable-line prefer-const
         const w =
           typeof fn === "function"
-            ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+            ? (...x) => {
+                awaitTO(tid)
+                  .then((v) => {
+                    if (v) {
+                      fn(...x);
+                    }
+                  })
+                  .catch(throwE);
+              }
             : fn;
-        id = nTO(w, Math.max(d, cfg.minTimeout), ...a);
-        return id;
+        tid = nTO(w, Math.max(d, cfg.minTimeout), ...a);
+        return tid;
       };
       window.setInterval = (fn, d = 0, ...a) => {
-        let id;
+        let iid; // eslint-disable-line prefer-const
         const w =
           typeof fn === "function"
-            ? (...x) =>
-                awaitTO(id)
-                  .then((v) => v && fn(...x))
-                  .catch(throwE)
+            ? (...x) => {
+                awaitTO(iid)
+                  .then((v) => {
+                    if (v) {
+                      fn(...x);
+                    }
+                  })
+                  .catch(throwE);
+              }
             : fn;
-        id = nSI(w, Math.max(d, cfg.minInterval), ...a);
-        return id;
+        iid = nSI(w, Math.max(d, cfg.minInterval), ...a);
+        return iid;
       };
       window.clearTimeout = (id) => {
         toSet.delete(id);
@@ -376,25 +390,29 @@
       let lastFrame = 0;
 
       window.requestAnimationFrame = (fn) => {
-        let id;
+        let rid; // eslint-disable-line prefer-const
         const q = p;
         const w = (ts) => {
           if (frameMs) {
             const now = Date.now();
             if (now - lastFrame < frameMs) {
-              nCAF(id);
+              nCAF(rid);
               return;
             }
             lastFrame = now;
           }
           const s = tl.currentTime;
-          awaitRAF(id, q)
-            .then((v) => v && fn(ts + (tl.currentTime - s)))
+          awaitRAF(rid, q)
+            .then((v) => {
+              if (v) {
+                fn(ts + (tl.currentTime - s));
+              }
+            })
             .catch(throwE);
         };
         if (last !== p) micro(trig);
-        id = nRAF(w);
-        return id;
+        rid = nRAF(w);
+        return rid;
       };
       window.cancelAnimationFrame = (id) => {
         rafSet.delete(id);
@@ -564,9 +582,17 @@
       const url = new URL(location.href.replace("/ref=", "?ref="));
       if (canonicalAmazon(url)) return;
       let c = stripTracking(url);
-      for (const h of HASH) if (url.hash.startsWith(`#${h}`)) c = 1;
+      for (const h of HASH) {
+        if (url.hash.startsWith(`#${h}`)) {
+          c = 1;
+        }
+      }
       if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
-    } catch {}
+    } catch (e) {
+      if (cfg.log) {
+        log("URL clean error", e);
+      }
+    }
   }
 
   const cleanLinks = (() => {
@@ -575,29 +601,32 @@
     return throttle(() => {
       if (busy) return;
       busy = 1;
-      const links = document.querySelectorAll("a[href]:not([data-wp-cl])");
-      if (!links.length) {
+      try {
+        const links = document.querySelectorAll("a[href]:not([data-wp-cl])");
+        if (!links.length) return;
+        let i = 0;
+        const step = () => {
+          const end = Math.min(i + C.BATCH, links.length);
+          for (; i < end; i++) {
+            const a = links[i];
+            mark(a, "data-wp-cl");
+            try {
+              const h = a.href;
+              const hl = h?.toLowerCase();
+              if (!hl || hl.startsWith("javascript:") || hl.startsWith("data:") || hl.startsWith("vbscript:")) continue;
+              const u = new URL(h);
+              if (u.origin === location.origin) continue;
+              if (stripTracking(u)) a.href = u.href;
+            } catch (e) {
+              if (cfg.log) log("Link clean error", e);
+            }
+          }
+          if (i < links.length) idle(step);
+        };
+        step();
+      } finally {
         busy = 0;
-        return;
       }
-      let i = 0;
-      const step = () => {
-        const end = Math.min(i + C.BATCH, links.length);
-        for (; i < end; i++) {
-          const a = links[i];
-          mark(a, "data-wp-cl");
-          try {
-            const h = a.href;
-            if (!h || h.startsWith("javascript:")) continue;
-            const u = new URL(h);
-            if (u.origin === location.origin) continue;
-            if (stripTracking(u)) a.href = u.href;
-          } catch {}
-        }
-        if (i < links.length) idle(step);
-        else busy = 0;
-      };
-      step();
     }, C.TIME.THR_CLEAN);
   })();
 
@@ -720,7 +749,9 @@
         { rootMargin: C.IO_MARGIN }
       );
     }
-    vids.forEach((v) => state.videoObserver.observe(v));
+    vids.forEach((v) => {
+      state.videoObserver.observe(v);
+    });
   }
 
   function optimizeVids() {
@@ -819,10 +850,14 @@
     if (state.interactionBound) return;
     const cb = () => {
       idle(() => restoreScripts(), 500);
-      UE.forEach((e) => window.removeEventListener(e, cb, { passive: true }));
+      UE.forEach((e) => {
+        window.removeEventListener(e, cb, { passive: true });
+      });
       state.interactionBound = 0;
     };
-    UE.forEach((e) => window.addEventListener(e, cb, { passive: true, once: true }));
+    UE.forEach((e) => {
+      window.addEventListener(e, cb, { passive: true, once: true });
+    });
     state.interactionBound = 1;
   }
 
@@ -855,7 +890,11 @@
             state.origins.add(url.origin);
             addHint("preconnect", url.origin);
           }
-        } catch {}
+        } catch (e) {
+          if (cfg.log) {
+            log("Origin extract error", e);
+          }
+        }
       });
   }
 
@@ -891,7 +930,9 @@
     if (!cfg.blockPrefetchLinks) return;
     document
       .querySelectorAll('link[rel="prefetch"]:not([data-wp-hint]),link[rel="preload"]:not([data-wp-hint])')
-      .forEach((l) => l.remove());
+      .forEach((l) => {
+        l.remove();
+      });
   }
 
   // YouTube privacy
@@ -916,7 +957,9 @@
       const src = s.getAttribute("src");
       if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) s.remove();
     });
-    document.querySelectorAll("noscript").forEach((n) => n.remove());
+    document.querySelectorAll("noscript").forEach((n) => {
+      n.remove();
+    });
     document.querySelectorAll("p").forEach((p) => {
       if (p.innerHTML.trim() === "&nbsp;") p.remove();
     });
@@ -1038,6 +1081,23 @@
   function showUI() {
     const ID = "wp-panel";
     if (document.getElementById(ID)) return;
+
+    const panel = document.createElement("div");
+    panel.id = ID;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      #${ID}{font-family:sans-serif;position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(4px)}
+      .wp-modal{background:#1e1e1e;color:#eee;border-radius:10px;padding:20px;max-width:480px;width:92%;max-height:85vh;overflow-y:auto}
+      .wp-modal h2{margin:0 0 14px;font-size:1.05em;border-bottom:1px solid #444;padding-bottom:8px}
+      .wp-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;cursor:pointer;font-size:.88em;line-height:1.4}
+      .wp-row input{margin-top:2px;flex-shrink:0}
+      .wp-note{font-size:.78em;color:#888;margin:6px 0 0}
+      .wp-modal button{background:#0070f3;color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;padding:8px;margin-top:10px;font-size:.9em}
+      .wp-modal button:hover{background:#0058c4}
+    `;
+    panel.appendChild(style);
+
     const LABELS = {
       log: "Debug logging",
       lazy: "Lazy-load images",
@@ -1072,34 +1132,47 @@
       pauseGIFs: "Freeze GIF animations",
       siteToggle: "Show per-site disable button"
     };
-    const rows = Object.entries(LABELS)
-      .map(
-        ([k, label]) =>
-          `<label class="wp-row"><input type="checkbox" data-k="${k}" ${cfg[k] ? "checked" : ""}><span>${label}</span></label>`
-      )
-      .join("");
 
-    const panel = document.createElement("div");
-    panel.id = ID;
-    panel.innerHTML = `<style>
-#${ID}{font-family:sans-serif;position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(4px)}
-.wp-modal{background:#1e1e1e;color:#eee;border-radius:10px;padding:20px;max-width:480px;width:92%;max-height:85vh;overflow-y:auto}
-.wp-modal h2{margin:0 0 14px;font-size:1.05em;border-bottom:1px solid #444;padding-bottom:8px}
-.wp-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;cursor:pointer;font-size:.88em;line-height:1.4}
-.wp-row input{margin-top:2px;flex-shrink:0}
-.wp-note{font-size:.78em;color:#888;margin:6px 0 0}
-.wp-modal button{background:#0070f3;color:#fff;border:none;border-radius:6px;cursor:pointer;width:100%;padding:8px;margin-top:10px;font-size:.9em}
-.wp-modal button:hover{background:#0058c4}
-</style><div class="wp-modal"><h2>⚡ Web Pro v6</h2>${rows}<p class="wp-note">Changes take effect on next page load.</p><button id="wp-close">Close</button></div>`;
+    const modal = document.createElement("div");
+    modal.className = "wp-modal";
 
-    document.body.appendChild(panel);
-    panel.querySelector("#wp-close").onclick = () => panel.remove();
-    panel.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+    const h2 = document.createElement("h2");
+    h2.textContent = "⚡ Web Pro v6";
+    modal.appendChild(h2);
+
+    Object.entries(LABELS).forEach(([k, label]) => {
+      const row = document.createElement("label");
+      row.className = "wp-row";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.dataset.k = k;
+      cb.checked = !!cfg[k];
       cb.onchange = (e) => {
         cfg[e.target.dataset.k] = e.target.checked ? 1 : 0;
         saveCfg();
       };
+
+      const span = document.createElement("span");
+      span.textContent = label;
+
+      row.append(cb, span);
+      modal.appendChild(row);
     });
+
+    const note = document.createElement("p");
+    note.className = "wp-note";
+    note.textContent = "Changes take effect on next page load.";
+    modal.appendChild(note);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.id = "wp-close";
+    closeBtn.textContent = "Close";
+    closeBtn.onclick = () => panel.remove();
+    modal.appendChild(closeBtn);
+
+    panel.appendChild(modal);
+    document.body.appendChild(panel);
   }
 
   // Per-site toggle

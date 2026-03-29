@@ -37,24 +37,11 @@ ADGUARD_INDICATORS: Final[list[str]] = [
     "~",
     "|",
 ]
-ADGUARD_INDICATORS_REGEX: Final[re.Pattern] = re.compile(
-    "|".join(map(re.escape, ADGUARD_INDICATORS))
-)
 
 
 def is_valid_domain(domain: str) -> bool:
     """Check if a string is a valid domain name."""
     return bool(DOMAIN_PATTERN.match(domain))
-
-
-def is_adguard_rule(line: str) -> bool:
-    """
-    Check if a line contains AdGuard/uBlock Origin syntax indicators.
-    Returns True if it looks like a rule, False if it might be a pure domain or something else.
-    """
-    if ADGUARD_INDICATORS_REGEX.search(line):
-        return True
-    return False
 
 
 def sanitize_filename(url: str, name: str | None = None) -> str:

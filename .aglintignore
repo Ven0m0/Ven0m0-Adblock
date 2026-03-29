@@ -1,1 +1,36 @@
-# Todo: add proper ignore file
+# Node/Bun dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+lists/releases/
+Filters/
+*.min.js
+
+# Python environments
+venv/
+.venv/
+__pycache__/
+
+# Version control
+.git/
+
+# Cache files
+.aglintcache
+.eslintcache
+
+# Project-specific ignores
+# Ignore userscripts as they are handled by eslint/biome
+userscripts/
+# Ignore hostlists that may use pure regex/domain formats not fully compatible with standard adblock linter
+lists/hostlist/
+# Ignore external sources
+lists/external/
+# Ignore raw sources if they are just downloaded/unprocessed lists
+lists/sources/
+
+# Logs and temporary files
+*.log
+*.tmp
+logs/

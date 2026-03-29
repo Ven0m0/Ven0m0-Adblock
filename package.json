@@ -32,7 +32,7 @@
     "aglint": "bunx aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\""
   },
   "devDependencies": {
-    "@adguard/aglint": "*",
+    "@adguard/aglint": "^3.0.2",
     "@adguard/dead-domains-linter": "*",
     "@adguard/hostlist-compiler": "*",
     "@biomejs/biome": "*",
@@ -73,5 +73,11 @@
     "web-enhancement"
   ],
   "author": "Ven0m0",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "overrides": {
+    "axios": ">=1.6.0",
+    "follow-redirects": ">=1.15.11",
+    "tldts": "7.0.27",
+    "tldts-core": "7.0.27"
+  }
 }

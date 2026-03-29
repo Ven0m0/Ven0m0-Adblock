@@ -18,7 +18,6 @@
 ! Get bits button
 ! Misc
 ! www.twitch.tv/esl_dota2
-!#endif
 !#if cap_html_filtering
 clips.twitch.tv#?#.clips-chat-replay > .tw-mg-b-1:style(margin-bottom: 2px !important)
 clips.twitch.tv#?#.clips-watch.tw-lg-pd-b-5.tw-pd-b-2.tw-sm-pd-b-3:style(max-width: none)
@@ -48,3 +47,4 @@ www.twitch.tv#?#.tw-flex-shrink-0.tw-full-width.tw-pd-b-2.tw-pd-t-1.tw-pd-x-2.vi
 www.twitch.tv#?#.tw-pd-r-1.tw-pd-l-2.tw-justify-content-between.tw-full-width:style(height: 2rem)
 www.twitch.tv#?#.tw-textarea.tw-textarea--no-resize:style(padding: 1px 35px !important; height: 55px !important)
 www.twitch.tv#?#.video-chat__header:style(height: 20px !important)
+!#endif
