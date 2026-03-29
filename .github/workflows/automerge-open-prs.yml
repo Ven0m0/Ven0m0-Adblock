@@ -1,0 +1,39 @@
+name: 🔀 Auto-merge Open PRs
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+
+concurrency:
+  group: ${{ github.workflow }}-main
+  cancel-in-progress: false
+
+jobs:
+  merge-open-prs:
+    name: Merge Open Pull Requests
+    runs-on: ubuntu-latest
+    env:
+      # Prefer PAT when branch protection or cross-repository branch updates exceed GITHUB_TOKEN.
+      GH_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+      BASE_BRANCH: main
+      # These aggressive defaults intentionally match the issue requirement to merge every open PR.
+      CONFLICT_STRATEGY: ours
+      ALLOW_ADMIN_MERGE: "true"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Merge open pull requests
+        run: bash ./Scripts/automerge-open-prs.sh

@@ -1,7 +1,7 @@
 import unittest
 import importlib.util
 from pathlib import Path
-from unittest.mock import Mock, mock_open
+from unittest.mock import Mock
 
 # Import the module dynamically
 file_path = Path(__file__).parent / "move_pure_domains.py"
@@ -76,8 +76,7 @@ another-pure.net
         # Mock the open() context manager
         # Since the code does `with adblock_file.open(...) as f:`, we need to mock the return value of open()
         # mock_open returns a file object that also acts as a context manager
-        mock_file_handle = mock_open(read_data=content)
-        mock_file.open.side_effect = mock_file_handle
+        mock_file.read_text.return_value = content
 
         # Create a mock directory object
         mock_dir = Mock(spec=Path)
@@ -112,8 +111,7 @@ another-pure.net
         mock_file = Mock(spec=Path)
         mock_file.name = "spotify_ads.txt"
         content = "spotify-tracker.com\n"
-        mock_file_handle = mock_open(read_data=content)
-        mock_file.open.side_effect = mock_file_handle
+        mock_file.read_text.return_value = content
 
         mock_dir = Mock(spec=Path)
         mock_dir.glob.return_value = [mock_file]

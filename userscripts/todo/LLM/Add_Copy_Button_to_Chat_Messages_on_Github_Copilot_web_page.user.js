@@ -177,7 +177,9 @@
    */
   function processExistingMessages() {
     const messageElements = document.querySelectorAll(`.${CHAT_MESSAGE_CONTENT_CLASS}`);
-    messageElements.forEach((messageElement) => addCopyButton(messageElement));
+    messageElements.forEach((messageElement) => {
+      addCopyButton(messageElement);
+    });
   }
 
   /**

@@ -37,7 +37,7 @@ CONSOLIDATED FEATURES:
   }
 
   // Promise isolation (YouTube Music hacks Promise in some browsers)
-  const Promise = (async () => {})().constructor;
+  const NativePromise = (async () => {})().constructor;
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -262,7 +262,9 @@ CONSOLIDATED FEATURES:
 
       // Observe thumbnails
       const observeImages = () => {
-        document.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+        document.querySelectorAll("img[data-src]").forEach((img) => {
+          observer.observe(img);
+        });
       };
 
       // Initial observation
@@ -272,8 +274,46 @@ CONSOLIDATED FEATURES:
         window.addEventListener("load", observeImages);
       }
 
-      // Observe dynamic content
-      new MutationObserver(observeImages).observe(document.body, {
+      const queuedNodes = new Set();
+      let isScheduled = false;
+
+      const processQueuedNodes = () => {
+        isScheduled = false;
+        const nodesToProcess = Array.from(queuedNodes);
+        queuedNodes.clear();
+
+        // Deduplicate: Remove nodes that are descendants of other nodes in the queue
+        const rootNodes = nodesToProcess.filter(
+          (node) => !nodesToProcess.some((otherNode) => otherNode !== node && otherNode.contains(node))
+        );
+
+        rootNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.tagName === "IMG" && node.dataset.src) {
+              observer.observe(node);
+            }
+            node.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+          }
+        });
+      };
+
+      // Observe dynamic content efficiently
+      new MutationObserver((mutations) => {
+        let hasNewNodes = false;
+        for (const mutation of mutations) {
+          for (const node of mutation.addedNodes) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              queuedNodes.add(node);
+              hasNewNodes = true;
+            }
+          }
+        }
+
+        if (hasNewNodes && !isScheduled) {
+          isScheduled = true;
+          requestAnimationFrame(processQueuedNodes);
+        }
+      }).observe(document.body, {
         childList: true,
         subtree: true
       });
