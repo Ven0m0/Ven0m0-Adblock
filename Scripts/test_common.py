@@ -5,7 +5,7 @@ from pathlib import Path
 import hashlib
 from unittest.mock import patch
 
-from Scripts.common import sanitize_filename, is_valid_domain, is_adguard_rule, read_lines
+from Scripts.common import sanitize_filename, is_valid_domain, read_lines
 
 
 class TestCommon(unittest.TestCase):
@@ -78,12 +78,6 @@ class TestCommon(unittest.TestCase):
         self.assertFalse(is_valid_domain("-start.com"))
         self.assertFalse(is_valid_domain("end-.com"))
         self.assertFalse(is_valid_domain("http://example.com"))
-
-    def test_is_adguard_rule(self):
-        self.assertTrue(is_adguard_rule("||example.com^"))
-        self.assertTrue(is_adguard_rule("example.com##.ad"))
-        self.assertTrue(is_adguard_rule("! comment"))
-        self.assertFalse(is_adguard_rule("example.com"))
 
     def test_read_lines(self):
         with tempfile.TemporaryDirectory() as temp_dir:
