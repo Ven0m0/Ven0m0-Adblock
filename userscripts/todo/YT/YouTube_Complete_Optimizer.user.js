@@ -34,6 +34,9 @@ IMPROVEMENTS OVER ORIGINALS:
 */
 
 (function () {
+  // Polymer Engine Optimization: Skip initial wait
+  window.polymerSkipWait = true;
+
   // Emergency disable
   if (localStorage.getItem("disable_yt_complete_optimizer") === "1") {
     console.warn("[YouTube Complete Optimizer]: Disabled by user");
@@ -42,6 +45,20 @@ IMPROVEMENTS OVER ORIGINALS:
 
   // Promise isolation (YouTube hacks Promise in some browsers)
   const PromiseConstructor = (async () => {})().constructor;
+
+  // Polymer Engine Flags Optimization
+  function _updateEngineFlags() {
+    const flags = window.yt?.config_?.EXPERIMENT_FLAGS || window.ytcfg?.get("EXPERIMENT_FLAGS");
+    if (flags) {
+      if (CONFIG.disableAnimations) {
+        flags.polymer_animations_disabled = true;
+        flags.web_supports_animations_api = false;
+      }
+      // Speed up component loading
+      flags.kevlar_tuna_streaming_initial_data = true;
+      flags.kevlar_early_data_prefetch = true;
+    }
+  }
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
@@ -67,18 +84,6 @@ IMPROVEMENTS OVER ORIGINALS:
     instantNavigation: GM_getValue("yt_instant_nav", true),
     blockTracking: GM_getValue("yt_block_tracking", true)
   };
-
-  function _saveConfig() {
-    GM_setValue("yt_block_av1", CONFIG.blockAV1);
-    GM_setValue("yt_cpu_tamer", CONFIG.enableCPUTamer);
-    GM_setValue("yt_resource_opt", CONFIG.enableResourceOptimization);
-    GM_setValue("yt_disable_animations", CONFIG.disableAnimations);
-    GM_setValue("yt_hide_shorts", CONFIG.hideShorts);
-    GM_setValue("yt_hide_comments", CONFIG.hideComments);
-    GM_setValue("yt_hide_sidebar", CONFIG.hideSidebar);
-    GM_setValue("yt_instant_nav", CONFIG.instantNavigation);
-    GM_setValue("yt_block_tracking", CONFIG.blockTracking);
-  }
 
   // ═══════════════════════════════════════════════════════════
   // MODULE 1: AV1 CODEC BLOCKER
@@ -128,8 +133,11 @@ IMPROVEMENTS OVER ORIGINALS:
         return this.getItem("yt-player-av1-pref");
       },
       set(newValue) {
-        if (this === localStorage) return true; // Block writes
-        return this.setItem("yt-player-av1-pref", newValue);
+        if (this === localStorage) {
+          // Block writes
+        } else {
+          this.setItem("yt-player-av1-pref", newValue);
+        }
       },
       enumerable: true,
       configurable: true
@@ -144,7 +152,7 @@ IMPROVEMENTS OVER ORIGINALS:
 
   if (CONFIG.enableCPUTamer) {
     ((o) => {
-      const [_setTimeout_, _setInterval_, requestAnimationFrame_, _clearTimeout_, _clearInterval_] = o;
+      const [, , requestAnimationFrame_] = o;
       const win = this instanceof Window ? this : window;
 
       // Duplicate detection
@@ -157,7 +165,7 @@ IMPROVEMENTS OVER ORIGINALS:
         try {
           const canvas = document.createElement("canvas");
           return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
-        } catch (_e) {
+        } catch {
           return false;
         }
       })();
@@ -180,7 +188,9 @@ IMPROVEMENTS OVER ORIGINALS:
         let topLastTimeUpdate = -1;
         try {
           topLastTimeUpdate = top.lastTimeUpdate;
-        } catch {}
+        } catch {
+          // Ignore cross-origin errors
+        }
         return topLastTimeUpdate >= 1 ? () => top.lastTimeUpdate : () => window.lastTimeUpdate;
       })();
 
@@ -228,7 +238,7 @@ IMPROVEMENTS OVER ORIGINALS:
                 return new PromiseConstructor(waitForFrame).then(waitForDocument);
               }
               const root = document.documentElement;
-              root.appendChild(noscriptElement);
+            if (root) root.appendChild(noscriptElement);
               if (blobURL)
                 PromiseConstructor.resolve().then(() => {
                   URL.revokeObjectURL(blobURL);
@@ -268,7 +278,7 @@ IMPROVEMENTS OVER ORIGINALS:
               for (const key in boundFunctions) boundFunctions[key] = boundFunctions[key].bind(win);
               if (removeFrame) PromiseConstructor.resolve(boundFunctions.setTimeout).then(removeFrame);
               resolve(boundFunctions);
-            } catch (_e) {
+            } catch {
               if (removeFrame) removeFrame();
               resolve(null);
             }
@@ -461,7 +471,9 @@ IMPROVEMENTS OVER ORIGINALS:
             win.setInterval.toString = setInterval.toString.bind(setInterval);
             win.clearTimeout.toString = clearTimeout.toString.bind(clearTimeout);
             win.clearInterval.toString = clearInterval.toString.bind(clearInterval);
-          } catch (_e) {}
+          } catch {
+            // Some browsers block overriding toString
+          }
         })();
 
         let intervalInterrupter = null;
@@ -488,9 +500,6 @@ IMPROVEMENTS OVER ORIGINALS:
   if (CONFIG.enableResourceOptimization) {
     // Disable WebLock (experimental feature that can block tabs)
     if (navigator.locks) {
-      const _locksQuery_ = navigator.locks.query;
-      const _locksRequest_ = navigator.locks.request;
-
       navigator.locks.query = () =>
         new Promise((resolve) => {
           resolve({ held: [], pending: [] });
@@ -504,7 +513,6 @@ IMPROVEMENTS OVER ORIGINALS:
 
     // IndexedDB lifecycle management - auto-close after 18s idle
     if (window.indexedDB) {
-      const _idbOpen_ = window.indexedDB.open;
       const openKey = Symbol();
       const dbSet = new Set();
       let openCount = 0;
@@ -553,18 +561,37 @@ IMPROVEMENTS OVER ORIGINALS:
 
     if (CONFIG.disableAnimations) {
       css += `
-        * {
+        /* Disable animations except for critical feedback */
+        *:not(#progress):not(.ytp-load-progress):not(.ytp-spinner):not(.ytp-spinner-container) {
           transition: none !important;
           animation: none !important;
         }
         html {
           scroll-behavior: auto !important;
         }
+        /* Hide interaction overlays for better performance */
+        yt-interaction, paper-ripple {
+          display: none !important;
+        }
+        /* Optimize rendering of heavy sections */
+        #comments, #related, ytd-watch-next-secondary-results-renderer {
+          content-visibility: auto;
+          contain-intrinsic-size: 1px 1000px;
+        }
       `;
     }
 
     if (CONFIG.hideShorts) {
-      css += "ytd-rich-section-renderer { display: none !important; }";
+      css += `
+        ytd-rich-section-renderer,
+        ytd-reel-shelf-renderer,
+        ytd-rich-shelf-renderer[is-shorts],
+        #endpoint[title="Shorts"],
+        a[title="Shorts"],
+        ytd-mini-guide-entry-renderer[aria-label="Shorts"] {
+          display: none !important;
+        }
+      `;
     }
 
     if (CONFIG.hideComments) {
@@ -644,6 +671,44 @@ IMPROVEMENTS OVER ORIGINALS:
   // ═══════════════════════════════════════════════════════════
   // INITIALIZATION
   // ═══════════════════════════════════════════════════════════
+
+  // Apply engine flags
+  _updateEngineFlags();
+
+  // Unified MutationObserver for dynamic fixes
+  const _unifiedObserver = new MutationObserver((mutations) => {
+    // Re-apply engine flags if head changed
+    if (mutations.some((m) => m.target.tagName === "HEAD")) {
+      _updateEngineFlags();
+    }
+
+    // Shorts redirection
+    if (CONFIG.hideShorts && location.pathname.startsWith("/shorts/")) {
+      const videoId = location.pathname.split("/")[2];
+      if (videoId) {
+        window.location.replace("/watch?v=" + videoId);
+      }
+    }
+  });
+
+  if (document.documentElement) {
+    _unifiedObserver.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: false
+    });
+  }
+
+  window.addEventListener("yt-navigate-finish", () => {
+    _updateEngineFlags();
+    // Extra check for Shorts redirection on SPA navigation
+    if (CONFIG.hideShorts && location.pathname.startsWith("/shorts/")) {
+      const videoId = location.pathname.split("/")[2];
+      if (videoId) {
+        window.location.replace("/watch?v=" + videoId);
+      }
+    }
+  });
 
   console.info(
     "[YouTube Complete Optimizer] Initialized (" +
