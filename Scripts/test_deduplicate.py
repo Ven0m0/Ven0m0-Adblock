@@ -84,39 +84,28 @@ class TestDeduplicate(unittest.TestCase):
 
     def test_find_cross_file_duplicates(self):
         file_rules = {
-            "file1.txt": ["rule1", "rule2", "rule3"],
-            "file2.txt": ["rule2", "rule4"],
-            "file3.txt": ["rule3", "rule4", "rule1", ""],
+            "file1.txt": ["rule1.com", "rule2.com", "  rule3.com  "],
+            "file2.txt": ["rule2.com", "rule4.com"],
+            "file3.txt": ["rule3.com", "rule5.com", "  "],
         }
 
         duplicates = find_cross_file_duplicates(file_rules)
 
-        # rule1: file1, file3
-        # rule2: file1, file2
-        # rule3: file1, file3
-        # rule4: file2, file3
-        # "" should be ignored
-
-        self.assertIn("rule1", duplicates)
-        self.assertEqual(sorted(duplicates["rule1"]), ["file1.txt", "file3.txt"])
-
-        self.assertIn("rule2", duplicates)
-        self.assertEqual(sorted(duplicates["rule2"]), ["file1.txt", "file2.txt"])
-
-        self.assertIn("rule3", duplicates)
-        self.assertEqual(sorted(duplicates["rule3"]), ["file1.txt", "file3.txt"])
-
-        self.assertIn("rule4", duplicates)
-        self.assertEqual(sorted(duplicates["rule4"]), ["file2.txt", "file3.txt"])
-
-        self.assertEqual(len(duplicates), 4)
-
-        # Case with no duplicates
-        file_rules_no_dupes = {
-            "file1.txt": ["a", "b"],
-            "file2.txt": ["c", "d"],
+        # rule2.com is in file1 and file2
+        # rule3.com is in file1 and file3 (due to stripping)
+        expected = {
+            "rule2.com": ["file1.txt", "file2.txt"],
+            "rule3.com": ["file1.txt", "file3.txt"],
         }
-        self.assertEqual(find_cross_file_duplicates(file_rules_no_dupes), {})
+
+        self.assertEqual(duplicates, expected)
+
+        # Test no duplicates
+        no_dupes = {"f1": ["a"], "f2": ["b"]}
+        self.assertEqual(find_cross_file_duplicates(no_dupes), {})
+
+        # Test empty input
+        self.assertEqual(find_cross_file_duplicates({}), {})
 
 
 if __name__ == "__main__":
