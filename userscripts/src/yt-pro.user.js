@@ -579,14 +579,15 @@
     try {
       const saved = await getStored("settingsSaved", false);
       if (CFG.quality.overwriteStoredSettings || !saved) {
-        for (const [k, v] of Object.entries(CFG.quality)) await setStored(`quality_${k}`, v);
+        await Promise.all(Object.entries(CFG.quality).map(([k, v]) => setStored(`quality_${k}`, v)));
         await setStored("settingsSaved", true);
         log("Settings saved");
       } else {
-        for (const k of Object.keys(CFG.quality)) {
-          const nv = await getStored(`quality_${k}`, CFG.quality[k]);
-          if (k !== "overwriteStoredSettings") CFG.quality[k] = nv;
-        }
+        const keys = Object.keys(CFG.quality);
+        const vals = await Promise.all(keys.map((k) => getStored(`quality_${k}`, CFG.quality[k])));
+        keys.forEach((k, i) => {
+          if (k !== "overwriteStoredSettings") CFG.quality[k] = vals[i];
+        });
         log("Settings loaded");
       }
     } catch (e) {
