@@ -546,9 +546,28 @@ IMPROVEMENTS OVER ORIGINALS:
   // ═══════════════════════════════════════════════════════════
 
   // CSS Optimizations
-  if (CONFIG.disableAnimations || CONFIG.hideShorts || CONFIG.hideComments || CONFIG.hideSidebar) {
-    let css = "";
+  let css = "";
 
+  // Notification and popup fixes
+  css += `
+    ytd-notification-renderer,
+    tp-yt-paper-toast {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      z-index: 9999 !important;
+    }
+    ytd-popup-container,
+    tp-yt-paper-dialog {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 10000 !important;
+    }
+  `;
+
+  if (CONFIG.disableAnimations || CONFIG.hideShorts || CONFIG.hideComments || CONFIG.hideSidebar) {
     if (CONFIG.disableAnimations) {
       css += `
         /* Disable animations except for critical feedback */
@@ -592,28 +611,10 @@ IMPROVEMENTS OVER ORIGINALS:
       css += "ytd-watch-next-secondary-results-renderer { display: none !important; }";
     }
 
-    // Notification and popup fixes
-    css += `
-      ytd-notification-renderer,
-      tp-yt-paper-toast {
-        position: fixed !important;
-        top: 20px !important;
-        right: 20px !important;
-        z-index: 9999 !important;
-      }
-      ytd-popup-container,
-      tp-yt-paper-dialog {
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        z-index: 10000 !important;
-      }
-    `;
-
-    if (css) GM_addStyle(css);
-    console.log("[YouTube Optimizer] Polymer UI fixes applied");
   }
+
+  if (css) GM_addStyle(css);
+  console.log("[YouTube Optimizer] Polymer UI fixes applied");
 
   // ═══════════════════════════════════════════════════════════
   // MODULE 5: PERFORMANCE FEATURES
