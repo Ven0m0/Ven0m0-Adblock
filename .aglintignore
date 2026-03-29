@@ -1,18 +1,36 @@
-# Hostlist files - regex patterns with $ end anchors
-lists/hostlist/Ads.txt
-lists/hostlist/Games.txt
-lists/hostlist/Native.txt
-lists/hostlist/Regex.txt
-lists/hostlist/Smart-TV.txt
-lists/hostlist/Social-Media.txt
-lists/hostlist/Spotify.txt
-lists/hostlist/extra.txt
-lists/hostlist/spy.txt
+# Node/Bun dependencies
+node_modules/
 
-# Uses ipaddress modifier and IPv6 domain values
-lists/adblock/lan-block.txt
-lists/sources/lan-block.txt
+# Build outputs
+dist/
+build/
+lists/releases/
+Filters/
+*.min.js
 
-# Uses $network modifier
-lists/adblock/Other.txt
-lists/sources/Other.txt
+# Python environments
+venv/
+.venv/
+__pycache__/
+
+# Version control
+.git/
+
+# Cache files
+.aglintcache
+.eslintcache
+
+# Project-specific ignores
+# Ignore userscripts as they are handled by eslint/biome
+userscripts/
+# Ignore hostlists that may use pure regex/domain formats not fully compatible with standard adblock linter
+lists/hostlist/
+# Ignore external sources
+lists/external/
+# Ignore raw sources if they are just downloaded/unprocessed lists
+lists/sources/
+
+# Logs and temporary files
+*.log
+*.tmp
+logs/
