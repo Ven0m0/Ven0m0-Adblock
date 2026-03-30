@@ -28,7 +28,11 @@ esbuild.config.js              # Bundler config
 hostlist-config.json           # Hostlist compiler config
 lists/conf.json                # Filter list build config
 lists/sources-urls.json        # External source URLs
-lists/ext.md                   # Notes on potential external sources to add
+docs/ext.md                    # Notes on potential external sources to add
+
+docs/
+  TODO.md                      # Project todo list
+  ext.md                       # External source reference links
 
 lists/
   adblock/                     # Hand-edited adblock filter rules (EDIT)
@@ -89,19 +93,12 @@ Scripts/
   build.sh                     # Main build orchestrator
   lib-common.sh                # Shared shell functions
   hosts-creator.sh             # Hosts file builder
-  userscript.sh                # Userscript builder
   automerge-open-prs.sh        # Auto-merge PR helper
-  hosts-config/                # Hosts build configuration files
+  run_pre_commit.sh            # Pre-commit hook runner via prek
+  hosts-config                 # Hosts build configuration (sourced by hosts-creator.sh)
   update_lists.py              # External list updater
-  deduplicate.py               # Rule deduplication
-  move_pure_domains.py         # Domain extraction utility
   common.py                    # Shared Python utilities
   __init__.py                  # Python package init
-  test_common.py               # Tests for common.py
-  test_deduplicate.py          # Tests for deduplicate.py
-  test_move_pure_domains.py    # Tests for move_pure_domains.py
-  test_update_lists.py         # Tests for update_lists.py
-  test_is_pure_domain_logic.py # Tests for domain logic
 
 .github/workflows/
   aglint.yml                   # Filter lint CI
@@ -185,11 +182,6 @@ bun run validate            # Test + build
 - **YAML:** yamllint
 - **Shell:** shellcheck, shfmt
 - **Git hooks:** prek
-
-**Python tests:**
-```bash
-python3 -m unittest discover Scripts/ 'test_*.py'
-```
 
 ### Deploy
 
@@ -464,7 +456,6 @@ bun run format              # Format all
 bun run validate            # Test + build
 
 # Python
-python3 -m unittest discover Scripts/ 'test_*.py'
 ruff check . && ruff format --check .
 
 # Search (use rg, not grep)
