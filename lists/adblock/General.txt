@@ -38,7 +38,6 @@ $removeparam=utm_term
 @@||apis.google.com^
 @@||clients1.google.com^
 @@||consent.google.com^$subdocument
-@@||smartblock.firefox.etp^
 ||accounts.google.com^$3p
 ||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
 ||challenges.cloudflare.com^$3p
