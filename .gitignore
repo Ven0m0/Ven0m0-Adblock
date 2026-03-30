@@ -44,3 +44,5 @@ coverage/
 .aglintcache
 logs/
 .serena/
+dead-domains.txt
+dead-domains/
