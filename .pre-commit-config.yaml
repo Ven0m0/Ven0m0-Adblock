@@ -65,3 +65,11 @@ repos:
         language: system
         types: [shell]
         args: [--severity=warning]
+
+      # Python: unit tests (run when Scripts/*.py files change)
+      - id: python-tests
+        name: Python unit tests
+        entry: python3 -m unittest discover -s Scripts/ -p test_*.py
+        language: system
+        pass_filenames: false
+        files: ^Scripts/.*\.py$
