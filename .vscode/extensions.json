@@ -4,6 +4,7 @@
         "davidanson.vscode-markdownlint",
         "github.vscode-github-actions",
         "exodiusstudios.comment-anchors",
-        "biomejs.biome"
+        "biomejs.biome",
+        "oxc.oxc-vscode"
     ]
 }
