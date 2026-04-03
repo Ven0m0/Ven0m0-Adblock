@@ -18,7 +18,9 @@ Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0
 - `userscripts/src/*.user.js` - userscript source files
 - `Scripts/*.sh` - shell tooling
 - `Scripts/*.py` - Python tooling
-- Root configs such as `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `eslint.config.mjs`, `biome.json`, and workflow files when the task requires them
+- Root configs such as `package.json`, `mise.toml`, `pyproject.toml`,
+  `.aglintrc.yml`, `eslint.config.mjs`, `biome.json`, and workflow files
+  when the task requires them
 
 ### Generated or pipeline-managed paths - do not hand-edit
 
@@ -46,7 +48,9 @@ Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0
 
 - Human-authored filter content lives in `lists/adblock/` and `lists/hostlist/`.
 - The custom build script reads normalized inputs from `lists/sources/` and writes outputs to `lists/releases/`.
-- `Scripts/update_lists.py` also writes into `lists/sources/`, so treat that directory as pipeline-managed unless the task is specifically about the update pipeline.
+- `Scripts/update_lists.py` also writes into `lists/sources/`, so treat
+  that directory as pipeline-managed unless the task is specifically about
+  the update pipeline.
 - Userscripts are built from `userscripts/src/` into `userscripts/dist/`.
 - Some workflows also write temporary or published artifacts under the repository-root `dist/` directory.
 - `userscripts/todo/` is work-in-progress content and is excluded from the normal userscript lint/build flow.
@@ -91,7 +95,8 @@ uv run ruff format --check .
 - `bun run test` runs `lint` plus `format:check`.
 - `bun run validate` runs `test` plus `build`.
 - YAML, shell, and Python checks are separate and should be run when you touch those file types.
-- If the environment lacks Bun, use the closest existing project tooling available, but do not invent new validation steps.
+- If the environment lacks Bun, use the closest existing project tooling
+  available, but do not invent new validation steps.
 
 ## Style conventions
 
