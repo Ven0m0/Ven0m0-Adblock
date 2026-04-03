@@ -1,0 +1,133 @@
+import unittest
+import sys
+import io
+import tempfile
+from pathlib import Path
+import hashlib
+from unittest.mock import patch
+
+# Add current directory to path
+if str(Path(__file__).parent) not in sys.path:
+    sys.path.append(str(Path(__file__).parent))
+
+from common import sanitize_filename, is_valid_domain, read_lines
+
+
+class TestCommon(unittest.TestCase):
+    def test_sanitize_filename_with_name(self):
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My List"), "My-List.txt"
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My List.txt"), "My-List.txt"
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", "safe-name"), "safe-name.txt"
+        )
+
+    def test_sanitize_filename_without_name(self):
+        url = "https://example.com/list.txt"
+        filename = sanitize_filename(url)
+        # Check structure: domain-hash.txt
+        self.assertTrue(filename.startswith("example-com-"))
+        self.assertTrue(filename.endswith(".txt"))
+
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
+        self.assertIn(expected_hash, filename)
+
+    def test_sanitize_filename_with_name_special_chars(self):
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My!@#$%^&*()_+=List"),
+            "My----------_--List.txt",
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", 'a/b\\c:d*e?f"g<h>i|j'),
+            "a-b-c-d-e-f-g-h-i-j.txt",
+        )
+        self.assertEqual(
+            sanitize_filename("http://example.com", "My List.txt"), "My-List.txt"
+        )
+        self.assertEqual(sanitize_filename("http://example.com", "a/b.txt"), "a-b.txt")
+        self.assertEqual(
+            sanitize_filename("http://example.com", "c.txt.txt"), "c.txt.txt"
+        )
+
+    def test_sanitize_filename_without_name_special_urls(self):
+        # Missing scheme (no ://)
+        url = "example.com/list.txt"
+        filename = sanitize_filename(url)
+        self.assertTrue(filename.startswith("list-"))
+        self.assertTrue(filename.endswith(".txt"))
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
+        self.assertEqual(filename, f"list-{expected_hash}.txt")
+
+        # Empty string
+        url = ""
+        filename = sanitize_filename(url)
+        self.assertTrue(filename.startswith("list-"))
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
+        self.assertEqual(filename, f"list-{expected_hash}.txt")
+
+        # URL with port
+        url = "http://example.com:8080/list.txt"
+        filename = sanitize_filename(url)
+        self.assertTrue(filename.startswith("example-com-8080-"))
+        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
+        self.assertEqual(filename, f"example-com-8080-{expected_hash}.txt")
+
+    def test_is_valid_domain(self):
+        self.assertTrue(is_valid_domain("example.com"))
+        self.assertTrue(is_valid_domain("sub.example.com"))
+        self.assertTrue(is_valid_domain("my-domain.co.uk"))
+        self.assertFalse(is_valid_domain("invalid"))
+        self.assertFalse(is_valid_domain("-start.com"))
+        self.assertFalse(is_valid_domain("end-.com"))
+        self.assertFalse(is_valid_domain("http://example.com"))
+
+    def test_read_lines(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+            target_file = temp_dir_path / "test.txt"
+            target_file.write_text("line1 \nline2\r\nline3", encoding="utf-8")
+
+            lines = read_lines(target_file)
+            self.assertEqual(lines, ["line1", "line2", "line3"])
+
+    def test_read_lines_file_not_found(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+            non_existent = temp_dir_path / "missing.txt"
+
+            with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
+                lines = read_lines(non_existent)
+                self.assertIsNone(lines)
+                self.assertIn(f"Error reading {non_existent}", mock_stderr.getvalue())
+
+    def test_write_lines_atomic(self):
+        from common import write_lines
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir_path = Path(temp_dir)
+            target_file = temp_dir_path / "target.txt"
+
+            # Test write
+            result = write_lines(target_file, ["line1", "line2"])
+            self.assertTrue(result)
+            self.assertTrue(target_file.exists())
+            self.assertEqual(target_file.read_text(encoding="utf-8"), "line1\nline2\n")
+
+            # Test atomic overwrite
+            result = write_lines(target_file, ["line3", "line4"])
+            self.assertTrue(result)
+            self.assertEqual(target_file.read_text(encoding="utf-8"), "line3\nline4\n")
+
+            # Test append
+            result = write_lines(target_file, ["line5"], mode="a")
+            self.assertTrue(result)
+            self.assertEqual(
+                target_file.read_text(encoding="utf-8"), "line3\nline4\nline5\n"
+            )
+
+
+if __name__ == "__main__":
+    unittest.main()
