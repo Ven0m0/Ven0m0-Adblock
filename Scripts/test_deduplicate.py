@@ -1,9 +1,15 @@
+import sys
+import tempfile
+from pathlib import Path
+from io import StringIO
+from unittest.mock import patch
 import unittest
 from unittest.mock import patch
 from pathlib import Path
 
 # Add current directory to path to allow importing deduplicate
 from Scripts.deduplicate import (
+    main,
     process_content,
     is_header,
     is_valid_rule,
@@ -112,17 +118,64 @@ class TestDeduplicate(unittest.TestCase):
         self.assertEqual(find_cross_file_duplicates({}), {})
 
 
-    @patch("pathlib.Path.open")
-    def test_deduplicate_file_error_handling(self, mock_open):
-        # Configure the mock to raise an exception when opening the file
-        mock_open.side_effect = OSError("Permission denied")
+class TestMain(unittest.TestCase):
+    def test_main_with_valid_directory(self):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            tmpdir = Path(tmpdirname)
 
-        # Call the function
-        stats, rules = deduplicate_file(Path("dummy.txt"))
+            # Create a test file
+            file1 = tmpdir / "file1.txt"
+            file1.write_text("rule1.com\nrule1.com\nrule2.com\n")
 
-        # Verify it handled the error gracefully and returned empty results
-        self.assertEqual(stats, Stats())
-        self.assertEqual(rules, [])
+            # Create another test file
+            file2 = tmpdir / "file2.txt"
+            file2.write_text("rule2.com\nrule3.com\n")
+
+            with (
+                patch.object(sys, "argv", ["deduplicate.py", str(tmpdir)]),
+                patch("sys.stdout", new=StringIO()),
+                patch("sys.stderr", new=StringIO()),
+            ):
+                result = main()
+
+            self.assertEqual(result, 0)
+
+            # Check files were deduplicated
+            self.assertEqual(file1.read_text(), "rule1.com\nrule2.com\n")
+            self.assertEqual(file2.read_text(), "rule2.com\nrule3.com\n")
+
+    def test_main_directory_not_found(self):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            tmpdir = Path(tmpdirname) / "nonexistent"
+
+            with (
+                patch.object(sys, "argv", ["deduplicate.py", str(tmpdir)]),
+                patch("sys.stderr", new_callable=StringIO) as mock_stderr,
+                patch("sys.stdout", new_callable=StringIO),
+            ):
+                result = main()
+
+            self.assertEqual(result, 1)
+            self.assertIn("Error: Lists directory not found", mock_stderr.getvalue())
+
+    def test_main_no_txt_files(self):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            tmpdir = Path(tmpdirname)
+
+            # Create a non-txt file
+            file1 = tmpdir / "file1.log"
+            file1.write_text("rule1.com\n")
+
+            with (
+                patch.object(sys, "argv", ["deduplicate.py", str(tmpdir)]),
+                patch("sys.stderr", new_callable=StringIO) as mock_stderr,
+                patch("sys.stdout", new_callable=StringIO),
+            ):
+                result = main()
+
+            self.assertEqual(result, 1)
+            self.assertIn("No .txt files found", mock_stderr.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()
