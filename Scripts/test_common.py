@@ -93,6 +93,15 @@ class TestCommon(unittest.TestCase):
             lines = read_lines(target_file)
             self.assertEqual(lines, ["line1", "line2", "line3"])
 
+    @patch("pathlib.Path.open")
+    def test_read_lines_unicode_error(self, mock_open):
+        mock_open.side_effect = UnicodeError("mock unicode error")
+        with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
+            lines = read_lines(Path("dummy.txt"))
+            self.assertIsNone(lines)
+            self.assertIn("Error reading dummy.txt", mock_stderr.getvalue())
+            self.assertIn("mock unicode error", mock_stderr.getvalue())
+
     def test_read_lines_file_not_found(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)
@@ -126,34 +135,27 @@ class TestCommon(unittest.TestCase):
                 target_file.read_text(encoding="utf-8"), "line3\nline4\nline5\n"
             )
 
-    def test_write_lines_append_exception(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_dir_path = Path(temp_dir)
-            target_file = temp_dir_path / "target.txt"
+    @patch("pathlib.Path.open")
+    def test_write_lines_os_error_append(self, mock_open):
+        from common import write_lines
 
-            with patch("pathlib.Path.open") as mock_open:
-                mock_open.side_effect = OSError("Access denied")
-                with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
-                    result = write_lines(target_file, ["line1"], mode="a")
-                    self.assertFalse(result)
-                    self.assertIn(
-                        f"Error writing {target_file}", mock_stderr.getvalue()
-                    )
+        mock_open.side_effect = OSError("mock os error append")
+        with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
+            result = write_lines(Path("dummy.txt"), ["line1"], mode="a")
+            self.assertFalse(result)
+            self.assertIn("Error writing dummy.txt", mock_stderr.getvalue())
+            self.assertIn("mock os error append", mock_stderr.getvalue())
 
-    def test_write_lines_append_write_exception(self):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_dir_path = Path(temp_dir)
-            target_file = temp_dir_path / "target.txt"
+    @patch("tempfile.mkstemp")
+    def test_write_lines_os_error_atomic(self, mock_mkstemp):
+        from common import write_lines
 
-            with patch("pathlib.Path.open") as mock_open:
-                mock_file = mock_open.return_value.__enter__.return_value
-                mock_file.write.side_effect = OSError("Disk full")
-                with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
-                    result = write_lines(target_file, ["line1"], mode="a")
-                    self.assertFalse(result)
-                    self.assertIn(
-                        f"Error writing {target_file}", mock_stderr.getvalue()
-                    )
+        mock_mkstemp.side_effect = OSError("mock os error atomic")
+        with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
+            result = write_lines(Path("dummy.txt"), ["line1"], mode="w")
+            self.assertFalse(result)
+            self.assertIn("Error writing dummy.txt", mock_stderr.getvalue())
+            self.assertIn("mock os error atomic", mock_stderr.getvalue())
 
 
 if __name__ == "__main__":
