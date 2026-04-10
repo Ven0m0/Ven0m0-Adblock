@@ -25,7 +25,7 @@ indent_size = 4
 
 # Markdown docs
 [*.{md,markdown}]
-max_line_length = 100
+max_line_length = unset
 trim_trailing_whitespace = false
 
 # Lock files
@@ -34,4 +34,9 @@ insert_final_newline = true
 
 # Minified files
 [*.min.{js,css,txt}]
+insert_final_newline = false
+
+# Blocklist
+[*.txt]
+max_line_length = unset
 insert_final_newline = false
