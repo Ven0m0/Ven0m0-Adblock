@@ -95,8 +95,8 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
     return domain_moves, file_updates
 
 
-def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:
-    """Append domains to hostlists and update source files."""
+def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
+    """Append domains to hostlists."""
     total_moved = 0
 
     print("\n" + "=" * 60)
@@ -135,6 +135,11 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
                 total_moved += len(new_domains)
                 print(f"Appended {len(new_domains)} domains to {target_file}")
 
+    return total_moved
+
+
+def _update_source_files(file_updates: dict) -> None:
+    """Update source adblock files."""
     print("\n" + "=" * 60)
     print("Updating source adblock files")
     print("=" * 60 + "\n")
@@ -148,6 +153,11 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
             if tmp_path.exists():
                 tmp_path.unlink()
 
+
+def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:
+    """Append domains to hostlists and update source files."""
+    total_moved = _update_hostlists(hostlist_dir, domain_moves)
+    _update_source_files(file_updates)
     return total_moved
 
 
