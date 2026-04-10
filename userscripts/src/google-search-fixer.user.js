@@ -19,8 +19,6 @@
     fn();
   };
 
-  const isElement = (v) => v instanceof Element;
-
   const decodeGoogleRedirect = (u) => {
     // Common redirect forms:
     // 1) https://www.google.com/url?q=<target>&sa=...
@@ -67,18 +65,18 @@
   const observe = () => {
     let timeoutId = null;
     const mo = new MutationObserver((mutations) => {
-      let shouldScan = false;
-      for (const m of mutations) {
-        for (const n of m.addedNodes) {
-          if (!isElement(n)) continue;
-          if (n.tagName === "A") {
-            fixAnchor(n);
-            continue;
+      let hasElements = false;
+      for (let i = 0; i < mutations.length; i++) {
+        const addedNodes = mutations[i].addedNodes;
+        for (let j = 0; j < addedNodes.length; j++) {
+          if (addedNodes[j].nodeType === 1) { // Node.ELEMENT_NODE
+            hasElements = true;
+            break;
           }
-          shouldScan = true;
         }
+        if (hasElements) break;
       }
-      if (shouldScan && !timeoutId) {
+      if (hasElements && !timeoutId) {
         if (typeof requestAnimationFrame !== "undefined") {
           timeoutId = requestAnimationFrame(() => {
             timeoutId = null;

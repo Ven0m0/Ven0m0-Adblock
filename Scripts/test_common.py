@@ -10,7 +10,7 @@ from unittest.mock import patch
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import sanitize_filename, is_valid_domain, read_lines
+from common import sanitize_filename, is_valid_domain, read_lines, write_lines
 
 
 class TestCommon(unittest.TestCase):
@@ -113,8 +113,6 @@ class TestCommon(unittest.TestCase):
                 self.assertIn(f"Error reading {non_existent}", mock_stderr.getvalue())
 
     def test_write_lines_atomic(self):
-        from common import write_lines
-
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)
             target_file = temp_dir_path / "target.txt"

@@ -52,9 +52,12 @@ jobs:
           echo "hostlist_files=$hostlist_files" >> $GITHUB_OUTPUT
 
       - name: Export Dead Domains
+        env:
+          ADBLOCK_FILES: ${{ steps.filter-files.outputs.adblock_files }}
+          HOSTLIST_FILES: ${{ steps.filter-files.outputs.hostlist_files }}
         run: |
           mkdir -p dead-domains
-          for file in ${{ steps.filter-files.outputs.adblock_files }} ${{ steps.filter-files.outputs.hostlist_files }}; do
+          for file in $ADBLOCK_FILES $HOSTLIST_FILES; do
             if [[ -f "$file" ]]; then
               mise exec -- bunx dead-domains-linter --export "dead-domains/$(basename "$file").txt" --input "$file" 2>/dev/null || true
             fi
@@ -133,8 +136,11 @@ jobs:
 
       - name: Remove Dead Domains
         if: steps.read-dead-domains.outputs.has_dead_domains == 'true'
+        env:
+          ADBLOCK_FILES: ${{ steps.filter-files.outputs.adblock_files }}
+          HOSTLIST_FILES: ${{ steps.filter-files.outputs.hostlist_files }}
         run: |
-          for file in ${{ steps.filter-files.outputs.adblock_files }} ${{ steps.filter-files.outputs.hostlist_files }}; do
+          for file in $ADBLOCK_FILES $HOSTLIST_FILES; do
             if [[ -f "$file" ]]; then
               mise exec -- bunx dead-domains-linter --auto --import "dead-domains/$(basename "$file").txt" --input "$file" --output "$file" 2>/dev/null || true
             fi
