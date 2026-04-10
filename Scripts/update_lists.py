@@ -258,8 +258,12 @@ async def save_metadata(
     }
 
     metadata_path = Path(METADATA_FILE)
+
+    # Offload CPU-bound JSON serialization and IO to prevent event loop blocking
+    json_data = await asyncio.to_thread(json.dumps, metadata, indent=2, sort_keys=True)
     async with aiofiles.open(metadata_path, mode="w", encoding="utf-8") as f:
-        await f.write(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
+        await f.write(json_data + "\n")
+
     logger.info(f"Saved metadata: {metadata_path}")
 
 
