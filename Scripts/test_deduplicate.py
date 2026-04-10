@@ -1,4 +1,6 @@
 import unittest
+from unittest.mock import patch
+from pathlib import Path
 
 # Add current directory to path to allow importing deduplicate
 from Scripts.deduplicate import (
@@ -6,6 +8,8 @@ from Scripts.deduplicate import (
     is_header,
     is_valid_rule,
     find_cross_file_duplicates,
+    deduplicate_file,
+    Stats,
 )
 
 
@@ -107,6 +111,18 @@ class TestDeduplicate(unittest.TestCase):
         # Test empty input
         self.assertEqual(find_cross_file_duplicates({}), {})
 
+
+    @patch("pathlib.Path.open")
+    def test_deduplicate_file_error_handling(self, mock_open):
+        # Configure the mock to raise an exception when opening the file
+        mock_open.side_effect = OSError("Permission denied")
+
+        # Call the function
+        stats, rules = deduplicate_file(Path("dummy.txt"))
+
+        # Verify it handled the error gracefully and returned empty results
+        self.assertEqual(stats, Stats())
+        self.assertEqual(rules, [])
 
 if __name__ == "__main__":
     unittest.main()
