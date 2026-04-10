@@ -236,7 +236,9 @@ def load_sources(config_path: Path) -> dict[str, dict]:
     }
 
 
-def save_metadata(sources: dict, results: dict[str, bool], output_dir: Path) -> None:
+async def save_metadata(
+    sources: dict, results: dict[str, bool], output_dir: Path
+) -> None:
     """Save download metadata for tracking."""
     from datetime import datetime, timezone
 
@@ -253,10 +255,12 @@ def save_metadata(sources: dict, results: dict[str, bool], output_dir: Path) -> 
     }
 
     metadata_path = Path(METADATA_FILE)
-    metadata_path.write_text(
-        json.dumps(metadata, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+
+    # Offload CPU-bound JSON serialization and IO to prevent event loop blocking
+    json_data = await asyncio.to_thread(json.dumps, metadata, indent=2, sort_keys=True)
+    async with aiofiles.open(metadata_path, mode="w", encoding="utf-8") as f:
+        await f.write(json_data + "\n")
+
     logger.info(f"Saved metadata: {metadata_path}")
 
 
@@ -331,7 +335,7 @@ async def main() -> int:
     results_dict = dict(results)
     success_count = sum(1 for success in results_dict.values() if success)
 
-    save_metadata(sources, results_dict, output_dir)
+    await save_metadata(sources, results_dict, output_dir)
 
     logger.info(f"✓ Updated {success_count}/{len(sources)} lists successfully")
 
