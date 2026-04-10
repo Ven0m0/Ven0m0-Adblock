@@ -19,6 +19,7 @@
   ],
   "rules": {
     "eqeqeq": "error",
+    "no-unused-expressions": "off",
     "no-eval": "error",
     "no-var": "error",
     "prefer-const": "error",

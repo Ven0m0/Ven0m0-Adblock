@@ -408,13 +408,13 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "aiofiles", specifier = ">=25.1.0" },
-    { name = "aiohttp", specifier = ">=3.13.3" },
+    { name = "aiohttp", specifier = ">=3.13.5" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "prek", specifier = ">=0.3.4" },
-    { name = "ruff", specifier = ">=0.15.4" },
+    { name = "prek", specifier = ">=0.3.8" },
+    { name = "ruff", specifier = ">=0.15.10" },
 ]
 
 [[package]]
