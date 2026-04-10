@@ -4,6 +4,7 @@ Move pure domain entries from adblock lists to hostlist files.
 Pure domains are entries without AdGuard filter syntax (||, ##, $, @@, etc.)
 """
 
+import re
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -26,6 +27,11 @@ def is_pure_domain(line: str) -> bool:
     return is_valid_domain(line)
 
 
+# Compiled regex patterns for domain categorization
+ADS_PATTERN = re.compile(r"ad|ads|analytics|tracking|telemetry|metric")
+SOCIAL_PATTERN = re.compile(r"social|facebook|twitter|instagram")
+
+
 def categorize_domain(domain: str, source_file: str) -> str:
     """Determine which hostlist category a domain belongs to"""
     domain_lower = domain.lower()
@@ -41,15 +47,9 @@ def categorize_domain(domain: str, source_file: str) -> str:
         return "Games.txt"
 
     # Map based on domain content
-    if any(
-        keyword in domain_lower
-        for keyword in ["ad", "ads", "analytics", "tracking", "telemetry", "metric"]
-    ):
+    if ADS_PATTERN.search(domain_lower):
         return "Ads.txt"
-    elif any(
-        keyword in domain_lower
-        for keyword in ["social", "facebook", "twitter", "instagram"]
-    ):
+    elif SOCIAL_PATTERN.search(domain_lower):
         return "Social-Media.txt"
     else:
         return "Other.txt"
@@ -95,8 +95,8 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
     return domain_moves, file_updates
 
 
-def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:
-    """Append domains to hostlists and update source files."""
+def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
+    """Append domains to hostlists."""
     total_moved = 0
 
     print("\n" + "=" * 60)
@@ -135,12 +135,17 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
                 total_moved += len(new_domains)
                 print(f"Appended {len(new_domains)} domains to {target_file}")
 
+    return total_moved
+
+
+def _update_source_files(file_updates: dict) -> None:
+    """Update source adblock files."""
     print("\n" + "=" * 60)
     print("Updating source adblock files")
     print("=" * 60 + "\n")
 
     for filepath, new_lines in file_updates.items():
-        tmp_path = filepath.with_name(filepath.name + '.tmp')
+        tmp_path = filepath.with_name(filepath.name + ".tmp")
         if write_lines(tmp_path, new_lines):
             tmp_path.replace(filepath)
             print(f"Updated {filepath.name}")
@@ -148,6 +153,11 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
             if tmp_path.exists():
                 tmp_path.unlink()
 
+
+def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:
+    """Append domains to hostlists and update source files."""
+    total_moved = _update_hostlists(hostlist_dir, domain_moves)
+    _update_source_files(file_updates)
     return total_moved
 
 

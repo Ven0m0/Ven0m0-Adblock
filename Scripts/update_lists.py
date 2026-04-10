@@ -100,7 +100,7 @@ async def process_downloaded_file(
     skip_checksum: bool = False,
 ) -> Path | None:
     """Process and move temp file to final destination."""
-    dest_path = output_dir / filename
+    dest_path = output_dir / Path(filename).name
 
     try:
         async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
@@ -200,9 +200,9 @@ async def fetch_list(
 # ============================================================================
 
 
-def load_sources(config_path: Path) -> dict[str, dict]:
+async def load_sources(config_path: Path) -> dict[str, dict]:
     """Load source URLs configuration."""
-    if not config_path.exists():
+    if not await asyncio.to_thread(config_path.exists):
         logger.warning(f"Config not found: {config_path}, creating template")
         template = {
             "sources": [
@@ -220,11 +220,15 @@ def load_sources(config_path: Path) -> dict[str, dict]:
                 },
             ]
         }
-        config_path.parent.mkdir(parents=True, exist_ok=True)
-        config_path.write_text(json.dumps(template, indent=2) + "\n", encoding="utf-8")
+        await asyncio.to_thread(config_path.parent.mkdir, parents=True, exist_ok=True)
+        async with aiofiles.open(config_path, mode="w", encoding="utf-8") as f:
+            await f.write(json.dumps(template, indent=2) + "\n")
         logger.info(f"Created template config: {config_path}")
 
-    data = json.loads(config_path.read_text(encoding="utf-8"))
+    async with aiofiles.open(config_path, mode="r", encoding="utf-8") as f:
+        content = await f.read()
+    data = json.loads(content)
+
     return {
         src["url"]: {
             "filename": src.get("filename") or sanitize_filename(src["url"]),
@@ -304,10 +308,10 @@ async def main() -> int:
     args = parser.parse_args()
 
     output_dir: Path = args.output_dir
-    output_dir.mkdir(parents=True, exist_ok=True)
+    await asyncio.to_thread(output_dir.mkdir, parents=True, exist_ok=True)
 
     logger.info("Loading source configuration...")
-    sources = load_sources(args.config)
+    sources = await load_sources(args.config)
 
     if args.filter:
         sources = {

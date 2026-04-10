@@ -28,7 +28,7 @@ on:
         type: boolean
         default: false
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -36,6 +36,8 @@ concurrency:
 jobs:
   build:
     name: Build & Optimize
+    outputs:
+      has_changes: ${{ steps.detect.outputs.has_changes }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -149,18 +151,6 @@ jobs:
           done
           printf '\n---\n*Built on %s*\n' "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> dist/README.md
 
-      - name: Commit and push changes
-        if: |
-          steps.detect.outputs.has_changes == 'true' &&
-          github.event_name != 'pull_request'
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_message: "ci: build and optimize userscripts [skip ci]"
-          file_pattern: "dist/*.js dist/README.md userscripts/dist/*.js"
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
-          skip_dirty_check: false
-
       - name: Upload artifacts
         if: steps.detect.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v7
@@ -169,4 +159,28 @@ jobs:
           path: |
             dist/*.js
             dist/README.md
+            userscripts/dist/*.js
           retention-days: 30
+
+  deploy:
+    name: Commit and Push
+    needs: build
+    if: github.event_name != 'pull_request' && needs.build.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: userscripts-${{ github.sha }}
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "ci: build and optimize userscripts [skip ci]"
+          file_pattern: "dist/*.js dist/README.md userscripts/dist/*.js"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          skip_dirty_check: false
