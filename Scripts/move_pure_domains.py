@@ -4,6 +4,7 @@ Move pure domain entries from adblock lists to hostlist files.
 Pure domains are entries without AdGuard filter syntax (||, ##, $, @@, etc.)
 """
 
+import re
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -26,6 +27,11 @@ def is_pure_domain(line: str) -> bool:
     return is_valid_domain(line)
 
 
+# Compiled regex patterns for domain categorization
+ADS_PATTERN = re.compile(r"ad|ads|analytics|tracking|telemetry|metric")
+SOCIAL_PATTERN = re.compile(r"social|facebook|twitter|instagram")
+
+
 def categorize_domain(domain: str, source_file: str) -> str:
     """Determine which hostlist category a domain belongs to"""
     domain_lower = domain.lower()
@@ -41,15 +47,9 @@ def categorize_domain(domain: str, source_file: str) -> str:
         return "Games.txt"
 
     # Map based on domain content
-    if any(
-        keyword in domain_lower
-        for keyword in ["ad", "ads", "analytics", "tracking", "telemetry", "metric"]
-    ):
+    if ADS_PATTERN.search(domain_lower):
         return "Ads.txt"
-    elif any(
-        keyword in domain_lower
-        for keyword in ["social", "facebook", "twitter", "instagram"]
-    ):
+    elif SOCIAL_PATTERN.search(domain_lower):
         return "Social-Media.txt"
     else:
         return "Other.txt"
@@ -140,7 +140,7 @@ def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) ->
     print("=" * 60 + "\n")
 
     for filepath, new_lines in file_updates.items():
-        tmp_path = filepath.with_name(filepath.name + '.tmp')
+        tmp_path = filepath.with_name(filepath.name + ".tmp")
         if write_lines(tmp_path, new_lines):
             tmp_path.replace(filepath)
             print(f"Updated {filepath.name}")
