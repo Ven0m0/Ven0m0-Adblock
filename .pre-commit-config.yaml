@@ -34,10 +34,10 @@ repos:
         language: system
         types: [python]
 
-      # JavaScript: ESLint
-      - id: eslint
-        name: ESLint
-        entry: bun run lint:eslint
+      # JavaScript: Oxlint
+      - id: oxlint
+        name: Oxlint
+        entry: bun run lint:oxlint
         language: system
         types_or: [javascript, jsx, ts, tsx]
         pass_filenames: false

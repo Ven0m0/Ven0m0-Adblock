@@ -19,7 +19,7 @@ Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0
 - `Scripts/*.sh` - shell tooling
 - `Scripts/*.py` - Python tooling
 - Root configs such as `package.json`, `mise.toml`, `pyproject.toml`,
-  `.aglintrc.yml`, `eslint.config.mjs`, `biome.json`, and workflow files
+  `.aglintrc.yml`, `.oxlintrc.json`, `biome.json`, and workflow files
   when the task requires them
 
 ### Generated or pipeline-managed paths - do not hand-edit
