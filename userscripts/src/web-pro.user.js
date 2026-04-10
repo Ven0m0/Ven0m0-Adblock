@@ -129,7 +129,7 @@
     "rowan_id1",
     "rowan_msg_id"
   ];
-  const HASH = ["intcid", "back-url", "back_url", "src"];
+  const HASH_RE = /^#(?:intcid|back-url|back_url|src)/;
   const UE = ["click", "keydown", "touchstart", "pointerdown"];
 
   const DEF = {
@@ -576,10 +576,8 @@
       const url = new URL(location.href.replace("/ref=", "?ref="));
       if (canonicalAmazon(url)) return;
       let c = stripTracking(url);
-      for (const h of HASH) {
-        if (url.hash.startsWith(`#${h}`)) {
-          c = 1;
-        }
+      if (HASH_RE.test(url.hash)) {
+        c = 1;
       }
       if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
     } catch (e) {
