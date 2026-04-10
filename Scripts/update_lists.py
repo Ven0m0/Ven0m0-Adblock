@@ -100,7 +100,7 @@ async def process_downloaded_file(
     skip_checksum: bool = False,
 ) -> Path | None:
     """Process and move temp file to final destination."""
-    dest_path = output_dir / filename
+    dest_path = output_dir / Path(filename).name
 
     try:
         async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
