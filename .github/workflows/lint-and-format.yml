@@ -21,13 +21,16 @@ jobs:
       fail-fast: false
       matrix:
         linter:
-          - name: ESLint
-            command: mise exec -- bun run lint:eslint
+          - name: Biome Lint
+            command: mise exec -- bun run lint:biome
+            paths: "**/*.{js,mjs,cjs,json,yml,yaml,md}"
+          - name: Oxlint
+            command: mise exec -- bun run lint:oxlint
             paths: "**/*.{js,mjs,cjs}"
           - name: AGLint
             command: mise exec -- bun run lint:aglint
             paths: "lists/sources/**/*.txt"
-          - name: Prettier
+          - name: Biome Format
             command: mise exec -- bun run format:check
             paths: "**/*.{js,json,yml,yaml,md}"
     steps:

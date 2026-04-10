@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["unicorn", "oxc"],
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "Filters/**",
+    "lists/releases/**",
+    "lists/mirror/**",
+    "userscripts/todo/**",
+    "*.min.js",
+    "*.bundle.js"
+  ],
+  "rules": {
+    "eqeqeq": "error",
+    "no-eval": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "no-console": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.user.js", "userscripts/**/*.js"],
+      "globals": {
+        "GM_getValue": "readonly",
+        "GM_setValue": "readonly",
+        "GM_addStyle": "readonly",
+        "GM_xmlhttpRequest": "readonly",
+        "GM_info": "readonly",
+        "GM_config": "readonly",
+        "unsafeWindow": "readonly",
+        "waitForElems": "readonly"
+      }
+    }
+  ]
+}

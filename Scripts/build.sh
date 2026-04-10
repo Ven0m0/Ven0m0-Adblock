@@ -154,7 +154,8 @@ build_userscripts(){
     mapfile -t files < <(find "$SCRIPT_SRC" -type f -name "*.js" 2>/dev/null)
   (( ${#files[@]} == 0 )) && { log userscripts "No files in $SCRIPT_SRC"; return 0; }
   log userscripts "Processing ${#files[@]} files"
-  has eslint && eslint --fix --quiet --no-warn-ignored "${files[@]}" 2>/dev/null || :
+  has oxlint && oxlint --config .oxlintrc.json --fix --quiet "${files[@]}" 2>/dev/null || :
+  has biome && biome check --write --no-errors-on-unmatched --files-ignore-unknown=true "${files[@]}" 2>/dev/null || :
   export -f _process_js ok err warn
   export REPO SCRIPT_OUT R G Y N RUNNER
   RUNNER=$(runner)
