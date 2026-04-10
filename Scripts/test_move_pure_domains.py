@@ -1,6 +1,8 @@
 import unittest
 import importlib.util
+import tempfile
 from pathlib import Path
+
 from unittest.mock import Mock
 
 # Import the module dynamically
@@ -13,6 +15,7 @@ spec.loader.exec_module(module)
 is_pure_domain = module.is_pure_domain
 scan_adblock_files = module.scan_adblock_files
 categorize_domain = module.categorize_domain
+apply_updates = module.apply_updates
 
 
 class TestIsPureDomain(unittest.TestCase):
@@ -185,6 +188,87 @@ class TestCategorizeDomain(unittest.TestCase):
         # Match fallback
         self.assertEqual(categorize_domain("example.com", "unknown.txt"), "Other.txt")
         self.assertEqual(categorize_domain("randomsite.org", "filter.txt"), "Other.txt")
+
+
+class TestApplyUpdates(unittest.TestCase):
+    def test_apply_updates_basic(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            hostlist_dir = tmpdir_path / "hostlist"
+            hostlist_dir.mkdir()
+            adblock_dir = tmpdir_path / "adblock"
+            adblock_dir.mkdir()
+
+            # Setup target file
+            target_file = "Other.txt"
+            target_path = hostlist_dir / target_file
+            target_path.write_text("existing.com\n")
+
+            # Setup source file
+            source_file = "test_list.txt"
+            source_path = adblock_dir / source_file
+            source_path.write_text("domain1.com\ndomain2.com\n||ad.com^\n")
+
+            domain_moves = {
+                "Other.txt": {"test_list.txt": ["domain1.com", "domain2.com"]}
+            }
+            file_updates = {source_path: ["||ad.com^"]}
+
+            total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
+
+            self.assertEqual(total_moved, 2)
+
+            # Check target file content
+            self.assertEqual(
+                target_path.read_text(), "existing.com\ndomain1.com\ndomain2.com\n"
+            )
+
+            # Check source file content
+            self.assertEqual(source_path.read_text(), "||ad.com^\n")
+
+    def test_apply_updates_deduplication(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            hostlist_dir = tmpdir_path / "hostlist"
+            hostlist_dir.mkdir()
+            adblock_dir = tmpdir_path / "adblock"
+            adblock_dir.mkdir()
+
+            # Setup target file with existing domain
+            target_file = "Other.txt"
+            target_path = hostlist_dir / target_file
+            target_path.write_text("existing.com\n")
+
+            source_path = adblock_dir / "test_list.txt"
+            source_path.write_text("existing.com\nnew.com\n")
+
+            domain_moves = {"Other.txt": {"test_list.txt": ["existing.com", "new.com"]}}
+            file_updates = {source_path: []}
+
+            total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
+
+            self.assertEqual(total_moved, 1)  # Only new.com is moved
+            self.assertEqual(target_path.read_text(), "existing.com\nnew.com\n")
+
+    def test_apply_updates_source_update_failure(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            hostlist_dir = tmpdir_path / "hostlist"
+            hostlist_dir.mkdir()
+            adblock_dir = tmpdir_path / "adblock"
+            adblock_dir.mkdir()
+            source_path = adblock_dir / "test_list.txt"
+
+            domain_moves = {"Other.txt": {"test_list.txt": ["new.com"]}}
+            file_updates = {source_path: ["||ad.com^"]}
+
+            original_write_lines = module.write_lines
+            module.write_lines = Mock(return_value=False)
+            try:
+                total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
+                self.assertEqual(total_moved, 0)
+            finally:
+                module.write_lines = original_write_lines
 
 
 if __name__ == "__main__":
