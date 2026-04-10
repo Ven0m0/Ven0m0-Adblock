@@ -30,7 +30,7 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Wait for tests
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const pullNumber = context.payload.pull_request.number;

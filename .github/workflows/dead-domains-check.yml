@@ -63,7 +63,7 @@ jobs:
 
       - name: Read Dead Domains
         id: read-dead-domains
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { readFile } = require('fs').promises;
@@ -84,7 +84,7 @@ jobs:
             core.setOutput('dead_domains', deadDomains);
 
       - name: Close Pull Request(s)
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: pullRequests } = await github.rest.pulls.list({
@@ -175,7 +175,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.read-dead-domains.outputs.has_dead_domains == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: pullRequest } = await github.rest.pulls.create({
