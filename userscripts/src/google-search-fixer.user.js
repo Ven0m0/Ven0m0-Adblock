@@ -69,7 +69,8 @@
       for (let i = 0; i < mutations.length; i++) {
         const addedNodes = mutations[i].addedNodes;
         for (let j = 0; j < addedNodes.length; j++) {
-          if (addedNodes[j].nodeType === 1) { // Node.ELEMENT_NODE
+          if (addedNodes[j].nodeType === 1) {
+            // Node.ELEMENT_NODE
             hasElements = true;
             break;
           }

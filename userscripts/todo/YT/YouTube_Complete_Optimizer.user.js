@@ -44,7 +44,24 @@ IMPROVEMENTS OVER ORIGINALS:
   }
 
   // Promise isolation (YouTube hacks Promise in some browsers)
-  const IsolatedPromise = (async () => {})().constructor;
+  const IsolatedPromise = (() => {
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      if (document.documentElement) {
+        document.documentElement.appendChild(iframe);
+        const cleanPromise = iframe.contentWindow.Promise;
+        document.documentElement.removeChild(iframe);
+        if (cleanPromise) return cleanPromise;
+      }
+    } catch (e) {
+      // Ignore errors
+    }
+    try {
+      return (async () => {})().constructor;
+    } catch (e) {}
+    return Promise;
+  })();
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
