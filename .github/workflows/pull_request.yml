@@ -21,6 +21,8 @@ jobs:
           install: true
           cache: true
           experimental: true
+      - name: Install dependencies
+        run: bun install
       - name: Run JavaScript quality checks
         run: bun run lint:js
       - name: Run formatting checks

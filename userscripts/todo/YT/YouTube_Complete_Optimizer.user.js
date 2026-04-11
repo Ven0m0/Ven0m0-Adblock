@@ -48,14 +48,19 @@ IMPROVEMENTS OVER ORIGINALS:
     try {
       const iframe = document.createElement("iframe");
       iframe.style.display = "none";
-      document.documentElement.appendChild(iframe);
-      const CleanPromise = iframe.contentWindow.Promise;
-      // Do not remove the iframe immediately to prevent Firefox "dead object" errors
-      // when instantiating the Promise later.
-      return CleanPromise;
+      if (document.documentElement) {
+        document.documentElement.appendChild(iframe);
+        const cleanPromise = iframe.contentWindow.Promise;
+        document.documentElement.removeChild(iframe);
+        if (cleanPromise) return cleanPromise;
+      }
     } catch (e) {
-      return (async () => {})().constructor;
+      // Ignore errors
     }
+    try {
+      return (async () => {})().constructor;
+    } catch (e) {}
+    return Promise;
   })();
 
   // ═══════════════════════════════════════════════════════════
