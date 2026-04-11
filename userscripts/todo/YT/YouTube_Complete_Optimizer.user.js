@@ -44,7 +44,19 @@ IMPROVEMENTS OVER ORIGINALS:
   }
 
   // Promise isolation (YouTube hacks Promise in some browsers)
-  const IsolatedPromise = (async () => {})().constructor;
+  const IsolatedPromise = (() => {
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      document.documentElement.appendChild(iframe);
+      const CleanPromise = iframe.contentWindow.Promise;
+      // Do not remove the iframe immediately to prevent Firefox "dead object" errors
+      // when instantiating the Promise later.
+      return CleanPromise;
+    } catch (e) {
+      return (async () => {})().constructor;
+    }
+  })();
 
   // ═══════════════════════════════════════════════════════════
   // CONFIGURATION
