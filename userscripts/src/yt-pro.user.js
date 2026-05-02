@@ -406,23 +406,28 @@
       obs.observe(e);
     };
     const lazy = () => document.querySelectorAll(sel).forEach(processNode);
+    let moTimeout;
     const mo = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        for (const node of m.addedNodes) {
-          if (node.nodeType === 1) {
-            const n = node.nodeName;
-            if (
-              (n === "YTD-RICH-ITEM-RENDERER" || n === "YTD-COMPACT-VIDEO-RENDERER" || n === "YTD-THUMBNAIL") &&
-              !node.dataset.lazyOpt
-            ) {
-              processNode(node);
-            }
-            if (node.querySelectorAll) {
-              const els = node.querySelectorAll(sel);
-              for (let i = 0; i < els.length; i++) processNode(els[i]);
-            }
+      let hasAdded = false;
+      for (let i = 0; i < mutations.length; i++) {
+        const added = mutations[i].addedNodes;
+        for (let j = 0; j < added.length; j++) {
+          if (added[j].nodeType === 1) {
+            hasAdded = true;
+            break;
           }
         }
+        if (hasAdded) break;
+      }
+
+      if (hasAdded) {
+        if (moTimeout) clearTimeout(moTimeout);
+        moTimeout = setTimeout(() => {
+          const els = document.querySelectorAll(sel);
+          for (let i = 0; i < els.length; i++) {
+            processNode(els[i]);
+          }
+        }, 100);
       }
     });
     mo.observe(document.body || document.documentElement, { childList: true, subtree: true });
