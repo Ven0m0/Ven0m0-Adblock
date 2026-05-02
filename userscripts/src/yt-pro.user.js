@@ -406,18 +406,28 @@
       obs.observe(e);
     };
     const lazy = () => document.querySelectorAll(sel).forEach(processNode);
-    const debounceLazy = debounce(lazy, 50);
+    let moTimeout;
     const mo = new MutationObserver((mutations) => {
-      let added = false;
+      let hasAdded = false;
       for (let i = 0; i < mutations.length; i++) {
-        const nodes = mutations[i].addedNodes;
-        for (let j = 0; j < nodes.length; j++) {
-          if (nodes[j].nodeType === 1) {
-            added = true;
+        const added = mutations[i].addedNodes;
+        for (let j = 0; j < added.length; j++) {
+          if (added[j].nodeType === 1) {
+            hasAdded = true;
             break;
           }
         }
-        if (added) break;
+        if (hasAdded) break;
+      }
+
+      if (hasAdded) {
+        if (moTimeout) clearTimeout(moTimeout);
+        moTimeout = setTimeout(() => {
+          const els = document.querySelectorAll(sel);
+          for (let i = 0; i < els.length; i++) {
+            processNode(els[i]);
+          }
+        }, 100);
       }
       if (added) debounceLazy();
     });
