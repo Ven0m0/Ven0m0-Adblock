@@ -406,24 +406,20 @@
       obs.observe(e);
     };
     const lazy = () => document.querySelectorAll(sel).forEach(processNode);
+    const debounceLazy = debounce(lazy, 50);
     const mo = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        for (const node of m.addedNodes) {
-          if (node.nodeType === 1) {
-            const n = node.nodeName;
-            if (
-              (n === "YTD-RICH-ITEM-RENDERER" || n === "YTD-COMPACT-VIDEO-RENDERER" || n === "YTD-THUMBNAIL") &&
-              !node.dataset.lazyOpt
-            ) {
-              processNode(node);
-            }
-            if (node.querySelectorAll) {
-              const els = node.querySelectorAll(sel);
-              for (let i = 0; i < els.length; i++) processNode(els[i]);
-            }
+      let added = false;
+      for (let i = 0; i < mutations.length; i++) {
+        const nodes = mutations[i].addedNodes;
+        for (let j = 0; j < nodes.length; j++) {
+          if (nodes[j].nodeType === 1) {
+            added = true;
+            break;
           }
         }
+        if (added) break;
       }
+      if (added) debounceLazy();
     });
     mo.observe(document.body || document.documentElement, { childList: true, subtree: true });
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", lazy) : setTimeout(lazy, 120);
