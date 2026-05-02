@@ -429,6 +429,7 @@
           }
         }, 100);
       }
+      if (added) debounceLazy();
     });
     mo.observe(document.body || document.documentElement, { childList: true, subtree: true });
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", lazy) : setTimeout(lazy, 120);
