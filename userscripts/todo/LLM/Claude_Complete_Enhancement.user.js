@@ -1724,172 +1724,94 @@ IMPROVEMENTS OVER ORIGINALS:
       const usage = UsageMonitorModule.usageData;
       const settings = UsageMonitorModule.settings;
 
-      tabContent.textContent = "";
-
       if (!usage && !settings) {
-        const errorDiv = document.createElement("div");
-        errorDiv.className = "loading";
-        errorDiv.textContent = "❌ Failed to load";
-        tabContent.appendChild(errorDiv);
+        tabContent.innerHTML = '<div class="loading">❌ Failed to load</div>';
         return;
       }
 
-      if (usage) {
-        const usageSection = document.createElement("div");
-        usageSection.className = "cts-section";
+      let html = "";
 
-        const usageTitle = document.createElement("div");
-        usageTitle.className = "cts-section-title";
-        usageTitle.textContent = "📊 Usage";
-        usageSection.appendChild(usageTitle);
+      if (usage) {
+        html += '<div class="cts-section"><div class="cts-section-title">📊 Usage</div>';
 
         if (usage.five_hour) {
           const percent = usage.five_hour.utilization || 0;
           const barClass = percent > 80 ? "danger" : percent > 60 ? "warning" : "";
-
-          const usageItem = document.createElement("div");
-          usageItem.className = "usage-item";
-
-          const usageLabel = document.createElement("div");
-          usageLabel.className = "usage-label";
-
-          const labelText = document.createElement("span");
-          labelText.className = "usage-label-text";
-          labelText.textContent = "Current Session";
-
-          const labelTime = document.createElement("span");
-          labelTime.className = "usage-label-time";
-          labelTime.textContent = UsageMonitorModule.formatResetTime(usage.five_hour.resets_at);
-
-          usageLabel.appendChild(labelText);
-          usageLabel.appendChild(labelTime);
-
-          const usageBar = document.createElement("div");
-          usageBar.className = "usage-bar";
-
-          const barFill = document.createElement("div");
-          barFill.className = "usage-bar-fill";
-          if (barClass) barFill.classList.add(barClass);
-          barFill.style.width = `${percent}%`;
-
-          usageBar.appendChild(barFill);
-
-          const usagePercent = document.createElement("div");
-          usagePercent.className = "usage-percent";
-          usagePercent.textContent = `${percent}% used`;
-
-          usageItem.appendChild(usageLabel);
-          usageItem.appendChild(usageBar);
-          usageItem.appendChild(usagePercent);
-
-          usageSection.appendChild(usageItem);
+          html += `
+            <div class="usage-item">
+              <div class="usage-label">
+                <span class="usage-label-text">Current Session</span>
+                <span class="usage-label-time">${UsageMonitorModule.formatResetTime(usage.five_hour.resets_at)}</span>
+              </div>
+              <div class="usage-bar">
+                <div class="usage-bar-fill ${barClass}" style="width: ${percent}%"></div>
+              </div>
+              <div class="usage-percent">${percent}% used</div>
+            </div>
+          `;
         }
 
         if (usage.seven_day) {
           const percent = usage.seven_day.utilization || 0;
           const barClass = percent > 80 ? "danger" : percent > 60 ? "warning" : "";
-
-          const usageItem = document.createElement("div");
-          usageItem.className = "usage-item";
-
-          const usageLabel = document.createElement("div");
-          usageLabel.className = "usage-label";
-
-          const labelText = document.createElement("span");
-          labelText.className = "usage-label-text";
-          labelText.textContent = "Weekly (All Models)";
-
-          const labelTime = document.createElement("span");
-          labelTime.className = "usage-label-time";
-          labelTime.textContent = UsageMonitorModule.formatResetTime(usage.seven_day.resets_at);
-
-          usageLabel.appendChild(labelText);
-          usageLabel.appendChild(labelTime);
-
-          const usageBar = document.createElement("div");
-          usageBar.className = "usage-bar";
-
-          const barFill = document.createElement("div");
-          barFill.className = "usage-bar-fill";
-          if (barClass) barFill.classList.add(barClass);
-          barFill.style.width = `${percent}%`;
-
-          usageBar.appendChild(barFill);
-
-          const usagePercent = document.createElement("div");
-          usagePercent.className = "usage-percent";
-          usagePercent.textContent = `${percent}% used`;
-
-          usageItem.appendChild(usageLabel);
-          usageItem.appendChild(usageBar);
-          usageItem.appendChild(usagePercent);
-
-          usageSection.appendChild(usageItem);
+          html += `
+            <div class="usage-item">
+              <div class="usage-label">
+                <span class="usage-label-text">Weekly (All Models)</span>
+                <span class="usage-label-time">${UsageMonitorModule.formatResetTime(usage.seven_day.resets_at)}</span>
+              </div>
+              <div class="usage-bar">
+                <div class="usage-bar-fill ${barClass}" style="width: ${percent}%"></div>
+              </div>
+              <div class="usage-percent">${percent}% used</div>
+            </div>
+          `;
         }
 
-        tabContent.appendChild(usageSection);
+        html += "</div>";
       }
 
       if (settings) {
-        const settingsSection = document.createElement("div");
-        settingsSection.className = "cts-section";
-
-        const settingsTitle = document.createElement("div");
-        settingsTitle.className = "cts-section-title";
-        settingsTitle.textContent = "🔧 Feature Toggles";
-        settingsSection.appendChild(settingsTitle);
+        html += '<div class="cts-section"><div class="cts-section-title">🔧 Feature Toggles</div>';
 
         UsageMonitorModule.FEATURES.forEach((feature) => {
           const isEnabled = settings[feature.key] === true;
-
-          const featureItem = document.createElement("div");
-          featureItem.className = "feature-item";
-
-          const featureInfo = document.createElement("div");
-          featureInfo.className = "feature-info";
-
-          const featureName = document.createElement("div");
-          featureName.className = "feature-name";
-          featureName.textContent = feature.name;
-
-          const featureDesc = document.createElement("div");
-          featureDesc.className = "feature-desc";
-          featureDesc.textContent = feature.desc;
-
-          featureInfo.appendChild(featureName);
-          featureInfo.appendChild(featureDesc);
-
-          const button = document.createElement("button");
-          button.className = "feature-toggle";
-          button.classList.add(isEnabled ? "on" : "off");
-          button.dataset.key = feature.key;
-          button.dataset.value = isEnabled;
-          if (feature.exclusive) {
-            button.dataset.exclusive = feature.exclusive;
-          }
-          button.textContent = isEnabled ? "✓ ON" : "OFF";
-
-          button.addEventListener("click", async (e) => {
-            const btn = e.target;
-            const key = btn.dataset.key;
-            const currentValue = btn.dataset.value === "true";
-            const exclusiveKey = btn.dataset.exclusive || null;
-
-            btn.disabled = true;
-            btn.textContent = "...";
-
-            await UsageMonitorModule.toggleFeature(key, currentValue, exclusiveKey);
-            setTimeout(() => UsageMonitorModule.refresh(), 300);
-          });
-
-          featureItem.appendChild(featureInfo);
-          featureItem.appendChild(button);
-
-          settingsSection.appendChild(featureItem);
+          html += `
+            <div class="feature-item">
+              <div class="feature-info">
+                <div class="feature-name">${feature.name}</div>
+                <div class="feature-desc">${feature.desc}</div>
+              </div>
+              <button class="feature-toggle ${isEnabled ? "on" : "off"}"
+                      data-key="${feature.key}"
+                      data-value="${isEnabled}"
+                      data-exclusive="${feature.exclusive || ""}">
+                ${isEnabled ? "✓ ON" : "OFF"}
+              </button>
+            </div>
+          `;
         });
 
-        tabContent.appendChild(settingsSection);
+        html += "</div>";
       }
+
+      tabContent.innerHTML = html;
+
+      // Add event listeners for feature toggles
+      tabContent.querySelectorAll(".feature-toggle").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          const button = e.target;
+          const key = button.dataset.key;
+          const currentValue = button.dataset.value === "true";
+          const exclusiveKey = button.dataset.exclusive || null;
+
+          button.disabled = true;
+          button.textContent = "...";
+
+          await UsageMonitorModule.toggleFeature(key, currentValue, exclusiveKey);
+          setTimeout(() => UsageMonitorModule.refresh(), 300);
+        });
+      });
     },
 
     makeDraggable(element, saveKey, onClick, dragHandle = null) {
