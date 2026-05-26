@@ -75,14 +75,11 @@ class AsyncIterator:
 
 
 class TestUpdateLists(unittest.TestCase):
-    def setUp(self):
-        self.valid_content_body = "||example.comxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx^\n"
-        normalized = self.valid_content_body.replace("\r", "").rstrip("\n") + "\n"
-        computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
-        self.checksum = base64.b64encode(computed_hash).decode().rstrip("=")
-        self.valid_full_content = (
-            f"! checksum: {self.checksum}\n{self.valid_content_body}"
-        )
+    valid_content_body = "||example.comxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx^\n"
+    normalized = valid_content_body.replace("\r", "").rstrip("\n") + "\n"
+    computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
+    checksum = base64.b64encode(computed_hash).decode().rstrip("=")
+    valid_full_content = f"! checksum: {checksum}\n{valid_content_body}"
 
     def test_validate_checksum_valid(self):
         # NOTE: This test assumes validate_checksum has been refactored to accept string
@@ -145,9 +142,10 @@ class TestUpdateLists(unittest.TestCase):
         mock_aiofiles.files[str(temp_path)] = "some content"
 
         # Using a real Path object instead of MagicMock(spec=Path) because of internal string conversion in mock_aiofiles
-        with patch.object(Path, "exists", return_value=True), patch.object(
-            Path, "unlink"
-        ) as mock_unlink:
+        with (
+            patch.object(Path, "exists", return_value=True),
+            patch.object(Path, "unlink") as mock_unlink,
+        ):
             result = asyncio.run(
                 update_lists.process_downloaded_file(
                     temp_path, "http://url", "final.txt", Path("/tmp/out")
@@ -163,7 +161,9 @@ class TestUpdateLists(unittest.TestCase):
     @patch("update_lists.process_downloaded_file")
     @patch("tempfile.NamedTemporaryFile")
     @patch("asyncio.to_thread")
-    def test_fetch_list_cleanup_logic(self, mock_to_thread, mock_tempfile, mock_process):
+    def test_fetch_list_cleanup_logic(
+        self, mock_to_thread, mock_tempfile, mock_process
+    ):
         """Verify fetch_list handles cleanup in finally block."""
 
         # Mock session response
@@ -395,7 +395,9 @@ domain.com
 
             # Verify list1
             self.assertIn("https://example.com/list1.txt", sources)
-            self.assertEqual(sources["https://example.com/list1.txt"]["filename"], "custom-name.txt")
+            self.assertEqual(
+                sources["https://example.com/list1.txt"]["filename"], "custom-name.txt"
+            )
             self.assertTrue(sources["https://example.com/list1.txt"]["skip_checksum"])
 
             # Verify list3 (no filename provided - should use sanitize)
