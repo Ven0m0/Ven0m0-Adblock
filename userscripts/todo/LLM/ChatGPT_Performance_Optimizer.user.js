@@ -309,63 +309,127 @@ Why Both?
       border: "1px solid rgba(255,255,255,0.15)"
     });
 
-    panel.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <strong style="font-size:13px;">ChatGPT Optimizer</strong>
-        <button id="cgpt-close" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:18px;padding:0;">×</button>
-      </div>
+    const _header = document.createElement("div");
+    _header.style.cssText = "display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;";
 
-      <div style="font-size:11px;opacity:0.8;margin-bottom:10px;line-height:1.4;">
-        <strong>Layer 1:</strong> Memory (fetch) - keep <span id="cgpt-keep-display">${getKeepLast()}</span> msgs<br>
-        <strong>Layer 2:</strong> DOM cleanup - keep <span id="cgpt-leave-display">${domSettings.leaveOnly}</span> msgs
-      </div>
+    const _title = document.createElement("strong");
+    _title.style.fontSize = "13px";
+    _title.textContent = "ChatGPT Optimizer";
 
-      <div style="margin-bottom:8px;">
-        <label style="display:flex;align-items:center;gap:6px;">
-          <input type="checkbox" id="cgpt-dom-enabled" ${domSettings.enabled ? "checked" : ""}>
-          <span>DOM auto-clean enabled</span>
-        </label>
-      </div>
+    const _closeBtn = document.createElement("button");
+    _closeBtn.id = "cgpt-close";
+    _closeBtn.style.cssText = "background:none;border:none;color:#ccc;cursor:pointer;font-size:18px;padding:0;";
+    _closeBtn.textContent = "×";
 
-      <div style="margin-bottom:8px;">
-        <label style="display:block;margin-bottom:4px;">DOM: Keep last</label>
-        <input id="cgpt-dom-keep" type="number" value="${domSettings.leaveOnly}" min="1" max="100"
-          style="width:60px;padding:4px;background:#222;color:#fff;border:1px solid #555;border-radius:4px;">
-        <span style="margin-left:6px;opacity:0.8;">messages</span>
-      </div>
+    _header.append(_title, _closeBtn);
 
-      <div style="margin-bottom:10px;">
-        <label style="display:block;margin-bottom:4px;">DOM: Interval</label>
-        <input id="cgpt-dom-interval" type="number" value="${domSettings.intervalSec}" min="2" max="60"
-          style="width:60px;padding:4px;background:#222;color:#fff;border:1px solid #555;border-radius:4px;">
-        <span style="margin-left:6px;opacity:0.8;">seconds</span>
-      </div>
+    const _layersDiv = document.createElement("div");
+    _layersDiv.style.cssText = "font-size:11px;opacity:0.8;margin-bottom:10px;line-height:1.4;";
 
-      <button id="cgpt-clean-now" style="
-        width:100%;padding:8px;background:#008000;color:#fff;border:none;
-        border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:8px;">
-        Clean DOM Now
-      </button>
+    const _layer1Strong = document.createElement("strong");
+    _layer1Strong.textContent = "Layer 1:";
+    const _layer1Span = document.createElement("span");
+    _layer1Span.id = "cgpt-keep-display";
+    _layer1Span.textContent = getKeepLast();
 
-      <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;margin-top:8px;">
-        <div style="font-size:11px;opacity:0.8;margin-bottom:6px;">Memory optimization:</div>
-        <button id="cgpt-load-older" style="
-          width:100%;padding:6px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);
-          border-radius:4px;cursor:pointer;font-size:11px;margin-bottom:4px;">
-          Load +${FETCH_CONFIG.STEP} older messages
-        </button>
-        <button id="cgpt-reset-fast" style="
-          width:100%;padding:6px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);
-          border-radius:4px;cursor:pointer;font-size:11px;margin-bottom:4px;">
-          Reset to default (${FETCH_CONFIG.DEFAULT_KEEP_LAST} msgs)
-        </button>
-        <button id="cgpt-full-history" style="
-          width:100%;padding:6px;background:rgba(255,255,0,0.2);color:#ff0;border:1px solid rgba(255,255,0,0.3);
-          border-radius:4px;cursor:pointer;font-size:11px;">
-          Load full history (slow!)
-        </button>
-      </div>
-    `;
+    const _layer2Strong = document.createElement("strong");
+    _layer2Strong.textContent = "Layer 2:";
+    const _layer2Span = document.createElement("span");
+    _layer2Span.id = "cgpt-leave-display";
+    _layer2Span.textContent = domSettings.leaveOnly;
+
+    _layersDiv.append(_layer1Strong, " Memory (fetch) - keep ", _layer1Span, " msgs", document.createElement("br"),
+                     _layer2Strong, " DOM cleanup - keep ", _layer2Span, " msgs");
+
+    const _enableDiv = document.createElement("div");
+    _enableDiv.style.marginBottom = "8px";
+
+    const _enableLabel = document.createElement("label");
+    _enableLabel.style.cssText = "display:flex;align-items:center;gap:6px;";
+
+    const _enableInput = document.createElement("input");
+    _enableInput.type = "checkbox";
+    _enableInput.id = "cgpt-dom-enabled";
+    _enableInput.checked = domSettings.enabled;
+
+    const _enableSpan = document.createElement("span");
+    _enableSpan.textContent = "DOM auto-clean enabled";
+
+    _enableLabel.append(_enableInput, _enableSpan);
+    _enableDiv.appendChild(_enableLabel);
+
+    const _keepDiv = document.createElement("div");
+    _keepDiv.style.marginBottom = "8px";
+
+    const _keepLabel = document.createElement("label");
+    _keepLabel.style.cssText = "display:block;margin-bottom:4px;";
+    _keepLabel.textContent = "DOM: Keep last";
+
+    const _keepInput = document.createElement("input");
+    _keepInput.id = "cgpt-dom-keep";
+    _keepInput.type = "number";
+    _keepInput.value = domSettings.leaveOnly;
+    _keepInput.min = "1";
+    _keepInput.max = "100";
+    _keepInput.style.cssText = "width:60px;padding:4px;background:#222;color:#fff;border:1px solid #555;border-radius:4px;";
+
+    const _keepSpan = document.createElement("span");
+    _keepSpan.style.cssText = "margin-left:6px;opacity:0.8;";
+    _keepSpan.textContent = "messages";
+
+    _keepDiv.append(_keepLabel, _keepInput, _keepSpan);
+
+    const _intervalDiv = document.createElement("div");
+    _intervalDiv.style.marginBottom = "10px";
+
+    const _intervalLabel = document.createElement("label");
+    _intervalLabel.style.cssText = "display:block;margin-bottom:4px;";
+    _intervalLabel.textContent = "DOM: Interval";
+
+    const _intervalInput = document.createElement("input");
+    _intervalInput.id = "cgpt-dom-interval";
+    _intervalInput.type = "number";
+    _intervalInput.value = domSettings.intervalSec;
+    _intervalInput.min = "2";
+    _intervalInput.max = "60";
+    _intervalInput.style.cssText = "width:60px;padding:4px;background:#222;color:#fff;border:1px solid #555;border-radius:4px;";
+
+    const _intervalSpan = document.createElement("span");
+    _intervalSpan.style.cssText = "margin-left:6px;opacity:0.8;";
+    _intervalSpan.textContent = "seconds";
+
+    _intervalDiv.append(_intervalLabel, _intervalInput, _intervalSpan);
+
+    const _cleanNowBtn = document.createElement("button");
+    _cleanNowBtn.id = "cgpt-clean-now";
+    _cleanNowBtn.style.cssText = "width:100%;padding:8px;background:#008000;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-bottom:8px;";
+    _cleanNowBtn.textContent = "Clean DOM Now";
+
+    const _memDiv = document.createElement("div");
+    _memDiv.style.cssText = "border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;margin-top:8px;";
+
+    const _memTitle = document.createElement("div");
+    _memTitle.style.cssText = "font-size:11px;opacity:0.8;margin-bottom:6px;";
+    _memTitle.textContent = "Memory optimization:";
+
+    const _loadOlderBtn = document.createElement("button");
+    _loadOlderBtn.id = "cgpt-load-older";
+    _loadOlderBtn.style.cssText = "width:100%;padding:6px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:4px;cursor:pointer;font-size:11px;margin-bottom:4px;";
+    _loadOlderBtn.textContent = `Load +${FETCH_CONFIG.STEP} older messages`;
+
+    const _resetFastBtn = document.createElement("button");
+    _resetFastBtn.id = "cgpt-reset-fast";
+    _resetFastBtn.style.cssText = "width:100%;padding:6px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:4px;cursor:pointer;font-size:11px;margin-bottom:4px;";
+    _resetFastBtn.textContent = `Reset to default (${FETCH_CONFIG.DEFAULT_KEEP_LAST} msgs)`;
+
+    const _fullHistoryBtn = document.createElement("button");
+    _fullHistoryBtn.id = "cgpt-full-history";
+    _fullHistoryBtn.style.cssText = "width:100%;padding:6px;background:rgba(255,255,0,0.2);color:#ff0;border:1px solid rgba(255,255,0,0.3);border-radius:4px;cursor:pointer;font-size:11px;";
+    _fullHistoryBtn.textContent = "Load full history (slow!)";
+
+    _memDiv.append(_memTitle, _loadOlderBtn, _resetFastBtn, _fullHistoryBtn);
+
+    panel.append(_header, _layersDiv, _enableDiv, _keepDiv, _intervalDiv, _cleanNowBtn, _memDiv);
 
     container.appendChild(toggleBtn);
     container.appendChild(panel);
