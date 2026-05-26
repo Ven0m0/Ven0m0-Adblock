@@ -289,7 +289,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
             "✗ Unexpected error for http://url: Boom"
         )
 
-    async def test_count_rules(self):
+    def test_count_rules(self):
         # Empty content
         self.assertEqual(count_rules(""), 0)
 
@@ -316,7 +316,7 @@ domain.com
         content = "rule1.com\r\nrule2.com\r\n"
         self.assertEqual(count_rules(content), 2)
 
-    async def test_count_rules_with_whitespace(self):
+    def test_count_rules_with_whitespace(self):
         # Lines with only whitespace should not count
         content = "rule1.com\n   \n\trule2.com\n"
         self.assertEqual(count_rules(content), 2)
