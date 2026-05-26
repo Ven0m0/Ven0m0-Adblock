@@ -350,7 +350,8 @@ CONSOLIDATED FEATURES:
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel {
         display: flex !important;
-        flex-wrap: wrap !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
         justify-content: flex-start !important;
       }
 
