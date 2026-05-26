@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 
-def validate_checksum(content: str, name: str = "unknown") -> bool:
+async def validate_checksum(content: str, name: str = "unknown") -> bool:
     """Validate Adblock Plus checksum header."""
     pattern = re.compile(
         r"^\s*!\s*checksum[\s\-:]+([\w\+\/=]+).*\n",
@@ -61,9 +61,37 @@ def validate_checksum(content: str, name: str = "unknown") -> bool:
         return True
 
     declared_checksum = match.group(1)
-    data_no_checksum = pattern.sub("", content, 1)
-    normalized = data_no_checksum.replace("\r", "").rstrip("\n") + "\n"
-    computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
+
+    match_start = match.start()
+    match_end = match.end()
+
+    end_idx = len(content)
+    while end_idx > 0 and content[end_idx - 1] in ("\n", "\r"):
+        end_idx -= 1
+
+    hasher = hashlib.sha256()
+    chunk_size = 1024 * 1024  # 1MB chunks
+
+    # Process content before the match
+    for start in range(0, match_start, chunk_size):
+        chunk = content[start : min(start + chunk_size, match_start)]
+        if "\r" in chunk:
+            chunk = chunk.replace("\r", "")
+        hasher.update(chunk.encode("utf-8"))
+        await asyncio.sleep(0)  # Yield control to the event loop
+
+    # Process content after the match
+    for start in range(match_end, end_idx, chunk_size):
+        chunk = content[start : min(start + chunk_size, end_idx)]
+        if "\r" in chunk:
+            chunk = chunk.replace("\r", "")
+        hasher.update(chunk.encode("utf-8"))
+        await asyncio.sleep(0)  # Yield control to the event loop
+
+    # Append the trailing newline as required by the checksum algorithm
+    hasher.update(b"\n")
+
+    computed_hash = hasher.digest()
     computed_checksum = base64.b64encode(computed_hash).decode().rstrip("=")
 
     if declared_checksum == computed_checksum:
@@ -106,8 +134,8 @@ async def process_downloaded_file(
             content = await f.read()
 
         if not skip_checksum:
-            # Offload CPU-bound checksum validation to a thread
-            is_valid = await asyncio.to_thread(validate_checksum, content, filename)
+            # Yield control while validating checksum in chunks to prevent blocking
+            is_valid = await validate_checksum(content, filename)
             if not is_valid:
                 logger.warning(f"Checksum validation failed for {url}")
                 # Do not delete temp_path here; the caller's finally block is responsible for cleanup.
