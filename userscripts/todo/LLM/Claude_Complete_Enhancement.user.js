@@ -180,7 +180,11 @@ IMPROVEMENTS OVER ORIGINALS:
           // Preserve multiple newlines better than default behavior
           if (text.includes('\n')) {
             text = text.replace(/\r\n/g, '\n');
-            document.execCommand("insertText", false, text);
+            const success = document.execCommand("insertText", false, text);
+            if (!success && typeof active.setRangeText === "function") {
+              active.setRangeText(text, active.selectionStart, active.selectionEnd, "end");
+              active.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+            }
             e.preventDefault();
           }
         }
