@@ -4,8 +4,6 @@ from pathlib import Path
 from io import StringIO
 from unittest.mock import patch
 import unittest
-from unittest.mock import patch
-from pathlib import Path
 
 # Add current directory to path to allow importing deduplicate
 from Scripts.deduplicate import (
@@ -14,8 +12,6 @@ from Scripts.deduplicate import (
     is_header,
     is_valid_rule,
     find_cross_file_duplicates,
-    deduplicate_file,
-    Stats,
 )
 
 

@@ -81,7 +81,6 @@ IMPROVEMENTS OVER ORIGINALS:
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
   function _saveConfig() {
     GM_setValue("warning_threshold", CONFIG.thresholds.warning);
     GM_setValue("danger_threshold", CONFIG.thresholds.danger);
@@ -180,7 +179,11 @@ IMPROVEMENTS OVER ORIGINALS:
           // Preserve multiple newlines better than default behavior
           if (text.includes('\n')) {
             text = text.replace(/\r\n/g, '\n');
-            document.execCommand("insertText", false, text);
+            const success = document.execCommand("insertText", false, text);
+            if (!success && typeof active.setRangeText === "function") {
+              active.setRangeText(text, active.selectionStart, active.selectionEnd, "end");
+              active.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+            }
             e.preventDefault();
           }
         }
@@ -1562,6 +1565,15 @@ IMPROVEMENTS OVER ORIGINALS:
       document.getElementById("cts-refresh")?.addEventListener("click", () => TokenSaverModule.refresh());
       document.getElementById("cts-clear")?.addEventListener("click", () => TokenSaverModule.clear());
 
+      // Settings checkboxes
+      panel.querySelectorAll(".feature-checkbox").forEach((checkbox) => {
+        checkbox.addEventListener("change", (e) => {
+          const feature = e.target.dataset.feature;
+          CONFIG.features[feature] = e.target.checked;
+          _saveConfig();
+        });
+      });
+
       // Draggable header
       const header = panel.querySelector(".panel-header");
       this.makeDraggable(panel, "ui_position", null, header);
@@ -1617,11 +1629,11 @@ IMPROVEMENTS OVER ORIGINALS:
           <div class="cts-section">
             <div class="cts-section-title">⚙️ Feature Toggles</div>
             <div class="cts-help">
-              <label><input type="checkbox" ${CONFIG.features.theme ? "checked" : ""}> Dark oceanic theme</label><br>
-              <label><input type="checkbox" ${CONFIG.features.tokenSaver ? "checked" : ""}> Token Saver</label><br>
-              <label><input type="checkbox" ${CONFIG.features.codeCollapser ? "checked" : ""}> Code Collapser</label><br>
-              <label><input type="checkbox" ${CONFIG.features.usageMonitor ? "checked" : ""}> Usage Monitor</label><br>
-              <label><input type="checkbox" ${CONFIG.features.fork ? "checked" : ""}> Fork Conversation</label><br>
+              <label><input type="checkbox" class="feature-checkbox" data-feature="theme" ${CONFIG.features.theme ? "checked" : ""}> Dark oceanic theme</label><br>
+              <label><input type="checkbox" class="feature-checkbox" data-feature="tokenSaver" ${CONFIG.features.tokenSaver ? "checked" : ""}> Token Saver</label><br>
+              <label><input type="checkbox" class="feature-checkbox" data-feature="codeCollapser" ${CONFIG.features.codeCollapser ? "checked" : ""}> Code Collapser</label><br>
+              <label><input type="checkbox" class="feature-checkbox" data-feature="usageMonitor" ${CONFIG.features.usageMonitor ? "checked" : ""}> Usage Monitor</label><br>
+              <label><input type="checkbox" class="feature-checkbox" data-feature="fork" ${CONFIG.features.fork ? "checked" : ""}> Fork Conversation</label><br>
               <br>
               <small style="color:#909090;">Refresh page to apply changes</small>
             </div>

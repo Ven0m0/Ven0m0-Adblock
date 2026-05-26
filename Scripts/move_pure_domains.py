@@ -32,21 +32,30 @@ ADS_PATTERN = re.compile(r"ad|ads|analytics|tracking|telemetry|metric")
 SOCIAL_PATTERN = re.compile(r"social|facebook|twitter|instagram")
 
 
+def get_file_category(source_file: str) -> str | None:
+    """Get category based on source file name, if any"""
+    source_lower = source_file.lower()
+    if "spotify" in source_lower:
+        return "Spotify.txt"
+    elif "youtube" in source_lower or "twitch" in source_lower:
+        return "Social-Media.txt"
+    elif "reddit" in source_lower or "twitter" in source_lower:
+        return "Social-Media.txt"
+    elif "game" in source_lower:
+        return "Games.txt"
+    return None
+
+
 def categorize_domain(domain: str, source_file: str) -> str:
     """Determine which hostlist category a domain belongs to"""
-    domain_lower = domain.lower()
 
-    # Map based on source file name
-    if "spotify" in source_file.lower():
-        return "Spotify.txt"
-    elif "youtube" in source_file.lower() or "twitch" in source_file.lower():
-        return "Social-Media.txt"
-    elif "reddit" in source_file.lower() or "twitter" in source_file.lower():
-        return "Social-Media.txt"
-    elif "game" in source_file.lower():
-        return "Games.txt"
+    # Check file-based category first
+    file_category = get_file_category(source_file)
+    if file_category:
+        return file_category
 
     # Map based on domain content
+    domain_lower = domain.lower()
     if ADS_PATTERN.search(domain_lower):
         return "Ads.txt"
     elif SOCIAL_PATTERN.search(domain_lower):
@@ -88,9 +97,23 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
             print(f"  Found {len(pure_domains)} pure domains")
             file_updates[adblock_file] = filter_rules
 
-            for domain in pure_domains:
-                target_file = categorize_domain(domain, adblock_file.name)
-                domain_moves[target_file][adblock_file.name].append(domain)
+            # Optimization: check file category once instead of per-domain
+            file_category = get_file_category(adblock_file.name)
+
+            if file_category:
+                # Fast path: all domains go to the same target based on source filename
+                domain_moves[file_category][adblock_file.name].extend(pure_domains)
+            else:
+                # Slow path: categorize based on domain content
+                for domain in pure_domains:
+                    domain_lower = domain.lower()
+                    if ADS_PATTERN.search(domain_lower):
+                        target_file = "Ads.txt"
+                    elif SOCIAL_PATTERN.search(domain_lower):
+                        target_file = "Social-Media.txt"
+                    else:
+                        target_file = "Other.txt"
+                    domain_moves[target_file][adblock_file.name].append(domain)
 
     return domain_moves, file_updates
 

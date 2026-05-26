@@ -389,11 +389,13 @@
   if (CFG.gpu.lazyThumbs) {
     const obs = new IntersectionObserver(
       (es) => {
-        es.forEach((e) => {
-          if (e.isIntersecting) {
-            if (e.target.style.display === "none") e.target.style.display = "";
-            obs.unobserve(e.target);
-          }
+        requestAnimationFrame(() => {
+          es.forEach((e) => {
+            if (e.isIntersecting) {
+              if (e.target.style.display === "none") e.target.style.display = "";
+              obs.unobserve(e.target);
+            }
+          });
         });
       },
       { rootMargin: K.LAZY_THUMB_MARGIN }
