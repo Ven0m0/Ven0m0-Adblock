@@ -75,14 +75,11 @@ class AsyncIterator:
 
 
 class TestUpdateLists(unittest.TestCase):
-    def setUp(self):
-        self.valid_content_body = "||example.comxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx^\n"
-        normalized = self.valid_content_body.replace("\r", "").rstrip("\n") + "\n"
-        computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
-        self.checksum = base64.b64encode(computed_hash).decode().rstrip("=")
-        self.valid_full_content = (
-            f"! checksum: {self.checksum}\n{self.valid_content_body}"
-        )
+    valid_content_body = "||example.comxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx^\n"
+    normalized = valid_content_body.replace("\r", "").rstrip("\n") + "\n"
+    computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
+    checksum = base64.b64encode(computed_hash).decode().rstrip("=")
+    valid_full_content = f"! checksum: {checksum}\n{valid_content_body}"
 
     def test_validate_checksum_valid(self):
         # NOTE: This test assumes validate_checksum has been refactored to accept string
