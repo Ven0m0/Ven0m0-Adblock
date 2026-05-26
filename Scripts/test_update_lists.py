@@ -145,10 +145,9 @@ class TestUpdateLists(unittest.TestCase):
         mock_aiofiles.files[str(temp_path)] = "some content"
 
         # Using a real Path object instead of MagicMock(spec=Path) because of internal string conversion in mock_aiofiles
-        with (
-            patch.object(Path, "exists", return_value=True),
-            patch.object(Path, "unlink") as mock_unlink,
-        ):
+        with patch.object(Path, "exists", return_value=True), patch.object(
+            Path, "unlink"
+        ) as mock_unlink:
             result = asyncio.run(
                 update_lists.process_downloaded_file(
                     temp_path, "http://url", "final.txt", Path("/tmp/out")
@@ -164,9 +163,7 @@ class TestUpdateLists(unittest.TestCase):
     @patch("update_lists.process_downloaded_file")
     @patch("tempfile.NamedTemporaryFile")
     @patch("asyncio.to_thread")
-    def test_fetch_list_cleanup_logic(
-        self, mock_to_thread, mock_tempfile, mock_process
-    ):
+    def test_fetch_list_cleanup_logic(self, mock_to_thread, mock_tempfile, mock_process):
         """Verify fetch_list handles cleanup in finally block."""
 
         # Mock session response
@@ -398,9 +395,7 @@ domain.com
 
             # Verify list1
             self.assertIn("https://example.com/list1.txt", sources)
-            self.assertEqual(
-                sources["https://example.com/list1.txt"]["filename"], "custom-name.txt"
-            )
+            self.assertEqual(sources["https://example.com/list1.txt"]["filename"], "custom-name.txt")
             self.assertTrue(sources["https://example.com/list1.txt"]["skip_checksum"])
 
             # Verify list3 (no filename provided - should use sanitize)
