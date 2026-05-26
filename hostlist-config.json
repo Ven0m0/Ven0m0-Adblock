@@ -16,7 +16,7 @@
       "name": "Search engine tracking and ads"
     },
     {
-      "source": "lists/sources/TwitterAnnoyances.txt",
+      "source": "lists/sources/Twitter.txt",
       "type": "adblock",
       "name": "Twitter/X annoyances and tracking"
     }
