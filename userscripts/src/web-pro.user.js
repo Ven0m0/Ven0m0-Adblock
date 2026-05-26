@@ -1000,15 +1000,17 @@
       DEBOUNCE = 240;
     const prio = "fetchPriority" in HTMLImageElement.prototype;
     const optAZ = (root = document) => {
-      root.querySelectorAll("img:not([data-az])").forEach((img, i) => {
+      const imgs = root.getElementsByTagName("img");
+      let i = 0;
+      for (let j = 0; j < imgs.length; j++) {
+        const img = imgs[j];
+        if (img.dataset.az) continue;
         img.dataset.az = "1";
         if (img.closest("#navFooter")) {
           img.loading = "lazy";
           img.decoding = "async";
           if (prio) img.fetchPriority = "low";
-          return;
-        }
-        if (img.classList.contains("s-image")) {
+        } else if (img.classList.contains("s-image")) {
           if (i < HIGH) {
             img.loading = "eager";
             if (prio) img.fetchPriority = "high";
@@ -1017,13 +1019,12 @@
             img.decoding = "async";
             if (prio) img.fetchPriority = "low";
           }
-          return;
-        }
-        if (!img.loading) {
+        } else if (!img.loading) {
           img.loading = "lazy";
           img.decoding = "async";
         }
-      });
+        i++;
+      }
     };
     const runAZ = () => {
       optAZ(document);
