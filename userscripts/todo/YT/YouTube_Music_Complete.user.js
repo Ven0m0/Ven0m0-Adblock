@@ -346,6 +346,7 @@ CONSOLIDATED FEATURES:
       /* Fix New Releases section layout */
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] {
         display: block !important;
+        width: 100% !important;
       }
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel {
@@ -353,12 +354,17 @@ CONSOLIDATED FEATURES:
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         justify-content: flex-start !important;
+        gap: 16px !important;
+        scrollbar-width: none !important; /* Firefox */
+      }
+
+      ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel::-webkit-scrollbar {
+        display: none !important; /* Safari and Chrome */
       }
 
       ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel-item {
         flex: 0 0 auto !important;
-        margin-right: 16px !important;
-        margin-bottom: 16px !important;
+        margin: 0 !important;
       }
     `);
   }
