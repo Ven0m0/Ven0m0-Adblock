@@ -150,7 +150,7 @@ def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
                     existing_domains.add(stripped)
 
         # Filter out duplicates
-        new_domains = [d for d in all_domains if d not in existing_domains]
+        new_domains = list(set(all_domains) - existing_domains)
 
         if new_domains:
             # Append new domains
