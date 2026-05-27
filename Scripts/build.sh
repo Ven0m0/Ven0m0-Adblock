@@ -4,7 +4,8 @@
 # shellcheck enable=all shell=bash source-path=SCRIPTDIR
 set -euo pipefail; shopt -s nullglob globstar extglob
 IFS=$'\n\t' LC_ALL=C
-readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+readonly SCRIPT_DIR
 # shellcheck source=lib-common.sh
 . "${SCRIPT_DIR}/lib-common.sh"
 
@@ -15,7 +16,7 @@ readonly SCRIPT_SRC="userscripts/src"
 readonly SCRIPT_OUT="userscripts/dist"
 readonly SCRIPT_LIST="userscripts/list.txt"
 
-_FD= _RG= _PAR= _JOBS= _RUNNER=
+_FD="" _RG="" _PAR="" _JOBS="" _RUNNER=""
 fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
 rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo grep); echo "$_RG"; }; }
 par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }

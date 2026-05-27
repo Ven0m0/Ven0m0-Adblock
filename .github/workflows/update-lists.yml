@@ -14,12 +14,6 @@ concurrency:
   cancel-in-progress: true
 env:
   DEBIAN_FRONTEND: noninteractive
-  PYTHONOPTIMIZE: 2
-  PYTHONNODEBUGRANGES: 1
-  PYTHONDONTWRITEBYTECODE: 1
-  PYTHONUTF8: 1
-  PYTHONSAFEPATH: 1
-  PYTHON_COLORS: 0
   LC_ALL: C
   GITHUB_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 jobs:
@@ -32,21 +26,17 @@ jobs:
         with:
           fetch-depth: 1
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - name: Setup mise
+        uses: jdx/mise-action@v4
         with:
-          python-version: "3.14"
-      - uses: astral-sh/setup-uv@v8.1.0
-        with:
-          version: "latest"
-          enable-cache: true
-          github-token: ${{ github.token || secrets.PAT }}
-      - run: uv sync
+          install: true
+          cache: true
+          experimental: true
       - name: Run update script
         id: update
         run: |
           set -e; mkdir -p lists/mirror
-          uv run python3 -OO -m Scripts.update_lists --output-dir lists/mirror --max-concurrent 8
+          mise exec -- bun run Scripts/update_lists.ts --output-dir lists/mirror --max-concurrent 8
       - name: Run dead domains linter
         if: success()
         continue-on-error: true

@@ -4,7 +4,8 @@
 # Downloads, processes, and installs system-wide hosts file for ad-blocking
 set -euo pipefail; shopt -s nullglob globstar
 IFS=$'\n\t' LC_ALL=C
-readonly SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+readonly SCRIPT_DIR
 # shellcheck source=lib-common.sh
 . "${SCRIPT_DIR}/lib-common.sh"
 
@@ -17,6 +18,7 @@ readonly REPLACE="${replacehosts:-1}"
 readonly BACKUP_DIR=backups
 readonly RESOLVE="${RESOLVE_HOST:-127.0.0.1 $(hostname 2>/dev/null || echo localhost).local $(hostname 2>/dev/null || echo localhost) localhost}"
 
+# shellcheck source=/dev/null
 [[ -f $CONFIG ]] && . "$CONFIG"
 
 chk "$DL"
@@ -38,7 +40,8 @@ download(){
   local n=0 url
   for url in ${HOSTS:-}; do
     ((n++))
-    printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
+    C="" N=""
+      printf '%b%d)%b %s\n' "$C" "$n" "$N" "$url"
     "$DL" -fsSL -- "$url" >> "$NEW_NAME" 2>/dev/null || warn "Failed: $url"
   done
 }

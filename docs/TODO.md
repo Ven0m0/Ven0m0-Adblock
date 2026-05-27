@@ -4,7 +4,7 @@
 
 - [ ] Finish hostlist-compiler configs (`hostlist-config.json`, `lists/conf.json`) — see [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler) and [example config](https://github.com/AdguardTeam/AdGuardSDNSFilter/blob/master/configuration.json)
 - [ ] Review and consolidate cross-file duplicates in filter lists
-- [ ] Migrate remaining Python scripts to Bun/JS for CI portability
+- [x] Migrate remaining Python scripts to Bun/JS for CI portability
 
 ## Future Consideration
 
