@@ -183,6 +183,26 @@ IMPROVEMENTS OVER ORIGINALS:
             if (!success && typeof active.setRangeText === "function") {
               active.setRangeText(text, active.selectionStart, active.selectionEnd, "end");
               active.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+            } else if (!success && active.isContentEditable) {
+              const selection = window.getSelection();
+              if (selection && selection.rangeCount) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                const fragment = document.createDocumentFragment();
+                const lines = text.split('\n');
+                lines.forEach((line, i) => {
+                  if (line) {
+                    fragment.appendChild(document.createTextNode(line));
+                  }
+                  if (i < lines.length - 1) {
+                    fragment.appendChild(document.createElement("br"));
+                  }
+                });
+                range.insertNode(fragment);
+                range.collapse(false);
+                active.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+              }
             }
             e.preventDefault();
           }
