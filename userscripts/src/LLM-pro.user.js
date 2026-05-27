@@ -163,15 +163,23 @@
     });
   }
   if (isCGPT) {
+    let cgptCachedMsgs = null;
+    const cgptObserver = new MutationObserver(() => {
+      cgptCachedMsgs = null;
+    });
+    cgptObserver.observe(document.documentElement, { childList: true, subtree: true });
+
     const cleanup = () => {
       if (document.visibilityState !== "visible") return;
-      const msgs = document.querySelectorAll(SEL.CGPT.TURN);
-      if (msgs.length > CFG.CHATGPT.MAX) {
-        msgs.forEach((el, i) => {
-          if (i < msgs.length - CFG.CHATGPT.MAX) {
-            el.remove();
-          }
-        });
+      if (!cgptCachedMsgs) {
+        cgptCachedMsgs = Array.from(document.querySelectorAll(SEL.CGPT.TURN));
+      }
+      const over = cgptCachedMsgs.length - CFG.CHATGPT.MAX;
+      if (over > 0) {
+        for (let i = 0; i < over; i++) {
+          cgptCachedMsgs[i].remove();
+        }
+        cgptCachedMsgs.splice(0, over);
       }
     };
     let int = null;
@@ -270,15 +278,23 @@
       .catch(() => {});
   }
   if (isCl) {
+    let clCachedMsgs = null;
+    const clObserver = new MutationObserver(() => {
+      clCachedMsgs = null;
+    });
+    clObserver.observe(document.documentElement, { childList: true, subtree: true });
+
     const clean = () => {
       if (document.visibilityState !== "visible") return;
-      const m = document.querySelectorAll(SEL.CLAUDE.RENDER);
-      if (m.length > CFG.CLAUDE.MAX) {
-        m.forEach((el, i) => {
-          if (i < m.length - CFG.CLAUDE.MAX) {
-            el.remove();
-          }
-        });
+      if (!clCachedMsgs) {
+        clCachedMsgs = Array.from(document.querySelectorAll(SEL.CLAUDE.RENDER));
+      }
+      const over = clCachedMsgs.length - CFG.CLAUDE.MAX;
+      if (over > 0) {
+        for (let i = 0; i < over; i++) {
+          clCachedMsgs[i].remove();
+        }
+        clCachedMsgs.splice(0, over);
       }
     };
     setInterval(clean, CFG.CLAUDE.CLEAN);
