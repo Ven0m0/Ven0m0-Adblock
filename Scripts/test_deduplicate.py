@@ -90,15 +90,15 @@ class TestDeduplicate(unittest.TestCase):
 
     def test_find_cross_file_duplicates(self):
         file_rules = {
-            "file1.txt": ["rule1.com", "rule2.com", "  rule3.com  "],
+            "file1.txt": ["rule1.com", "rule2.com", "rule3.com"],
             "file2.txt": ["rule2.com", "rule4.com"],
-            "file3.txt": ["rule3.com", "rule5.com", "  "],
+            "file3.txt": ["rule3.com", "rule5.com"],
         }
 
         duplicates = find_cross_file_duplicates(file_rules)
 
         # rule2.com is in file1 and file2
-        # rule3.com is in file1 and file3 (due to stripping)
+        # rule3.com is in file1 and file3
         expected = {
             "rule2.com": ["file1.txt", "file2.txt"],
             "rule3.com": ["file1.txt", "file3.txt"],
