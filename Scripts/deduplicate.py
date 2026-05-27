@@ -128,7 +128,6 @@ def find_cross_file_duplicates(
 
     for filename, rules in file_rules.items():
         for rule in rules:
-            rule = rule.strip()
             if rule:
                 entry_locations[rule].append(filename)
 
