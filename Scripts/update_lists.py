@@ -9,6 +9,7 @@ import argparse
 import asyncio
 import base64
 import hashlib
+import io
 import json
 import logging
 import re
@@ -114,7 +115,7 @@ def count_rules(content: str) -> int:
     """Count active rules in the content."""
     return sum(
         1
-        for line in content.splitlines()
+        for line in io.StringIO(content)
         if (stripped := line.strip()) and not stripped.startswith(HEADER_PREFIXES)
     )
 
