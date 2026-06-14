@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "Ad-blocking filter list utilities"
 requires-python = ">=3.13"
 dependencies = [
-  "aiohttp>=3.13.5",
+  "aiohttp>=3.14.1",
   "aiofiles>=25.1.0",
 ]
 
@@ -14,5 +14,5 @@ managed = true
 [dependency-groups]
 dev = [
     "prek>=0.4.4",
-    "ruff>=0.15.16",
+    "ruff>=0.15.17",
 ]
