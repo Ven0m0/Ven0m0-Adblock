@@ -1,8 +1,13 @@
-💡 What
-Removed the redundant `rule.strip()` operation inside the inner loop of `find_cross_file_duplicates` in `Scripts/deduplicate.py`. Also updated `Scripts/test_deduplicate.py` to match the expected input types to mirror the production pipeline where rules are already stripped by `process_content`.
+🎯 **What:**
+Extracted the large `injectFunctionalCSS` string (over 500 lines) out of the function body and into a top-level constant `FUNCTIONAL_CSS` in `userscripts/todo/LLM/Claude_Complete_Enhancement.user.js`.
 
-🎯 Why
-Because `process_content` effectively formats, filters, and strips rules from leading and trailing whitespace, rules passed to `find_cross_file_duplicates` are already stripped. Re-stripping them here adds unnecessary string allocation and manipulation overhead for thousands of lines in hot loops. Removing it reduces CPU overhead.
+💡 **Why:**
+Storing giant multiline CSS strings inside a function pollutes the function definition and makes the logic of that function (and its surrounding components) harder to read and maintain. By extracting the literal into a separate constant, we keep the data modular and improve code readability.
 
-📊 Measured Improvement
-In an isolated benchmark on a large dictionary with 1 million rule entries, eliminating the string stripping string methods improved the processing time from 0.56s to 0.44s (~21% reduction). While small on typical runs, this avoids unnecessary operations globally.
+✅ **Verification:**
+* Verified the script still syntactically compiles without error using `bun run lint:js`.
+* Formatting checks pass via `bun run format:check`.
+* Manual visual inspection of the replaced chunk confirms structural integrity.
+
+✨ **Result:**
+The `injectFunctionalCSS` function is now clean and immediately understandable, containing simply `GM_addStyle(FUNCTIONAL_CSS);`, significantly reducing unnecessary scrolling and visual clutter for developers maintaining the core logic.
