@@ -254,8 +254,7 @@ IMPROVEMENTS OVER ORIGINALS:
   // FUNCTIONAL CSS
   // ═══════════════════════════════════════════════════════════
 
-  function injectFunctionalCSS() {
-    GM_addStyle(`
+  const FUNCTIONAL_CSS = `
       /* ═══════════════════════════════════════════════════════════
          UNIFIED CONTROL PANEL
          ═══════════════════════════════════════════════════════════ */
@@ -790,7 +789,10 @@ IMPROVEMENTS OVER ORIGINALS:
         color: #909090;
         font-size: 13px;
       }
-    `);
+    `;
+
+  function injectFunctionalCSS() {
+    GM_addStyle(FUNCTIONAL_CSS);
   }
 
   // ═══════════════════════════════════════════════════════════
