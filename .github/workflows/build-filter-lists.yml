@@ -41,7 +41,7 @@ jobs:
           mise list
           mise up -y
       - name: Run AGLint
-        run: mise exec -- bunx --bun aglint --fix
+        run: mise exec -- bunx --bun @adguard/aglint --fix
         continue-on-error: true
       - name: Commit lint fixes
         uses: stefanzweifel/git-auto-commit-action@v7
