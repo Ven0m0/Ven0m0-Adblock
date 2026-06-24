@@ -83,7 +83,7 @@ jobs:
         run: |
           mise exec -- bun run lint:fix
           mise exec -- bun run format
-          mise exec -- bunx aglint --fix
+          mise exec -- bunx @adguard/aglint --fix
         continue-on-error: true
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v7

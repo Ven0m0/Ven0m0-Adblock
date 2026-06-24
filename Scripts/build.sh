@@ -17,10 +17,20 @@ readonly SCRIPT_LIST="userscripts/list.txt"
 
 _FD= _RG= _PAR= _JOBS= _RUNNER=
 fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
-rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo grep); echo "$_RG"; }; }
+rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo _rg_compat); echo "$_RG"; }; }
+_rg_compat(){ grep -E "$@"; }
 par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }
 jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
 runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RUNNER"; }; }
+run_runner(){
+  if has bun; then
+    bun x "$@"
+  elif has npx; then
+    npx -y "$@"
+  else
+    "$@"
+  fi
+}
 
 build_adblock(){
   local -a src=(Combination*.txt Other.txt Reddit.txt Twitter.txt Youtube.txt Twitch.txt Spotify.txt Search-Engines.txt General.txt)
@@ -71,14 +81,14 @@ EOF
 }
 
 build_hostlist(){
-  chk hostlist-compiler
+  { [[ -x node_modules/.bin/hostlist-compiler ]] || has hostlist-compiler; } || { warn "hostlist-compiler missing"; return 0; }
   log hostlist "Compiling hostlist"
   mkdir -p "$FILTER_OUT"
   [[ -f hostlist-config.json ]] && {
-    hostlist-compiler -c hostlist-config.json -o "$FILTER_OUT/hostlist.txt" --verbose || warn "Hostlist compilation failed"
+    run_runner hostlist-compiler -c hostlist-config.json -o "$FILTER_OUT/hostlist.txt" --verbose || warn "Hostlist compilation failed"
   }
   [[ -f configuration_popup_filter.json ]] && {
-    hostlist-compiler -c configuration_popup_filter.json -o "$FILTER_OUT/adguard_popup_filter.txt" --verbose || warn "Popup filter compilation failed"
+    run_runner hostlist-compiler -c configuration_popup_filter.json -o "$FILTER_OUT/adguard_popup_filter.txt" --verbose || warn "Popup filter compilation failed"
     [[ -f scripts/popup_filter_build.js ]] && node scripts/popup_filter_build.js "$FILTER_OUT/adguard_popup_filter.txt" || :
   }
 }
@@ -88,10 +98,10 @@ lint_filters(){
   log lint "Setting up AGLint"
   [[ -f package.json ]] || npm init -y &>/dev/null
   npm list @adguard/aglint &>/dev/null || npm i -D @adguard/aglint &>/dev/null
-  [[ -f .aglintrc.yaml ]] || npx aglint init &>/dev/null
+  [[ -f .aglintrc.yaml ]] || run_runner @adguard/aglint init &>/dev/null
   local s
   s=$(npm pkg get scripts.lint 2>/dev/null || echo '""')
-  [[ $s == '""' || $s == "undefined" ]] && npm pkg set scripts.lint=aglint &>/dev/null
+  [[ $s == '""' || $s == "undefined" ]] && npm pkg set scripts.lint=@adguard/aglint &>/dev/null
   npm run lint || warn "Lint found issues"
 }
 
@@ -134,7 +144,7 @@ _process_js(){
     -e "s|^(// @downloadURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.user.js|" \
     -e "s|^(// @updateURL).*|\1 https://raw.githubusercontent.com/$REPO/main/$SCRIPT_OUT/$base.meta.js|" \
     <<< "$meta")
-  js=$("$(runner)" esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || {
+  js=$(run_runner esbuild --minify --target=es2022 --format=iife --platform=browser --log-level=error <<< "$code" 2>&1) || {
     err "$fn (esbuild failed)"
     return 1
   }
@@ -156,7 +166,7 @@ build_userscripts(){
   log userscripts "Processing ${#files[@]} files"
   has oxlint && oxlint --config .oxlintrc.json --fix --quiet "${files[@]}" 2>/dev/null || :
   has biome && biome check --write --no-errors-on-unmatched --files-ignore-unknown=true "${files[@]}" 2>/dev/null || :
-  export -f _process_js ok err warn
+  export -f _process_js ok err warn run_runner has
   export REPO SCRIPT_OUT R G Y N RUNNER
   RUNNER=$(runner)
   if [[ -n $(par) ]] && (( ${#files[@]} > 1 )); then
