@@ -85,7 +85,6 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_validate_checksum_valid(self):
-        # NOTE: This test assumes validate_checksum has been refactored to accept string
         result = await update_lists.validate_checksum(self.valid_full_content)
         self.assertTrue(result)
 

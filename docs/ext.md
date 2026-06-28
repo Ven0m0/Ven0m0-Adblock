@@ -1,16 +1,21 @@
-### TODO:
+# Upstream Sources Evaluation
 
-- https://github.com/ShadowWhisperer/BlockLists
-- https://github.com/AdguardTeam/AdGuardFilters
-- https://github.com/easylist
-- https://github.com/brave
-- https://github.com/hagezi
-- https://github.com/StevenBlack
-- https://github.com/DandelionSprout/adfilt
+**Integrated:**
+
+- ✓ ShadowWhisperer/BlockLists - Ads list (26,917 rules)
+- ✓ easylist/easylist - Already integrated as EasyList source
+- ✓ AdguardTeam/AdGuardFilters - Already integrated as AdGuard-Base and AdGuard-Tracking-Protection
+
+**Rejected:**
+
+- ✗ brave/adblock-lists - Brave-specific filters, not needed for general adblocking
+- ✗ hagezi/dns-blocklists - DNS-level blocking, different use case than browser filters
+- ✗ StevenBlack/hosts - Hosts file format, not compatible with adblock filter format
+- ✗ DandelionSprout/adfilt - Highly specialized lists (regional, anti-malware), not general-purpose
 
 ---
 
-### optimized lists
+## Optimized lists
 
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/118_optimized.txt
 - https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/platforms/android/filters/107_optimized.txt
