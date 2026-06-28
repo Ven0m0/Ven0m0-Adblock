@@ -29,6 +29,12 @@
       "filename": "uBlock-ResourceAbuse.txt",
       "skip_checksum": false,
       "enabled": true
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Ads",
+      "filename": "shadowwhisperer-ads.txt",
+      "skip_checksum": true,
+      "enabled": true
     }
   ]
 }

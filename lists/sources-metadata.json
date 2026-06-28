@@ -1,0 +1,35 @@
+{
+  "last_updated": "2026-06-28T20:22:10.927133+00:00",
+  "sources": {
+    "https://easylist.to/easylist/easylist.txt": {
+      "checksum_validated": true,
+      "filename": "EasyList.txt",
+      "success": false
+    },
+    "https://filters.adtidy.org/extension/ublock/filters/17.txt": {
+      "checksum_validated": false,
+      "filename": "AdGuard-Tracking-Protection.txt",
+      "success": true
+    },
+    "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt": {
+      "checksum_validated": true,
+      "filename": "AdGuard-Base.txt",
+      "success": true
+    },
+    "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Ads": {
+      "checksum_validated": false,
+      "filename": "shadowwhisperer-ads.txt",
+      "success": true
+    },
+    "https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt": {
+      "checksum_validated": true,
+      "filename": "uBlock-Filters.txt",
+      "success": true
+    },
+    "https://raw.githubusercontent.com/uBlockOrigin/uAssets/refs/heads/master/filters/resource-abuse.txt": {
+      "checksum_validated": true,
+      "filename": "uBlock-ResourceAbuse.txt",
+      "success": true
+    }
+  }
+}
