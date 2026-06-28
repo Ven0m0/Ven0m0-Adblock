@@ -29,6 +29,7 @@ ghalint = "latest"
 act = "latest"
 action-validator = "latest"
 actionlint = "latest"
+ripgrep = "latest"
 
 [env]
 NODE_ENV = "production"
