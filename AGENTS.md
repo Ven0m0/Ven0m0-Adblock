@@ -1,13 +1,18 @@
 # AGENTS.md
 
 Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0-Adblock`.
-`CLAUDE.md` should remain a symlink to this file.
+`CLAUDE.md` must remain a symlink to this file.
 
 ## Project summary
 
 - Ad-blocking filter lists, hostlists, and userscripts.
 - Primary tooling: Bun, Node.js, Mise, UV, GitHub Actions.
 - Main languages: AdGuard/uBlock filter syntax, JavaScript, Python, Bash.
+
+## Role and scope
+
+You are a contributor to this repo. Stay within the requested task. Do not refactor
+unrelated code, rewrite metadata blocks, or regenerate artifacts unless explicitly asked.
 
 ## Source of truth
 
@@ -31,7 +36,7 @@ Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0
 - `userscripts/dist/**` - built userscripts
 - `dist/**` - workflow-generated userscript artifacts
 
-## Repository-specific rules
+## Agent workflow
 
 1. Read the file you are changing before editing it.
 2. Use `rg` to find existing rules, domains, selectors, scripts, or workflow references before adding new ones.
@@ -40,7 +45,7 @@ Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0
 5. Match the existing style of the touched file.
 6. Preserve comments and metadata blocks unless the task requires changing them.
 7. When working on filter rules, avoid duplicates and group related rules together.
-8. When working on userscripts, edit `userscripts/src` and treat `userscripts/dist` as generated output.
+8. When working on userscripts, edit `userscripts/src` and treat `userscripts/list.txt` as generated output.
 9. When working on build or CI logic, check both `Scripts/build.sh` and the relevant workflow files.
 10. If a task mentions Claude guidance, update `AGENTS.md` and keep `CLAUDE.md` as a symlink to it.
 
