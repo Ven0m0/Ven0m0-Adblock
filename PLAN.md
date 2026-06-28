@@ -128,9 +128,9 @@ to consume in the build pipeline.
 {
   "sources": [
     {
-      "name": "shadowwhisperer-ads",
-      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Ads"
-    }
+{
+  "sources": [
+    { "filename": "shadowwhisperer-ads.txt", "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Ads" }
   ]
 }
 ```
