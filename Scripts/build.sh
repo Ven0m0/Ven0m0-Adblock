@@ -15,13 +15,18 @@ readonly SCRIPT_SRC="userscripts/src"
 readonly SCRIPT_OUT="userscripts/dist"
 readonly SCRIPT_LIST="userscripts/list.txt"
 
-_FD= _RG= _PAR= _JOBS= _RUNNER=
-fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
-rg_bin(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo _rg_compat); echo "$_RG"; }; }
+FD_BIN=$(has fd && echo fd || has fdfind && echo fdfind || echo find)
+RG_BIN=$(has rg && echo rg || echo _rg_compat)
+PAR_BIN=$(has parallel && echo parallel || echo "")
+JOBS_BIN=$(ncpu)
+RUNNER_BIN=$(jsrun)
+
+fd(){ echo "$FD_BIN"; }
+rg_bin(){ echo "$RG_BIN"; }
 _rg_compat(){ grep -E "$@"; }
-par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }
-jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
-runner(){ [[ -n $_RUNNER ]] && echo "$_RUNNER" || { _RUNNER=$(jsrun); echo "$_RUNNER"; }; }
+par(){ echo "$PAR_BIN"; }
+jobs(){ echo "$JOBS_BIN"; }
+runner(){ echo "$RUNNER_BIN"; }
 run_runner(){
   if has bun; then
     bun x "$@"

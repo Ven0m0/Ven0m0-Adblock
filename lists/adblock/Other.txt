@@ -374,7 +374,7 @@
 /OneSignalSDKUpdaterWorker.js
 /OneSignalSDKWorker.js
 /PushexSDK.js
-/^172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])$/
+/^https?:\/\/172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])(\/|$)/
 /accusmartwebpush-fire-push-public.js
 /al-fb-notification/assets/scripts/al-main-script.js
 /amp-user-notification-
