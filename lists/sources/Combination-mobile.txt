@@ -10,7 +10,7 @@
 !#include Other.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
-!#include https://filters.adtidy.org/extension/ublock/filters/251_optimized.txt
 !#include https://filters.adtidy.org/extension/ublock/filters/201_optimized.txt
-!#include https://filters.adtidy.org/extension/ublock/filters/239_optimized.txt
 !#include https://filters.adtidy.org/extension/ublock/filters/207_optimized.txt
+!#include https://filters.adtidy.org/extension/ublock/filters/239_optimized.txt
+!#include https://filters.adtidy.org/extension/ublock/filters/251_optimized.txt
