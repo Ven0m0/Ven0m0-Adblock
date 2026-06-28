@@ -17,7 +17,7 @@ readonly SCRIPT_LIST="userscripts/list.txt"
 
 _FD= _RG= _PAR= _JOBS= _RUNNER=
 fd(){ [[ -n $_FD ]] && echo "$_FD" || { _FD=$(has fd && echo fd || has fdfind && echo fdfind || echo find); echo "$_FD"; }; }
-rg(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo _rg_compat); echo "$_RG"; }; }
+rg_bin(){ [[ -n $_RG ]] && echo "$_RG" || { _RG=$(has rg && echo rg || echo _rg_compat); echo "$_RG"; }; }
 _rg_compat(){ grep -E "$@"; }
 par(){ [[ -n $_PAR ]] && echo "$_PAR" || { _PAR=$(has parallel && echo parallel || echo ""); echo "$_PAR"; }; }
 jobs(){ [[ -n $_JOBS ]] && echo "$_JOBS" || { _JOBS=$(ncpu); echo "$_JOBS"; }; }
@@ -52,7 +52,7 @@ EOF
     [[ -f $f ]] && ex+=("$f")
   done
   (( ${#ex[@]} == 0 )) && die "No filter source files found"
-  cat "${ex[@]}" 2>/dev/null | "$(rg)" -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out" || true
+  cat "${ex[@]}" 2>/dev/null | "$(rg_bin)" -v '^[[:space:]]*!|\[Adblock|^[[:space:]]*$' | LC_ALL=C sort -u >> "$OLDPWD/$out" || true
   cd "$OLDPWD"
   rule_count=$(wc -l < "$out")
   ok "$out ($rule_count rules)"
@@ -74,7 +74,7 @@ EOF
     [[ -f $f ]] && ex+=("$f")
   done
   (( ${#ex[@]} == 0 )) && die "No host source files found"
-  cat "${ex[@]}" | "$(rg)" -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
+  cat "${ex[@]}" | "$(rg_bin)" -io '[a-z0-9][-a-z0-9]{0,61}(\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}' | \
     awk '{print "0.0.0.0",tolower($1)}' | LC_ALL=C sort -u >> "$OLDPWD/$out"
   cd "$OLDPWD"
   ok "$out ($(wc -l < "$out") entries)"
@@ -112,7 +112,7 @@ download_userscripts(){
   local line url fn suffix
   while IFS= read -r line; do
     [[ -z $line || $line == \#* ]] && continue
-    url=$("$(rg)" -o 'https://[^[:space:]]+\.user\.js' <<< "$line" | head -n1)
+    url=$("$(rg_bin)" -o 'https://[^[:space:]]+\.user\.js' <<< "$line" | head -n1)
     [[ -z $url ]] && continue
     fn=$(basename "$url" | tr -cd '[:alnum:]._-')
     [[ $fn != *.user.js ]] && fn="${fn}.user.js"
