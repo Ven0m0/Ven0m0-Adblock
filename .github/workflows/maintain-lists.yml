@@ -48,16 +48,20 @@ jobs:
       - name: Remove dead domains
         continue-on-error: true
         run: |
-          dead-domains-linter -a -i "*.txt" --exclude "Lists-todo.txt" || :
-      - name: Deduplicate files
+          dead-domains-linter -a -i "lists/sources/*.txt" || :
+      - name: Deduplicate filter lists
         continue-on-error: true
         run: |
-          find .  -type f -name '*.txt' !  -path '*/\.*' !  -name 'Lists-todo.txt' -print0 | while IFS= read -r -d '' f; do
+          PYTHONPATH=. python3 Scripts/deduplicate.py lists/sources || :
+      - name: Deduplicate hostlists
+        continue-on-error: true
+        run: |
+          find lists/hostlist -type f -name '*.txt' -print0 | while IFS= read -r -d '' f; do
             tmp=$(mktemp)
             sed -E '/^@@|^#|^[[:space:]]*$/d; s/^0\. 0\.0\.0[[:space:]]+//; s/^[[:space:]]+//; s/[[:space:]]+$//' "$f" | \
               awk 'NF && ! seen[$0]++' | sort -u > "$tmp"
             [[ -s "$tmp" ]] && mv "$tmp" "$f" || rm -f "$tmp"
-          done; echo "✓ Deduplicated all lists"
+          done; echo "✓ Hostlists deduplicated"
       - name: Build blocklist
         continue-on-error: true
         run: |

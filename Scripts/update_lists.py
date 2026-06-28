@@ -333,6 +333,11 @@ async def main() -> int:
         action="store_true",
         help="Run AGLint validation after downloads",
     )
+    parser.add_argument(
+        "--dedupe",
+        action="store_true",
+        help="Deduplicate and minify downloaded lists after download",
+    )
     args = parser.parse_args()
 
     output_dir: Path = args.output_dir
@@ -370,6 +375,18 @@ async def main() -> int:
     await save_metadata(sources, results_dict, output_dir)
 
     logger.info(f"✓ Updated {success_count}/{len(sources)} lists successfully")
+
+    if args.dedupe and success_count > 0:
+        try:
+            import subprocess
+
+            logger.info("Deduplicating and minifying downloaded lists...")
+            subprocess.run(
+                [sys.executable, "-m", "Scripts.deduplicate", str(output_dir)],
+                check=False,
+            )
+        except Exception as e:
+            logger.warning(f"Could not run deduplication: {e}")
 
     if args.validate:
         try:

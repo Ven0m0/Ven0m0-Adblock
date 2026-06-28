@@ -115,7 +115,8 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
         print(
             f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)"
         )
-        return stats, rules
+        # Return only actual rules (not comments) for cross-file duplicate detection
+        return stats, [r for r in rules if not is_header(r)]
 
     return Stats(), []
 
