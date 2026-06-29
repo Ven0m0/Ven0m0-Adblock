@@ -46,3 +46,4 @@ logs/
 .serena/
 dead-domains.txt
 dead-domains/
+.omc/

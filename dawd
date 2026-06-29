@@ -1,0 +1,97 @@
+[33mcommit 4226d4ccc855409a4630ebc61de0bedb3eca0d50[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: a942147 9b2a321
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 12:30:08 2026 +0200
+
+    Merge branch 'main' of https://github.com/Ven0m0/Ven0m0-Adblock
+
+[33mcommit a942147e3fe1acbcc57ca5132491804e44371589[m
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 12:28:56 2026 +0200
+
+    chore: remove copilot-instructions.md
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit 17fa5bc2b5aa0fbd30714a7f864c06342950cc23[m
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 12:28:37 2026 +0200
+
+    chore: remove copilot-instructions.md and update ublock filters
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit 9b2a3213296db6dc0799b2877b1c535353460090[m
+Author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+Date:   Mon Jun 29 10:23:30 2026 +0000
+
+    fix(filters): remove dead domains (#266)
+    
+    Co-authored-by: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+
+[33mcommit 62884f2dcdfc0d4fdd60f3802af5fd4d417f6ca0[m
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 12:22:47 2026 +0200
+
+    docs: rewrite AGENTS.md and copilot-instructions.md with best practices
+    
+    - Restructure into Source / CI-generated / Workflow / Commands / Style sections
+    - Document CI and release process (build-filter-lists, maintain-lists, update-lists, userscripts workflows)
+    - Add instruction-layer precedence note (AGENTS.md > copilot-instructions.md)
+    - Fix prose false-path matches (slash-separated phrases) that confused ctxlint
+    - Use full .github/workflows/ paths for workflow references
+    - Reframe negatives as positives per agnix recommendations
+    - Reduce from 39 ctxlint errors to 12 (all remaining are CI-generated dirs absent on fresh checkout)
+    - agnix: 0 errors, 0 warnings
+    - CLAUDE.md remains a symlink to AGENTS.md
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit 5db7056de1dda6980b4b2afe79456ec0421fc3bb[m
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 08:51:42 2026 +0200
+
+    fix: exclude vendored adguard-extra scripts from biome/oxlint, fix useOptionalChain warning
+    
+    - Exclude userscripts/src/adguard-extra.user.js and 1_adguard-extra.user.js
+      from biome and oxlint (downloaded external obfuscated scripts, not hand-authored)
+    - Fix biome linter.rules "recommended" deprecation: use "preset" instead
+    - Fix useOptionalChain warning in google-search-fixer.user.js:44
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit 2b9ba9c76fbdb7cc5ffd540636ba290b47f6def7[m
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 08:33:52 2026 +0200
+
+    refactor: convert bash scripts to Python, clean up dead comments
+    
+    Replace all five bash scripts (build.sh, hosts-creator.sh,
+    lib-common.sh, run_pre_commit.sh, automerge-open-prs.sh) with
+    Python equivalents invoked via `uv run python -m Scripts.*`.
+    
+    - Scripts/build.py: port of build.sh, parallel userscript processing
+    - Scripts/hosts_creator.py: port of hosts-creator.sh
+    - Scripts/run_pre_commit.py: 3-line prek wrapper
+    - Scripts/automerge_open_prs.py: port using json.loads instead of jq
+    - Scripts/common.py: extended with logging/color utilities from lib-common.sh
+    - Scripts/update_lists.py: validate_checksum made sync (removed asyncio.to_thread)
+    - Scripts/deduplicate.py: removed method aliases, removed narrating comments
+    - Scripts/move_pure_domains.py: slow path calls categorize_domain(), removed narrating comments
+    
+    Update package.json, mise.toml, and workflows to use the new invocation
+    paths. Remove bun run lint:shell and the Shell style section from AGENTS.md.
+    Fix stale Scripts/build.sh reference in copilot-instructions.md.
+    Suppress E402 on post-sys.path imports in build.py and hosts_creator.py.
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit c1dceb9ed73cf99ad9696f3bf38f6e0c34c7ed91[m[33m ([m[1;34mgrafted[m[33m)[m
+Author: Ven0m0 <ven0m0.wastaken@gmail.com>
+Date:   Mon Jun 29 07:27:14 2026 +0200
+
+    Add adblock warning removal and web annoyances filter lists (#265)
+    
+    Co-authored-by: Claude Opus 4.8 <noreply@anthropic.com>
+    Co-authored-by: Claude <noreply@anthropic.com>
+    Co-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>
