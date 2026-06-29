@@ -10,7 +10,7 @@
 !#include Other.txt
 !#include Reddit.txt
 !#include Search-Engines.txt
-!#include url-shortener.txt
 !#include web-annoyances.txt
-!#include fanboy-anti-font.txt
 !#include adblock-warning-removal.txt
+!#include fanboy-anti-font.txt
+!#include url-shortener.txt
