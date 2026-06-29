@@ -1483,13 +1483,9 @@ IMPROVEMENTS OVER ORIGINALS:
         }
 
         if (url?.includes("/retry_completion") && this.pendingForkModel) {
-          // Fork conversation logic (simplified - full implementation available in original)
-          console.log("[Fork] Intercepted retry request");
-          // ... (fork implementation details omitted for brevity)
-
+          // ponytail: model-switching requires claude.ai internal API knowledge; pass through as plain retry
           this.pendingForkModel = null;
           this.pendingUseSummary = false;
-          return new Response(JSON.stringify({ success: true }));
         }
 
         return originalFetch(...args);
