@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"rtk git stash && rtk git pull --rebase && rtk git stash pop && rtk git push\",\"description\":\"Stash, pull rebase, restore, push\"}",
+  "error": "Exit code 128\nok stashed\nFAILED: git pull\nerror: cannot pull with rebase: You have unstaged changes.\nerror: Please commit or stash them.",
+  "timestamp": "2026-06-29T10:29:07.009Z",
+  "retry_count": 3
+}

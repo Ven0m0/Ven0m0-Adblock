@@ -1,0 +1,311 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1782710923403,
+  "projectRoot": "C:\\Users\\Ven0m0\\project\\Ven0m0-Adblock",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": ">=24.0.0",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      },
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "esbuild",
+        "version": "*",
+        "category": "build"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": "Node.js 24.0.0"
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": null,
+    "scripts": {
+      "build": "./Scripts/build.sh",
+      "build:all": "./Scripts/build.sh adblock hosts userscripts",
+      "build:adblock": "./Scripts/build.sh adblock",
+      "build:hosts": "./Scripts/build.sh hosts",
+      "build:userscripts": "./Scripts/build.sh userscripts",
+      "lint": "bun run lint:js && bun run lint:filters && bun run lint:md",
+      "lint:js": "bun run lint:biome && bun run lint:oxlint",
+      "lint:biome": "bun x biome lint .",
+      "lint:oxlint": "bun x oxlint --quiet .",
+      "lint:filters": "bun x @adguard/aglint",
+      "lint:yaml": "command -v yamllint >/dev/null && yamllint . || { echo 'yamllint not installed. Install with: pip install yamllint' >&2; exit 1; }",
+      "lint:md": "bun x markdownlint-cli2 '**/*.md' '#node_modules' '#.opencode' '#.kilo' '#.venv'",
+      "lint:shell": "shellcheck Scripts/*.sh || :",
+      "lint:aglint": "bun x @adguard/aglint",
+      "lint:fix": "bun x oxlint --fix . && bun x biome check --write . && bun x @adguard/aglint --fix",
+      "lint:fix:all": "bun run lint:fix && bun run format",
+      "format": "bun x biome format --write .",
+      "format:check": "bun x biome format .",
+      "test": "bun run lint && bun run format:check",
+      "test:ci": "bun run lint && bun run format:check",
+      "clean": "rm -rf node_modules dist lists/releases userscripts/dist Filters",
+      "clean:cache": "rm -rf node_modules/.cache",
+      "clean:all": "bun run clean && bun run clean:cache",
+      "precommit": "bun run lint:fix:all",
+      "validate": "bun run test && bun run build",
+      "aglint": "bunx @adguard/aglint --cache --cache-location .aglintcache --cache-strategy content \"**/*.txt\""
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 3,
+      "lastAccessed": 1782710923206,
+      "keyFiles": [
+        "ext.md",
+        "filter-rules.md",
+        "TODO.md"
+      ]
+    },
+    "lists": {
+      "path": "lists",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1782710923206,
+      "keyFiles": [
+        "conf.json",
+        "sources-metadata.json",
+        "sources-urls.json",
+        "TODO.md"
+      ]
+    },
+    "Scripts": {
+      "path": "Scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 16,
+      "lastAccessed": 1782710923213,
+      "keyFiles": [
+        "automerge-open-prs.sh",
+        "build.sh",
+        "common.py",
+        "deduplicate.py",
+        "hosts-config"
+      ]
+    },
+    "userscripts": {
+      "path": "userscripts",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1782710923214,
+      "keyFiles": [
+        "list.txt"
+      ]
+    },
+    "userscripts\\src": {
+      "path": "userscripts\\src",
+      "purpose": "Source code",
+      "fileCount": 9,
+      "lastAccessed": 1782710923215,
+      "keyFiles": [
+        "1_adguard-extra.user.js",
+        "adguard-extra.user.js",
+        "gh-pro.user.js"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "AGENTS.md",
+      "accessCount": 19,
+      "lastAccessed": 1782728542235,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\move_pure_domains.py",
+      "accessCount": 18,
+      "lastAccessed": 1782713169219,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\update_lists.py",
+      "accessCount": 13,
+      "lastAccessed": 1782713139901,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 6,
+      "lastAccessed": 1782728218448,
+      "type": "directory"
+    },
+    {
+      "path": "Scripts\\deduplicate.py",
+      "accessCount": 4,
+      "lastAccessed": 1782713176325,
+      "type": "file"
+    },
+    {
+      "path": "biome.json",
+      "accessCount": 4,
+      "lastAccessed": 1782715831999,
+      "type": "file"
+    },
+    {
+      "path": "mise.toml",
+      "accessCount": 4,
+      "lastAccessed": 1782728225908,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 3,
+      "lastAccessed": 1782712262630,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\common.py",
+      "accessCount": 3,
+      "lastAccessed": 1782712815917,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\hosts_creator.py",
+      "accessCount": 3,
+      "lastAccessed": 1782713226948,
+      "type": "file"
+    },
+    {
+      "path": "userscripts\\src\\google-search-fixer.user.js",
+      "accessCount": 3,
+      "lastAccessed": 1782715810258,
+      "type": "file"
+    },
+    {
+      "path": ".oxlintrc.json",
+      "accessCount": 3,
+      "lastAccessed": 1782715833268,
+      "type": "file"
+    },
+    {
+      "path": "Scripts",
+      "accessCount": 2,
+      "lastAccessed": 1782712470645,
+      "type": "directory"
+    },
+    {
+      "path": "userscripts\\src\\1_adguard-extra.user.js",
+      "accessCount": 2,
+      "lastAccessed": 1782715640405,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\hosts-creator.sh",
+      "accessCount": 1,
+      "lastAccessed": 1782711433028,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\lib-common.sh",
+      "accessCount": 1,
+      "lastAccessed": 1782711433809,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\run_pre_commit.sh",
+      "accessCount": 1,
+      "lastAccessed": 1782711434209,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\automerge-open-prs.sh",
+      "accessCount": 1,
+      "lastAccessed": 1782711434367,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 1,
+      "lastAccessed": 1782711442179,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\hosts-config",
+      "accessCount": 1,
+      "lastAccessed": 1782711442526,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1782711737684,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\run_pre_commit.py",
+      "accessCount": 1,
+      "lastAccessed": 1782712209549,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\automerge_open_prs.py",
+      "accessCount": 1,
+      "lastAccessed": 1782712230562,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\test_common.py",
+      "accessCount": 1,
+      "lastAccessed": 1782712401988,
+      "type": "file"
+    },
+    {
+      "path": "Scripts\\test_move_pure_domains.py",
+      "accessCount": 1,
+      "lastAccessed": 1782712960745,
+      "type": "directory"
+    },
+    {
+      "path": "userscripts\\list.txt",
+      "accessCount": 1,
+      "lastAccessed": 1782715640841,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
