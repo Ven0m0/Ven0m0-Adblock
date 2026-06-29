@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/207_optimized/207_optimized-s-1782696752-14400.patch
 ! Title: Adblock Warning Removal List (Optimized)
 ! Description: Removes anti-adblock warnings and other obtrusive messages.
-! Version: 2.1.93.19
+! Version: 5db7056
 ! TimeUpdated: 2026-06-29T01:29:20+00:00
 ! Expires: 5 days (update frequency)
 /adb-watch.
@@ -14,7 +14,6 @@
 @@/adsbygoogle.js$script,domain=arabiaweather.com
 @@||imasdk.googleapis.com/js/sdkloader/ima3.js$domain=shahid.mbc.net
 @@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=shed4u1.com|elktob.online
-@@||play.bokracdn.run/v2/adsjs/ads.js$script,~3p
 @@||securepubads.g.doubleclick.net/tag/js/gpt.js$domain=shahid.mbc.net
 ###adblock_screen
 ###adblock_message
@@ -30,12 +29,10 @@ azrotv.com##.adbn-wrap
 freestore.app##.adbn2-wrap2
 4algeria.com###exposeMask
 ak.sv###ignielAdBlock
-chahid4u.tk###unblocker
 okanime.tv##.jconfirm
 fctvhd.com##.mw-adblock
 4algeria.com##.xenOverlay
 azrotv.com##div[id^="laoad_Adb"]
-shahid4u.club#@#.adsBox
 @@||ak.sv^$generichide
 @@||al-aqsanews.com
 @@||ency-educ.com^$generichide
@@ -56,15 +53,12 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||amazonaws.com^*/abb-msg.js$domain=hardocp.com
 ||baeldung.com/*/library/dist/js/pro-recovery.
 ||baeldung.com/*/library/dist/js/recovery.
-||corrosif.science^$domain=filerev.cc|pencurimovie.pw
 ||ffmovies.lol/jss/dectector-2025.js
 ||freeiptvplayer.net/wp-content/uploads/$script
 ||full.video/btn.js
 ||rockradio.com^*/blockadblock-$script,domain=rockradio.com
 ||samfw.com/js/script.js
 ||static.game-state.com/images/main/alert/replacement/
-||tritoshi.com/libs/check.js
-||tristoshink.online/libs/check.js
 ||venea.net/web/ab_message?
 ||wheregoes.com/c/uploads/$script
 ||www.google.*/ajax/pi/phd?abd=0$xhr
@@ -73,10 +67,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||2znp09oa.com^
 ||3rdspacetech.com^
 ||4jnzhl0d0.com^
-||5mcwl.pw^
-||6ldu6qa.com^
 ||82o9v830.com^
-||abilityscale.com^
 ||abilitytoucan.com^
 ||abjectattempt.com^
 ||aboardamusement.com^
@@ -96,7 +87,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||accurateanimal.com^
 ||accuratecoal.com^
 ||acebunny.com^
-||achieverknee.com^
 ||acidicstraw.com^
 ||acidpigs.com^
 ||acquireuser.com^
@@ -109,7 +99,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||addressfriend.com^
 ||admiral.pub^
 ||admiralproxied.com^
-||admissionaudit.com^
 ||adorableanger.com^
 ||adorableattention.com^
 ||adventurousamount.com^
@@ -150,7 +139,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||amidsttruly.com^
 ||amuckafternoon.com^
 ||amusedbucket.com^
-||amusementmorning.com^
 ||analyzecorona.com^
 ||ancientact.com^
 ||animalcoder.com^
@@ -162,7 +150,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||applocus.com^
 ||applyless.com^
 ||aquaticowl.com^
-||ar1nvz5.com^
 ||archswimming.com^
 ||arclet.net^
 ||aromamirror.com^
@@ -174,7 +161,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||aspiringtoy.com^
 ||astonishingfood.com^
 ||astralhustle.com^
-||astrallullaby.com^
 ||attendchase.com^
 ||attractionbanana.com^
 ||attractivecap.com^
@@ -187,11 +173,9 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||awakebird.com^
 ||awarealley.com^
 ||awzbijw.com^
-||axiomaticalley.com^
 ||axiomaticanger.com^
 ||azuremystique.com^
 ||azurestealth.com^
-||babyblissgifts.com^
 ||backtension.com^
 ||backupcat.com^
 ||baconbags.com^
@@ -211,7 +195,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||barbershirts.com^
 ||barqueue.com^
 ||baseboosters.com^
-||basilfish.com^
 ||basketballbelieve.com^
 ||baskettexture.com^
 ||bastingart.com^
@@ -225,7 +208,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||beginnerpancake.com^
 ||bentengine.com^
 ||berserkhydrant.com^
-||bespokesandals.com^
 ||bestboundary.com^
 ||bestshoesboot.com^
 ||betazebra.com^
@@ -250,7 +232,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||biologylog.com^
 ||birthdaybelief.com^
 ||blackbelted.com^
-||blackbrake.com^
 ||bleachbubble.com^
 ||bleachscarecrow.com^
 ||bleedlight.com^
@@ -279,7 +260,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||boldbars.com^
 ||bonuscomplex.com^
 ||bookbeef.com^
-||bookprobe.com^
 ||boomboomcloud.com^
 ||boostbehavior.com^
 ||boredcrown.com^
@@ -290,9 +270,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||boundlessargument.com^
 ||boundlessbrake.com^
 ||boundlessveil.com^
-||boxatech.com^
 ||brainybasin.com^
-||brainynut.com^
 ||branchborder.com^
 ||brandsfive.com^
 ||brandybison.com^
@@ -304,12 +282,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||breezygrove.com^
 ||brewthing.com^
 ||brianwould.com^
-||briefstem.com^
 ||brighttoe.com^
 ||briskedge.net^
 ||briskstorm.com^
 ||broadborder.com^
-||broadboundary.com^
 ||broadcastbed.com^
 ||broaddoor.com^
 ||brotherslocket.com^
@@ -324,10 +300,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||buildingknife.com^
 ||bulbbait.com^
 ||bumpermash.com^
-||bumpydevelopment.com^
 ||bungeesleeves.com^
 ||burgersalt.com^
-||burlywhistle.com^
 ||burnbubble.com^
 ||bushesbag.com^
 ||businessupdater.com^
@@ -343,7 +317,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cakeagenda.com^
 ||cakesdrum.com^
 ||calculatingcircle.com^
-||calculatingtoothbrush.com^
 ||calculatorstatement.com^
 ||callousbrake.com^
 ||calmcactus.com^
@@ -355,7 +328,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cannonborough.com^
 ||cannonchange.com^
 ||canvasandsocks.com^
-||capablecup.com^
 ||capriciouscorn.com^
 ||captainstick.com^
 ||captivatingcanyon.com^
@@ -366,15 +338,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cardmethod.com^
 ||carefuldolls.com^
 ||caringcast.com^
-||caringzinc.com^
 ||carloforward.com^
-||carpentercomparison.com^
 ||carpoolqueen.com^
-||carryenjoy.com^
 ||carsarace.com^
-||carscannon.com^
 ||cartelsalsa.com^
-||cartkitten.com^
 ||cartlug.com^
 ||carvecakes.com^
 ||casualphysics.com^
@@ -384,7 +351,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cattlecommittee.com^
 ||cauldronfest.com^
 ||causecherry.com^
-||cautiouscamera.com^
 ||cautiouscherries.com^
 ||cautiouscrate.com^
 ||cautiouscredit.com^
@@ -416,7 +382,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||childlikeform.com^
 ||chillingtofu.com^
 ||chingovernment.com^
-||chinsnakes.com^
 ||chipcardice.com^
 ||chipperisle.com^
 ||chivalrouscord.com^
@@ -432,7 +397,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cleanhaircut.com^
 ||climbingright.com^
 ||cloisteredcurve.com^
-||closedcows.com^
 ||cloudchickens.com^
 ||cloudhustles.com^
 ||cloudjumbo.com^
@@ -441,32 +405,24 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||coatfood.com^
 ||cobaltoverture.com^
 ||coffeesidehustle.com^
-||coinsyouneed.com^
 ||coldbalance.com^
 ||coldcallpro.com^
 ||coloradoserves.com^
-||colorfulafterthought.com^
 ||colorfulpet.com^
-||coloringisland.com^
 ||coloroptimizer.com^
 ||colorsonchain.com^
 ||colossalclouds.com^
 ||colossalcoat.com^
 ||colossalcry.com^
-||combativecar.com^
 ||combativedetail.com^
 ||combbit.com^
 ||combcattle.com^
 ||combcompetition.com^
 ||cometquote.com^
 ||comfortablecheese.com^
-||commonalmanac.com^
 ||comparereaction.com^
-||compiledoctor.com^
 ||compilework.com^
 ||complexpixel.com^
-||concernedchickens.com^
-||concretetom.com^
 ||condemnedcomb.com^
 ||conditionchange.com^
 ||conditioncrush.com^
@@ -476,22 +432,17 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||configcontrol.com^
 ||confirmglobal.com^
 ||confusedcart.com^
-||connectashelf.com^
 ||consciouschairs.com^
 ||consciouscheese.com^
 ||consumerknowhow.com^
 ||consumerzero.com^
-||contentcamera.com^
-||controlcola.com^
 ||controlhall.com^
-||controlswim.com^
 ||convertbatch.com^
 ||cooingcoal.com^
 ||cookiestorybook.com^
 ||coolestcatcare.com^
 ||coolguesthouse.com^
 ||coolkidsdistrict.com^
-||coordinatedbedroom.com^
 ||coordinatedcoat.com^
 ||copperstills.net^
 ||copycarpenter.com^
@@ -502,7 +453,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||coralcranes.com^
 ||coralreverie.com^
 ||corgibeachday.com^
-||cornershirts.com^
 ||cosmicsculptor.com^
 ||cosmosjackson.com^
 ||cosplaygalaxy.com^
@@ -533,7 +483,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||crochetdivas.com^
 ||crookedcreature.com^
 ||crowdedmass.com^
-||cruisetourist.com^
 ||crunchcontrol.com^
 ||crypticgenius.com^
 ||cryptvalue.com^
@@ -546,10 +495,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cuddlylunchroom.com^
 ||culturedcamera.com^
 ||culturedfeather.com^
-||cumbersomecake.com^
-||cumbersomecar.com^
 ||cumbersomecarpenter.com^
-||cupcakegem.com^
 ||curatedtea.com^
 ||curbminers.com^
 ||curbneon.com^
@@ -561,10 +507,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||curtaincows.com^
 ||curvedhoney.com^
 ||curveshore.com^
-||curvycord.com^
 ||curvycry.com^
 ||cushiondrum.com^
-||cushionpig.com^
 ||cutecalculator.com^
 ||cutechin.com^
 ||cyclinghere.com^
@@ -575,33 +519,26 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||damageddistance.com^
 ||damdoor.com^
 ||dampdock.com^
-||dancemistake.com^
 ||dandydune.com^
 ||dandyglow.com^
 ||dapperdiscussion.com^
-||dashingdrop.com^
 ||datacirrus.com^
 ||datapickles.com^
 ||datastoried.com^
 ||daybreaklights.com^
-||daymodern.com^
 ||dazzlingbook.com^
-||deafeningdock.com^
 ||dealchocolate.com^
 ||debonairdust.com^
 ||debonairtree.com^
 ||decidedrum.com^
 ||decisivebase.com^
 ||decisivedrawer.com^
-||decisiveducks.com^
 ||decklibrary.com^
-||decoycreation.com^
 ||deeptack.com^
 ||deerbeginner.com^
 ||defeatedbadge.com^
 ||defensevest.com^
 ||degreechariot.com^
-||delegatediscussion.com^
 ||delicatecascade.com^
 ||deliciousducks.com^
 ||deltafault.com^
@@ -622,12 +559,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||devilishdinner.com^
 ||dewdroplagoon.com^
 ||dicecandies.com^
-||dicemoments.com^
 ||difficultfog.com^
 ||digestiondrawer.com^
 ||digithalo.com^
 ||dinnerquartz.com^
-||diplomahawaii.com^
 ||direfuldesk.com^
 ||disagreeabledrop.com^
 ||discopond.com^
@@ -637,14 +572,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||distributionpocket.com^
 ||distributiontomatoes.com^
 ||disturbedquiet.com^
-||divehope.com^
-||dk4ywix.com^
 ||dockdigestion.com^
 ||docketnews.com^
 ||dodgebugs.com^
 ||dogbedscentral.com^
 ||dogcollarfavourbluff.com^
-||doggieshome.com^
 ||dollardelta.com^
 ||dollarthrill.com^
 ||domaincolumn.com^
@@ -657,7 +589,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||drainpaste.com^
 ||dramaticdirection.com^
 ||dreamsdome.com^
-||dreamycanyon.com^
 ||driftingchef.com^
 ||driftpizza.com^
 ||droidwiz.com^
@@ -666,7 +597,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||dustydime.com^
 ||dustyhammer.com^
 ||dyecloud.com^
-||eagereden.com^
 ||eagerflame.com^
 ||eagerknight.com^
 ||earnbaht.com^
@@ -685,12 +615,9 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||effulgenttempest.com^
 ||eightgreens.com^
 ||eighthlayer.net^
-||ejyymghi.com^
 ||elasticchange.com^
-||elderlybean.com^
 ||elderlytown.com^
 ||elegantboulevard.com^
-||elephantqueue.com^
 ||elusivebreeze.com^
 ||elusivecascade.com^
 ||embellishedmeadow.com^
@@ -701,17 +628,14 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||emptyescort.com^
 ||enchantedskyline.com^
 ||enchantingdiscovery.com^
-||enchantingenchantment.com^
 ||enchantingtundra.com^
 ||enchantingvalley.com^
-||encourageshock.com^
 ||encouragingthread.com^
 ||endlesstrust.com^
 ||endurablebulb.com^
 ||energeticexample.com^
 ||energeticladybug.com^
 ||energyfools.com^
-||engineergrape.com^
 ||engineertrick.com^
 ||enigmaprint.com^
 ||enigmaticcanyon.com^
@@ -741,13 +665,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||exampleshake.com^
 ||excitingdates.com^
 ||excitingtub.com^
-||exclusivebrass.com^
 ||executeknowledge.com^
 ||exhibitsneeze.com^
 ||exitblocked.com^
 ||expansioneggnog.com^
 ||exportdialog.com^
-||exquisiteartisanship.com^
 ||extractobservation.com^
 ||extralocker.com^
 ||extramonies.com^
@@ -756,9 +678,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||fabledsoul.com^
 ||fabulousbooking.com^
 ||facilitatebreakfast.com^
-||fadechildren.com^
 ||fadedsnow.com^
-||failedforks.com^
 ||fairfeeling.com^
 ||fairiesbranch.com^
 ||fairygaze.com^
@@ -774,7 +694,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||fancycolorlist.net^
 ||fancydune.com^
 ||fangfeeling.com^
-||fannybacker.com^
 ||farethief.com^
 ||farmergoldfish.com^
 ||farshake.com^
@@ -808,13 +727,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||filtercutter.com^
 ||finalizeforce.com^
 ||financefear.com^
-||finemines.com^
 ||firecatfilms.com^
 ||fireworkcamp.com^
 ||firstendpoint.com^
-||firstfrogs.com^
 ||firstscreenshot.com^
-||firsttexture.com^
 ||fishersfinds.com^
 ||fitmessage.com^
 ||fitnessmapper.com^
@@ -824,7 +740,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||flakyfeast.com^
 ||flameuncle.com^
 ||flashtexting.com^
-||fleetbegin.com^
 ||flimsycircle.com^
 ||flimsythought.com^
 ||flippedfunnel.com^
@@ -876,11 +791,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||friedone.com^
 ||friendlycrayon.com^
 ||friendlyfold.com^
-||frightenedpotato.com^
-||frogator.com^
 ||frogsfinds.com^
 ||fronttoad.com^
-||frostpocket.com^
 ||frozekitchen.com^
 ||frugalfiestas.com^
 ||fuelinspector.com^
@@ -892,26 +804,19 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||funoverflow.com^
 ||funtoyplanet.com^
 ||furryfork.com^
-||furryhorses.com^
 ||fusedcontent.com^
-||futuristicapparatus.com^
-||futuristicfairies.com^
 ||futuristicfifth.com^
 ||futuristicframe.com^
-||fuzzyaudio.com^
 ||fuzzybasketball.com^
 ||fuzzyerror.com^
-||fvl1f.pw^
 ||gammamaximum.com^
 ||gardenovens.com^
-||gatejunction.com^
 ||gaudyairplane.com^
 ||gearbubbles.com^
 ||geekactive.com^
 ||geekbackyard.com^
 ||gemorganic.com^
 ||generalprose.com^
-||generateoffice.com^
 ||getbendyyoga.com^
 ||getwagtail.com^
 ||ghostgenie.com^
@@ -923,7 +828,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||giraffepiano.com^
 ||gitcrumbs.com^
 ||givevacation.com^
-||gladglen.com^
 ||gladysway.com^
 ||glamhawk.com^
 ||glasscoyote.com^
@@ -954,16 +858,13 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||grandfatherguitar.com^
 ||grandkingdom.com^
 ||granlite.com^
-||grassfedsalmon.com^
 ||gravitygive.com^
 ||gravitykick.com^
 ||grayoranges.com^
 ||grayreceipt.com^
 ||grayscaleart.com^
 ||graywords.net^
-||greasegarden.com^
 ||greasysquare.com^
-||greyinstrument.com^
 ||gridbelow.com^
 ||gripcorn.com^
 ||grocerycrew.com^
@@ -976,7 +877,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||grumpydrawer.com^
 ||guardeddirection.com^
 ||guardedschool.com^
-||guardfruit.com^
 ||guessdetail.com^
 ||guidecent.com^
 ||guildalpha.com^
@@ -984,8 +884,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||gulliblegrip.com^
 ||gustocooking.com^
 ||gustygrandmother.com^
-||h78xb.pw^
-||habitualhumor.com^
 ||haikusoap.com^
 ||halcyoncanyon.com^
 ||halocolor.com^
@@ -999,7 +897,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||handsomelyhealth.com^
 ||handsomelythumb.com^
 ||handsomeyam.com^
-||handyfield.com^
 ||handyfireman.com^
 ||handyincrease.com^
 ||haplesshydrant.com^
@@ -1009,13 +906,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||harborcontrol.com^
 ||harborcub.com^
 ||harmonywing.com^
-||hatefulrequest.com^
 ||hayweb.net^
 ||hazmatworkshop.com^
 ||headydegree.com^
 ||headyhook.com^
 ||healflowers.com^
-||hearinglizards.com^
 ||heartbreakingmind.com^
 ||hearthow.com^
 ||heavydetail.com^
@@ -1029,7 +924,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||highfalutinbox.com^
 ||highfalutinhoney.com^
 ||highnoongear.com^
-||hikingbars.com^
 ||hilariouszinc.com^
 ||hippojump.com^
 ||historicalbeam.com^
@@ -1045,7 +939,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||honorablehydrant.com^
 ||honorableland.com^
 ||hookconference.com^
-||horsesoda.com^
 ||hospitablehall.com^
 ||hospitablehat.com^
 ||howdoesthislook.com^
@@ -1061,7 +954,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||hypnoticwound.com^
 ||hystericalcloth.com^
 ||hystericalfinger.com^
-||i9w8p.pw^
 ||icywinter.com^
 ||idlecollect.com^
 ||illinvention.com^
@@ -1070,11 +962,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||immensehoney.com^
 ||imminentshake.com^
 ||importantmeat.com^
-||importedincrease.com^
 ||importedinsect.com^
-||importlocate.com^
 ||impossibleexpansion.com^
-||impossiblemove.com^
 ||impulsejewel.com^
 ||incomehippo.com^
 ||incompetentjoke.com^
@@ -1083,9 +972,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||infinityhedge.com^
 ||informalbook.com^
 ||innocentlamp.com^
-||innocentwax.com^
 ||inputicicle.com^
-||inquisitiveice.com^
 ||inquisitiveinvention.com^
 ||insectmacros.com^
 ||insidepsych.net^
@@ -1109,12 +996,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||itsmatchtime.com^
 ||ivykiosk.com^
 ||j93557g.com^
-||jadeitite.com^
-||jaderooster.com^
 ||jailbulb.com^
 ||jamexport.com^
-||jazzstadium.com^
-||jazzwholesale.com^
 ||jellyfinstream.com^
 ||jetskiscovers.com^
 ||jewelryforest.com^
@@ -1143,24 +1026,19 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||justpickaname.com^
 ||justwebcards.com^
 ||justwowjars.com^
-||k54nw.pw^
 ||keenquill.com^
 ||kernellife.com^
 ||kidpowers.com^
-||kindasingle.com^
 ||kindhush.com^
 ||kindlereunion.com^
-||kitesquirrel.com^
 ||kitetuning.com^
 ||kittentacos.com^
 ||kittycatking.com^
 ||knewpenny.com^
 ||knifetreasury.com^
 ||knitstamp.com^
-||knottysticks.com^
 ||knottyswing.com^
 ||laboredlocket.com^
-||lackadaisicalkite.com^
 ||lakesecure.com^
 ||lameletters.com^
 ||lamplow.com^
@@ -1171,12 +1049,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||lastanonymous.com^
 ||lasttaco.com^
 ||laughcloth.com^
-||laughdrum.com^
 ||launchjack.com^
 ||lazychord.com^
 ||lazyexplore.com^
 ||leafpilot.com^
-||leaguepoll.com^
 ||leaplunchroom.com^
 ||leftliquid.com^
 ||lemonpackage.com^
@@ -1192,13 +1068,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||lilydreamer.com^
 ||limecodesign.com^
 ||limepeal.com^
-||linkedleg.com^
 ||linksoutside.com^
 ||linkstable.com^
 ||littlesun.net^
 ||livelumber.com^
 ||livelylaugh.com^
-||livelyreward.com^
 ||livingsleet.com^
 ||lizardslaugh.com^
 ||llamavoice.com^
@@ -1206,10 +1080,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||loadedhearts.com^
 ||loadsurprise.com^
 ||locateskill.com^
-||lockuplookup.com^
 ||locolava.com^
 ||logicalminds.net^
-||logoshutter.com^
 ||lonelyflavor.com^
 ||longingtrees.com^
 ||longloops.com^
@@ -1223,7 +1095,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||lowercases.com^
 ||lowerthewatts.net^
 ||lowkeypalmtree.com^
-||lp3tdqle.com^
 ||luckyshelf.com^
 ||ludicrousarch.com^
 ||lumberamount.com^
@@ -1246,14 +1117,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||magicaljoin.com^
 ||magicalpiano.com^
 ||magicminibox.com^
-||magiczenith.com^
-||magnetairport.com^
-||majesticmountainrange.com^
 ||majesticwaterscape.com^
 ||majesticwilderness.com^
 ||makesimpact.com^
 ||maliciousmusic.com^
-||managedpush.com^
 ||manamoment.com^
 ||mantrafox.com^
 ||manydiamonds.com^
@@ -1262,13 +1129,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||mapcommand.com^
 ||marblediscussion.com^
 ||marinechurch.com^
-||markedcrayon.com^
 ||markedmeasure.com^
 ||marketspiders.com^
 ||marriedbelief.com^
 ||marriedmailbox.com^
 ||marriedvalue.com^
-||marrowleaves.com^
 ||marsnextdoor.com^
 ||massivemark.com^
 ||materialisticmoon.com^
@@ -1305,14 +1170,12 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||messmonster.com^
 ||messyoranges.com^
 ||metajaws.com^
-||metalbold.com^
 ||metawelcome.com^
 ||midnightmead.com^
 ||mightyspiders.com^
 ||millswell.com^
 ||mimosamajor.com^
 ||mindfulgem.com^
-||mindlessmark.com^
 ||mineinvoice.com^
 ||minibilling.com^
 ||minorcattle.com^
@@ -1322,7 +1185,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||mistervillas.com^
 ||mistyhorizon.com^
 ||mittencattle.com^
-||mixedreading.com^
 ||mixplays.com^
 ||modularmental.com^
 ||momentfilter.com^
@@ -1347,13 +1209,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||muddledaftermath.com^
 ||muddledmemory.com^
 ||mundanenail.com^
-||mundanepollution.com^
 ||mushroomgods.com^
 ||mushywaste.com^
 ||musicflashcard.com^
 ||muteknife.com^
 ||mutemailbox.com^
-||mutualhappy.com^
 ||mysketchpad.com^
 ||mysticalagoon.com^
 ||naivestatement.com^
@@ -1365,7 +1225,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||neatshade.com^
 ||nebulacrescent.com^
 ||nebulajubilee.com^
-||nebulousamusement.com^
 ||nebulousgarden.com^
 ||nebulousquasar.com^
 ||needleaf.com^
@@ -1406,18 +1265,14 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||nullnorth.com^
 ||nullradar.com^
 ||numerousnest.com^
-||nutritiousbean.com^
 ||oafishchance.com^
 ||oafishobservation.com^
 ||objecthero.com^
-||objectsnetwork.com^
 ||oblivionfleet.com^
 ||obscenesidewalk.com^
 ||obscurespace.com^
-||observantice.com^
 ||obsidiangems.com^
 ||oceancloudhosts.com^$~xhr
-||octaneblood.com^
 ||offerniche.com^
 ||offgridcrops.com^
 ||offshoreassets.com^
@@ -1425,11 +1280,9 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||offshoregeology.com^
 ||offshoregoods.com^
 ||okaysurethat.com^
-||oldandindie.com^
 ||oldfashionedoffer.com^
 ||oldportcoffee.com^
 ||omgthink.com^
-||omniscientfeeling.com^
 ||onecrow.net^
 ||onedropocean.com^
 ||onespecify.com^
@@ -1438,7 +1291,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||opalquill.com^
 ||operationchicken.com^
 ||operationnail.com^
-||oppositeoperation.com^
 ||optimallimit.com^
 ||optionsnomad.com^
 ||opulentsylvan.com^
@@ -1475,7 +1327,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||papamug.com^
 ||parallelbulb.com^
 ||parchedsofa.com^
-||pardonpopular.com^
 ||parentpicture.com^
 ||parsimoniouspolice.com^
 ||partnerhut.com^
@@ -1489,17 +1340,14 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||pedropanther.com^
 ||peeringhost.net^
 ||pegsbuttons.com^
-||perceivequarter.com^
 ||perfectfetch.com^
 ||petitechili.com^
-||petiteumbrella.com^
 ||phonecup.com^
 ||phoneresult.com^
 ||photographpan.com^
 ||photohints.com^
 ||physicstees.com^
 ||pickmicro.com^
-||pietexture.com^
 ||pigeonkit.com^
 ||pigeonsetc.com^
 ||pigmentpaper.com^
@@ -1525,14 +1373,12 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||pluckypocket.com^
 ||pluckyzone.com^
 ||pocketfaucet.com^
-||podiumpresto.com^
 ||podname.com^
 ||poemprompt.com^
 ||poeticpackage.com^
 ||pointdigestion.com^
 ||pointlesspocket.com^
 ||pointlessprofit.com^
-||pointlessrifle.com^
 ||poisedfuel.com^
 ||poisedpig.com^
 ||polishedcrescent.com^
@@ -1568,7 +1414,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||processplantation.com^
 ||producecopy.com^
 ||producepickle.com^
-||productivepear.com^
 ||productsurfer.com^
 ||profanstee.com^
 ||profitrumour.com^
@@ -1579,7 +1424,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||protectpool.com^
 ||protestcopy.com^
 ||psychedelicarithmetic.com^
-||psychedelicchess.com^
 ||pubfs.com^
 ||pubimgs.com^
 ||publicsofa.com^
@@ -1594,20 +1438,15 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||punyplant.com^
 ||puppetcorp.com^
 ||puppiesart.com^
-||puppytooth.com^
 ||purebloom.net^
 ||purposepipe.com^
-||pyramidpaw.com^
 ||q20jqurls0y7gk8.info^
-||quaintcan.com^
-||qualifiedblog.com^
 ||quantumlagoon.com^
 ||quantumshine.com^
 ||queenjam.com^
 ||queenskart.com^
 ||questionate.com^
 ||quicklyedit.com^
-||quicksandear.com^
 ||quicktrick.net^
 ||quietknowledge.com^
 ||quillkick.com^
@@ -1628,7 +1467,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||radiosfax.com^
 ||raidmedics.com^
 ||railwaygiraffe.com^
-||railwayrainstorm.com^
 ||railwayreason.com^
 ||raintwig.com^
 ||rainyhand.com^
@@ -1652,7 +1490,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||rebelswing.com^
 ||rebootrewire.com^
 ||receiptcent.com^
-||receptiveink.com^
 ||receptivereaction.com^
 ||recessrain.com^
 ||recipepin.com^
@@ -1682,7 +1519,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||resonantbrush.com^
 ||resonantrock.com^
 ||respectrain.com^
-||resplendentecho.com^
 ||restfultools.com^
 ||restrainstorm.com^
 ||restructureinvention.com^
@@ -1702,7 +1538,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||rigorlab.com^
 ||ringplant.com^
 ||ringsrecord.com^
-||ritzykey.com^
 ||ritzyrepresentative.com^
 ||ritzyveil.com^
 ||roaddynamics.com^
@@ -1722,7 +1557,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||rusticfrench.com^
 ||rusticprice.com^
 ||ruthlessdegree.com^
-||ruthlessmilk.com^
 ||sableshelf.com^
 ||sablesmile.com^
 ||sablesong.com^
@@ -1745,9 +1579,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||satisfycork.com^
 ||savoryink.com^
 ||savoryorange.com^
-||savorystructure.com^
 ||sayinnovation.com^
-||scarcecard.com^
 ||scarceshock.com^
 ||scarcesign.com^
 ||scarcestructure.com^
@@ -1759,7 +1591,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||scaredsnakes.com^
 ||scaredsong.com^
 ||scaredstomach.com^
-||scaredswing.com^
 ||scarefowl.com^
 ||scarfsmash.com^
 ||scatteredheat.com^
@@ -1793,7 +1624,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||secretturtle.com^
 ||securityannex.net^
 ||seedscissors.com^
-||seekmyshop.com^
 ||seekremote.com^
 ||seenvault.com^
 ||seespice.com^
@@ -1802,7 +1632,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||selfishsnake.com^
 ||sendingspire.com^
 ||seniordynamic.com^
-||sensorsmile.com^
 ||sentinelp.com^
 ||sentrymagic.com^
 ||separatesort.com^
@@ -1815,9 +1644,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||serenezenith.com^
 ||serenezephyr.com^
 ||serenitygem.com^
-||serioussuit.com^
-||serpentshampoo.com^
-||servicesscoop.com^
 ||settleshoes.com^
 ||sevendeer.com^
 ||sevenhalves.com^
@@ -1825,9 +1651,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||shadowmade.com^
 ||shaggytank.com^
 ||shakegoldfish.com^
-||shakyseat.com^
 ||shakysurprise.com^
-||shakytaste.com^
 ||shallowart.com^
 ||shallowblade.com^
 ||shamerain.com^
@@ -1858,7 +1682,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||signaturepod.com^
 ||silentcredit.com^
 ||silentjackal.com^
-||silentwrench.com^
 ||siliconslow.com^
 ||sillyscrew.com^
 ||simplenaming.com^
@@ -1880,7 +1703,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||skilledview.com^
 ||skillfuldrop.com^
 ||skillfullyfrugal.com^
-||skillsresults.com^
 ||skisofa.com^
 ||skullmagnets.com^
 ||skullteeth.com^
@@ -1889,22 +1711,18 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||slaysweater.com^
 ||slickcontent.com^
 ||slimesupplies.net^
-||slimyscarf.com^
 ||slinksuggestion.com^
 ||slopesoap.com^
 ||smallershops.com^
 ||smashquartz.com^
 ||smashshoe.com^
 ||smashsurprise.com^
-||smilewound.com^
 ||smilingcattle.com^
 ||smilingmaster.com^
 ||smilingswim.com^
-||smilingwaves.com^
 ||smoggysnakes.com^
 ||smoggysongs.com^
 ||smoggystation.com^
-||smokedolives.com^
 ||snacktoken.com^
 ||snakemineral.com^
 ||snakeslang.com^
@@ -1918,7 +1736,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||snowmentor.com^
 ||sockpacks.com^
 ||soggysponge.com^
-||soggyzoo.com^
 ||soilcontent.com^
 ||soilphotos.com^
 ||solarislabyrinth.com^
@@ -1936,11 +1753,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||sophisticatedstove.com^
 ||sorebear.com^
 ||soresidewalk.com^
-||soresneeze.com^
-||sorethunder.com^
 ||soretrain.com^
 ||sortstructure.com^
-||sortsummer.com^
 ||soulclicking.com^
 ||soundmachine.net^
 ||soundstocking.com^
@@ -1952,12 +1766,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||sparkgoal.com^
 ||sparklingshelf.com^
 ||specialscissors.com^
-||specialsnake.com^
 ||spectacularstamp.com^
 ||spellingthoughts.com^
 ||spellknight.com^
 ||spellmist.com^
-||spellsalsa.com^
 ||spicesonwheels.com^
 ||spicevikings.com^
 ||spiffymachine.com^
@@ -1978,10 +1790,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||springsister.com^
 ||springsnails.com^
 ||sproutingbag.com^
-||sprydelta.com^
 ||sprysummit.com^
 ||spuriousair.com^
-||spuriousbase.com^
 ||spurioussquirrel.com^
 ||spuriousstranger.com^
 ||spysubstance.com^
@@ -2004,7 +1814,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||starrynets.com^
 ||starsmarter.com^
 ||startercost.com^
-||startingcars.com^
 ||statshunt.com^
 ||statuesqueship.com^
 ||statusinside.com^
@@ -2038,12 +1847,10 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||stonechin.com^
 ||stonepole.com^
 ||stopstomach.com^
-||stormyachiever.com^
 ||stormyflower.com^
 ||straightnest.com^
 ||straindrinks.com^
 ||strangeclocks.com^
-||strangesink.com^
 ||strawburn.com^
 ||streetsort.com^
 ||stretchsister.com^
@@ -2058,26 +1865,17 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||stupendoussleet.com^
 ||stupendoussnow.com^
 ||stupidscene.com^
-||stupidsnake.com^
 ||sturdysnail.com^
 ||styleaffinity.com^
 ||stylelockers.com^
 ||stylishbuds.com^
 ||subjectivepoint.com^
-||subletyoke.com^
 ||sublimequartz.com^
 ||subseaagent.com^
 ||subseacare.com^
 ||subseasecurity.com^
-||subsequentstew.com^
-||subsequentswim.com^
-||substantialcarpenter.com^
 ||substantialgrade.com^
 ||successbuffet.com^
-||successfuelevents.com^
-||successfulscent.com^
-||suddensidewalk.com^
-||suddensoda.com^
 ||suggestionbridge.com^
 ||sulkycook.com^
 ||summerobject.com^
@@ -2092,9 +1890,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||supplyreward.com^
 ||supportwaves.com^
 ||surfacesmedia.com^
-||surfbangles.com^
 ||swankysquare.com^
-||sweetslope.com^
 ||swellstocking.com^
 ||swiftintro.com^
 ||swimfreely.com^
@@ -2111,10 +1907,8 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||tacojournal.com^
 ||talltouch.com^
 ||tangibleteam.com^
-||tangletrace.com^
 ||tangyamount.com^
 ||tangycover.com^
-||tarttendency.com^
 ||taskdelight.com^
 ||tasksimplify.com^
 ||tasselapp.com^
@@ -2122,13 +1916,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||tastesnake.com^
 ||tawdryson.com^
 ||taxisubsea.com^
-||tdzvm.pw^
 ||tealjewel.com^
 ||teamstatus.net^
 ||tearfulglass.com^
 ||techconverter.com^
 ||tediousbear.com^
-||tediousticket.com^
 ||tedioustooth.com^
 ||teejubilee.com^
 ||teenytinycellar.com^
@@ -2137,13 +1929,11 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||teeshining.com^
 ||telephoneapparatus.com^
 ||tempertrick.com^
-||tempttalk.com^
 ||temptteam.com^
 ||tendertest.com^
 ||tenhourweek.com^
 ||terriblethumb.com^
 ||testadmiral.com^
-||testedtouch.com^
 ||texturetrick.com^
 ||thebigvan.com^
 ||thebrainybulb.com^
@@ -2157,21 +1947,17 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||thesolartime.com^
 ||thesoulbrand.com^
 ||thewavebeats.com^
-||thickticket.com^
-||thicktrucks.com^
 ||thingsafterthought.com^
 ||thingstaste.com^
 ||thinkitten.com^
 ||thinkitwice.com^
 ||thirdrespect.com^
-||thirstytwig.com^
 ||thomastorch.com^
 ||thoughtlessknot.com^
 ||threechurch.com^
 ||threetruck.com^
 ||thrillasoft.com^
 ||thrivingmarketplace.com^
-||thunderingtendency.com^
 ||ticketaunt.com^
 ||ticketjolly.com^
 ||ticketssponge.com^
@@ -2185,39 +1971,30 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||tinybluewhale.com^
 ||tinyswans.com^
 ||tinytendency.com^
-||tiredthroat.com^
 ||tireinside.com^
 ||tiresomethunder.com^
 ||titangods.com^
 ||toasttutor.com^
-||tofupancake.com^
 ||tofusquirrel.com^
 ||tomatobarrel.com^
 ||toolcapital.com^
 ||toolforthought.com^
-||toomanyalts.com^
-||topbookgifts.com^
 ||topcrazypress.com^
 ||topthrowbacks.com^
-||torpidtongue.com^
 ||tortoisepage.com^
-||touristfuel.com^
 ||toysbasics.com^
 ||toytakeover.com^
 ||tracecontent.com^
 ||traderbyte.com^
 ||tradetooth.com^
 ||tranquilcan.com^
-||tranquilcanyon.com^
 ||tranquilplume.com^
-||tranquilside.com^
 ||tranquilveil.com^
 ||tranquilveranda.com^
 ||trappush.com^
 ||travelerpic.com^
 ||treadbun.com^
 ||treatoceans.com^
-||tremendousearthquake.com^
 ||tremendousplastic.com^
 ||tremendoustime.com^
 ||trickfile.com^
@@ -2240,9 +2017,7 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||typewebsite.com^
 ||typicalairplane.com^
 ||typicalteeth.com^
-||tzwaw.pw^
 ||ubiquitoussea.com^
-||ubiquitousyard.com^
 ||ultraoranges.com^
 ||ultravalid.com^
 ||unablehope.com^
@@ -2259,18 +2034,14 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||unitedscans.com^
 ||unknowncrate.com^
 ||unknownidea.com^
-||unknowntray.com^
 ||unloadyourself.com^
-||untidyquestion.com^
 ||untidyrice.com^
-||unusedstone.com^
 ||unusualtitle.com^
 ||unwieldyhealth.com^
 ||unwieldyimpulse.com^
 ||unwieldyplastic.com^
 ||upgradeyoga.com^
 ||uppitytime.com^
-||upscaledigest.com^
 ||urbanlaurel.com^
 ||usabilitybook.com^
 ||uselesslumber.com^
@@ -2290,7 +2061,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||verdantlabyrinth.com^
 ||verdantloom.com^
 ||verdantsculpture.com^
-||verifiedarts.com^
 ||verseballs.com^
 ||versuswall.com^
 ||vibrantcelebration.com^
@@ -2304,7 +2074,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||vilenexus.com^
 ||viralfoodie.net^
 ||virtualvincent.com^
-||visitstor.com^
 ||vividcanopy.com^
 ||vividfrost.com^
 ||vividmeadow.com^
@@ -2315,15 +2084,12 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||volatileprofit.com^
 ||volatilevessel.com^
 ||voraciousgrip.com^
-||vq1qi.pw^
 ||waitingnumber.com^
 ||wantingwindow.com^
 ||warmafterthought.com^
-||warmquiver.com^
 ||warnwing.com^
 ||washbanana.com^
 ||watersensible.com^
-||wateryvan.com^
 ||waterywave.com^
 ||waveinverter.com^
 ||wavesimple.com^
@@ -2333,16 +2099,13 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||weatherbytes.net^
 ||weatherpush.net^
 ||websitesdude.com^
-||weeklybanner.com^
 ||wellgroomedapparel.com^
 ||wellgroomedhydrant.com^
-||wellmadefrog.com^
 ||whimsicalcanyon.com^
 ||whimsicalgrove.com^
 ||whimsicalvantage.com^
 ||whimsicalzenith.com^
 ||whimsygadget.com^
-||whineattempt.com^
 ||whirlwealth.com^
 ||whiskyqueue.com^
 ||whisperingcascade.com^
@@ -2389,11 +2152,9 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||wrongpotato.com^
 ||wrongwound.com^
 ||wtaccesscontrol.com^
-||xovq5nemr.com^
 ||yieldingwoman.com^
 ||youcandrawanything.com^
 ||yourlifedream.com^
-||zbwp6ghm.com^
 ||zephyrcatalyst.com^
 ||zephyrlabyrinth.com^
 ||zeppelinradio.com^
@@ -2412,7 +2173,6 @@ llifle.com###ad_blocker_found
 flightradar24.com###bottomRightPanel
 audiotag.info###dclaim
 videofun.me###flowplayer > div[class][style]:first-child
-abc-fonts.me###galepro-core-adb-enabled
 yocast.tv###ra9e
 flightradar24.com###responsiveBottomPanel
 techonthenet.com###sabl
@@ -2420,7 +2180,6 @@ outlook.live.com##.N3k7EN5vRGTrONWBPg250
 myanimelist.net##._unit
 ##.ad-blocker-warning
 photofilters.com##.adBlocked
-biggestplayer.me##.adblock + *
 nexusmods.com##.areplacer
 hearthhead.com,wowhead.com##.block-bg
 wowhead.com##.block-bgimg
@@ -2430,18 +2189,15 @@ euroiphone.eu##.div-download-v
 findretros.com##.fuck-adblock
 technologypep.com##.main-container-wrap > div[class$="-bg"]
 technologypep.com##.main-container-wrap > div[id][class][style*="opacity"]
-biggestplayer.me##.masr
 rediafile.com##.protection:not(body)
-videobug.net,videofun.me,vidzur.com##.randid
+videofun.me##.randid
 toolslib.net##.row > .col-md-7 > .panel-default
 codeshare.io##.sad-face
 hearthhead.com,thottbot.com,wowhead.com##.sidebar-bg
-biggestplayer.me##.soret
 spanishdict.com##.whitelist
 ftuapps.dev##[style*="cursor: no-drop;"]
-play44.net,videobug.net,videofun.me,vidzur.com,yucache.net##[style^="position: absolute; width: 100%;"]
+play44.net,videofun.me,yucache.net##[style^="position: absolute; width: 100%;"]
 pkmods.com##body > div[style*="z-index"][style*="background"]
-leechyscripts.com##div[class^="chp_ads_block_modal"]
 freelogovectors.net##div[class^="popup"]
 nslookup.io##div[id$="-fallback"]
 financerites.com##div[id^="__vliadb"]
@@ -2449,21 +2205,17 @@ strikeout.co,vipbox.sx,vipleague.co,vipleague.is##div[style="display: block;"]
 nexusmods.com##div[style="float: left; width: 728px; height: 90px; background: #313131;"]
 efootballdb.com##div[style="position: fixed; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.8); width: 100vw; height: 100vh; z-index: 9999999;"]
 playonlinux.com##div[style="text-align:center;  border-radius:7px; width:160px;  border:1px solid #666666;  margin-left:5px;padding-right:5px;color:#FFF;  background-color:#666;font-family:Maven Pro,century gothic, arial, helvetica, sans serif;padding-top:94px;  height:600px;  padding-left:5px; font-size:18px; "]
-byzoo.org,videobug.net##div[style^="position: absolute; width: 300px;"]
 outlook.live.com._6tqjFb_HmyQup_NPe6dhC
-homerun.re,strikeout.co,vipbox.sx,vipleague.ch,vipleague.co,vipleague.is,vipleague.me##span[id][style] > div[id]:first-child:last-child
+strikeout.co,vipbox.sx,vipleague.ch,vipleague.co,vipleague.is,vipleague.me##span[id][style] > div[id]:first-child:last-child
 scrolller.com##.popup--sticky:contains(adblock)
 redtube.com###as_131
 redtube.com###slidePanelContainerAB
 redtube.com##.qb
 shadbase.com##img[alt="adblock"]
-@@||ankrzkz.sbs/js/boxad.js?$script,~3p
 @@||download.megaup.net/openads.js$script,~3p
-@@||alwingulla.com/88/tag.min.js$domain=darkino.online
 @@||fundingchoicesmessages.google.com^$script,domain=hurriyet.com.tr|milliyet.com.tr
 @@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=exe-urls.com|fileink.com|phoneky.com|rockmods.net
 @@||cheatography.com^$generichide
-@@||darkino.online^$generichide
 @@||docs.w3cub.com^$generichide
 @@||haxnode.net^$generichide
 @@||www.ifon.ca^$generichide
@@ -2530,9 +2282,8 @@ _adblock_killer.
 ||nikopik.com/wp-content/themes/*/js/nikopik.js
 ||nordpresse.be/wp-content/uploads/$script
 ||nrj.fr/nrj?Page=/rg.fake&
-||sdefx.cloud/js/acheck.js
 ||skyrock.net/img/*/adblock/
-@@/ads.js$script,~3p,domain=abcbourse.com|action-sociale.org|anime-vf.fr|impactmangas.fr|presse-algerie.net|primfx.com|undernews.fr
+@@/ads.js$script,~3p,domain=abcbourse.com|action-sociale.org|anime-vf.fr|presse-algerie.net|primfx.com|undernews.fr
 @@/advertisement.js$script,~3p,domain=fun-animes.fr|macupload.net|majorgeeks.com|upload.ac
 @@/noadblock-nice-message/assets/js/ads.js?$script,~3p
 @@||animedigitalnetwork.fr/templates/*/js/advertising.min.js?$script,~3p
@@ -2714,12 +2465,11 @@ iphonesoft.fr,iphonetweak.fr###msgUser
 retinaboys.com###screen_block
 lagrosseradio.com###warn
 monacomatin.mc,nicematin.com,varmatin.com##.RhooBg
-scantrad.net##.adbon
 trackr.fr##.alert-dashed
 journaldugeek.com##.banner__content
 closermag.fr,grazia.fr,topsante.com##.dfp-slot
 soonnight.com##.display_natural
-ceesty.com,clkme.me,clkmein.com,cllkme.com,corneey.com,destyy.com,festyy.com,gestyy.com,jigbig.tk,newsfortrump.ga,sh.st,shorte.st,skiip.me,skipp.io,viid.me,wiid.me##.information-container
+ceesty.com,clkme.me,cllkme.com,corneey.com,destyy.com,festyy.com,gestyy.com,sh.st,shorte.st,skiip.me,viid.me,wiid.me##.information-container
 dzfoot.com##.messageB
 monacomatin.mc,nicematin.com,varmatin.com##.modalRhoo
 multiup.io##.mfp-bg, .mfp-wrap
@@ -2737,16 +2487,12 @@ pausecafein.fr###adb-pop
 #@##adblocktest
 dbz-fantasy.com#@##adTeaser
 fstore.biz#@##adblockinfo
-dz-android.com,freeiphone.fr,hommedumatch.fr,jetetroll.com,testious.com#@##adsense
+freeiphone.fr,hommedumatch.fr,jetetroll.com,testious.com#@##adsense
 debrideurstream.fr#@##pubdirecte
-ot-boutique.fr#@##publicite
 iwin.com#@##sponsorText
-fairytailmx.com#@##sponsored-ad
 hypebeast.com,hypebeast.kr#@#.ad-blocked
-forum.virtualdjing.com#@#.adFrame
 japscan.lol#@#.ad_slot
 gamaniak.com#@#.adsbygoogle
-dealerdunet.fr#@#.text_ads
 comptoir-info.com#@#.textad
 @@||jeux.meteocity.com^$generichide
 @@||lecrabeinfo.net^$generichide
@@ -2760,7 +2506,7 @@ minimultik.ru###abDetected
 patrioty.org.ua###ad_pu_modal
 i.factor.ua###adb-info
 sanstv.ru###adblock
-dressupmix.ru,teensgames.ru###adblock_popup
+dressupmix.ru###adblock_popup
 vesti-ukr.com###adblockpopup
 wotactions.com###ads_warning
 polska-ie.com#@##adsense
@@ -2780,7 +2526,6 @@ myshared.ru###download_form > .uk-margin-top[style]
 forum.bestflowers.ru###exposeMask
 internet-law.ru###fab-enabled
 frkp.lol###film > #content > span[style="color:#ff6a00;"]
-gk-stalker.xyz###gkadblock
 pastenow.ru###google-block
 gamesubject.com###headb
 provinceinfo.ru###header > .container > a[href="/menu"] ~ h2
@@ -2803,18 +2548,14 @@ zx-pk.ru###stickymsg
 professorweb.ru###submain > div[class^="a"][style]
 kaermorhen.ru###top-line-container
 numberempire.com###toplink > h3[style="color: red"]
-ganoderma-mushrooms.com,korrektor.name,varicream.org###turn_advert.adblock
 vsaduidoma.com##.ABD_display_wrapper
 reshuent.ru,sdamgia.ru##.S29e4f5cdae
 eurabota.com##.abtop
 sprashivalka.com##.ad
-topcraft.ru##.ad-info
 bycard.by,goodfon.ru,old-games.ru,satsis.info,swordmaster.org##.adb
 vsadu.ru##.adb-block
 andevice.ru,dietdo.ru##.adb-def
 telesputnik.ru##.adbPopup
-tuchkatv.ru##.adb_m
-brazzers-hdx.club##.adblck
 forum.qrz.ru,life.ru,mastergrad.com,wallpapershome.ru##.adblock
 nevasport.ru##.adblock-notify
 exler.ru##.adblock-pls
@@ -2829,14 +2570,13 @@ nonameno.com,rusrek.com##.alert
 vk.barkov.net##.alert-danger
 2ip.me,2ip.ua##.alert-mess > .row
 ria.ru##.antiblock
-fotoshop-online.org##.aslot
 mel.fm##.b-ad-space__placeholder
 irk.ru##.b-adblock-message
 cs-amba.ru##.banka
 medical-club.net##.blocker-notice,.blocker-overlay
 electric-house.ru##.blok_forum > div[style]
-audio-hi-fi.ru,electro-sila.ru##.blok_new > div[style]
-015.by,0312.ua,032.ua,0332.ua,0342.ua,0352.ua,0362.ua,0372.ua,0382.ua,0412.ua,04141.com.ua,0432.ua,04563.com.ua,04596.com.ua,04597.com.ua,04598.com.ua,0462.ua,0472.ua,048.ua,04868.com.ua,0512.com.ua,05136.com.ua,05161.com.ua,0522.ua,0532.ua,05366.com.ua,0542.ua,05447.com.ua,0552.ua,056.ua,0564.ua,0566.com.ua,0569.com.ua,057.ua,061.ua,06153.com.ua,0619.com.ua,0623.com.ua,06236.com.ua,06237.com.ua,06239.com.ua,06242.ua,06252.com.ua,06267.com.ua,06272.com.ua,06274.com.ua,06277.com.ua,0629.com.ua,0642.ua,06452.com.ua,0652.ua,0692.ua,1rnd.ru,3652.ru,3654.ru,3849.com.ua,44.ua,4594.com.ua,5692.com.ua,62.ua,6262.com.ua,6264.com.ua,65.media,7232.kz,8422city.ru,anapa.life,angarsk38.ru,bazhopol.ru,city01.am,city41.ru,comores24.com,go01.ru,go11.kz,go212.by,go216.by,go26.ru,go31.ru,go61.ru,go7812.ru,godublin.info,golondon.info,goriga.info,gorod3466.ru,gorodarmavir.ru,goroddomodedovo.ru,goshymkent.kz,inaktau.kz,inalmaty.kz,inastana.kz,inatyrau.kz,infolyubertsy.ru,inform69.ru,vilniuje.info,yocity12.ru##.bung-container
+audio-hi-fi.ru##.blok_new > div[style]
+015.by,0312.ua,032.ua,0332.ua,0342.ua,0352.ua,0362.ua,0372.ua,0382.ua,0412.ua,04141.com.ua,0432.ua,04563.com.ua,04597.com.ua,04598.com.ua,0462.ua,0472.ua,048.ua,04868.com.ua,0512.com.ua,05136.com.ua,05161.com.ua,0522.ua,0532.ua,05366.com.ua,0542.ua,05447.com.ua,0552.ua,056.ua,0564.ua,0566.com.ua,0569.com.ua,057.ua,061.ua,06153.com.ua,0619.com.ua,06236.com.ua,06237.com.ua,06239.com.ua,06242.ua,06252.com.ua,06267.com.ua,06272.com.ua,06274.com.ua,06277.com.ua,0629.com.ua,0642.ua,06452.com.ua,0652.ua,1rnd.ru,3652.ru,3654.ru,3849.com.ua,44.ua,4594.com.ua,5692.com.ua,62.ua,6262.com.ua,6264.com.ua,65.media,7232.kz,8422city.ru,anapa.life,angarsk38.ru,city41.ru,comores24.com,go01.ru,go11.kz,go26.ru,go31.ru,go61.ru,go7812.ru,gorod3466.ru,gorodarmavir.ru,goroddomodedovo.ru,inaktau.kz,inalmaty.kz,inastana.kz,inatyrau.kz,infolyubertsy.ru,inform69.ru,vilniuje.info##.bung-container
 kanobu.ru##.c-moneyPlace_empty
 tvcook.ru##.cat
 rusopen.com##.classblsi.addshr
@@ -2859,13 +2599,12 @@ shuba.life##.md\:u-block
 peers.tv##.moanerwrap
 megatest.online##.msg-AdBlock
 ykt.ru##.n-banner--adblocked
-animeland.su,itcats.ru,nekto.me,noadsradio.ru,sharkgame.ru,studies.in.ua,w10.jeanzzz.ru##.no-adb
+itcats.ru,nekto.me,noadsradio.ru,sharkgame.ru,studies.in.ua,w10.jeanzzz.ru##.no-adb
 yarik-sat.com##.noadb
 mail.rambler.ru##.notification-warning
 delfi.lv##.notification-widget
 radio.yandex.by,radio.yandex.kz,radio.yandex.ru##.notify
 alexfilm.cc##.panel-primary
-izmailov.tv##.popupBlock
 newnavitel.blogspot.com##.post-body > div[dir] > div[dir] > h1#result
 animedub.ru##.poverh
 pythonworld.ru##.pythonworld-contributor
@@ -2877,21 +2616,20 @@ playunturned.ru##.side_left > center
 playunturned.ru##.side_right > center
 qaru.site##.similar.a[style]
 slivap.ru##.svg-adblock
-l-a-w.ru,mhelp.kz##.swal2-container
+mhelp.kz##.swal2-container
 objavlenija.respublika.cz##.sweet-alert,.sweet-overlay
 kinoafisha.ua##.turn-off-add-block-text
 stalkerportaal.ru##.video_adsense
-bookskeeper.ru,e-xecutive.ru##.warning
+e-xecutive.ru##.warning
 forum.bestflowers.ru##.xenOverlay
 /^https?:\/\/pikabu\.ru\/ajax\/([A-Za-z0-9]{7,})+\?[A-Za-z0-9]+=[0-9a-z-]+[0-9a-z_]/$xhr,domain=pikabu.ru
-/cookie_check.min.js$domain=acetv.me
-/gogl_detector$script,domain=meddaily.ru|newsru.com
+/gogl_detector$script,domain=newsru.com
 @@||anidub.com/ads.js|$script,domain=anidub.com
 @@||goha.ru/app/video/adblock.teaser.js|$script,domain=goha.ru
 @@||qpython.club^$generichide
 @@||sports.ru^*/adfox.$xhr
 i.factor.ua##[data-place-block]
-auto62rus.ru,eset-key.ru,mycrib.ru,piggy-bank.online,politonline.ru,showmehow.ru##[data-type="anti-abp"]
+auto62rus.ru,eset-key.ru,mycrib.ru,politonline.ru,showmehow.ru##[data-type="anti-abp"]
 megogo.net##[data-widget*="adblockOverlayEnabled"] .notifications
 lr-club.com##a[href="https://adblockplus.org/ru/faq_basics#disable"]
 drive2.ru##a[href][target="_blank"] > img[src][style^="width: 100%; height: auto;"][style*="vertical-align: middle; max-width: 240px;"]
@@ -2906,12 +2644,11 @@ ukr.net##body > .yellow-die
 poznamka.ru##body > [id]:not([class])[style^="z-index"]
 in-trend.biz##body > [id][style^="z-index"]
 fightnews.info##body > blockquote
-torrnado.win##body > div > .a-overlay
 finget.ru,katalog-aktsii.ru,rp5.by,rp5.kz,rp5.ru,sms24.info,sms24.me,vikings-warofclans.ru##body > div:not([id]):not([class])[style^="position"][style*="background"][style*="z-index"]
 just-for-fun.ru##body > div[class*="-container"][class*="-hide"]
 anticollector.biz.ua,cnc3018.ru,factorio.su##body > div[class][style*="background"][style*="display: block"]
 gdekluet.ru##body > div[class^="stop-block"]
-admin.rainbow-online.ru,gitjournal.tech,logist.uxxo.ru,meteoservice.ru,pawno-info.ru##body > div[id]:not([class])[style="display: block;"]
+gitjournal.tech,meteoservice.ru,pawno-info.ru##body > div[id]:not([class])[style="display: block;"]
 factorio.su##body > div[id][class][style*="background"][style*="visible"]
 gta.com.ua##body > div[id][style*="background"][style*="visible"]
 portfel.info##body > div[id][style="display: block;"]
@@ -2921,11 +2658,10 @@ igorchernomoretz.com##body > div[id^="ab"] + div[style*="cursor"]
 gisher.org##body > div[id^="ban"][style]
 natural-cosmetology.ru##body > div[style*="background-color:#ff0000;color:#ffffff;"]
 tut.by##body > div[style*="position: fixed;"][style*="right: 0;"]
-1snau.ru,bychico.net,dyrik.ru,ecosounds.net,in-drive.ru,inforpost.com,musecube.org,obozrevatel.com,oknotivi.ru,pogodnik.com,sandero.ru,turbominer.ru##body > div[style*="z-index"][style*="9999"]
+1snau.ru,dyrik.ru,ecosounds.net,in-drive.ru,inforpost.com,musecube.org,obozrevatel.com,oknotivi.ru,pogodnik.com,sandero.ru,turbominer.ru##body > div[style*="z-index"][style*="9999"]
 budport.com.ua##body > div[style^="position:fixed;"][style*="z-index"][style*="background"]
 drive2.ru##div[class]:has(> div[id][class] > a[href] > img[src^="https://avatars.mds.yandex.net/get-adfox-content/"])
 blackdesert-info.ru##div[class][style*="z-index"][style*="999999;"][style*="background"][style*="rgb"]
-imgrutor.com##div[class^="adblock-warning"]
 game2day.ru##div[class^="adblock_"]
 lostfilm.tv##div[class^="alarm"]
 rutab.net##div[class^="ggmodale"]
@@ -2946,12 +2682,10 @@ shuba.life##img[height][src^="https://shuba.life/static/banners/placeholders/"]
 nv.ua##img[src="/images/dis_blocker_big.jpg"]
 drive2.ru##img[src^="https://avatars.mds.yandex.net/get-adfox-content/"]
 reshuent.ru,sdamgia.ru##main > div[class*=" "]:nth-child(-n+2) > div ~ div
-fotoshop-online.org##section > .col-full + script + center[class]
 ph4.ru##table[width][height="90"][style]
 savevideo.me##td > div[class]:not([id])[style*="important"]
 bigpuzzle.ru##td[valign="top"][width="200px"][height="600"] > div[style]
 bigpuzzle.ru##td[valign="top"][width="240px"][height="600"]
-||adscat.ru^$3p
 ||allnorilsk.ru/js/adb.js
 ||anivisual.net/mim*.js|$script,domain=anivisual.net
 ||avito.ru^*/some-pretty-script.js
@@ -2962,7 +2696,6 @@ bigpuzzle.ru##td[valign="top"][width="240px"][height="600"]
 ||fairtop.in/template/js/fdetect.js
 ||fundingchoicesmessages.google.com^
 ||gamemag.ru/assets/*/js.cookie.js
-||i140.ru/js/etxm*.js|$script
 ||ipprof.ru/wp-content/plugins/ad-blocking-advisor/
 ||kontrolnaya-rabota.ru^*/fuckadblock.$script
 ||kontrolnaya-rabota.ru^*/toastr.$script,stylesheet
@@ -2971,5 +2704,4 @@ bigpuzzle.ru##td[valign="top"][width="240px"][height="600"]
 ||pwnews.net/des/antiblock.js$script
 ||rockstargame.su/adb_script$script
 ||rusnext.ru/advar.js$script
-||shellcat.ru^$3p
 ||vazhno.ru/cdn-cgi/apps/head/*.js
