@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/251_optimized/251_optimized-s-1782437417-14400.patch
 ! Title: Legitimate URL Shortener (Optimized)
 ! Description: Automatically removes unnecessary '$' and '&' values from URLs, making them easier to copy from the URL bar and pasting elsewhere as links. Already included in Dandelion Sprout's Annoyances List.
-! Version: 2.0.9.96
+! Version: 5db7056
 ! TimeUpdated: 2026-06-26T01:27:34+00:00
 ! Expires: 5 days (update frequency)
 $removeparam=yclid
@@ -162,7 +162,7 @@ $document,removeparam=rlz
 $document,removeparam=pcampaignid
 $document,removeparam=igshid
 $document,removeparam=snr,domain=steampowered.com|steamcommunity.com|steamgames.com
-$document,removeparam=referrer,domain=~bolt.com|~f4map.com|~deviantart.com|~github.com|~discover.*|~vimeo.*|~123-reg.co.uk|~cravesandflames.com|~portswigger.net|~aluminate.net|~timeguessr.com
+$document,removeparam=referrer,domain=~bolt.com|~f4map.com|~deviantart.com|~github.com|~discover.*|~vimeo.*|~123-reg.co.uk|~portswigger.net|~aluminate.net|~timeguessr.com
 $document,removeparam=ext_source
 $removeparam=iradid
 $removeparam=irpid
@@ -1073,8 +1073,8 @@ $removeparam=imgtk
 ?ref=winget|$removeparam=/^ref=winget$/
 $removeparam=id_externo_rsoc
 /auto-append-spmid.js
-$document,removeparam=cid,domain=8days.sg|abcnews.go.com|adguard.com|adshares.net|ae.com|anntaylor.com|apple.com|bitdefender.*|blair.com|channelnewsasia.com|childrensplace.com|controld.com|dcard.tw|elmundo.es|emirates.com|factoryoutletstore.com|fifa.com|flipkart.com|gamestop.com|giphy.com|glasses.com|haband.com|intel.com|intuit.com|jared.com|jcpenney.com|kay.com|kohls.com|lenovo.com|loft.com|marca.com|members.transunion.ca|microsoft.com|nbcnews.com|nike.com|nyandcompany.com|overstock.com|persol.com|proshop.*|radissonhotelsamericas.com|ray-ban.com|rei.com|rightmove.co.uk|samsung.com|stadium.*|staples.com|telenor.no|todayonline.com|tokopedia.com|tommy.com|toms.com|totalbeauty.com|tractorsupply.com|underarmour.com|vineyardvines.com|voxi.co.uk|wine.com|wsj.com|xg4ken.com|zales.com
-$removeparam=ref,document,domain=404media.co|abebooks.com|accounts.binance.com|adobe.com|akuankka.fi|albiononline.com|altcustoms.com|app.blockfi.com|arvopaperi.fi|audible.*|baidu.com|bestbuy.com|bing.com|bitlox.com|bitwarden.com|blinkforhome.com|blogit.fi|bookdepository.com|brave.com|browserstack.com|business.twitter.com|buzzfeed.com|buzzfeednews.com|bybit.com|catch.com.au|cmjornal.pt|codehs.com|comixology.*|coop.no|daily.dev|deal.no|dell.com|depot.dev|digidip.net|domains.ch|droix.net|eset.com|etsy.com|ettoday.net|eventbrite.*|emsisoft.com|expo.io|facebook.*|facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion|fairphone.com|fig.io|foreca.*|freebies.indiegala.com|gallery.so|geeksforgeeks.org|github.io|goodreads.com|greenhouse.io|hintaopas.fi|hintaseuranta.fi|hs.fi|idenati.com|ikea.com|iltapulu.fi|imdb.com|is.fi|jasonsavard.com|kauppalehti.fi|kesaduuni.org|kickstarter.com|ku.fi|lex.page|mastermind.ac|mediuutiset.fi|megapornfreehd.com|merrell.com|mikrobitti.fi|motouutiset.fi|nebula.tv|oikotie.fi|omataloyhtio.fi|proton.me|protonvpn.com|puutarha.net|rakentaja.fi|record.pt|reddit.com|reddittorjg6rue252oqsxryoxengawnmo46qy4kyii5wtqnwfj4ooad.onion|remppatori.fi|sahkovertailu.fi|sanoma.fi|scandinavianphoto.fi|schibsted.fi|semrush.com|shein.com|shodan.io|shopping.google.*|sketch.com|spiegel.de|sportskeeda.com|snapchat.com|storyhouseegmont.fi|student.com|suomi24.fi|talouselama.fi|target.com|tekniikkatalous.fi|telsu.fi|thedailybeast.com|theregister.com|tivi.fi|t.ly|tokenmetrics.com|twitch.tv|udemy.com|uusisuomi.fi|umami.is|vultr.com|webhallen.no|woot.com|wormhole.app|yle.fi|zappos.com|zulily.com|emag.ro|account.microsoft.com|tierlist.com|lastampa.it|repubblica.it|ilsecoloxix.it|gelocal.it|limesonline.com|huffingtonpost.*|hcaptcha.com|hola.org
+$document,removeparam=cid,domain=8days.sg|abcnews.go.com|adguard.com|adshares.net|ae.com|anntaylor.com|apple.com|bitdefender.*|channelnewsasia.com|childrensplace.com|controld.com|dcard.tw|elmundo.es|emirates.com|factoryoutletstore.com|fifa.com|flipkart.com|gamestop.com|giphy.com|glasses.com|haband.com|intel.com|intuit.com|jared.com|jcpenney.com|kay.com|kohls.com|lenovo.com|loft.com|marca.com|members.transunion.ca|microsoft.com|nbcnews.com|nike.com|nyandcompany.com|overstock.com|persol.com|proshop.*|radissonhotelsamericas.com|ray-ban.com|rei.com|rightmove.co.uk|samsung.com|stadium.*|staples.com|telenor.no|todayonline.com|tokopedia.com|tommy.com|toms.com|totalbeauty.com|tractorsupply.com|underarmour.com|vineyardvines.com|voxi.co.uk|wine.com|wsj.com|xg4ken.com|zales.com
+$removeparam=ref,document,domain=404media.co|abebooks.com|accounts.binance.com|adobe.com|akuankka.fi|albiononline.com|altcustoms.com|app.blockfi.com|arvopaperi.fi|audible.*|baidu.com|bestbuy.com|bing.com|bitlox.com|bitwarden.com|blinkforhome.com|blogit.fi|bookdepository.com|brave.com|browserstack.com|business.twitter.com|buzzfeed.com|buzzfeednews.com|bybit.com|catch.com.au|cmjornal.pt|codehs.com|comixology.*|coop.no|daily.dev|deal.no|dell.com|depot.dev|digidip.net|domains.ch|droix.net|eset.com|etsy.com|ettoday.net|eventbrite.*|emsisoft.com|expo.io|facebook.*|facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion|fairphone.com|fig.io|foreca.*|freebies.indiegala.com|gallery.so|geeksforgeeks.org|github.io|goodreads.com|greenhouse.io|hintaopas.fi|hintaseuranta.fi|hs.fi|idenati.com|ikea.com|iltapulu.fi|imdb.com|is.fi|jasonsavard.com|kauppalehti.fi|kesaduuni.org|kickstarter.com|ku.fi|lex.page|mastermind.ac|mediuutiset.fi|megapornfreehd.com|merrell.com|mikrobitti.fi|motouutiset.fi|nebula.tv|oikotie.fi|omataloyhtio.fi|proton.me|protonvpn.com|puutarha.net|rakentaja.fi|record.pt|reddit.com|reddittorjg6rue252oqsxryoxengawnmo46qy4kyii5wtqnwfj4ooad.onion|remppatori.fi|sahkovertailu.fi|sanoma.fi|scandinavianphoto.fi|schibsted.fi|semrush.com|shein.com|shodan.io|shopping.google.*|sketch.com|spiegel.de|sportskeeda.com|snapchat.com|storyhouseegmont.fi|student.com|suomi24.fi|talouselama.fi|target.com|tekniikkatalous.fi|telsu.fi|thedailybeast.com|theregister.com|tivi.fi|t.ly|tokenmetrics.com|twitch.tv|udemy.com|uusisuomi.fi|umami.is|vultr.com|woot.com|wormhole.app|yle.fi|zappos.com|zulily.com|emag.ro|account.microsoft.com|tierlist.com|lastampa.it|repubblica.it|ilsecoloxix.it|gelocal.it|limesonline.com|huffingtonpost.*|hcaptcha.com|hola.org
 $removeparam=tid,domain=clickbank.net|comixology.*|gap.com|gapcanada.ca|mintmobile.com|nhl.com|zulily.com
 $removeparam=src,document,domain=3cx.com|adafruit.com|ashford.com|bluejeans.com|bose.*|brave.com|buyzero.de|cytron.io|digikey.*|elastix.org|engadget.com|hallmark.com|hinta.fi|investors.com|kennethcole.com|kipling-usa.com|kubii.*|melopero.com|mozilla.org|msn.com|neeva.com|newbalance.com|nexo.io|officestationery.co.uk|okdo.com|raspipc.es|reichelt.*|tandfonline.com|tracking.narvar.com|thepihut.com|thunderbird.net|tiendatec.es|tokopedia.com|twitter.com|udemy.com|ups.com|viking-direct.co.uk|webmd.com|welectron.com|wondershare.*|wuzhuiso.com|x.com|tumblr.com|aliexpress.*
 $document,removeparam=source,denyallow=googlevideo.com,domain=1sol.io|about.gitlab.com|ashford.com|asos.com|att.com|appdownload.superhi-tech.com|awd-it.*|bankofamerica.com|barenecessities.com|bedbathandbeyond.com|betterprogramming.pub|blavity.com|blog.getadblock.com|blogs.oracle.com|bluemountain.com|boscovs.com|boxboat.com|britishcornershop.co.uk|brownells.*|burkesoutlet.com|bybit.com|choicehotels.com|chollometro.com|cmswire.com|coinpanel.com|contabo.com|cyberghostvpn.com|deshaw.com|despegar.*|directv.com|discord.*|docs.google.com|docsend.com|doctrine.fr|drinkhint.com|educba.com|edx.org|eonline.com|escentual.com|eventbrite.*|fiverr.com|fool.com|forms.gle|gethotspotshield.com|gleam.io|goodcrypto.app|googleusercontent.com|greenhouse.io|greenvoice.fr|hammacher.com|hanes.com|hbomax.com|hobbyhall.fi|hotspotshield.com|hottopic.com|housing.com|hp.com|ilgusto.it|instagram.com|italian.tech|itnext.io|intel.com|jacquielawson.com|jobs.deepl.com|just-eat.co.uk|kasta.io|ladbible.com|lastampa.it|learn.microsoft.com|medium.com|microsoftedgewelcome.microsoft.com|monster.fi|nautica.com|navan.com|netflix.com|ngx.me|nortonsafe.search.ask.com|nytimes.com|onehanesplace.com|outnorth.fi|paypal.com|petsupplies.com|phonesoap.com|privatehomeclips.com|propublica.org|quizlet.com|remppatori.fi|repubblica.it|robinhood.com|riteaid.com|runnode.com|search.brave.com|seekingalpha.com|sonos.com|spiceworks.com|squarespace.com|startpage.com|studio.co.uk|subscribe.gq.com|t.me|tcgplayer.com|theathletic.com|thedailybeast.com|themeditelegraph.com|tiktok.com|tokopedia.com|tommybahama.com|torrid.com|tous.com|tradingview.com|trendmicro.com|tumblr.com|twitter.com|user.qzone.qq.com|vimeo.com|webhint.io|wilsonsleather.com|wired.com|x.com|xd.wayin.com|ylighting.com|youtube.com|35.190.94.206|206.94.190.35.bc.googleusercontent.com|yubo.live
@@ -1727,7 +1727,7 @@ $removeparam=TheTime,domain=cnet.*|gamespot.com
 ||babbel.com^$removeparam=bsc
 ||babbel.com^$removeparam=btp
 ||microsoft.com^$removeparam=destrt
-$removeparam=ad,domain=24hshop.fi|adlibris.com|data-systems.fi|e-ville.com|moosejaw.com|multitronic.fi|scandinavianphoto.fi|swamp.fi|ocado.com|ask.com|askmoney.com|bloglines.com|consumersearch.com|directhit.com|faqtoids.com|findthedish.com|informationvine.com|internetcorkboard.com|life123.com|ohdeal.com|questionsanswered.net|reference.com|shop411.com|shopping.net|simpli.com|smarter.com|symptomfind.com
+$removeparam=ad,domain=24hshop.fi|adlibris.com|data-systems.fi|e-ville.com|moosejaw.com|multitronic.fi|scandinavianphoto.fi|swamp.fi|ocado.com|ask.com|askmoney.com|bloglines.com|consumersearch.com|faqtoids.com|informationvine.com|life123.com|questionsanswered.net|reference.com|shopping.net|smarter.com
 $removeparam=ad_src,domain=24hshop.fi|adlibris.com|data-systems.fi|e-ville.com|scandinavianphoto.fi|swamp.fi
 $removeparam=ad_content,domain=24hshop.fi|adlibris.com|data-systems.fi|e-ville.com|scandinavianphoto.fi|swamp.fi
 $removeparam=ad_prodid,domain=24hshop.fi|adlibris.com|data-systems.fi|e-ville.com|scandinavianphoto.fi|swamp.fi
@@ -1816,7 +1816,7 @@ $removeparam=ecmp,domain=4wheelparts.com
 $removeparam=kc,domain=autoanything.com
 $removeparam=/^linkshareid=.*$/i,domain=bloomingdales.com|macys.com
 $removeparam=mc,domain=bose.*|hallmark.com
-$removeparam=mid,domain=agentprovocateur.com|change.org|columbia.com|dxl.com|hanes.com|josbank.com|links.e.malwarebytes.com|onehanesplace.com|productshopper.*|columbiasportswear.*|saksfifthavenue.com|saksoff5th.com|sorel.com|lookmovie211.xyz|verabradley.com
+$removeparam=mid,domain=agentprovocateur.com|change.org|columbia.com|dxl.com|hanes.com|josbank.com|links.e.malwarebytes.com|onehanesplace.com|productshopper.*|columbiasportswear.*|saksfifthavenue.com|saksoff5th.com|sorel.com|verabradley.com
 $removeparam=mktvar002,domain=autodesk.com
 $removeparam=mp_id,domain=blinds.com
 $removeparam=ogmap,domain=coach.com|loft.com
@@ -2001,7 +2001,7 @@ $removeparam=eml,domain=endesa.com|scholastic.com
 ||despegar.$removeparam=/^clt_.*$/
 ||despegar.$removeparam=mktdata
 ||entradas.com^$removeparam=referer_info
-$removeparam=referer,document,domain=bodykind.com|clink2.com|dlink2.com|nitter.net
+$removeparam=referer,document,domain=bodykind.com|dlink2.com|nitter.net
 ||officemonster.co.uk^$removeparam=/^fo_.*$/
 ||analytics.bluekai.com^$removeparam=phint
 ||hao123.com^$removeparam=tn
@@ -2013,7 +2013,7 @@ $removeparam=referer,document,domain=bodykind.com|clink2.com|dlink2.com|nitter.n
 ||target.com^$removeparam=lnk
 $removeparam=marketing_id
 $removeparam=s,domain=greenhouse.io|mothership.sg|spreadprivacy.com|nextdoor.com|qwant.com|t.info.telus.com
-$document,removeparam=t,domain=rakuten.com|steamcdn-a.akamaihd.net|elprecio.es|adressa.no|tiktok.com|lookmovie211.xyz
+$document,removeparam=t,domain=rakuten.com|steamcdn-a.akamaihd.net|elprecio.es|adressa.no|tiktok.com
 ||yandex.$removeparam=clid
 $removeparam=cpa-perf
 $removeparam=visit_id,document,domain=bilibili.com|google.*
@@ -2246,12 +2246,10 @@ $removeparam=searchResultPosition,domain=nytimes.com|nytimesn7cgmftshazwhfgzm37q
 $removeparam=tck,domain=mongodb.com
 $removeparam=locale,domain=udemy.com
 ||zoho.com^$removeparam=zsrc
-||lookmovie211.xyz^$removeparam=sid
-||lookmovie211.xyz^$removeparam=sec
 ||nortonsafe.search.ask.com^$removeparam=installsource
 ||nortonsafe.search.ask.com^$removeparam=os
 ||nortonsafe.search.ask.com^$removeparam=templatecat
-$removeparam=o,domain=nortonsafe.search.ask.com|linkvertise.com|demo.thisischip.com
+$removeparam=o,domain=nortonsafe.search.ask.com|linkvertise.com
 ||nortonsafe.search.ask.com^$removeparam=vendorsrc
 ||nortonsafe.search.ask.com^$removeparam=olpchannel
 ||nortonsafe.search.ask.com^$removeparam=chn
@@ -2296,7 +2294,7 @@ $removeparam=user_id,document,domain=nytimes.com|nytimesn7cgmftshazwhfgzm37qxb44
 $removeparam=x50878
 ||redirect.appmetrica.yandex.com^$removeparam=c
 $removeparam=fromMostRead,domain=bloomberg.com
-$removeparam=source_widget_id,domain=tapahtumat.almatalent.fi|tapahtumat.ekarjala.fi|tapahtumat.ekonomit.fi|tapahtumat.eslu.fi|tapahtumat.hel.fi|tapahtumat.hyvinkaa.fi|tapahtumat.intoseinajoki.fi|tapahtumat.joensuu.fi|tapahtumat.kaleva.fi|tapahtumat.kannus.fi|tapahtumat.karjalainen.fi|tapahtumat.kauppakamari.fi|tapahtumat.kerava.fi|tapahtumat.kirkkonummi.fi|tapahtumat.kokkola.fi|tapahtumat.kuusamo.fi|tapahtumat.lappeenranta.fi|tapahtumat.lempaala.fi|tapahtumat.loviisa.fi|tapahtumat.masku.fi|tapahtumat.mikkeli.fi|tapahtumat.munoulu.fi|tapahtumat.osakeliitto.fi|tapahtumat.pori.fi|tapahtumat.raasepori.fi|tapahtumat.rantalakeus.fi|tapahtumat.ratsastus.fi|tapahtumat.rovaniemi.fi|tapahtumat.salo.fi|tapahtumat.sipoo.fi|tapahtumat.sley.fi|tapahtumat.studentum.fi|tapahtumat.tampereensuomalainenklubi.fi|tapahtumat.tuusula.fi|tapahtumat.vantaa.fi|tapahtumat.vihti.fi|tapahtumat.visitespoo.fi|tapahtumat.visitkotkahamina.fi|tapahtumat.visitlohja.fi|tapahtumat.visitsavonlinna.fi|tapahtumat.visitvantaa.fi|tapahtumienkeskipohjanmaa.fi
+$removeparam=source_widget_id,domain=tapahtumat.almatalent.fi|tapahtumat.ekarjala.fi|tapahtumat.ekonomit.fi|tapahtumat.eslu.fi|tapahtumat.hel.fi|tapahtumat.hyvinkaa.fi|tapahtumat.intoseinajoki.fi|tapahtumat.joensuu.fi|tapahtumat.kaleva.fi|tapahtumat.kannus.fi|tapahtumat.karjalainen.fi|tapahtumat.kauppakamari.fi|tapahtumat.kerava.fi|tapahtumat.kirkkonummi.fi|tapahtumat.kokkola.fi|tapahtumat.kuusamo.fi|tapahtumat.lappeenranta.fi|tapahtumat.lempaala.fi|tapahtumat.loviisa.fi|tapahtumat.masku.fi|tapahtumat.mikkeli.fi|tapahtumat.munoulu.fi|tapahtumat.osakeliitto.fi|tapahtumat.pori.fi|tapahtumat.raasepori.fi|tapahtumat.rantalakeus.fi|tapahtumat.ratsastus.fi|tapahtumat.rovaniemi.fi|tapahtumat.salo.fi|tapahtumat.sipoo.fi|tapahtumat.sley.fi|tapahtumat.studentum.fi|tapahtumat.tampereensuomalainenklubi.fi|tapahtumat.tuusula.fi|tapahtumat.vantaa.fi|tapahtumat.vihti.fi|tapahtumat.visitespoo.fi|tapahtumat.visitkotkahamina.fi|tapahtumat.visitlohja.fi|tapahtumat.visitsavonlinna.fi|tapahtumienkeskipohjanmaa.fi
 $removeparam=referrer_id,domain=autoblog.com
 ||linkedin.com^$removeparam=original_referer
 $document,removeparam=refId,domain=aebn.com|linkedin.com
@@ -2304,7 +2302,7 @@ $removeparam=mode,domain=omaha.com
 $removeparam=skip,domain=privatehomeclips.com
 $removeparam=plimit,domain=privatehomeclips.com
 $removeparam=rp,domain=sporcle.com|hclips.com
-$removeparam=pb,domain=fullxh.com|hamsterix.*|megaxh.com|unlockxh4.com|xhamster.*|xhamster1.*|xhamster10.*|xhamster11.*|xhamster12.*|xhamster13.*|xhamster14.*|xhamster15.*|xhamster16.*|xhamster17.*|xhamster18.*|xhamster19.*|xhamster2.*|xhamster3.*|xhamster4.*|xhamster46.com|xhamster5.*|xhamster7.*|xhamster8.*|xhday.com|xhday1.com|xhplanet1.com|xhplanet2.com|xhtab2.com|xhwebsite.com|xhwide1.com
+$removeparam=pb,domain=fullxh.com|hamsterix.*|megaxh.com|unlockxh4.com|xhamster.*|xhamster1.*|xhamster10.*|xhamster11.*|xhamster12.*|xhamster13.*|xhamster14.*|xhamster15.*|xhamster16.*|xhamster17.*|xhamster18.*|xhamster19.*|xhamster2.*|xhamster3.*|xhamster4.*|xhamster46.com|xhamster5.*|xhamster7.*|xhamster8.*|xhday.com|xhday1.com|xhtab2.com|xhwebsite.com|xhwide1.com
 ||eporner.$removeparam=trx
 $removeparam=sub,domain=allboner.com|twinkvideos.com
 ||fandom.com^$removeparam=so
@@ -2314,11 +2312,11 @@ $removeparam=sub,domain=allboner.com|twinkvideos.com
 ||tokopedia.com^$removeparam=extParam
 ||tokopedia.com^$removeparam=refined
 ||sony.$removeparam=cpint
-$removeparam=ueid,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|directhit.com|faqtoids.com|findthedish.com|informationvine.com|internetcorkboard.com|life123.com|ohdeal.com|questionsanswered.net|reference.com|shop411.com|shopping.net|simpli.com|smarter.com|symptomfind.com
-$removeparam=qo,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|directhit.com|faqtoids.com|findthedish.com|informationvine.com|internetcorkboard.com|life123.com|ohdeal.com|questionsanswered.net|reference.com|shop411.com|shopping.net|simpli.com|smarter.com|symptomfind.com|search.ask.com
-$removeparam=qsrc,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|directhit.com|faqtoids.com|findthedish.com|informationvine.com|internetcorkboard.com|life123.com|ohdeal.com|questionsanswered.net|reference.com|shop411.com|shopping.net|simpli.com|smarter.com|symptomfind.com|search.ask.com
-$document,removeparam=o,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|directhit.com|faqtoids.com|findthedish.com|informationvine.com|internetcorkboard.com|life123.com|ohdeal.com|questionsanswered.net|reference.com|shop411.com|shopping.net|simpli.com|smarter.com|symptomfind.com
-$document,removeparam=l,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|directhit.com|faqtoids.com|findthedish.com|informationvine.com|internetcorkboard.com|life123.com|ohdeal.com|questionsanswered.net|reference.com|shop411.com|shopping.net|simpli.com|smarter.com|symptomfind.com
+$removeparam=ueid,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|faqtoids.com|informationvine.com|life123.com|questionsanswered.net|reference.com|shopping.net|smarter.com
+$removeparam=qo,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|faqtoids.com|informationvine.com|life123.com|questionsanswered.net|reference.com|shopping.net|smarter.com|search.ask.com
+$removeparam=qsrc,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|faqtoids.com|informationvine.com|life123.com|questionsanswered.net|reference.com|shopping.net|smarter.com|search.ask.com
+$document,removeparam=o,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|faqtoids.com|informationvine.com|life123.com|questionsanswered.net|reference.com|shopping.net|smarter.com
+$document,removeparam=l,domain=ask.com|askmoney.com|bloglines.com|consumersearch.com|faqtoids.com|informationvine.com|life123.com|questionsanswered.net|reference.com|shopping.net|smarter.com
 ||baike.com^$removeparam=prd
 ||baike.com^$removeparam=view_id
 ||baike.com^$removeparam=search_id
@@ -2502,7 +2500,7 @@ $document,removeparam=plcmt,domain=grafana.com
 $document,removeparam=user_email_address
 $document,removeparam=cn,domain=twitter.com|x.com
 $document,domain=bilibili.com|querie.me,removeparam=timestamp
-$removeparam=dyn,domain=clink2.com|dlink2.com,document
+$removeparam=dyn,domain=dlink2.com,document
 ||gitlab.$removeparam=referrer_action,document
 ||gitlab.$document,removeparam=glm_source
 ||gitlab.$document,removeparam=glm_content
@@ -2708,10 +2706,10 @@ ref=words.filippo.io$document,removeparam=ref
 ||www.booking.com^$document,removeparam=sid
 ||www.booking.com^$document,removeparam=redirected
 ||www.booking.com^$document,removeparam=srpvid
-$removeparam=/^.*arenaportlet_back_url=.*$/,domain=altabibliotek.no|berlevagbibliotek.no|finnmarksbibliotekene.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|nessebybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no|vardobibliotek.no
-$removeparam=/^.*arena_search_query=.*$/,domain=altabibliotek.no|berlevagbibliotek.no|finnmarksbibliotekene.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|nessebybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no|vardobibliotek.no
-$removeparam=p_p_id,domain=altabibliotek.no|berlevagbibliotek.no|finnmarksbibliotekene.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|nessebybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no|vardobibliotek.no
-$removeparam=/^.*arena_facet_queries=.*$/,domain=altabibliotek.no|berlevagbibliotek.no|finnmarksbibliotekene.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|nessebybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no|vardobibliotek.no
+$removeparam=/^.*arenaportlet_back_url=.*$/,domain=altabibliotek.no|berlevagbibliotek.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no
+$removeparam=/^.*arena_search_query=.*$/,domain=altabibliotek.no|berlevagbibliotek.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no
+$removeparam=p_p_id,domain=altabibliotek.no|berlevagbibliotek.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no
+$removeparam=/^.*arena_facet_queries=.*$/,domain=altabibliotek.no|berlevagbibliotek.no|gamvikbibliotek.no|hasvikbibliotek.no|karasjokbibliotek.no|kautokeinofolkebibliotek.no|lebesbybibliotek.no|loppabibliotek.no|masoybibliotek.no|porsangerbibliotek.no|sor-varangerbibliotek.no|tanabibliotek.no|vadsobibliotek.no
 ref=news.risky.biz$document,removeparam=ref
 ||www.roblox.com^$document,removeparam=isAd
 ||www.roblox.com^$document,removeparam=nativeAdData
@@ -2979,8 +2977,8 @@ weekend-reading-link-$document,removeparam=/^weekend-reading-link-\d{6}/
 ||doctrine.fr^$document,removeparam=sourcePage
 $removeparam=w,domain=files.wordpress.com|store.playstation.com|s-microsoft.com|store-images.microsoft.com|dr.dk|if.com.au
 $removeparam=h,domain=files.wordpress.com|store.playstation.com|s-microsoft.com|store-images.microsoft.com|dr.dk
-$removeparam=width,domain=i-viaplay.com.akamaized.net|media.discordapp.net|tvno.nu
-$removeparam=height,domain=i-viaplay.com.akamaized.net|media.discordapp.net|tvno.nu
+$removeparam=width,domain=i-viaplay.com.akamaized.net|media.discordapp.net
+$removeparam=height,domain=i-viaplay.com.akamaized.net|media.discordapp.net
 ||ikea.com/*/images/products^$removeparam=f
 @@mailinglist$removeparam=/^utm_.*$/i
 @@||web.archive.org/*_/http$removeparam
