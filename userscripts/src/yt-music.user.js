@@ -3,7 +3,9 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0.0
 // @description  Consolidated YouTube Music optimizer: Opus codec preference, auto audio-only mode, autopause prevention, performance fixes, lazy loading, UI enhancements
-// @author       Consolidated from 7 YouTube Music scripts
+// @author       Ven0m0
+// @namespace    http://tampermonkey.net/
+// @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // @match        *://music.youtube.com/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
 // @run-at       document-start
@@ -12,9 +14,6 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
 // @license      MIT
-// @inject-into  page
-// @downloadURL  https://update.greasyfork.org/scripts/[ID]/YouTube%20Music%20Complete.user.js
-// @updateURL    https://update.greasyfork.org/scripts/[ID]/YouTube%20Music%20Complete.meta.js
 // ==/UserScript==
 
 /*
@@ -30,6 +29,10 @@ CONSOLIDATED FEATURES:
 */
 
 (() => {
+  const GUARD = "__ytmusic_complete__";
+  if (window[GUARD]) return;
+  window[GUARD] = 1;
+
   // Emergency disable
   if (localStorage.getItem("disable_ytmusic_complete") === "1") {
     console.warn("[YT Music Complete]: Disabled by user");
@@ -47,12 +50,12 @@ CONSOLIDATED FEATURES:
         document.documentElement.removeChild(iframe);
         if (cleanPromise) return cleanPromise;
       }
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors
     }
     try {
       return (async () => {})().constructor;
-    } catch (e) {}
+    } catch (_e) {}
     return Promise;
   })();
 
@@ -309,7 +312,9 @@ CONSOLIDATED FEATURES:
             if (node.tagName === "IMG" && node.dataset.src) {
               observer.observe(node);
             }
-            node.querySelectorAll("img[data-src]").forEach((img) => observer.observe(img));
+            node.querySelectorAll("img[data-src]").forEach((img) => {
+              observer.observe(img);
+            });
           }
         });
       };

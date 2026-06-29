@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name         YouTube Unified Optimizer
+// @author       Ven0m0
 // @namespace    http://tampermonkey.net/
 // @version      4.3.1
 // @description  Lightweight YouTube optimizer: CPU/GPU/UI tweaks, quality lock, flags, engine tame
@@ -154,8 +155,9 @@
     };
   })();
   (() => {
-    if (Document?.prototype?.requestStorageAccess) Document.prototype.requestStorageAccess = undefined;
-    if (Document?.prototype?.requestStorageAccessFor) Document.prototype.requestStorageAccessFor = undefined;
+    if (Document?.prototype?.requestStorageAccess) Document.prototype.requestStorageAccess = () => Promise.reject();
+    if (Document?.prototype?.requestStorageAccessFor)
+      Document.prototype.requestStorageAccessFor = () => Promise.reject();
   })();
   if (CFG.gpu.blockAV1) {
     const cp = HTMLMediaElement.prototype.canPlayType;

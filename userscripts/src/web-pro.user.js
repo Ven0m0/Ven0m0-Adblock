@@ -10,10 +10,7 @@
 // @match        *://*/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
 // @grant        GM_addStyle
-// @grant        GM_getValue
-// @grant        GM_setValue
 // @grant        GM_registerMenuCommand
-// @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @run-at       document-start
 // @allFrames    true
@@ -28,6 +25,7 @@
   if (win[HKEY]) return;
   win[HKEY] = true;
 
+  const isYouTube = /(?:^|\.)youtube\.com$|^youtu\.be$/.test(location.hostname);
   const conn = navigator.connection;
   const eff = conn?.effectiveType;
   const MODE = eff === "slow-2g" ? 2 : conn?.saveData || eff?.includes("2g") ? 1 : 0;
@@ -275,8 +273,8 @@
     }
   }
 
-  // CPU tamer / RAF tamer
-  if (cfg.cpuTamer || cfg.rafTamer) {
+  // CPU tamer / RAF tamer — skip on YouTube; yt-pro handles those domains
+  if ((cfg.cpuTamer || cfg.rafTamer) && !isYouTube) {
     const AsyncFn = (async () => {}).constructor;
     const [nTO, nSI, nRAF, nCTO, nCI, nCAF] = [
       setTimeout,
@@ -452,8 +450,6 @@
     ["log", "warn", "error", "debug", "info"].forEach((m) => {
       console[m] = noop;
     });
-  } else if (!cfg.log) {
-    console.log = console.warn = console.error = () => {};
   }
 
   // Dark mode
@@ -465,7 +461,7 @@
   // Tab save
   if (cfg.tabSave)
     document.addEventListener("visibilitychange", () => {
-      document.documentElement.style.cssText = document.visibilityState === "hidden" ? "display:none!important" : "";
+      document.documentElement.style.display = document.visibilityState === "hidden" ? "none" : "";
     });
 
   // XHR interception
@@ -617,26 +613,6 @@
       } finally {
         busy = 0;
       }
-      let i = 0;
-      const step = () => {
-        const end = Math.min(i + C.BATCH, links.length);
-        for (; i < end; i++) {
-          const a = links[i];
-          mark(a, "data-wp-cl");
-          try {
-            const h = a.href;
-            if (!h || h.startsWith("javascript:")) continue;
-            const u = new URL(h);
-            if (u.origin === location.origin) continue;
-            if (stripTracking(u)) a.href = u.href;
-          } catch (e) {
-            log("Link clean error:", e);
-          }
-        }
-        if (i < links.length) idle(step);
-        else busy = 0;
-      };
-      step();
     }, C.TIME.THR_CLEAN);
   })();
 
@@ -666,14 +642,10 @@
   // Cookie auto-accept
   function acceptCookies() {
     if (!cfg.cookie) return;
-    throttle(() => {
-      document.querySelectorAll("button,input[type=button]").forEach((b) => {
-        const t = (b.innerText || b.value || "").toLowerCase();
-        if (/accept|agree|allow/.test(t)) {
-          b.click();
-        }
-      });
-    }, C.TIME.THR_COOKIE)();
+    document.querySelectorAll("button,input[type=button]").forEach((b) => {
+      const t = (b.innerText || b.value || "").toLowerCase();
+      if (/accept|agree|allow/.test(t)) b.click();
+    });
   }
 
   // GPU compositing hints
@@ -691,22 +663,18 @@
 
   function optimizeMem() {
     if (!cfg.mem) return;
-    if (performance?.memory) performance.memory.jsHeapSizeLimit *= 0.9;
     if (window.gc) window.gc();
   }
 
   function preloadRes() {
     if (!cfg.preload) return;
-    document
-      .querySelectorAll("img:not([data-wp-pre]),video:not([data-wp-pre]),audio:not([data-wp-pre])")
-      .forEach((r) => {
-        const u = r.src || r.href;
-        if (u) {
-          const i = new Image();
-          i.src = u;
-        }
-        mark(r, "data-wp-pre");
-      });
+    document.querySelectorAll("img:not([data-wp-pre])").forEach((r) => {
+      if (r.src) {
+        const i = new Image();
+        i.src = r.src;
+      }
+      mark(r, "data-wp-pre");
+    });
   }
 
   // Lazy loading
