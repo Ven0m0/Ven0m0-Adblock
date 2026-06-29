@@ -1,45 +1,40 @@
 # GitHub Copilot Instructions
 
-Use `/AGENTS.md` as the canonical long-form guide for this repository.
+`AGENTS.md` is the canonical long-form guide for this repository. Read it first.
 
 ## Project focus
 
-This repository maintains ad-blocking filter lists, hostlists, userscripts, and the scripts/workflows that build them.
+Ad-blocking filter lists, hostlists, userscripts, and the CI workflows and scripts that build them.
 
 ## Edit these by hand
 
-- `lists/adblock/*.txt`
-- `lists/hostlist/*.txt`
-- `userscripts/src/*.user.js`
-- `Scripts/*.py`
-- Relevant config or workflow files for the task
+- `lists/adblock/` — adblock filter rules
+- `lists/hostlist/` — DNS hostlist rules
+- `userscripts/src/` — userscript source files
+- `Scripts/` — Python build and maintenance tooling
+- Config files at repo root: `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `.oxlintrc.json`, `biome.json`
+- Workflow files under `.github/workflows/` when the task requires it
 
-## Do not hand-edit generated paths
+## CI-managed paths — edit source files instead
 
-- `lists/sources/**`
-- `lists/external/**`
-- `lists/releases/**`
-- `Filters/**`
-- `userscripts/dist/**`
-- `dist/**`
+The following are written by CI and absent from a fresh checkout:
+`lists/sources/`, `lists/external/`, `lists/releases/`, `Filters/`, `userscripts/dist/`, `dist/`
 
 ## Repo rules
 
 - Read files before editing them.
 - Use `rg` to find existing rules, domains, selectors, and references before adding new ones.
-- Prefer source changes over generated-file changes.
 - Keep changes small and task-focused.
-- Match existing file style and metadata/header conventions.
+- Match existing file style and file metadata conventions.
 - Avoid duplicate filter rules.
-- Treat `userscripts/todo/` as out of scope for normal lint/build work.
+- Treat `userscripts/todo/` as out of scope for the lint and build pipeline.
 - Keep `CLAUDE.md` as a symlink to `AGENTS.md`.
 
 ## Path clarifications
 
 - Human-maintained filter rules live in `lists/adblock/` and `lists/hostlist/`.
-- `Scripts/build.py` and parts of CI build from normalized inputs in `lists/sources/`.
-- Userscripts build from `userscripts/src/` to `userscripts/dist/`.
-- Some workflows also publish artifacts under the repo-root `dist/` directory.
+- `Scripts/build.py` and CI build from normalized inputs in `lists/sources/`.
+- Userscripts build from `userscripts/src/` into the dist output directory.
 
 ## Commands
 
@@ -51,7 +46,7 @@ bun run validate
 bun run build:adblock
 bun run build:hosts
 bun run build:userscripts
-bun run lint:yaml
+yamllint .
 uv run ruff check .
 uv run ruff format --check .
 ```

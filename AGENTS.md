@@ -1,138 +1,109 @@
 # AGENTS.md
 
-Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0-Adblock`.
-`CLAUDE.md` must remain a symlink to this file.
+Canonical agent instructions for `Ven0m0/Ven0m0-Adblock`.
+`CLAUDE.md` is a symlink to this file and reflects all changes automatically.
+`.github/copilot-instructions.md` is a secondary reference for Copilot; this file takes precedence.
 
-## Project summary
+## Project
 
-- Ad-blocking filter lists, hostlists, and userscripts.
-- Primary tooling: Bun, Node.js, Mise, UV, GitHub Actions.
-- Main languages: AdGuard/uBlock filter syntax, JavaScript, Python.
+Ad-blocking filter lists, hostlists, and userscripts.
+Tooling: Bun (JS runtime and package manager), Python 3.13+ via uv, Mise (tool manager), GitHub Actions.
+Filter syntax: AdGuard and uBlock Origin rule formats.
 
-## Role and scope
+## Source files — edit these
 
-You are a contributor to this repo. Stay within the requested task. Do not refactor
-unrelated code, rewrite metadata blocks, or regenerate artifacts unless explicitly asked.
+| Path | Content |
+|------|---------|
+| `lists/adblock/` | Hand-maintained adblock filter rules |
+| `lists/hostlist/` | Hand-maintained DNS hostlist rules |
+| `userscripts/src/` | Userscript source files |
+| `Scripts/` | Python build and maintenance tooling |
+| `.github/workflows/` | CI workflow definitions |
+| Root configs | `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `.oxlintrc.json`, `biome.json` |
 
-## Source of truth
+## CI-generated paths — owned by pipeline
 
-### Edit these by hand
+These are absent from a fresh checkout and written by CI or build scripts.
+Edit source files; the pipeline regenerates these automatically.
 
-- `lists/adblock/*.txt` - hand-maintained adblock rules
-- `lists/hostlist/*.txt` - hand-maintained DNS/hostlist rules
-- `userscripts/src/*.user.js` - userscript source files
-- `Scripts/*.py` - Python tooling
-- Root configs such as `package.json`, `mise.toml`, `pyproject.toml`,
-  `.aglintrc.yml`, `.oxlintrc.json`, `biome.json`, and workflow files
-  when the task requires them
-
-### Generated or pipeline-managed paths - do not hand-edit
-
-- `lists/sources/**` - normalized/generated filter inputs consumed by `Scripts/build.py` and CI
-- `lists/external/**` - downloaded upstream content
-- `lists/releases/**` - built list outputs
-- `Filters/**` - compiled filter and hostlist outputs
-- `userscripts/dist/**` - built userscripts
-- `dist/**` - workflow-generated userscript artifacts
+| Path | Written by |
+|------|-----------|
+| `lists/sources/` | `Scripts/update_lists.py` and CI (treat as pipeline-managed unless the task targets the update pipeline directly) |
+| `lists/releases/` | `Scripts/build.py` via `.github/workflows/build-filter-lists.yml` |
+| `Filters/` | AdGuard hostlist-compiler via `.github/workflows/build-filter-lists.yml` |
+| `userscripts/dist/` | `Scripts/build.py` via `.github/workflows/userscripts.yml` |
+| `dist/` | `.github/workflows/userscripts.yml` artifact step |
 
 ## Agent workflow
 
-1. Read the file you are changing before editing it.
-2. Use `rg` to find existing rules, domains, selectors, scripts, or workflow references before adding new ones.
-3. Prefer changing hand-authored source files over generated outputs.
-4. Keep changes surgical; do not clean up unrelated code.
-5. Match the existing style of the touched file.
+1. Read the file before editing it.
+2. Use `rg` to find existing rules, domains, selectors, or references before adding new ones.
+3. Change source files; the pipeline handles generated outputs.
+4. Keep changes surgical — leave unrelated code untouched.
+5. Match the style of the file being edited.
 6. Preserve comments and metadata blocks unless the task requires changing them.
-7. When working on filter rules, avoid duplicates and group related rules together.
-8. When working on userscripts, edit `userscripts/src` and treat `userscripts/list.txt` as generated output.
-9. When working on build or CI logic, check both `Scripts/build.py` and the relevant workflow files.
-10. If a task mentions Claude guidance, update `AGENTS.md` and keep `CLAUDE.md` as a symlink to it.
+7. When adding filter rules, verify no duplicate exists first.
+8. Userscript work: edit `userscripts/src/`; `userscripts/todo/` is out of scope for lint and build.
+9. Build or CI changes: check `Scripts/build.py` and the relevant workflow file together.
+10. When updating agent instructions: edit `AGENTS.md`; `CLAUDE.md` updates automatically.
 
-## Important path clarifications
+## CI and release process
 
-- Human-authored filter content lives in `lists/adblock/` and `lists/hostlist/`.
-- The custom build script reads normalized inputs from `lists/sources/` and writes outputs to `lists/releases/`.
-- `Scripts/update_lists.py` also writes into `lists/sources/`, so treat
-  that directory as pipeline-managed unless the task is specifically about
-  the update pipeline.
-- Userscripts are built from `userscripts/src/` into `userscripts/dist/`.
-- Some workflows also write temporary or published artifacts under the repository-root `dist/` directory.
-- `userscripts/todo/` is work-in-progress content and is excluded from the normal userscript lint/build flow.
+| Workflow | Trigger | What it does |
+|----------|---------|-------------|
+| `.github/workflows/build-filter-lists.yml` | Push to `main` touching `lists/sources/` or `Scripts/build.py` | Lints sources, compiles filter outputs, auto-commits |
+| `.github/workflows/update-lists.yml` | Schedule / dispatch | Downloads upstream filter lists into `lists/sources/` |
+| `.github/workflows/maintain-lists.yml` | Manual dispatch | Deduplicates, removes dead domains, creates a dated GitHub release (tag format: vYYYY.MM.DD-HHMM) with a compiled `blocklist` artifact |
+| `.github/workflows/userscripts.yml` | Push | Builds and publishes userscript dist outputs |
+| `.github/workflows/lint-and-format.yml` | PR | Runs JS and markdown linters |
+| `.github/workflows/aglint.yml` | PR and push | Lints and auto-fixes filter rules |
+
+Releases are created automatically by `.github/workflows/maintain-lists.yml` — no manual tagging needed.
 
 ## Commands
 
-### Setup
-
 ```bash
+# Setup
 mise install && bun install && uv sync
-```
 
-### Core commands
-
-```bash
-bun run build
-bun run build:adblock
-bun run build:hosts
-bun run build:userscripts
+# Lint (JS + filters + markdown)
 bun run lint
-bun run test
-bun run validate
-```
 
-### File-type specific checks
+# Lint subsets
+bun run lint:js        # biome + oxlint
+bun run lint:filters   # AGLint
+bun run lint:md        # markdownlint
 
-```bash
-bun run lint:js
-bun run lint:filters
-bun run lint:md
-bun run lint:yaml
-bun run format
-bun run format:check
+# Format
+bun run format         # write
+bun run format:check   # check only
+
+# Build
+bun run build              # all outputs
+bun run build:adblock      # adblock filter list
+bun run build:hosts        # hosts file
+bun run build:userscripts  # userscripts
+
+# Python checks (run when editing .py files)
 uv run ruff check .
 uv run ruff format --check .
+
+# YAML and workflow checks (run when editing .yml files)
+yamllint .             # requires: pip install yamllint
 ```
 
-## Build and validation expectations
-
-- `bun run lint` covers JavaScript, filter lists, and Markdown.
-- `bun run test` runs `lint` plus `format:check`.
-- `bun run validate` runs `test` plus `build`.
-- YAML, shell, and Python checks are separate and should be run when you touch those file types.
-- If the environment lacks Bun, use the closest existing project tooling
-  available, but do not invent new validation steps.
+`bun run test` = lint + format check. `bun run validate` = test + build.
 
 ## Style conventions
 
-### JavaScript
+**JavaScript** — 2-space indent, double quotes, semicolons required, `const` preferred over `let`.
 
-- 2-space indentation
-- Double quotes
-- Semicolons required
-- Prefer `const` over `let`; never use `var`
-- Use strict equality
+**Python** — 3.13+, `ruff` for lint and format, `snake_case` filenames, internal imports use the `Scripts` package namespace.
 
-### Python
+**Filter rules** — one rule per line, `!` prefix for comments, group related rules together, no duplicates.
 
-- Python 3.13+
-- `ruff` for linting and formatting
-- Use `snake_case.py`
-- Internal imports use the `Scripts` package namespace when applicable
+## Commit and PR conventions
 
-### Filter rules
-
-- One rule per line
-- Use `!` comments
-- Keep related rules grouped
-- Check for duplicates with `rg` before adding rules
-
-## Workflow notes
-
-- CI workflows may auto-commit generated artifacts from `Filters/`, `lists/releases/`, `dist/`, and `userscripts/dist/`.
-- Do not hand-edit those generated artifacts unless the task explicitly requires it.
-- For workflow changes, review the matching files under `.github/workflows/` and any script they call.
-
-## Commit and PR guidance
-
-- Use conventional commit prefixes such as `feat:`, `fix:`, `docs:`, `ci:`, `refactor:`, `test:`, and `chore:`.
-- Keep commit subjects concise.
-- In PRs, explain the source files changed and mention generated outputs only if they were intentionally regenerated.
+Prefixes: `feat:`, `fix:`, `docs:`, `ci:`, `refactor:`, `test:`, `chore:`.
+Keep commit subjects concise.
+In PRs: name the source files changed; mention generated outputs only when intentionally regenerated.
