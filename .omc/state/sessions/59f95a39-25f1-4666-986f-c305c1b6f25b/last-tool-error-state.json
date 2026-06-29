@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"cd \\\"C:\\\\Users\\\\Ven0m0\\\\project\\\\Ven0m0-Adblock\\\" && rtk npx -y @yawlabs/ctxlint --depth 3 --mcp --strict --fix --yes 2>&1; echo \\\"---AGNIX---\\\"; rtk npx -y agnix --fix-unsafe -s -t claude...",
-  "error": "Exit code 1\nctxlint v0.18.2\nScanning C:\\Users\\Ven0m0\\project\\Ven0m0-Adblock...\nFound 3 context files (2.789 tokens total)\n  .github/copilot-instructions.md (435 tokens, 53 lines)\n  AGENTS.md (1.177 tokens, 110 lines)\n  CLAUDE.md -> AGENTS.md (symlink)\n.github/copilot-instructions.md\n  x Line 21: lists/releases/ directory does not exist\n  x Line 21: Filters/ directory does not exist\n  x Line 21: userscripts/dist/ directory does not exist\n  x Line 21: dist/ directory does not exist\n  i Line 35: Di...",
-  "timestamp": "2026-06-29T10:22:15.301Z",
-  "retry_count": 3
-}
