@@ -35,6 +35,30 @@
       "filename": "shadowwhisperer-ads.txt",
       "skip_checksum": true,
       "enabled": true
+    },
+    {
+      "url": "https://filters.adtidy.org/extension/ublock/filters/201_optimized.txt",
+      "filename": "web-annoyances.txt",
+      "skip_checksum": true,
+      "enabled": true
+    },
+    {
+      "url": "https://filters.adtidy.org/extension/ublock/filters/207_optimized.txt",
+      "filename": "adblock-warning-removal.txt",
+      "skip_checksum": true,
+      "enabled": true
+    },
+    {
+      "url": "https://filters.adtidy.org/extension/ublock/filters/239_optimized.txt",
+      "filename": "fanboy-anti-font.txt",
+      "skip_checksum": true,
+      "enabled": true
+    },
+    {
+      "url": "https://filters.adtidy.org/extension/ublock/filters/251_optimized.txt",
+      "filename": "url-shortener.txt",
+      "skip_checksum": true,
+      "enabled": true
     }
   ]
 }
