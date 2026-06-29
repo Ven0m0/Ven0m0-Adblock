@@ -20,7 +20,6 @@ from typing import Final
 import aiohttp
 import aiofiles
 
-# Import common utilities
 from Scripts.common import sanitize_filename
 
 # ============================================================================
@@ -49,60 +48,23 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 
-async def validate_checksum(content: str, name: str = "unknown") -> bool:
+def validate_checksum(content: str, name: str = "unknown") -> bool:
     """Validate Adblock Plus checksum header."""
-    pattern = re.compile(
+    match = re.search(
         r"^\s*!\s*checksum[\s\-:]+([\w\+\/=]+).*\n",
+        content,
         re.MULTILINE | re.IGNORECASE,
     )
-    match = pattern.search(content)
-
     if not match:
         logger.debug(f"No checksum in {name} (optional)")
         return True
-
-    declared_checksum = match.group(1)
-
-    match_start = match.start()
-    match_end = match.end()
-
-    end_idx = len(content)
-    while end_idx > 0 and content[end_idx - 1] in ("\n", "\r"):
-        end_idx -= 1
-
-    hasher = hashlib.sha256()
-    chunk_size = 1024 * 1024  # 1MB chunks
-
-    # Process content before the match
-    for start in range(0, match_start, chunk_size):
-        chunk = content[start : min(start + chunk_size, match_start)]
-        if "\r" in chunk:
-            chunk = chunk.replace("\r", "")
-        hasher.update(chunk.encode("utf-8"))
-        await asyncio.sleep(0)  # Yield control to the event loop
-
-    # Process content after the match
-    for start in range(match_end, end_idx, chunk_size):
-        chunk = content[start : min(start + chunk_size, end_idx)]
-        if "\r" in chunk:
-            chunk = chunk.replace("\r", "")
-        hasher.update(chunk.encode("utf-8"))
-        await asyncio.sleep(0)  # Yield control to the event loop
-
-    # Append the trailing newline as required by the checksum algorithm
-    hasher.update(b"\n")
-
-    computed_hash = hasher.digest()
-    computed_checksum = base64.b64encode(computed_hash).decode().rstrip("=")
-
-    if declared_checksum == computed_checksum:
+    declared = match.group(1)
+    body = (content[: match.start()] + content[match.end() :]).rstrip("\r\n").replace("\r", "") + "\n"
+    computed = base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest()).decode().rstrip("=")
+    if declared == computed:
         logger.info(f"✓ Checksum valid: {name}")
         return True
-
-    logger.error(
-        f"✗ Checksum mismatch in {name}: "
-        f"expected {computed_checksum}, got {declared_checksum}"
-    )
+    logger.error(f"✗ Checksum mismatch in {name}: expected {computed}, got {declared}")
     return False
 
 
@@ -135,8 +97,7 @@ async def process_downloaded_file(
             content = await f.read()
 
         if not skip_checksum:
-            # Yield control while validating checksum in chunks to prevent blocking
-            is_valid = await validate_checksum(content, filename)
+            is_valid = validate_checksum(content, filename)
             if not is_valid:
                 logger.warning(f"Checksum validation failed for {url}")
                 # Do not delete temp_path here; the caller's finally block is responsible for cleanup.
@@ -148,8 +109,7 @@ async def process_downloaded_file(
             )
             return None
 
-        # Offload CPU-bound rule counting to a thread
-        rule_count = await asyncio.to_thread(count_rules, content)
+        rule_count = count_rules(content)
 
         async with aiofiles.open(dest_path, mode="w", encoding="utf-8") as f:
             await f.write(content)
@@ -209,7 +169,7 @@ async def fetch_list(
                 # Ensure cleanup always
                 if tmp_path:
                     try:
-                        await asyncio.to_thread(tmp_path.unlink)
+                        tmp_path.unlink()
                     except FileNotFoundError:
                         pass
 
@@ -230,7 +190,7 @@ async def fetch_list(
 
 async def load_sources(config_path: Path) -> dict[str, dict]:
     """Load source URLs configuration."""
-    if not await asyncio.to_thread(config_path.exists):
+    if not config_path.exists():
         logger.warning(f"Config not found: {config_path}, creating template")
         template = {
             "sources": [
@@ -248,7 +208,7 @@ async def load_sources(config_path: Path) -> dict[str, dict]:
                 },
             ]
         }
-        await asyncio.to_thread(config_path.parent.mkdir, parents=True, exist_ok=True)
+        config_path.parent.mkdir(parents=True, exist_ok=True)
         async with aiofiles.open(config_path, mode="w", encoding="utf-8") as f:
             await f.write(json.dumps(template, indent=2) + "\n")
         logger.info(f"Created template config: {config_path}")
@@ -288,8 +248,7 @@ async def save_metadata(
 
     metadata_path = Path(METADATA_FILE)
 
-    # Offload CPU-bound JSON serialization and IO to prevent event loop blocking
-    json_data = await asyncio.to_thread(json.dumps, metadata, indent=2, sort_keys=True)
+    json_data = json.dumps(metadata, indent=2, sort_keys=True)
     async with aiofiles.open(metadata_path, mode="w", encoding="utf-8") as f:
         await f.write(json_data + "\n")
 
@@ -341,7 +300,7 @@ async def main() -> int:
     args = parser.parse_args()
 
     output_dir: Path = args.output_dir
-    await asyncio.to_thread(output_dir.mkdir, parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info("Loading source configuration...")
     sources = await load_sources(args.config)

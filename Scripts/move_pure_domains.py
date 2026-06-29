@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 
-# Import common utilities
 from Scripts.common import is_valid_domain, read_lines, write_lines
 
 
@@ -17,13 +16,11 @@ def is_pure_domain(line: str) -> bool:
     """Check if a line is a pure domain without AdGuard syntax"""
     line = line.strip()
 
-    # Skip empty lines, comments, and common adblock start patterns
     if not line or line.startswith(
         ("!", "#", "[", ";", "|", "@", "$", "^", "*", "]", "~")
     ):
         return False
 
-    # Validate as domain
     return is_valid_domain(line)
 
 
@@ -49,12 +46,10 @@ def get_file_category(source_file: str) -> str | None:
 def categorize_domain(domain: str, source_file: str) -> str:
     """Determine which hostlist category a domain belongs to"""
 
-    # Check file-based category first
     file_category = get_file_category(source_file)
     if file_category:
         return file_category
 
-    # Map based on domain content
     domain_lower = domain.lower()
     if ADS_PATTERN.search(domain_lower):
         return "Ads.txt"
@@ -104,16 +99,8 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
                 # Fast path: all domains go to the same target based on source filename
                 domain_moves[file_category][adblock_file.name].extend(pure_domains)
             else:
-                # Slow path: categorize based on domain content
                 for domain in pure_domains:
-                    domain_lower = domain.lower()
-                    if ADS_PATTERN.search(domain_lower):
-                        target_file = "Ads.txt"
-                    elif SOCIAL_PATTERN.search(domain_lower):
-                        target_file = "Social-Media.txt"
-                    else:
-                        target_file = "Other.txt"
-                    domain_moves[target_file][adblock_file.name].append(domain)
+                    domain_moves[categorize_domain(domain, adblock_file.name)][adblock_file.name].append(domain)
 
     return domain_moves, file_updates
 
@@ -130,14 +117,12 @@ def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
         target_path = hostlist_dir / target_file
         all_domains = []
 
-        # Collect all domains from different sources
         for _, domains in sorted(source_domains.items()):
             all_domains.extend(domains)
 
         if not all_domains:
             continue
 
-        # Read existing hostlist
         existing_domains = set()
         if target_path.exists():
             lines = read_lines(target_path)
@@ -149,11 +134,9 @@ def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
                 if stripped and is_valid_domain(stripped):
                     existing_domains.add(stripped)
 
-        # Filter out duplicates
         new_domains = list(set(all_domains) - existing_domains)
 
         if new_domains:
-            # Append new domains
             if write_lines(target_path, sorted(new_domains), mode="a"):
                 total_moved += len(new_domains)
                 print(f"Appended {len(new_domains)} domains to {target_file}")
@@ -177,13 +160,6 @@ def _update_source_files(file_updates: dict) -> None:
                 tmp_path.unlink()
 
 
-def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:
-    """Append domains to hostlists and update source files."""
-    total_moved = _update_hostlists(hostlist_dir, domain_moves)
-    _update_source_files(file_updates)
-    return total_moved
-
-
 def main() -> int:
     script_dir = Path(__file__).parent
     repo_dir = script_dir.parent
@@ -202,15 +178,14 @@ def main() -> int:
     print("Moving pure domain entries from adblock to hostlist")
     print("=" * 60 + "\n")
 
-    # Extract pure domains from adblock files (read only)
     domain_moves, file_updates = scan_adblock_files(adblock_dir)
 
     if not domain_moves:
         print("\n✓ No pure domains found in adblock lists")
         return 0
 
-    # Apply updates (write)
-    total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
+    total_moved = _update_hostlists(hostlist_dir, domain_moves)
+    _update_source_files(file_updates)
 
     print("\n" + "=" * 60)
     print(f"✓ Successfully moved {total_moved} pure domains to hostlist")

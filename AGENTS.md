@@ -7,7 +7,7 @@ Canonical repository instructions for AI coding agents working in `Ven0m0/Ven0m0
 
 - Ad-blocking filter lists, hostlists, and userscripts.
 - Primary tooling: Bun, Node.js, Mise, UV, GitHub Actions.
-- Main languages: AdGuard/uBlock filter syntax, JavaScript, Python, Bash.
+- Main languages: AdGuard/uBlock filter syntax, JavaScript, Python.
 
 ## Role and scope
 
@@ -21,7 +21,6 @@ unrelated code, rewrite metadata blocks, or regenerate artifacts unless explicit
 - `lists/adblock/*.txt` - hand-maintained adblock rules
 - `lists/hostlist/*.txt` - hand-maintained DNS/hostlist rules
 - `userscripts/src/*.user.js` - userscript source files
-- `Scripts/*.sh` - shell tooling
 - `Scripts/*.py` - Python tooling
 - Root configs such as `package.json`, `mise.toml`, `pyproject.toml`,
   `.aglintrc.yml`, `.oxlintrc.json`, `biome.json`, and workflow files
@@ -29,7 +28,7 @@ unrelated code, rewrite metadata blocks, or regenerate artifacts unless explicit
 
 ### Generated or pipeline-managed paths - do not hand-edit
 
-- `lists/sources/**` - normalized/generated filter inputs consumed by `Scripts/build.sh` and CI
+- `lists/sources/**` - normalized/generated filter inputs consumed by `Scripts/build.py` and CI
 - `lists/external/**` - downloaded upstream content
 - `lists/releases/**` - built list outputs
 - `Filters/**` - compiled filter and hostlist outputs
@@ -46,7 +45,7 @@ unrelated code, rewrite metadata blocks, or regenerate artifacts unless explicit
 6. Preserve comments and metadata blocks unless the task requires changing them.
 7. When working on filter rules, avoid duplicates and group related rules together.
 8. When working on userscripts, edit `userscripts/src` and treat `userscripts/list.txt` as generated output.
-9. When working on build or CI logic, check both `Scripts/build.sh` and the relevant workflow files.
+9. When working on build or CI logic, check both `Scripts/build.py` and the relevant workflow files.
 10. If a task mentions Claude guidance, update `AGENTS.md` and keep `CLAUDE.md` as a symlink to it.
 
 ## Important path clarifications
@@ -87,7 +86,6 @@ bun run lint:js
 bun run lint:filters
 bun run lint:md
 bun run lint:yaml
-bun run lint:shell
 bun run format
 bun run format:check
 uv run ruff check .
@@ -119,13 +117,6 @@ uv run ruff format --check .
 - `ruff` for linting and formatting
 - Use `snake_case.py`
 - Internal imports use the `Scripts` package namespace when applicable
-
-### Shell
-
-- Use Bash
-- Start scripts with strict mode such as `set -Eeuo pipefail` or existing repo equivalent
-- Quote variables
-- Prefer `[[ ... ]]`
 
 ### Filter rules
 

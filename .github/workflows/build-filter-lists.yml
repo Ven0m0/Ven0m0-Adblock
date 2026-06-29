@@ -9,7 +9,7 @@ on:
       - "hostlist-config.json"
       - "configuration_popup_filter.json"
       - "ragibkl-config.json"
-      - "Scripts/build.sh"
+      - "Scripts/build.py"
       - "mise.toml"
   workflow_dispatch:
   #schedule:
@@ -161,9 +161,7 @@ jobs:
           cache: true
           experimental: true
       - name: Run build script
-        run: |
-          chmod +x Scripts/build.sh
-          mise exec -- ./Scripts/build.sh adblock hosts hostlist
+        run: mise exec -- uv run python -m Scripts.build adblock hosts hostlist
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:

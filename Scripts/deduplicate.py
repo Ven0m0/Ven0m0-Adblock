@@ -75,20 +75,15 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
                 rules_with_comments.append((line, current_comments))
                 current_comments = []
             else:
-                # Discard comments for duplicate or invalid rules
                 current_comments = []
 
-    # Sort rules alphabetically by the rule text
     rules_with_comments.sort(key=lambda x: x[0])
 
-    # Flatten rules and their comments
     rules = []
-    extend = rules.extend
-    append = rules.append
     for rule, comments in rules_with_comments:
         if comments:
-            extend(comments)
-        append(rule)
+            rules.extend(comments)
+        rules.append(rule)
 
     stats.headers = len(headers)
     stats.final = len(headers) + len(rules)

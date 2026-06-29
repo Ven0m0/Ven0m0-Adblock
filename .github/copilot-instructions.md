@@ -11,7 +11,6 @@ This repository maintains ad-blocking filter lists, hostlists, userscripts, and 
 - `lists/adblock/*.txt`
 - `lists/hostlist/*.txt`
 - `userscripts/src/*.user.js`
-- `Scripts/*.sh`
 - `Scripts/*.py`
 - Relevant config or workflow files for the task
 
@@ -38,7 +37,7 @@ This repository maintains ad-blocking filter lists, hostlists, userscripts, and 
 ## Path clarifications
 
 - Human-maintained filter rules live in `lists/adblock/` and `lists/hostlist/`.
-- `Scripts/build.sh` and parts of CI build from normalized inputs in `lists/sources/`.
+- `Scripts/build.py` and parts of CI build from normalized inputs in `lists/sources/`.
 - Userscripts build from `userscripts/src/` to `userscripts/dist/`.
 - Some workflows also publish artifacts under the repo-root `dist/` directory.
 
@@ -53,7 +52,6 @@ bun run build:adblock
 bun run build:hosts
 bun run build:userscripts
 bun run lint:yaml
-bun run lint:shell
 uv run ruff check .
 uv run ruff format --check .
 ```

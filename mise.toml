@@ -64,12 +64,12 @@ depends = ["install"]
 
 [tasks.build]
 description = "Build all lists"
-run = "./Scripts/build-lists.sh"
+run = "uv run python -m Scripts.build"
 depends = ["install"]
 
 [tasks."build:all"]
 description = "Build everything"
-run = "./Scripts/build-all.sh all"
+run = "uv run python -m Scripts.build all"
 depends = ["install"]
 
 [tasks.lint]
@@ -92,16 +92,6 @@ run = "mise outdated"
 description = "Upgrade all tools"
 run = "mise up -y || :; mise prune -y || :"
 
-[tasks.quality]
-description = "Run JS/TS quality checks"
-run = "./Scripts/quality-check.sh"
-depends = ["install"]
-
-[tasks."quality:ci"]
-description = "Run quality checks in CI mode"
-env = { CI = "true" }
-run = "./Scripts/quality-check.sh"
-depends = ["install"]
 
 [tasks.uvcache]
 description = "Clean cargo and cache directories"

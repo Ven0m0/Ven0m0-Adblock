@@ -36,4 +36,4 @@ jobs:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
 
       - name: Merge open pull requests
-        run: bash ./Scripts/automerge-open-prs.sh
+        run: python3 Scripts/automerge_open_prs.py
