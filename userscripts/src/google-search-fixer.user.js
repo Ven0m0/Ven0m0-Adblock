@@ -41,7 +41,7 @@
   };
 
   const fixAnchor = (a) => {
-    if (!a || a.tagName !== "A") return;
+    if (a?.tagName !== "A") return;
     const href = a.getAttribute("href");
     if (!href) return;
 
