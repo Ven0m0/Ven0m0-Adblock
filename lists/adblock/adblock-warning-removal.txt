@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/207_optimized/207_optimized-s-1782696752-14400.patch
 ! Title: Adblock Warning Removal List (Optimized)
 ! Description: Removes anti-adblock warnings and other obtrusive messages.
-! Version: 5db7056
+! Version: 952c322
 ! TimeUpdated: 2026-06-29T01:29:20+00:00
 ! Expires: 5 days (update frequency)
 /adb-watch.
@@ -89,7 +89,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||acebunny.com^
 ||acidicstraw.com^
 ||acidpigs.com^
-||acquireuser.com^
 ||acridtwist.com^
 ||actuallysheep.com^
 ||actuallysnake.com^
@@ -200,7 +199,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||bastingart.com^
 ||battlekite.com^
 ||bawdybalance.com^
-||bawdybeast.com^
 ||beamvolcano.com^
 ||beancontrol.com^
 ||bedsberry.com^
@@ -655,7 +653,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||essayspin.com^
 ||etherealbamboo.com^
 ||ethereallagoon.com^
-||etherealquasar.com^
 ||etherealripple.com^
 ||evanescentedge.com^
 ||evasivejar.com^
@@ -840,7 +837,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||gloomyseason.com^
 ||gloriousbeef.com^
 ||glowingmeadow.com^
-||gluedpixel.com^
 ||goddesslamps.com^
 ||godseedband.com^
 ||goldfishgrowth.com^
@@ -1122,7 +1118,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||makesimpact.com^
 ||maliciousmusic.com^
 ||manamoment.com^
-||mantrafox.com^
 ||manydiamonds.com^
 ||manyfishes.com^
 ||mapbasin.com^
@@ -1344,7 +1339,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||petitechili.com^
 ||phonecup.com^
 ||phoneresult.com^
-||photographpan.com^
 ||photohints.com^
 ||physicstees.com^
 ||pickmicro.com^
@@ -2201,12 +2195,12 @@ pkmods.com##body > div[style*="z-index"][style*="background"]
 freelogovectors.net##div[class^="popup"]
 nslookup.io##div[id$="-fallback"]
 financerites.com##div[id^="__vliadb"]
-strikeout.co,vipbox.sx,vipleague.co,vipleague.is##div[style="display: block;"]
+strikeout.co,vipbox.sx,vipleague.is##div[style="display: block;"]
 nexusmods.com##div[style="float: left; width: 728px; height: 90px; background: #313131;"]
 efootballdb.com##div[style="position: fixed; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.8); width: 100vw; height: 100vh; z-index: 9999999;"]
 playonlinux.com##div[style="text-align:center;  border-radius:7px; width:160px;  border:1px solid #666666;  margin-left:5px;padding-right:5px;color:#FFF;  background-color:#666;font-family:Maven Pro,century gothic, arial, helvetica, sans serif;padding-top:94px;  height:600px;  padding-left:5px; font-size:18px; "]
 outlook.live.com._6tqjFb_HmyQup_NPe6dhC
-strikeout.co,vipbox.sx,vipleague.ch,vipleague.co,vipleague.is,vipleague.me##span[id][style] > div[id]:first-child:last-child
+strikeout.co,vipbox.sx,vipleague.ch,vipleague.is,vipleague.me##span[id][style] > div[id]:first-child:last-child
 scrolller.com##.popup--sticky:contains(adblock)
 redtube.com###as_131
 redtube.com###slidePanelContainerAB
@@ -2502,7 +2496,6 @@ comptoir-info.com#@#.textad
 ##.diysdk_webServices_banners1und1MainContent
 usgang.ch###rectangle-wrapper
 ||jappy.tv/i/wrbng/abb.png
-minimultik.ru###abDetected
 patrioty.org.ua###ad_pu_modal
 i.factor.ua###adb-info
 sanstv.ru###adblock
@@ -2629,7 +2622,7 @@ forum.bestflowers.ru##.xenOverlay
 @@||qpython.club^$generichide
 @@||sports.ru^*/adfox.$xhr
 i.factor.ua##[data-place-block]
-auto62rus.ru,eset-key.ru,mycrib.ru,politonline.ru,showmehow.ru##[data-type="anti-abp"]
+auto62rus.ru,eset-key.ru,mycrib.ru,politonline.ru##[data-type="anti-abp"]
 megogo.net##[data-widget*="adblockOverlayEnabled"] .notifications
 lr-club.com##a[href="https://adblockplus.org/ru/faq_basics#disable"]
 drive2.ru##a[href][target="_blank"] > img[src][style^="width: 100%; height: auto;"][style*="vertical-align: middle; max-width: 240px;"]
@@ -2637,7 +2630,6 @@ tproger.ru##article.type-post:has([href="/adblock"])
 pic4you.ru,pic5you.ru##body > #bb
 forum.vip-cxema.org##body > #document_modal.modal,#some_ad_block_key_popup
 it-enginer.ru##body > #modal[style*="blur"]
-dominus.kiev.ua##body > #myModal
 newkaliningrad.ru##body > .soclinks + script + div[class]:not([id])
 swaego.ru##body > .special-message-wrapper
 ukr.net##body > .yellow-die
