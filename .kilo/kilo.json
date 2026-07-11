@@ -1,6 +1,6 @@
 {
   "$schema": "https://app.kilo.ai/config.json",
-  "instructions": [".kilo/rules/*.md", "AGENTS.md"],
+  "instructions": [".kilo/rules/*.md", "AGENTS.md", ".claude/rules/*.md"],
   "skills": { "paths": [".kilo/skills", ".claude/skills"] },
   "permission": {
     "*": "allow",
@@ -14,6 +14,9 @@
     ":(){:|:&};:": "deny",
     "doom_loop": "deny"
   },
+  "agent": {
+    "compaction": { "model": "kilo-auto/free" }
+  },
   "provider": {
     "openai": {
       "options": { "apiKey": "{env:OPENAI_API_KEY}" }
@@ -25,27 +28,44 @@
   "disabled_providers": ["openai", "google", "anthropic"],
   "plugin": [
     "opencode-ignore@1.1.0",
-    "@bastiangx/opencode-unmoji",
+    "@bastiangx/opencode-unmoji@0.3.12",
     "@gotgenes/opencode-agent-identity@3.0.1",
-    "@nick-vi/opencode-type-inject@1.1.2",
+    "opencode-agent-skills@0.6.5",
     "@openspoon/subtask2@0.3.9",
     "@tarquinen/opencode-dcp@3.1.9",
-    "openslimedit@1.0.4",
-    "opencode-agent-memory@0.2.0",
-    "superpowers@git+https://github.com/obra/superpowers.git"
+    "opencode-session-handoff@1.1.6",
+    "opencode-websearch@0.5.0",
+	"@nick-vi/opencode-type-inject@1.1.2",
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "kilo-tools@git+https://github.com/Ven0m0/claude-config.git"
   ],
   "formatter": {
     "biome": {
-      "command": ["npx", "-y", "@biomejs/biome", "check", "--write", "--format-with-errors=true", "$FILE"],
+      "command": [
+        "npx",
+        "-y",
+        "@biomejs/biome",
+        "check",
+        "--write",
+        "--format-with-errors=true",
+        "$FILE"
+      ],
       "extensions": [".json", ".jsonc", ".js", ".ts"]
     },
     "ruff": {
-      "command": ["ruff", "format", "$FILE"],
+      "command": ["uvx", "ruff", "format", "$FILE"],
       "extensions": [".py", ".pyi", ".pyc"]
     }
   },
   "watcher": {
-    "ignore": ["node_modules/**", "dist/**", ".git/**", ".venv/**", "__pycache__/**", ".ruff_cache/**"]
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      ".venv/**",
+      "__pycache__/**",
+      ".ruff_cache/**"
+    ]
   },
   "mcp": {
     "ref-tools": {
@@ -53,9 +73,23 @@
       "url": "https://api.ref.tools/mcp",
       "enabled": true
     },
+    "grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": { "Authorization": "Bearer {env:CONTEXT7_API_KEY}" },
+      "enabled": true
+    },
     "github": {
       "type": "remote",
       "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
       "enabled": true
     },
     "exa": {
@@ -82,12 +116,6 @@
       "type": "local",
       "command": ["npx", "-y", "octocode-mcp@latest"],
       "enabled": true
-    },
-    "morph-mcp": {
-      "type": "local",
-      "command": ["npx", "-y", "@morphllm/morphmcp"],
-      "environment": { "MORPH_API_KEY": "{env:MORPH_API_KEY}" },
-      "enabled": true
     }
   },
   "lsp": {
@@ -97,12 +125,23 @@
     },
     "bash": {
       "command": ["bash-language-server", "start"],
-      "extensions": [".sh", ".bash", ".zsh"]
+      "extensions": [".sh", ".bash", ".zsh", ".ksh"]
     },
     "vtsls": {
       "command": ["vtsls", "--stdio"],
-      "extensions": [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"],
-      "initialization": { "preferences": { "importModuleSpecifierPreference": "relative" } }
+      "extensions": [
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx",
+        ".mjs",
+        ".cjs",
+        ".mts",
+        ".cts"
+      ],
+      "initialization": {
+        "preferences": { "importModuleSpecifierPreference": "relative" }
+      }
     },
     "rust": {
       "command": ["rust-analyzer"],
@@ -138,7 +177,7 @@
         "-NoLogo",
         "-NoProfile",
         "-Command",
-        "$module = Get-Module -ListAvailable PowerShellEditorServices | Sort-Object Version -Descending | Select-Object -First 1; if (-not $module) { throw 'PowerShellEditorServices is not installed. Run: Install-Module -Name PowerShellEditorServices -Scope CurrentUser' }; Import-Module $module.Path; Start-EditorServices -HostName 'Claude Code' -HostProfileId 'ClaudeCode' -HostVersion '1.0.0' -Stdio -BundledModulesPath (Split-Path $module.Path) -LogPath '/dev/null' -LogLevel 'None' -EnableConsoleRepl"
+        "$module = Get-Module -ListAvailable PowerShellEditorServices | Sort-Object Version -Descending | Select-Object -First 1; if (-not $module) { throw 'PowerShellEditorServices is not installed. Run: Install-Module -Name PowerShellEditorServices -Scope CurrentUser' }; Import-Module $module.Path; Start-EditorServices -HostName 'kilo' -HostProfileId 'kilo' -HostVersion '1.0.0' -Stdio -BundledModulesPath (Split-Path $module.Path) -LogPath '/dev/null' -LogLevel 'None' -EnableConsoleRepl"
       ],
       "extensions": [".ps1", ".psm1", ".psd1"]
     }
