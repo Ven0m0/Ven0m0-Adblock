@@ -13,6 +13,6 @@ managed = true
 
 [dependency-groups]
 dev = [
-    "prek>=0.4.8",
-    "ruff>=0.15.18",
+    "prek>=0.4.9",
+    "ruff>=0.15.21",
 ]
