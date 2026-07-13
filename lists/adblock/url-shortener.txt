@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/251_optimized/251_optimized-s-1782437417-14400.patch
 ! Title: Legitimate URL Shortener (Optimized)
 ! Description: Automatically removes unnecessary '$' and '&' values from URLs, making them easier to copy from the URL bar and pasting elsewhere as links. Already included in Dandelion Sprout's Annoyances List.
-! Version: 952c322
+! Version: c29aca8
 ! TimeUpdated: 2026-06-26T01:27:34+00:00
 ! Expires: 5 days (update frequency)
 $removeparam=yclid
@@ -1986,8 +1986,8 @@ $document,removeparam=iid,domain=cnn.com|time.com
 ||weibo.com/ajax/log$removeparam=act_code
 ||weibo.com/ajax/log$removeparam=fid
 $removeparam=/^cmpid%3D=.*$/i,domain=bloomberg.com
-$removeparam=h,domain=clockks.com|tellywebnews.com
-$removeparam=e,domain=clockks.com|tellywebnews.com
+$removeparam=h,domain=clockks.com
+$removeparam=e,domain=clockks.com
 $removeparam=d_id,domain=buzzfeed.com|buzzfeednews.com
 ||buzzfeednews.com^$removeparam=bfsource
 $removeparam=j,domain=change.org

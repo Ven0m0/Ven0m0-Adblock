@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/207_optimized/207_optimized-s-1782696752-14400.patch
 ! Title: Adblock Warning Removal List (Optimized)
 ! Description: Removes anti-adblock warnings and other obtrusive messages.
-! Version: 952c322
+! Version: c29aca8
 ! TimeUpdated: 2026-06-29T01:29:20+00:00
 ! Expires: 5 days (update frequency)
 /adb-watch.
@@ -73,7 +73,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||aboardamusement.com^
 ||aboardlevel.com^
 ||abovechat.com^
-||abruptroad.com^
 ||absentairport.com^
 ||absolutering.com^
 ||absorbingband.com^
@@ -580,7 +579,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||domaincolumn.com^
 ||doomhedge.com^
 ||dotshellmain.com^
-||doubledefend.com^
 ||doubtdrawer.com^
 ||dq95d35.com^
 ||dragonbats.com^
@@ -905,7 +903,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||hayweb.net^
 ||hazmatworkshop.com^
 ||headydegree.com^
-||headyhook.com^
 ||healflowers.com^
 ||heartbreakingmind.com^
 ||hearthow.com^
@@ -1718,7 +1715,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||smoggysongs.com^
 ||smoggystation.com^
 ||snacktoken.com^
-||snakemineral.com^
 ||snakeslang.com^
 ||snappyreport.com^
 ||snapsgate.com^
@@ -1815,7 +1811,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||steadfastseat.com^
 ||steadfastsound.com^
 ||steadfastsystem.com^
-||steadycopper.com^
 ||stealsteel.com^
 ||steelmaiden.com^
 ||steepsister.com^
@@ -2119,7 +2114,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||wirecomic.com^
 ||wiredforcoffee.com^
 ||wirenewsletter.com^
-||wirypaste.com^
 ||wisedotcom.com^
 ||wispycity.com^
 ||wistfulwaste.com^
@@ -2306,7 +2300,6 @@ _adblock_killer.
 @@||penducado.com/styles/ads.css
 @@||proxy.ads.canalplus-bo.net/web/undefined/v1/adserver/info/?asset=*&channel=$xhr,domain=www.mycanal.fr
 @@||ps3-infos.fr/adsense/openads/ads/ads.js
-@@||pstream.net/js/prebid35.js$~3p
 @@||ptitchef.com/js/ads.js
 @@||static.admysports.com/hb/site/als/hb_allosurf.js$domain=allosurf.net
 @@||static.adsafeprotected.com/favicon.ico$domain=tf1info.fr
@@ -2481,7 +2474,7 @@ pausecafein.fr###adb-pop
 #@##adblocktest
 dbz-fantasy.com#@##adTeaser
 fstore.biz#@##adblockinfo
-freeiphone.fr,hommedumatch.fr,jetetroll.com,testious.com#@##adsense
+hommedumatch.fr,jetetroll.com,testious.com#@##adsense
 debrideurstream.fr#@##pubdirecte
 iwin.com#@##sponsorText
 hypebeast.com,hypebeast.kr#@#.ad-blocked
@@ -2508,7 +2501,6 @@ cxem.net###antiAdBlock
 e.mail.ru,octavius.mail.ru#@##app-canvas .layout__overflow-container > .advert-column
 e.mail.ru,octavius.mail.ru#@##app-canvas .layout__overflow-container > .slot
 elhow.ru###b-info-wrapper
-piratia.su###block-warning
 ma.by###bodysubcont > div[style^="padding"]:not([id]):not([class])
 ucoin.net###bottom-notice
 pln-pskov.ru###check_ad_block
