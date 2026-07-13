@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@ast-grep/cli": "*",
-    "@kilocode/plugin": "7.4.1",
+    "@kilocode/plugin": "7.4.5",
     "@opencode-ai/plugin": "*",
     "diff": "*",
     "repair-json-stream": "*"
