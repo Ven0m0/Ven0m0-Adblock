@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/207_optimized/207_optimized-s-1782696752-14400.patch
 ! Title: Adblock Warning Removal List (Optimized)
 ! Description: Removes anti-adblock warnings and other obtrusive messages.
-! Version: c29aca8
+! Version: ee7f951
 ! TimeUpdated: 2026-06-29T01:29:20+00:00
 ! Expires: 5 days (update frequency)
 /adb-watch.
@@ -13,7 +13,7 @@
 /npsblocker/js/ads.
 @@/adsbygoogle.js$script,domain=arabiaweather.com
 @@||imasdk.googleapis.com/js/sdkloader/ima3.js$domain=shahid.mbc.net
-@@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=shed4u1.com|elktob.online
+@@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=shed4u1.com
 @@||securepubads.g.doubleclick.net/tag/js/gpt.js$domain=shahid.mbc.net
 ###adblock_screen
 ###adblock_message
@@ -482,7 +482,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||crowdedmass.com^
 ||crunchcontrol.com^
 ||crypticgenius.com^
-||cryptvalue.com^
 ||crystalboulevard.com^
 ||cubchannel.com^
 ||cubeglobal.net^
@@ -510,7 +509,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cutechin.com^
 ||cyclinghere.com^
 ||cyclopsdial.com^
-||dailydivision.com^
 ||dailydomino.com^
 ||damagedadvice.com^
 ||damageddistance.com^
@@ -692,7 +690,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||farethief.com^
 ||farmergoldfish.com^
 ||farshake.com^
-||farsnails.com^
 ||fastenfather.com^
 ||fasterfineart.com^
 ||fasterjson.com^
@@ -754,7 +751,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||flushingbeast.com^
 ||flutteringfireman.com^
 ||flystranger.com^
-||foambench.com^
 ||focusfitwear.com^
 ||folderplan.com^
 ||followborder.com^
@@ -882,7 +878,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||halcyoncanyon.com^
 ||halocolor.com^
 ||haltingbadge.com^
-||haltingdivision.com^
 ||hammerhearing.com^
 ||hamsterspot.com^
 ||handleteeth.com^
@@ -1256,7 +1251,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||nudgeduck.com^
 ||nullnorth.com^
 ||nullradar.com^
-||numerousnest.com^
 ||oafishchance.com^
 ||oafishobservation.com^
 ||objecthero.com^
@@ -1431,7 +1425,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||puppiesart.com^
 ||purebloom.net^
 ||purposepipe.com^
-||q20jqurls0y7gk8.info^
 ||quantumlagoon.com^
 ||quantumshine.com^
 ||queenjam.com^
@@ -1551,7 +1544,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||sableshelf.com^
 ||sablesmile.com^
 ||sablesong.com^
-||sadloaf.com^
 ||sadspacekitty.com^
 ||safetybrush.com^
 ||saffronrefuge.com^
@@ -2009,7 +2001,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||ubiquitoussea.com^
 ||ultraoranges.com^
 ||ultravalid.com^
-||unablehope.com^
 ||unaccountablepie.com^
 ||unarmedindustry.com^
 ||unbecominghall.com^
