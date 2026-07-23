@@ -115,6 +115,9 @@ Those who like to tinker may want to try this out, but you're better off just us
 3. **[EasyPrivacy (Optimized)](https://filters.adtidy.org/extension/ublock/filters/118_optimized.txt)** (14k optimized vs. 50k rules) | [iOS version](https://filters.adtidy.org/ios/filters/118_optimized.txt) (14k rules) | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/extension/ublock/filters/118_optimized.txt&title=EasyPrivacy%20(Optimized))
 <br> EasyPrivacy is a filter list to comprehensively block tracking on web pages, including tracking scripts and information collectors. EasyPrivacy protects personal data by stopping these trackers. This filter is the second most popular list used by many ad blockers. 
 
+4. **[AdGuard URL Tracking filter (Optimized)](https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt)** (2.6k rules; no separate unoptimized version) | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/extension/ublock/filters/17_optimized.txt&title=AdGuard%20URL%20Tracking%20filter%20(Optimized))
+<br> Removes tracking parameters from URLs. Already merged into `Actually Legitimate URL Shortener Tool` above, but useful standalone if you don't want that list's other rules.
+
 ### Annoyances
 
 1) **[Fanboy Annoyances (Optimized)](https://filters.adtidy.org/extension/ublock/filters/122_optimized.txt)** (56k optimized vs. 81k rules) |  [iOS version](https://filters.adtidy.org/ios/filters/122_optimized.txt) (11k rules) | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/extension/ublock/filters/122_optimized.txt&title=Fanboy%20Annoyances%20(Optimized))
@@ -126,6 +129,17 @@ Those who like to tinker may want to try this out, but you're better off just us
 4) **[AdGuard Social Media filter (Optimized)](https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt)** (16k optimized vs. 21k rules) | [iOS version](https://filters.adtidy.org/ios/filters/4_optimized.txt) (7k rules)
  | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/extension/ublock/filters/4_optimized.txt&title=AdGuard%20Social%20Media%20filter%20(Optimized))
 <br> If you do not like numerous `Like` and `Tweet` buttons on all the popular websites on the Internet, then subscribe to this filter and you will not see them anymore.
+
+5) **[Web Annoyances Ultralist (Optimized)](https://filters.adtidy.org/extension/ublock/filters/201_optimized.txt)** (2.4k optimized vs. 17k rules) | [iOS version](https://filters.adtidy.org/ios/filters/201_optimized.txt) (2.4k rules) | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/extension/ublock/filters/201_optimized.txt&title=Web%20Annoyances%20Ultralist%20(Optimized))
+<br> Blocks annoying web elements and reclaims lost screen real estate.
+
+6) **[Adblock Warning Removal List (Optimized)](https://filters.adtidy.org/extension/ublock/filters/207_optimized.txt)** (2.9k rules; no separate unoptimized version) | [iOS version](https://filters.adtidy.org/ios/filters/207_optimized.txt) (2.9k rules) | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/extension/ublock/filters/207_optimized.txt&title=Adblock%20Warning%20Removal%20List%20(Optimized))
+<br> Removes anti-adblock warnings and other obtrusive messages that some sites show when they detect an ad blocker.
+
+### Security
+
+1) **[uBlock Origin – Badware risks (Optimized)](https://filters.adtidy.org/android/filters/257_optimized.txt)** (4.2k rules) | [iOS version](https://filters.adtidy.org/ios/filters/257_optimized.txt) (4.2k rules) | [subscribe](https://subscribe.adblockplus.org/?location=https://filters.adtidy.org/android/filters/257_optimized.txt&title=uBlock%20Origin%20%E2%80%93%20Badware%20risks%20(Optimized))
+<br> Filter for risky sites, warning users of potential threats.
 
 ***
 
