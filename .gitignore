@@ -24,6 +24,7 @@ node_modules/
 !.vscode/extensions.json
 .vscode/
 .idea/
+.codegraph/
 
 # System
 .DS_Store

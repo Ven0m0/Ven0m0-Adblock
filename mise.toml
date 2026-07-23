@@ -20,6 +20,7 @@ uv_venv_create_args = ["--system-site-packages", "--seed"]
 binstall = true
 
 [tools]
+python = "latest"
 # node = "latest"
 # bun = "latest"
 # prek = "latest"
