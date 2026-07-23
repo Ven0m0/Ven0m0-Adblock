@@ -20,16 +20,11 @@ uv_venv_create_args = ["--system-site-packages", "--seed"]
 binstall = true
 
 [tools]
-node = "latest"
-bun = "latest"
-prek = "latest"
-uv = "latest"
-ruff = "latest"
-ghalint = "latest"
-act = "latest"
-action-validator = "latest"
-actionlint = "latest"
-ripgrep = "latest"
+# node = "latest"
+# bun = "latest"
+# prek = "latest"
+# uv = "latest"
+# ruff = "latest"
 
 [env]
 NODE_ENV = "production"
