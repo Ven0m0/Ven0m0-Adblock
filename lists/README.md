@@ -145,3 +145,7 @@ Toggle on [advanced settings](https://github.com/gorhill/uBlock/wiki/Advanced-us
 | `updateAssetBypassBrowserCache` | `true`              | bypass cache when manually fetching a filter list more than once an hour                             |
 
 ***
+
+
+https://github.com/yokoffing/filterlists/blob/main/block_third_party_fonts.txt
+https://filters.adtidy.org/android/filters/239_optimized.txt

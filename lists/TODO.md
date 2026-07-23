@@ -1,0 +1,1 @@
+add more optimized filterlists to @README.md from @my-ublock-backup_2026-07-23_20.16.54.txt and @my-ublock-backup_2026-07-23_20.23.28.txt
