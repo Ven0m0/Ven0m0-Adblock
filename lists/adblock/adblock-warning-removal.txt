@@ -3,7 +3,7 @@
 ! Diff-Path: ../patches/207_optimized/207_optimized-s-1782696752-14400.patch
 ! Title: Adblock Warning Removal List (Optimized)
 ! Description: Removes anti-adblock warnings and other obtrusive messages.
-! Version: ee7f951
+! Version: 30bf7b7
 ! TimeUpdated: 2026-06-29T01:29:20+00:00
 ! Expires: 5 days (update frequency)
 /adb-watch.
@@ -463,7 +463,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||cozyhillside.com^
 ||cozytryst.com^
 ||crabbychin.com^
-||crackedsafe.com^
 ||craftessays.com^
 ||crafthenry.com^
 ||crashchance.com^
@@ -1043,7 +1042,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||leafpilot.com^
 ||leaplunchroom.com^
 ||leftliquid.com^
-||lemonpackage.com^
 ||lemonsandjoy.com^
 ||lessonsnetwork.com^
 ||libraryfacts.com^
@@ -1089,7 +1087,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||luminousboulevard.com^
 ||luminouscatalyst.com^
 ||luminoussculptor.com^
-||lumpygnome.com^
 ||lumpylumber.com^
 ||lumpywood.com^
 ||lunarcave.com^
@@ -1545,7 +1542,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||sablesmile.com^
 ||sablesong.com^
 ||sadspacekitty.com^
-||safetybrush.com^
 ||saffronrefuge.com^
 ||saladfuel.com^
 ||salmonfin.com^
@@ -1792,7 +1788,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||stakingsmile.com^
 ||staleshow.com^
 ||stalesummer.com^
-||starkscale.com^
 ||starrynets.com^
 ||starsmarter.com^
 ||startercost.com^
@@ -1825,7 +1820,6 @@ koolhydraatarmerecepten.info##body > [style^="z-index: 1000000; "]
 ||stockingsneeze.com^
 ||stocktheme.com^
 ||stomachscience.com^
-||stonechin.com^
 ||stonepole.com^
 ||stopstomach.com^
 ||stormyflower.com^
