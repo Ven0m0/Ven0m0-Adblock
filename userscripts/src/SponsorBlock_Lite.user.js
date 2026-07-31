@@ -854,9 +854,8 @@
         if (vids.length === 1) {
           video = vids[0];
         } else {
-          video = Array.prototype.find.call(vids, v =>
-            v.closest(".bpx-player-video-area, .bilibili-player")
-          ) || vids[0];
+          video =
+            Array.prototype.find.call(vids, (v) => v.closest(".bpx-player-video-area, .bilibili-player")) || vids[0];
         }
       }
       return video;

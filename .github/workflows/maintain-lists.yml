@@ -48,11 +48,11 @@ jobs:
       - name: Remove dead domains
         continue-on-error: true
         run: |
-          dead-domains-linter -a -i "lists/sources/*.txt" || :
+          dead-domains-linter -a -i "lists/adblock/*.txt" || :
       - name: Deduplicate filter lists
         continue-on-error: true
         run: |
-          PYTHONPATH=. python3 Scripts/deduplicate.py lists/sources || :
+          PYTHONPATH=. python3 Scripts/deduplicate.py lists/adblock || :
       - name: Deduplicate hostlists
         continue-on-error: true
         run: |

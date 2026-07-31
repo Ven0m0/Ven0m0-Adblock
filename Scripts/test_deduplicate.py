@@ -1,17 +1,17 @@
 import sys
 import tempfile
-from pathlib import Path
-from io import StringIO
-from unittest.mock import patch
 import unittest
+from io import StringIO
+from pathlib import Path
+from unittest.mock import patch
 
 # Add current directory to path to allow importing deduplicate
 from Scripts.deduplicate import (
-    main,
-    process_content,
+    find_cross_file_duplicates,
     is_header,
     is_valid_rule,
-    find_cross_file_duplicates,
+    main,
+    process_content,
 )
 
 
@@ -31,7 +31,7 @@ class TestDeduplicate(unittest.TestCase):
             "rule4.com",
         ]
 
-        headers, rules, stats = process_content(lines)
+        headers, rules, _stats = process_content(lines)
 
         expected_headers = ["! Header line 1", "! Header line 2"]
 

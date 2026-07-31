@@ -8,7 +8,7 @@ import re
 import shutil
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Final
 
@@ -70,11 +70,11 @@ def ncpu() -> int:
 
 
 def ts_short() -> str:
-    return datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
+    return datetime.now(UTC).strftime("%Y%m%d%H%M")
 
 
 def ts_read() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    return datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
 
 
 # ============================================================================

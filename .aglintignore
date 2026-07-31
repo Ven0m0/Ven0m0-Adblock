@@ -1,20 +1,25 @@
+# NOTE: aglint 3.0.2's directory scanner tests ignore patterns against bare
+# basenames only (e.g. "external"), never full relative paths ("lists/external/").
+# Patterns with a "/" or a trailing "/" never match here - keep every directory
+# entry below as a bare name, no path prefix, no trailing slash.
+
 # Node/Bun dependencies
-node_modules/
+node_modules
 
 # Build outputs
-dist/
-build/
-lists/releases/
-Filters/
+dist
+build
+releases
+Filters
 *.min.js
 
 # Python environments
-venv/
-.venv/
-__pycache__/
+venv
+.venv
+__pycache__
 
 # Version control
-.git/
+.git
 
 # Cache files
 .aglintcache
@@ -22,15 +27,16 @@ __pycache__/
 
 # Project-specific ignores
 # Ignore userscripts as they are handled by eslint/biome
-userscripts/
+userscripts
 # Ignore hostlists that may use pure regex/domain formats not fully compatible with standard adblock linter
-lists/hostlist/
-# Ignore external sources
-lists/external/
-# Ignore raw sources if they are just downloaded/unprocessed lists
-lists/sources/
+hostlist
+# Ignore external sources (downloaded upstream lists, not ours to lint)
+external
+
+# Stray backup file, not a filter list
+my-ublock-backup_2026-07-31_22.19.20.txt
 
 # Logs and temporary files
 *.log
 *.tmp
-logs/
+logs

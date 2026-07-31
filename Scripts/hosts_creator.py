@@ -4,6 +4,7 @@
 import socket
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -11,7 +12,7 @@ _root = Path(__file__).parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from Scripts.common import die, has, log, ok, warn  # noqa: E402
+from Scripts.common import die, has, log, ok, warn
 
 CONFIG_PATH = Path(__file__).parent / "hosts-config"
 BACKUP_DIR = Path("backups")
@@ -61,7 +62,7 @@ def _load_config() -> dict[str, str]:
 def _resolve_host() -> str:
     try:
         hostname = socket.gethostname()
-    except Exception:
+    except OSError:
         hostname = "localhost"
     return f"127.0.0.1 {hostname}.local {hostname} localhost"
 
@@ -75,6 +76,7 @@ def backup(hosts_file: Path, backup_name: str) -> None:
             current.rename(old)
         if hosts_file.exists():
             import shutil
+
             shutil.copy2(hosts_file, current)
             log("backup", f"Saved {hosts_file}")
 
@@ -90,16 +92,22 @@ def download(urls: list[str], new_path: Path) -> None:
         try:
             req = urllib.request.Request(
                 url,
-                headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:138.0) Gecko/138.0 Firefox/138.0"},
+                headers={
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:138.0) Gecko/138.0 Firefox/138.0"
+                },
             )
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                with new_path.open("ab") as fh:
-                    fh.write(resp.read())
-        except Exception as e:
+            with (
+                urllib.request.urlopen(req, timeout=30) as resp,
+                new_path.open("ab") as fh,
+            ):
+                fh.write(resp.read())
+        except (OSError, urllib.error.URLError) as e:
             warn(f"Failed: {url}: {e}")
 
 
-def process(new_path: Path, rm_comments: bool, rm_trailing: bool, rm_dupes: bool) -> None:
+def process(
+    new_path: Path, rm_comments: bool, rm_trailing: bool, rm_dupes: bool
+) -> None:
     lines = new_path.read_text(encoding="utf-8", errors="replace").splitlines()
     if rm_trailing:
         lines = [ln.strip() for ln in lines]
@@ -127,7 +135,9 @@ def check_size(new_path: Path) -> None:
 def replace(new_path: Path, hosts_file: Path) -> None:
     sudo = "doas" if has("doas") else "sudo"
     log("replace", f"Installing to {hosts_file}")
-    result = subprocess.run([sudo, "mv", "-f", str(new_path), str(hosts_file)], check=False)
+    result = subprocess.run(
+        [sudo, "mv", "-f", str(new_path), str(hosts_file)], check=False
+    )
     if result.returncode != 0:
         die("Replace failed")
 

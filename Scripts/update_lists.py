@@ -13,12 +13,15 @@ import io
 import json
 import logging
 import re
+import subprocess
 import sys
 import tempfile
+from datetime import UTC
 from pathlib import Path
 from typing import Final
-import aiohttp
+
 import aiofiles
+import aiohttp
 
 from Scripts.common import sanitize_filename
 
@@ -26,7 +29,7 @@ from Scripts.common import sanitize_filename
 # CONFIGURATION
 # ============================================================================
 SOURCES_CONFIG: Final[str] = "lists/sources-urls.json"
-DEFAULT_OUTPUT: Final[str] = "lists/sources"
+DEFAULT_OUTPUT: Final[str] = "lists/external"
 METADATA_FILE: Final[str] = "lists/sources-metadata.json"
 HEADER_PREFIXES: Final[tuple[str, ...]] = ("! ", "#", "[")
 TIMEOUT: Final[int] = 60
@@ -48,7 +51,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 
-def validate_checksum(content: str, name: str = "unknown") -> bool:
+async def validate_checksum(content: str, name: str = "unknown") -> bool:
     """Validate Adblock Plus checksum header."""
     match = re.search(
         r"^\s*!\s*checksum[\s\-:]+([\w\+\/=]+).*\n",
@@ -59,8 +62,14 @@ def validate_checksum(content: str, name: str = "unknown") -> bool:
         logger.debug(f"No checksum in {name} (optional)")
         return True
     declared = match.group(1)
-    body = (content[: match.start()] + content[match.end() :]).rstrip("\r\n").replace("\r", "") + "\n"
-    computed = base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest()).decode().rstrip("=")
+    body = (content[: match.start()] + content[match.end() :]).rstrip("\r\n").replace(
+        "\r", ""
+    ) + "\n"
+    computed = (
+        base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest())
+        .decode()
+        .rstrip("=")
+    )
     if declared == computed:
         logger.info(f"✓ Checksum valid: {name}")
         return True
@@ -97,7 +106,7 @@ async def process_downloaded_file(
             content = await f.read()
 
         if not skip_checksum:
-            is_valid = validate_checksum(content, filename)
+            is_valid = await validate_checksum(content, filename)
             if not is_valid:
                 logger.warning(f"Checksum validation failed for {url}")
                 # Do not delete temp_path here; the caller's finally block is responsible for cleanup.
@@ -117,8 +126,8 @@ async def process_downloaded_file(
         logger.info(f"✓ {filename} ({rule_count} rules)")
         return dest_path
 
-    except Exception as e:
-        logger.exception(f"Error processing {url}: {e}")
+    except Exception:
+        logger.exception(f"Error processing {url}")
         if temp_path.exists():
             temp_path.unlink()
         return None
@@ -169,16 +178,16 @@ async def fetch_list(
                 # Ensure cleanup always
                 if tmp_path:
                     try:
-                        tmp_path.unlink()
+                        await asyncio.to_thread(tmp_path.unlink)
                     except FileNotFoundError:
                         pass
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.error(f"✗ Timeout: {url}")
     except aiohttp.ClientError as e:
         logger.error(f"✗ HTTP error for {url}: {e}")
-    except Exception as e:
-        logger.exception(f"✗ Unexpected error for {url}: {e}")
+    except Exception:
+        logger.exception(f"✗ Unexpected error for {url}")
 
     return (url, False)
 
@@ -232,10 +241,10 @@ async def save_metadata(
     sources: dict, results: dict[str, bool], output_dir: Path
 ) -> None:
     """Save download metadata for tracking."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     metadata = {
-        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "last_updated": datetime.now(UTC).isoformat(),
         "sources": {
             url: {
                 "filename": config["filename"],
@@ -337,22 +346,20 @@ async def main() -> int:
 
     if args.dedupe and success_count > 0:
         try:
-            import subprocess
-
             logger.info("Deduplicating and minifying downloaded lists...")
-            subprocess.run(
+            await asyncio.to_thread(
+                subprocess.run,
                 [sys.executable, "-m", "Scripts.deduplicate", str(output_dir)],
                 check=False,
             )
-        except Exception as e:
+        except (OSError, subprocess.SubprocessError) as e:
             logger.warning(f"Could not run deduplication: {e}")
 
     if args.validate:
         try:
-            import subprocess
-
             logger.info("Running AGLint validation...")
-            result = subprocess.run(
+            result = await asyncio.to_thread(
+                subprocess.run,
                 ["bun", "x", "@adguard/aglint", str(output_dir / "*.txt")],
                 capture_output=True,
                 text=True,
@@ -360,7 +367,7 @@ async def main() -> int:
             )
             if result.returncode != 0:
                 logger.warning("AGLint found issues (non-blocking)")
-        except Exception as e:
+        except (OSError, subprocess.SubprocessError) as e:
             logger.warning(f"Could not run AGLint: {e}")
 
     return 0 if success_count == len(sources) else 1

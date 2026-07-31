@@ -4,4 +4,4 @@
 import subprocess
 import sys
 
-sys.exit(subprocess.run(["prek", "run", *sys.argv[1:]]).returncode)
+sys.exit(subprocess.run(["prek", "run", *sys.argv[1:]], check=False).returncode)

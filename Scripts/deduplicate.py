@@ -8,10 +8,10 @@ Deduplicate and optimize blocklist files
 """
 
 import sys
-from pathlib import Path
 from collections import defaultdict
-from dataclasses import dataclass
 from collections.abc import Iterable
+from dataclasses import dataclass
+from pathlib import Path
 
 from Scripts.common import is_valid_domain, write_lines
 
@@ -100,7 +100,7 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
         with filepath.open("r", encoding="utf-8") as f:
             lines_gen = (line.strip() for line in f)
             headers, rules, stats = process_content(lines_gen)
-    except Exception as e:
+    except OSError as e:
         print(f"  Error reading {filepath}: {e}", file=sys.stderr)
         return Stats(), []
 

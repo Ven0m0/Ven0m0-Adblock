@@ -6,8 +6,8 @@ Pure domains are entries without AdGuard filter syntax (||, ##, $, @@, etc.)
 
 import re
 import sys
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 from Scripts.common import is_valid_domain, read_lines, write_lines
 
@@ -34,9 +34,12 @@ def get_file_category(source_file: str) -> str | None:
     source_lower = source_file.lower()
     if "spotify" in source_lower:
         return "Spotify.txt"
-    elif "youtube" in source_lower or "twitch" in source_lower:
-        return "Social-Media.txt"
-    elif "reddit" in source_lower or "twitter" in source_lower:
+    elif (
+        "youtube" in source_lower
+        or "twitch" in source_lower
+        or "reddit" in source_lower
+        or "twitter" in source_lower
+    ):
         return "Social-Media.txt"
     elif "game" in source_lower:
         return "Games.txt"
@@ -84,7 +87,7 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
                     pure_domains.append(line.strip())
                 else:
                     filter_rules.append(line)
-        except Exception as e:
+        except OSError as e:
             print(f"  Error reading: {e}", file=sys.stderr)
             continue
 
@@ -100,7 +103,9 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
                 domain_moves[file_category][adblock_file.name].extend(pure_domains)
             else:
                 for domain in pure_domains:
-                    domain_moves[categorize_domain(domain, adblock_file.name)][adblock_file.name].append(domain)
+                    domain_moves[categorize_domain(domain, adblock_file.name)][
+                        adblock_file.name
+                    ].append(domain)
 
     return domain_moves, file_updates
 
@@ -136,10 +141,9 @@ def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
 
         new_domains = list(set(all_domains) - existing_domains)
 
-        if new_domains:
-            if write_lines(target_path, sorted(new_domains), mode="a"):
-                total_moved += len(new_domains)
-                print(f"Appended {len(new_domains)} domains to {target_file}")
+        if new_domains and write_lines(target_path, sorted(new_domains), mode="a"):
+            total_moved += len(new_domains)
+            print(f"Appended {len(new_domains)} domains to {target_file}")
 
     return total_moved
 
@@ -158,6 +162,13 @@ def _update_source_files(file_updates: dict) -> None:
         else:
             if tmp_path.exists():
                 tmp_path.unlink()
+
+
+def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:
+    """Append moved domains to hostlists and rewrite source adblock files."""
+    total_moved = _update_hostlists(hostlist_dir, domain_moves)
+    _update_source_files(file_updates)
+    return total_moved
 
 
 def main() -> int:
@@ -184,8 +195,7 @@ def main() -> int:
         print("\n✓ No pure domains found in adblock lists")
         return 0
 
-    total_moved = _update_hostlists(hostlist_dir, domain_moves)
-    _update_source_files(file_updates)
+    total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
 
     print("\n" + "=" * 60)
     print(f"✓ Successfully moved {total_moved} pure domains to hostlist")

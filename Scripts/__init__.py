@@ -1,3 +1,4 @@
+# ruff: noqa: N999
 import sys
 from pathlib import Path
 

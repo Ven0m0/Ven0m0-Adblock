@@ -17,6 +17,7 @@ import re
 import shutil
 import subprocess
 import sys
+import urllib.error
 import urllib.request
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
@@ -26,10 +27,21 @@ _root = Path(__file__).parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from Scripts.common import dbg, die, err, has, log, ncpu, ok, ts_read, ts_short, warn  # noqa: E402
+from Scripts.common import (
+    dbg,
+    die,
+    err,
+    has,
+    log,
+    ncpu,
+    ok,
+    ts_read,
+    ts_short,
+    warn,
+)
 
 REPO = os.environ.get("GITHUB_REPOSITORY", "Ven0m0/Ven0m0-Adblock")
-FILTER_SRC = Path("lists/sources")
+FILTER_SRC = Path("lists/adblock")
 FILTER_OUT = Path("lists/releases")
 SCRIPT_SRC = Path("userscripts/src")
 SCRIPT_OUT = Path("userscripts/dist")
@@ -54,7 +66,8 @@ def _js_runner() -> list[str] | None:
 def _run_js(*args: str, **kwargs) -> subprocess.CompletedProcess:
     runner = _js_runner()
     cmd = [*runner, *args] if runner else list(args)
-    return subprocess.run(cmd, **kwargs)
+    check = kwargs.pop("check", False)
+    return subprocess.run(cmd, check=check, **kwargs)
 
 
 def _fetch(url: str, dest: Path) -> bool:
@@ -69,7 +82,7 @@ def _fetch(url: str, dest: Path) -> bool:
         with urllib.request.urlopen(req, timeout=30) as resp:
             dest.write_bytes(resp.read())
         return True
-    except Exception as e:
+    except (OSError, urllib.error.URLError) as e:
         warn(f"Failed to download {url}: {e}")
         return False
 
@@ -135,8 +148,8 @@ def build_hosts() -> None:
 
 
 def build_hostlist() -> None:
-    has_compiler = (
-        Path("node_modules/.bin/hostlist-compiler").exists() or has("hostlist-compiler")
+    has_compiler = Path("node_modules/.bin/hostlist-compiler").exists() or has(
+        "hostlist-compiler"
     )
     if not has_compiler:
         warn("hostlist-compiler missing")
@@ -173,7 +186,11 @@ def build_hostlist() -> None:
         popup_build = Path("scripts/popup_filter_build.js")
         if popup_build.exists():
             subprocess.run(
-                ["node", str(popup_build), str(FILTER_OUT / "adguard_popup_filter.txt")],
+                [
+                    "node",
+                    str(popup_build),
+                    str(FILTER_OUT / "adguard_popup_filter.txt"),
+                ],
                 check=False,
             )
 
@@ -187,8 +204,15 @@ def lint_filters() -> None:
     log("lint", "Setting up AGLint")
     if not Path("package.json").exists():
         subprocess.run(["npm", "init", "-y"], capture_output=True, check=False)
-    if subprocess.run(["npm", "list", "@adguard/aglint"], capture_output=True, check=False).returncode != 0:
-        subprocess.run(["npm", "i", "-D", "@adguard/aglint"], capture_output=True, check=False)
+    if (
+        subprocess.run(
+            ["npm", "list", "@adguard/aglint"], capture_output=True, check=False
+        ).returncode
+        != 0
+    ):
+        subprocess.run(
+            ["npm", "i", "-D", "@adguard/aglint"], capture_output=True, check=False
+        )
     if not Path(".aglintrc.yaml").exists():
         _run_js("@adguard/aglint", "init", capture_output=True, check=False)
 
@@ -295,7 +319,9 @@ def _process_js(f: Path) -> bool:
 
     SCRIPT_OUT.mkdir(parents=True, exist_ok=True)
     (SCRIPT_OUT / f"{base}.meta.js").write_text(meta_text + "\n", encoding="utf-8")
-    (SCRIPT_OUT / f"{base}.user.js").write_text(meta_text + "\n" + js + "\n", encoding="utf-8")
+    (SCRIPT_OUT / f"{base}.user.js").write_text(
+        meta_text + "\n" + js + "\n", encoding="utf-8"
+    )
     ok(f"{fn} -> {base}.user.js ({f.stat().st_size} -> {len(js)} bytes)")
     return True
 

@@ -1,16 +1,16 @@
-import unittest
-import sys
-import io
-import tempfile
-from pathlib import Path
 import hashlib
+import io
+import sys
+import tempfile
+import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 # Add current directory to path
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import sanitize_filename, is_valid_domain, read_lines, write_lines
+from common import is_valid_domain, read_lines, sanitize_filename, write_lines
 
 
 class TestCommon(unittest.TestCase):
@@ -88,7 +88,9 @@ class TestCommon(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)
             target_file = temp_dir_path / "test.txt"
-            target_file.write_text("line1 \nline2\r\nline3", encoding="utf-8")
+            target_file.write_text(
+                "line1 \nline2\r\nline3", encoding="utf-8", newline=""
+            )
 
             lines = read_lines(target_file)
             self.assertEqual(lines, ["line1", "line2", "line3"])

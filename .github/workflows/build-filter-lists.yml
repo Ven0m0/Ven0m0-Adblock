@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "lists/sources/**/*.txt"
+      - "lists/adblock/**/*.txt"
       - "hostlist-config.json"
       - "configuration_popup_filter.json"
       - "ragibkl-config.json"
@@ -47,7 +47,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "style: lint and fix filter lists"
-          file_pattern: "lists/sources/**/*.txt"
+          file_pattern: "lists/adblock/**/*.txt"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -78,7 +78,7 @@ jobs:
           declare -a compiler_args=()
           while IFS= read -r file; do
             compiler_args+=("-i" "$file")
-          done < <(find lists/sources -type f -name "*.txt" 2>/dev/null || true)
+          done < <(find lists/adblock -type f -name "*.txt" 2>/dev/null || true)
           if (( ${#compiler_args[@]} > 0 )); then
             printf 'Compiling combined list...\n'
             mise exec -- bunx @adguard/hostlist-compiler "${compiler_args[@]}" -o Filters/Venom-Combined.txt --verbose

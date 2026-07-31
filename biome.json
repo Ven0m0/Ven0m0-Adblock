@@ -2,7 +2,16 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**/*.js", "**/*.json", "**/*.yml", "**/*.yaml", "**/*.md", "!userscripts/todo", "!userscripts/src/1_adguard-extra.user.js", "!userscripts/src/adguard-extra.user.js"]
+    "includes": [
+      "**/*.js",
+      "**/*.json",
+      "**/*.yml",
+      "**/*.yaml",
+      "**/*.md",
+      "!userscripts/todo",
+      "!userscripts/src/1_adguard-extra.user.js",
+      "!userscripts/src/adguard-extra.user.js"
+    ]
   },
   "vcs": {
     "enabled": true,

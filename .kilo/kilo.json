@@ -35,21 +35,13 @@
     "@tarquinen/opencode-dcp@3.1.9",
     "opencode-session-handoff@1.1.6",
     "opencode-websearch@0.5.0",
-	"@nick-vi/opencode-type-inject@1.1.2",
+    "@nick-vi/opencode-type-inject@1.1.2",
     "superpowers@git+https://github.com/obra/superpowers.git",
     "kilo-tools@git+https://github.com/Ven0m0/claude-config.git"
   ],
   "formatter": {
     "biome": {
-      "command": [
-        "npx",
-        "-y",
-        "@biomejs/biome",
-        "check",
-        "--write",
-        "--format-with-errors=true",
-        "$FILE"
-      ],
+      "command": ["npx", "-y", "@biomejs/biome", "check", "--write", "--format-with-errors=true", "$FILE"],
       "extensions": [".json", ".jsonc", ".js", ".ts"]
     },
     "ruff": {
@@ -58,14 +50,7 @@
     }
   },
   "watcher": {
-    "ignore": [
-      "node_modules/**",
-      "dist/**",
-      ".git/**",
-      ".venv/**",
-      "__pycache__/**",
-      ".ruff_cache/**"
-    ]
+    "ignore": ["node_modules/**", "dist/**", ".git/**", ".venv/**", "__pycache__/**", ".ruff_cache/**"]
   },
   "mcp": {
     "ref-tools": {
@@ -129,16 +114,7 @@
     },
     "vtsls": {
       "command": ["vtsls", "--stdio"],
-      "extensions": [
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".mjs",
-        ".cjs",
-        ".mts",
-        ".cts"
-      ],
+      "extensions": [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"],
       "initialization": {
         "preferences": { "importModuleSpecifierPreference": "relative" }
       }

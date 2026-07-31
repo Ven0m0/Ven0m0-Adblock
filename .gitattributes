@@ -22,6 +22,7 @@ lists/hostlist/*.txt linguist-language=hosts linguist-detectable
 # Mark build outputs as generated (excluded from diffs/stats)
 dist/** linguist-generated=true
 lists/releases/** linguist-generated=true
+lists/external/** linguist-generated=true
 userscripts/dist/** linguist-generated=true
 *.min.js linguist-generated=true
 *.min.css linguist-generated=true

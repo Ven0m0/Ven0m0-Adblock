@@ -165,20 +165,21 @@ IMPROVEMENTS OVER ORIGINALS:
       "paste",
       (e) => {
         const active = document.activeElement;
-        const isTextInput = active && (active.tagName === "TEXTAREA" || active.tagName === "INPUT" || active.isContentEditable);
+        const isTextInput =
+          active && (active.tagName === "TEXTAREA" || active.tagName === "INPUT" || active.isContentEditable);
         if (!isTextInput) return;
 
         const dt = e.clipboardData;
         if (!dt) return;
 
         // Only modify plain text paste
-        if (dt.types.includes('text/plain') && !dt.types.includes('text/html')) {
+        if (dt.types.includes("text/plain") && !dt.types.includes("text/html")) {
           e.stopImmediatePropagation();
-          let text = dt.getData('text/plain');
+          let text = dt.getData("text/plain");
 
           // Preserve multiple newlines better than default behavior
-          if (text.includes('\n')) {
-            text = text.replace(/\r\n/g, '\n');
+          if (text.includes("\n")) {
+            text = text.replace(/\r\n/g, "\n");
             const success = document.execCommand("insertText", false, text);
             if (!success && typeof active.setRangeText === "function") {
               active.setRangeText(text, active.selectionStart, active.selectionEnd, "end");
@@ -190,7 +191,7 @@ IMPROVEMENTS OVER ORIGINALS:
                 range.deleteContents();
 
                 const fragment = document.createDocumentFragment();
-                const lines = text.split('\n');
+                const lines = text.split("\n");
                 lines.forEach((line, i) => {
                   if (line) {
                     fragment.appendChild(document.createTextNode(line));

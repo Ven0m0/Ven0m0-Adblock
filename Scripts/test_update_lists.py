@@ -1,11 +1,10 @@
-import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
+import base64
+import hashlib
 import importlib.util
 import sys
-import asyncio
+import unittest
 from pathlib import Path
-import hashlib
-import base64
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the target module
 # Mock missing dependencies
@@ -249,7 +248,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
     async def test_fetch_list_timeout(self, mock_logger_error):
         """Verify fetch_list handles TimeoutError."""
         mock_session = MagicMock()
-        mock_session.get.side_effect = asyncio.TimeoutError()
+        mock_session.get.side_effect = TimeoutError()
 
         result = await update_lists.fetch_list(
             mock_session, "http://url", "file.txt", Path("/tmp/out")
@@ -285,7 +284,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(result, ("http://url", False))
         mock_logger_exception.assert_called_once_with(
-            "✗ Unexpected error for http://url: Boom"
+            "✗ Unexpected error for http://url"
         )
 
     def test_count_rules(self):
@@ -322,8 +321,8 @@ domain.com
 
     async def test_load_sources_template_creation(self):
         """Test load_sources creates template when config doesn't exist."""
-        import tempfile
         import json
+        import tempfile
 
         with tempfile.TemporaryDirectory() as temp_dir:
             config_path = Path(temp_dir) / "sources-urls.json"
@@ -341,7 +340,7 @@ domain.com
 
             # Verify sources is a dict with expected keys
             self.assertIsInstance(sources, dict)
-            for url, config in sources.items():
+            for config in sources.values():
                 self.assertIn("filename", config)
                 self.assertIn("skip_checksum", config)
                 self.assertIn("enabled", config)
@@ -349,8 +348,8 @@ domain.com
 
     async def test_load_sources_existing_config(self):
         """Test load_sources loads existing config correctly."""
-        import tempfile
         import json
+        import tempfile
 
         with tempfile.TemporaryDirectory() as temp_dir:
             config_path = Path(temp_dir) / "sources-urls.json"

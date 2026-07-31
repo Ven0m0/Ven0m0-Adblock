@@ -7,11 +7,12 @@ import shutil
 import subprocess
 import sys
 
-
 BASE_BRANCH = os.environ.get("BASE_BRANCH", "main")
 MAX_CYCLES = int(os.environ.get("MAX_CYCLES", "100"))
 BOT_NAME = os.environ.get("BOT_NAME", "github-actions[bot]")
-BOT_EMAIL = os.environ.get("BOT_EMAIL", "41898282+github-actions[bot]@users.noreply.github.com")
+BOT_EMAIL = os.environ.get(
+    "BOT_EMAIL", "41898282+github-actions[bot]@users.noreply.github.com"
+)
 CONFLICT_STRATEGY = os.environ.get("CONFLICT_STRATEGY", "ours")
 ALLOW_ADMIN_MERGE = os.environ.get("ALLOW_ADMIN_MERGE", "true").lower() == "true"
 
@@ -28,10 +29,13 @@ def _run(*args: str, **kwargs) -> subprocess.CompletedProcess:
 
 def refresh_main() -> None:
     _run("git", "fetch", "origin", BASE_BRANCH, "--prune")
-    has_branch = subprocess.run(
-        ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{BASE_BRANCH}"],
-        check=False,
-    ).returncode == 0
+    has_branch = (
+        subprocess.run(
+            ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{BASE_BRANCH}"],
+            check=False,
+        ).returncode
+        == 0
+    )
     if has_branch:
         _run("git", "checkout", BASE_BRANCH)
     else:
@@ -43,13 +47,20 @@ def refresh_main() -> None:
 def list_prs() -> list[dict]:
     result = subprocess.run(
         [
-            "gh", "pr", "list",
-            "--state", "open",
-            "--base", BASE_BRANCH,
-            "--limit", "100",
+            "gh",
+            "pr",
+            "list",
+            "--state",
+            "open",
+            "--base",
+            BASE_BRANCH,
+            "--limit",
+            "100",
             "--json",
-            "number,title,isDraft,mergeStateStatus,headRefName,"
-            "headRepository,headRepositoryOwner,isCrossRepository,maintainerCanModify",
+            (
+                "number,title,isDraft,mergeStateStatus,headRefName,"
+                "headRepository,headRepositoryOwner,isCrossRepository,maintainerCanModify"
+            ),
         ],
         capture_output=True,
         text=True,
@@ -67,28 +78,58 @@ def sync_branch(number: int, head_ref: str, head_owner: str, head_repo: str) -> 
     print(f"Updating PR #{number} branch with {BASE_BRANCH}")
     refresh_main()
     _run("gh", "pr", "checkout", str(number))
-    merged = subprocess.run(
-        ["git", "merge", "--no-edit", "-X", CONFLICT_STRATEGY, f"origin/{BASE_BRANCH}"],
-        check=False,
-    ).returncode == 0
+    merged = (
+        subprocess.run(
+            [
+                "git",
+                "merge",
+                "--no-edit",
+                "-X",
+                CONFLICT_STRATEGY,
+                f"origin/{BASE_BRANCH}",
+            ],
+            check=False,
+        ).returncode
+        == 0
+    )
     if not merged:
         subprocess.run(["git", "merge", "--abort"], check=False)
         return False
-    _run("git", "push", f"https://github.com/{head_owner}/{head_repo}.git", f"HEAD:{head_ref}")
+    _run(
+        "git",
+        "push",
+        f"https://github.com/{head_owner}/{head_repo}.git",
+        f"HEAD:{head_ref}",
+    )
     return True
 
 
 def merge_pr(number: int) -> bool:
     print(f"Merging PR #{number}")
-    if subprocess.run(
-        ["gh", "pr", "merge", str(number), "--squash", "--delete-branch"], check=False
-    ).returncode == 0:
+    if (
+        subprocess.run(
+            ["gh", "pr", "merge", str(number), "--squash", "--delete-branch"],
+            check=False,
+        ).returncode
+        == 0
+    ):
         return True
     if ALLOW_ADMIN_MERGE:
-        return subprocess.run(
-            ["gh", "pr", "merge", str(number), "--admin", "--squash", "--delete-branch"],
-            check=False,
-        ).returncode == 0
+        return (
+            subprocess.run(
+                [
+                    "gh",
+                    "pr",
+                    "merge",
+                    str(number),
+                    "--admin",
+                    "--squash",
+                    "--delete-branch",
+                ],
+                check=False,
+            ).returncode
+            == 0
+        )
     return False
 
 
@@ -124,7 +165,9 @@ def main() -> None:
             is_cross: bool = pr.get("isCrossRepository", False)
             can_modify: bool = pr.get("maintainerCanModify", False)
 
-            print(f"Evaluating PR #{number} ({title}) [draft={is_draft} state={merge_state}]")
+            print(
+                f"Evaluating PR #{number} ({title}) [draft={is_draft} state={merge_state}]"
+            )
 
             if is_draft:
                 mark_ready(number)
@@ -132,7 +175,9 @@ def main() -> None:
                 continue
 
             if not head_ref or not head_owner or not head_repo:
-                blocked.append(f"PR #{number} is missing branch metadata required for auto-merge")
+                blocked.append(
+                    f"PR #{number} is missing branch metadata required for auto-merge"
+                )
                 continue
 
             if merge_state in ("DIRTY", "BEHIND"):
@@ -144,7 +189,9 @@ def main() -> None:
                 if sync_branch(number, head_ref, head_owner, head_repo):
                     progress_made = True
                     continue
-                blocked.append(f"PR #{number} could not be updated against {BASE_BRANCH}")
+                blocked.append(
+                    f"PR #{number} could not be updated against {BASE_BRANCH}"
+                )
                 continue
 
             if merge_pr(number):
@@ -153,7 +200,10 @@ def main() -> None:
             blocked.append(f"PR #{number} could not be merged in its current state")
 
         if not progress_made:
-            print("::error::Unable to make merge progress. Remaining pull requests:", file=sys.stderr)
+            print(
+                "::error::Unable to make merge progress. Remaining pull requests:",
+                file=sys.stderr,
+            )
             for pr in prs:
                 print(
                     f"  #{pr['number']} {pr['title']}"

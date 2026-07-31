@@ -68,6 +68,11 @@ description = "Build everything"
 run = "uv run python -m Scripts.build all"
 depends = ["install"]
 
+[tasks."update:lists"]
+description = "Refresh external filter lists"
+run = "uv run python -m Scripts.update_lists"
+depends = ["install"]
+
 [tasks.lint]
 description = "Run all linters"
 run = "bun run lint"

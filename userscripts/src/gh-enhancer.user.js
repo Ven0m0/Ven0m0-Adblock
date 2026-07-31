@@ -53,12 +53,12 @@
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       Object.entries({
         "aria-hidden": "true",
-        "height": "16",
-        "viewBox": "0 0 16 16",
-        "version": "1.1",
-        "width": "16",
+        height: "16",
+        viewBox: "0 0 16 16",
+        version: "1.1",
+        width: "16",
         "data-view-component": "true",
-        "class": "octicon octicon-search",
+        class: "octicon octicon-search"
       }).forEach(([key, value]) => svg.setAttribute(key, value));
 
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -275,8 +275,10 @@
       const svgDownload = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svgDownload.setAttribute("viewBox", "0 0 24 24");
       const line1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line1.setAttribute("x1", "12"); line1.setAttribute("y1", "5");
-      line1.setAttribute("x2", "12"); line1.setAttribute("y2", "19");
+      line1.setAttribute("x1", "12");
+      line1.setAttribute("y1", "5");
+      line1.setAttribute("x2", "12");
+      line1.setAttribute("y2", "19");
       const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
       polyline.setAttribute("points", "19 12 12 19 5 12");
       svgDownload.appendChild(line1);
@@ -289,11 +291,15 @@
       const svgClose = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svgClose.setAttribute("viewBox", "0 0 24 24");
       const line2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line2.setAttribute("x1", "18"); line2.setAttribute("y1", "6");
-      line2.setAttribute("x2", "6"); line2.setAttribute("y2", "18");
+      line2.setAttribute("x1", "18");
+      line2.setAttribute("y1", "6");
+      line2.setAttribute("x2", "6");
+      line2.setAttribute("y2", "18");
       const line3 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line3.setAttribute("x1", "6"); line3.setAttribute("y1", "6");
-      line3.setAttribute("x2", "18"); line3.setAttribute("y2", "18");
+      line3.setAttribute("x1", "6");
+      line3.setAttribute("y1", "6");
+      line3.setAttribute("x2", "18");
+      line3.setAttribute("y2", "18");
       svgClose.appendChild(line2);
       svgClose.appendChild(line3);
       closeBtn.appendChild(svgClose);
@@ -307,11 +313,15 @@
       const svgPrev = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svgPrev.setAttribute("viewBox", "0 0 24 24");
       const line4 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line4.setAttribute("x1", "15"); line4.setAttribute("y1", "18");
-      line4.setAttribute("x2", "9"); line4.setAttribute("y2", "12");
+      line4.setAttribute("x1", "15");
+      line4.setAttribute("y1", "18");
+      line4.setAttribute("x2", "9");
+      line4.setAttribute("y2", "12");
       const line5 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line5.setAttribute("x1", "15"); line5.setAttribute("y1", "6");
-      line5.setAttribute("x2", "9"); line5.setAttribute("y2", "12");
+      line5.setAttribute("x1", "15");
+      line5.setAttribute("y1", "6");
+      line5.setAttribute("x2", "9");
+      line5.setAttribute("y2", "12");
       svgPrev.appendChild(line4);
       svgPrev.appendChild(line5);
       prevBtn.appendChild(svgPrev);
@@ -322,11 +332,15 @@
       const svgNext = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svgNext.setAttribute("viewBox", "0 0 24 24");
       const line6 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line6.setAttribute("x1", "9"); line6.setAttribute("y1", "18");
-      line6.setAttribute("x2", "15"); line6.setAttribute("y2", "12");
+      line6.setAttribute("x1", "9");
+      line6.setAttribute("y1", "18");
+      line6.setAttribute("x2", "15");
+      line6.setAttribute("y2", "12");
       const line7 = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line7.setAttribute("x1", "9"); line7.setAttribute("y1", "6");
-      line7.setAttribute("x2", "15"); line7.setAttribute("y2", "12");
+      line7.setAttribute("x1", "9");
+      line7.setAttribute("y1", "6");
+      line7.setAttribute("x2", "15");
+      line7.setAttribute("y2", "12");
       svgNext.appendChild(line6);
       svgNext.appendChild(line7);
       nextBtn.appendChild(svgNext);
@@ -344,9 +358,7 @@
         rafId = null;
       let images = [],
         currentIdx = 0,
-        clickTimer = null,
-        // eslint-disable-next-line no-unused-vars
-        dragging = false;
+        clickTimer = null;
 
       const reset = () => {
         scale = 1;

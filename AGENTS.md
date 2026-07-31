@@ -14,7 +14,7 @@ Filter syntax: AdGuard and uBlock Origin rule formats.
 
 | Path | Content |
 |------|---------|
-| `lists/adblock/` | Hand-maintained adblock filter rules |
+| `lists/adblock/` | Hand-maintained adblock filter rules (yours only, no upstream lists) |
 | `lists/hostlist/` | Hand-maintained DNS hostlist rules |
 | `userscripts/src/` | Userscript source files |
 | `Scripts/` | Python build and maintenance tooling |
@@ -28,7 +28,7 @@ Edit source files; the pipeline regenerates these automatically.
 
 | Path | Written by |
 |------|-----------|
-| `lists/sources/` | `Scripts/update_lists.py` and CI (treat as pipeline-managed unless the task targets the update pipeline directly) |
+| `lists/external/` | `Scripts/update_lists.py` and `.github/workflows/update-lists.yml` (downloaded upstream lists; treat as pipeline-managed unless the task targets the update pipeline directly) |
 | `lists/releases/` | `Scripts/build.py` via `.github/workflows/build-filter-lists.yml` |
 | `Filters/` | AdGuard hostlist-compiler via `.github/workflows/build-filter-lists.yml` |
 | `userscripts/dist/` | `Scripts/build.py` via `.github/workflows/userscripts.yml` |
@@ -51,8 +51,8 @@ Edit source files; the pipeline regenerates these automatically.
 
 | Workflow | Trigger | What it does |
 |----------|---------|-------------|
-| `.github/workflows/build-filter-lists.yml` | Push to `main` touching `lists/sources/` or `Scripts/build.py` | Lints sources, compiles filter outputs, auto-commits |
-| `.github/workflows/update-lists.yml` | Schedule / dispatch | Downloads upstream filter lists into `lists/sources/` |
+| `.github/workflows/build-filter-lists.yml` | Push to `main` touching `lists/adblock/` or `Scripts/build.py` | Lints sources, compiles filter outputs, auto-commits |
+| `.github/workflows/update-lists.yml` | Schedule / dispatch | Downloads upstream filter lists into `lists/external/` |
 | `.github/workflows/maintain-lists.yml` | Manual dispatch | Deduplicates, removes dead domains, creates a dated GitHub release (tag format: vYYYY.MM.DD-HHMM) with a compiled `blocklist` artifact |
 | `.github/workflows/userscripts.yml` | Push | Builds and publishes userscript dist outputs |
 | `.github/workflows/lint-and-format.yml` | PR | Runs JS and markdown linters |

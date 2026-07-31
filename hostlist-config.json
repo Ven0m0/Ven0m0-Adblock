@@ -6,17 +6,17 @@
   "version": "1.0.1",
   "sources": [
     {
-      "source": "lists/sources/Other.txt",
+      "source": "lists/adblock/Other.txt",
       "type": "adblock",
       "name": "Miscellaneous blocking rules"
     },
     {
-      "source": "lists/sources/Search-Engines.txt",
+      "source": "lists/adblock/Search-Engines.txt",
       "type": "adblock",
       "name": "Search engine tracking and ads"
     },
     {
-      "source": "lists/sources/Twitter.txt",
+      "source": "lists/adblock/Twitter.txt",
       "type": "adblock",
       "name": "Twitter/X annoyances and tracking"
     }
