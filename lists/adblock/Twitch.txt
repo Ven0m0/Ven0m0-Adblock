@@ -16,14 +16,17 @@
 ! Maximises the size of the clip viewer pages
 ! Makes avatars square again without having to use FrankerFaceZ
 ! Get bits button
-! Misc
-! www.twitch.tv/esl_dota2
+
+! Twitch adblock fix
+twitch.tv##+js(twitch-videoad)
+twitch.tv##+js(vaft-ublock-origin)
+twitch.tv##+js(no-fetch-if, edge.ads.twitch.tv)
+
 !#if cap_html_filtering
 clips.twitch.tv#?#.clips-chat-replay > .tw-mg-b-1:style(margin-bottom: 2px !important)
 clips.twitch.tv#?#.clips-watch.tw-lg-pd-b-5.tw-pd-b-2.tw-sm-pd-b-3:style(max-width: none)
 clips.twitch.tv#?#span.text-fragment:not(:-abp-contains(/\S/))
 m.twitch.tv#?#li.chat-message:style(padding: 2px !important)
-twitch.tv##+js(twitch-videoad)
 twitch.tv#?#.channel-panels-container div[style^=position]:-abp-has(a[href^="/ext/ro13roxp88918kulntih9uzm7vs9jr"])
 twitch.tv#?#.chat-line__message:style(padding: 2px 4px !important)
 twitch.tv#?#.message > span:-abp-contains(/^ $/)
