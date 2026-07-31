@@ -3,7 +3,6 @@
 ! Description: This list makes Twitch much more enjoyable
 ! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
 
-! Twitch adblock: https://github.com/pixeltris/TwitchAdSolutions
 ! Aims to remove the spacing between Twitch emotes, for the sake of multi-part emotes
 ! Aims to remove mass spamming of "!play" on streams of 'Marbles on Stream'
 ! Aims to remove that one RPG-loot-game embed window that is on some Twitch channels
@@ -17,7 +16,7 @@
 ! Makes avatars square again without having to use FrankerFaceZ
 ! Get bits button
 
-! Twitch adblock fix
+! Twitch adblock fix https://github.com/ryanbr/TwitchAdSolutions
 twitch.tv##+js(twitch-videoad)
 twitch.tv##+js(vaft-ublock-origin)
 twitch.tv##+js(no-fetch-if, edge.ads.twitch.tv)
