@@ -95,3 +95,14 @@ weather.gov#?#p[class^=myforecast-current-]:has-text(°F)
 !#endif
 !#endif
 !#endif
+
+!!! Google's horrible AI summary and suggestions
+google.com##Odp5De
+google.com##hdzaWe
+google.com##Wm5I1e
+google.com###Odp5De
+google.com###eKIzJc
+google.com##.YViDd
+google.com###HbKV2c
+google.com##.oIk2Cb
+google.com##.A6K0A > .cUnQKe
