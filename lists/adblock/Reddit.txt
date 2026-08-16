@@ -203,3 +203,22 @@ www.reddit.com##shreddit-app[pagetype="home"] .main-container
 www.reddit.com##shreddit-app[pagetype="popular"] #subgrid-container
 www.reddit.com##span._2zZ-KGHbWWqrwGlHWXR90y:nth-of-type(5)
 !#endif
+
+!!! Old Reddit
+reddit.com##.initialized.listing-chooser
+reddit.com###sr-header-area
+reddit.com##.footer-parent
+reddit.com##.premium-banner-outer
+reddit.com##.create.sidebox
+reddit.com##.account-activity-box
+reddit.com##.author-tooltip
+reddit.com##.trophy-area.sidecontentbox
+reddit.com##.get-crisis-support
+reddit.com##.giftgold
+reddit.com##.listingsignupbar.infobar
+
+! RES
+reddit.com###gildUser
+reddit.com##.composeButton.blueButton
+reddit.com##.res-fancy-toggle-button
+reddit.com##li:nth-of-type(1) > .res-icon.pageNavigator
