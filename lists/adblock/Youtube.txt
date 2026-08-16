@@ -163,3 +163,45 @@ youtube.com#@#ytd-promoted-sparkles-web-renderer
 !#endif
 !#endif
 !#endif
+
+
+! Credits: https://github.com/d3adconnection/update/blob/main/ublock.txt
+! disable "workers"
+||music.youtube.com^$csp=worker-src 'none'
+||www.youtube.com^$csp=worker-src 'none'
+
+! remove unneeded buttons
+youtube.com###voice-search-button
+youtube.com###footer
+youtube.com##.ytp-paid-content-overlay, .ytmPaidContentOverlayHost
+youtube.com##ytd-video-description-infocards-section-renderer
+youtube.com##.ytInlinePlayerControlsTopLeftControls
+youtube.com###flexible-item-buttons
+youtube.com##.ytp-fullscreen-quick-actions
+youtube.com###video-summary
+youtube.com###top-row.ytd-watch-metadata yt-button-view-model:has([aria-label="Ask"])
+youtube.com##ytd-menu-service-item-renderer:has([d^="M480-80q0-83-31.5-156T363-363q-54-54-127-85.5T80-480q83"])
+
+! video player annoyances
+youtube.com##.ytp-cards-teaser
+youtube.com##.ytp-button.ytp-cards-button
+youtube.com##.ytp-button.branding-img-container
+youtube.com##.ytp-suggested-action
+youtube.com##.ytp-quality-menu .ytp-menuitem:has(.ytp-premium-label)
+youtube.com##body, ytd-app[scrolling]:style(overflow-x: hidden !important;)
+youtube-nocookie.com,youtube.com##.ytp-pause-overlay, .show-video-thumbnail-button
+~youtube-nocookie.com,~youtube.com##iframe ~ #topvbar > #rvid
+/annotations_module.js$script,xhr,important,domain=youtube.com
+/endscreen.js$script,xhr,important,domain=youtube.com
+youtube-nocookie.com,youtube.com##.ytp-pause-overlay, .show-video-thumbnail-button
+~youtube-nocookie.com,~youtube.com##iframe ~ #topvbar > #rvid
+youtube.com##a.ytp-suggestion-set
+youtube.com##.ytmThumbnailEndscreenElementHost
+
+! pop-up ads
+youtube.com##ytd-popup-container > tp-yt-paper-dialog > ytd-mealbar-promo-renderer, ytd-popup-container > tp-yt-paper-dialog > yt-mealbar-promo-renderer:has-text(/Claim Offer|Join now|Not Now|No thanks|YouTube TV|live TV|Live TV|movies|sports|Try it free|unlimited DVR|watch NFL/)
+
+! dismissed messages
+youtube.com##.ytDismissibleItemAspectRatioContainer
+youtube.com##.ytDismissibleItemAspectRatio16By9
+youtube.com##.ytDismissibleItemReplacedContent
