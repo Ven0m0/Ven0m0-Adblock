@@ -1,0 +1,32 @@
+name: Redundancy Check
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+
+jobs:
+  redundancy:
+    name: Check for shadowed/redundant rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup mise
+        uses: jdx/mise-action@v4.3.0
+        with:
+          install: true
+          cache: true
+      - name: Run redundancy checker
+        id: check
+        run: |
+          output=$(mise exec -- bun run lint:redundancy)
+          echo "$output"
+          {
+            echo "output<<EOF"
+            echo "$output"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - name: Report findings
+        if: contains(steps.check.outputs.output, '—')
+        run: echo "::warning::Redundancy checker found potential shadowed/duplicate rules. See job log for details."

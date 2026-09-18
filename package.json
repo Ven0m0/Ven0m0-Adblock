@@ -19,6 +19,7 @@
     "lint:yaml": "command -v yamllint >/dev/null && yamllint . || { echo 'yamllint not installed. Install with: pip install yamllint' >&2; exit 1; }",
     "lint:md": "bun x markdownlint-cli2 '**/*.md' '#node_modules' '#.opencode' '#.kilo' '#.venv'",
     "lint:aglint": "bun x @adguard/aglint",
+    "lint:redundancy": "bun run Scripts/check-redundant-rules.mjs lists/adblock/*.txt lists/hostlist/*.txt",
     "lint:fix": "bun x oxlint --fix . && bun x biome check --write . && bun x @adguard/aglint --fix",
     "lint:fix:all": "bun run lint:fix && bun run format",
     "format": "bun x biome format --write .",
