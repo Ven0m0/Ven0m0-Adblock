@@ -38,7 +38,6 @@ $removeparam=utm_term
 @@||apis.google.com^
 @@||clients1.google.com^
 @@||consent.google.com^$subdocument
-||accounts.google.com^$3p
-||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
+||accounts.google.com^$3p,domain=~reddit.com|~twitter.com|~x.com|~youtube.com
 ||challenges.cloudflare.com^$3p
 ||www.google.com^$3p,subdocument
