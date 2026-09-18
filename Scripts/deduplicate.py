@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Deduplicate and optimize blocklist files
+"""Deduplicate and optimize blocklist files
 - Removes duplicates within files and across files
 - Strips comments, empty lines, and trailing whitespace
 - Sorts entries for better compression
@@ -16,6 +15,15 @@ from pathlib import Path
 from Scripts.common import is_valid_domain, write_lines
 
 HEADER_PREFIXES = ("! ", "#", "[", ";")
+# AdGuard/uBO preprocessor directives: structural block markers, not comments.
+# They must keep their exact position and must never be deduplicated away -
+# nested "!#if"/"!#endif" pairs can repeat identical text per block.
+DIRECTIVE_PREFIXES = ("!#if", "!#endif", "!#else", "!#include")
+
+
+def is_directive(line: str) -> bool:
+    """Check if line is a preprocessor directive (block boundary)"""
+    return line.startswith(DIRECTIVE_PREFIXES)
 
 
 @dataclass(slots=True)
@@ -41,19 +49,35 @@ def is_valid_rule(line: str) -> bool:
         return False
     if line.startswith(("||", "@@||")):
         # Extract domain part: remove || or @@||, stop at ^ or $ or options separator
-        domain = line.split("^")[0].lstrip("|@")
+        domain = line.split("^", maxsplit=1)[0].lstrip("|@")
         return is_valid_domain(domain)
     return True
 
 
 def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
-    """Process lines to separate headers and rules, and deduplicate rules while keeping comments attached."""
+    """Process lines to separate headers and rules, and deduplicate rules while keeping comments attached.
+
+    Preprocessor directives (!#if/!#endif/!#else/!#include) are block
+    boundaries: they keep their exact position and are never deduplicated
+    or reordered. Dedup and alphabetical sort only apply within the run of
+    plain rules between directives, since the same rule text can validly
+    repeat under different conditional blocks.
+    """
     stats = Stats()
-    headers = []
-    rules_with_comments: list[tuple[str, list[str]]] = []
-    seen = set()
+    headers: list[str] = []
+    rules: list[str] = []
+    segment: list[tuple[str, list[str]]] = []
+    seen: set[str] = set()
     in_header = True
-    current_comments = []
+    current_comments: list[str] = []
+
+    def flush_segment() -> None:
+        segment.sort(key=lambda item: item[0])
+        for rule, comments in segment:
+            rules.extend(comments)
+            rules.append(rule)
+        segment.clear()
+        seen.clear()
 
     for raw_line in lines:
         stats.original += 1
@@ -63,7 +87,13 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
                 headers.append("")
             continue
 
-        if is_header(line):
+        if is_directive(line):
+            in_header = False
+            flush_segment()
+            rules.extend(current_comments)
+            current_comments = []
+            rules.append(line)
+        elif is_header(line):
             if in_header:
                 headers.append(line)
             else:
@@ -72,18 +102,13 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
             in_header = False
             if line not in seen and is_valid_rule(line):
                 seen.add(line)
-                rules_with_comments.append((line, current_comments))
+                segment.append((line, current_comments))
                 current_comments = []
             else:
                 current_comments = []
 
-    rules_with_comments.sort(key=lambda x: x[0])
-
-    rules = []
-    for rule, comments in rules_with_comments:
-        if comments:
-            rules.extend(comments)
-        rules.append(rule)
+    flush_segment()
+    rules.extend(current_comments)
 
     stats.headers = len(headers)
     stats.final = len(headers) + len(rules)
@@ -110,8 +135,8 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
         print(
             f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)"
         )
-        # Return only actual rules (not comments) for cross-file duplicate detection
-        return stats, [r for r in rules if not is_header(r)]
+        # Return only actual rules (not comments/directives) for cross-file duplicate detection
+        return stats, [r for r in rules if not is_header(r) and not is_directive(r)]
 
     return Stats(), []
 
@@ -161,9 +186,7 @@ def main() -> int:
 
     print(f"\n{'=' * 60}")
     print(f"Total: {total_stats.original} → {total_stats.final} lines")
-    print(
-        f"Removed: {total_stats.removed} ({total_stats.compression_ratio:.1f}% reduction)"
-    )
+    print(f"Removed: {total_stats.removed} ({total_stats.compression_ratio:.1f}% reduction)")
 
     print(f"\n{'=' * 60}")
     print("Checking for cross-file duplicates...")

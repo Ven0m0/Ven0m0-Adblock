@@ -50,6 +50,67 @@ class TestDeduplicate(unittest.TestCase):
         self.assertEqual(headers, expected_headers)
         self.assertEqual(rules, expected_rules)
 
+    def test_process_content_preserves_directive_blocks(self):
+        # Regression: !#if/!#endif must keep exact position and must never
+        # be deduplicated, since nested blocks repeat identical directive
+        # text (e.g. three nested "!#endif" closing three "!#if" blocks).
+        lines = [
+            "! header",
+            "",
+            "zzz.com",
+            "!#if !adguard",
+            "aaa.com",
+            "aaa.com",
+            "!#if !env_mv3",
+            "bbb.com",
+            "!#endif",
+            "!#endif",
+            "ccc.com",
+        ]
+
+        headers, rules, _stats = process_content(lines)
+
+        self.assertEqual(headers, ["! header", ""])
+        self.assertEqual(
+            rules,
+            [
+                "zzz.com",
+                "!#if !adguard",
+                "aaa.com",
+                "!#if !env_mv3",
+                "bbb.com",
+                "!#endif",
+                "!#endif",
+                "ccc.com",
+            ],
+        )
+
+    def test_process_content_dedup_is_segment_local(self):
+        # A rule repeated inside a different conditional block must survive:
+        # collapsing it globally could remove it from a branch that needs it.
+        lines = [
+            "!#if adguard",
+            "same.com",
+            "!#endif",
+            "!#if !adguard",
+            "same.com",
+            "!#endif",
+        ]
+
+        _headers, rules, _stats = process_content(lines)
+
+        self.assertEqual(
+            rules,
+            [
+                "!#if adguard",
+                "same.com",
+                "!#endif",
+                "!#if !adguard",
+                "same.com",
+                "!#endif",
+            ],
+        )
+
     def test_is_header(self):
         # Valid headers with prefixes
         self.assertTrue(is_header("! This is a comment"))
