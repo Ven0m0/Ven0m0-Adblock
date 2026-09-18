@@ -1,143 +1,167 @@
 # Implementation Plan
 
-Generated: 2026-06-28 · 6 tasks · Est. 750–1550 LOC
+Generated: 2026-09-18 · 5 tasks · Est. 850–1700 LOC
 
 ## Summary
 
-The repository contains six actionable markers across four files. The majority are documentation
-TODOs in `docs/TODO.md` and `docs/ext.md`, plus one stale `NOTE` in a Python test and one
-explanatory `NOTE` in a filter list. The highest-impact work is migrating Python tooling to
-Bun/JS and implementing the planned performance-booster userscript, while lower-impact items
-include deduplicating filter rules and evaluating upstream blocklist sources.
+Three items from the previous plan (old T001, T005, T006) were verified against the current
+repository state and found already resolved: `Scripts/test_update_lists.py:88` no longer
+carries the stale `NOTE`, `lists/adblock/Other.txt:21` already uses the structured
+"Blogroll / RSS widgets" comment, and `docs/ext.md` already documents an integrated/rejected
+evaluation of upstream blocklists with `shadowwhisperer-ads.txt` wired into
+`lists/sources-urls.json`. Those three tasks are dropped from this plan.
+
+Two items were merged in from `TODO.md`. The first is an active, user-reported bug: Reddit's
+page and login break when `lists/adblock/Combination-desktop.txt` is loaded, traced to a
+redundant/overshadowing rule pair in `lists/adblock/General.txt:41-42` that blocks
+`accounts.google.com` unconditionally on every domain, including reddit.com, breaking
+Reddit's Google sign-in widget. The second is a new tooling task: port the redundancy-detection
+concepts from `abpvn/abp-rule-checker` (a browser-only mirror of arestwo.org's rule checker,
+GPL-3.0, not an installable package) into a native Bun/JS lint script wired into a new opt-in
+`bun run lint:redundancy` and a report-only GitHub workflow — the same class of bug the Reddit
+fix addresses (an exception rule permanently shadowed by a broader one) is exactly what this
+checker is designed to catch going forward.
+
+The remaining backlog (cross-file dedupe, Python-to-Bun migration, performance-booster
+userscript) is carried over unchanged aside from renumbering.
 
 ## Task Index (topological order)
 
-1. **T001** (low, debt, S) - Remove stale NOTE from test_update_lists.py
-2. **T006** (low, docs, S) - Convert filter-list NOTE into structured documentation
-3. **T005** (low, feature, M) - Evaluate upstream blocklist sources for integration
-4. **T002** (medium, refactor, L) - Consolidate cross-file duplicate filter rules
-5. **T003** (high, refactor, XL) - Migrate Python tooling to Bun/JS for CI portability
-6. **T004** (medium, feature, XL) - Implement performance booster userscript
+1. **T001** (high, bug, S) - Fix Reddit login/page breakage caused by General.txt accounts.google.com block
+2. **T002** (medium, feature, M) - Implement redundancy checking via abpvn/abp-rule-checker
+3. **T003** (medium, refactor, L) - Consolidate cross-file duplicate filter rules
+4. **T004** (high, refactor, XL) - Migrate Python tooling to Bun/JS for CI portability
+5. **T005** (medium, feature, XL) - Implement performance booster userscript
 
 ## Tasks
 
-### T001 - Remove stale NOTE from test_update_lists.py
+### T001 - Fix Reddit login/page breakage caused by General.txt accounts.google.com block
 
-**File:** `Scripts/test_update_lists.py:88`
+**File:** `lists/adblock/General.txt:41-42`
 
-**Severity:** low · **Category:** debt · **Size:** S
-
-**Context:**
-
-```python
-    async def test_validate_checksum_valid(self):
-        # NOTE: This test assumes validate_checksum has been refactored to accept string
-        result = await update_lists.validate_checksum(self.valid_full_content)
-        self.assertTrue(result)
-```
-
-**Intent:** The author left a warning that the test required `validate_checksum` to accept
-a string argument; the refactor has already landed in `Scripts/update_lists.py:52`
-(`async def validate_checksum(content: str, name: str = "unknown") -> bool`).
-
-**Acceptance criteria:**
-
-- [ ] Delete the `NOTE` comment on line 88.
-- [ ] Run `uv run python -m unittest Scripts.test_update_lists` and confirm all tests pass.
-- [ ] Verify `bun run lint` still succeeds.
-
-**Implementation:**
-
-```python
-async def test_validate_checksum_valid(self):
-    result = await update_lists.validate_checksum(self.valid_full_content)
-    self.assertTrue(result)
-```
-
----
-
-### T006 - Convert filter-list NOTE into structured documentation
-
-**File:** `lists/adblock/Other.txt:21`
-
-**Severity:** low · **Category:** docs · **Size:** S
+**Severity:** high · **Category:** bug · **Size:** S
 
 **Context:**
 
 ```adblock
-! Generic Blocks
-! NOTE: Blogroll generic
-##.plugin-rss
-##.blogroll-wrapper
+37: @@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
+...
+41: ||accounts.google.com^$3p
+42: ||accounts.google.com^$3p,domain=~youtube.com|~twitter.com|~x.com
 ```
 
-**Intent:** The inline `NOTE` flags the following rules as generic blogroll selectors;
-the same marker exists in the generated copy at `lists/sources/Other.txt:21`,
-so only the hand-maintained `lists/adblock/Other.txt` should be edited.
+**Intent:** `lists/adblock/Combination-desktop.txt:9-14` includes `General.txt`, `Other.txt`,
+`Reddit.txt`, `Search-Engines.txt`, `Youtube.txt`, and `Twitch.txt`. None of the non-Reddit
+files contain any reddit.com-specific rule, so the breakage reported in `TODO.md` is an
+interaction between a *generic* rule and Reddit's page, not a `Reddit.txt` bug. `General.txt:41`
+blocks `accounts.google.com` as third-party unconditionally on every domain, which makes the
+domain-scoped exclusion on `General.txt:42` dead code — its `~youtube.com|~twitter.com|~x.com`
+carve-out can never take effect while line 41 already blocks everywhere. Reddit embeds Google
+Identity Services (One Tap / "Continue with Google") on its base page and login flow; the
+request to `accounts.google.com` gets blocked, and the resulting unhandled failure breaks both
+the sign-in widget and general page hydration. `reddit.com` is absent from every exclusion list
+on lines 37 and 42.
 
 **Acceptance criteria:**
 
-- [ ] Keep or improve the explanatory comment in `lists/adblock/Other.txt:21`.
-- [ ] Optionally add a `docs/filter-rules.md` entry describing the blogroll generic.
-- [ ] Run `bun run lint:filters` and `bun run build` to confirm no regressions.
+- [ ] Delete the unconditional `||accounts.google.com^$3p` rule at `General.txt:41`.
+- [ ] Extend the domain modifier on the remaining rule (`General.txt:42`) to exclude
+      `reddit.com` in addition to the existing exclusions.
+- [ ] Manually verify with `Combination-desktop.txt` loaded in uBlock Origin/AdGuard: reddit.com
+      renders normally and "Continue with Google" / Google One Tap completes without
+      `accounts.google.com` appearing as blocked in devtools' network panel.
+- [ ] Run `bun run lint:filters` to confirm no AGLint regressions.
+- [ ] Run `bun run build:adblock` to confirm `Combination-desktop.txt` still compiles cleanly.
 
 **Implementation:**
 
 ```adblock
-! Generic Blocks
-! Blogroll / RSS widgets (generic selectors)
-##.plugin-rss
-##.blogroll-wrapper
+! (delete line 41 entirely)
+||accounts.google.com^$3p,domain=~reddit.com|~twitter.com|~x.com|~youtube.com
 ```
 
 ---
 
-### T005 - Evaluate upstream blocklist sources for integration
+### T002 - Implement redundancy checking via abpvn/abp-rule-checker
 
-**File:** `docs/ext.md:1`
+**File:** `package.json`, new `Scripts/check-redundant-rules.mjs`, new
+`.github/workflows/redundancy-check.yml`
 
-**Severity:** low · **Category:** feature · **Size:** M
+**Severity:** medium · **Category:** feature · **Size:** M
 
 **Context:**
 
-```markdown
-### TODO:
+`abpvn/abp-rule-checker` (GPL-3.0, license-compatible with this repo) is a mirror of
+arestwo.org's `redundantRuleChecker.html` — a browser-only tool, not an npm package or CLI.
+Its source files (`redundant.js`, `similar.js`, `onlyDomainDiffers.js`,
+`findWhitelistRules.js`, `hidingToBlocking.js`) implement pairwise rule-comparison heuristics
+meant to run in-browser against pasted filter text. There is nothing to `bun add`; the repo's
+existing `bun run lint:filters` (`@adguard/aglint`, see `.github/workflows/aglint.yml`) only
+checks syntax, not cross-rule semantic redundancy.
 
-- https://github.com/ShadowWhisperer/BlockLists
-- https://github.com/AdguardTeam/AdGuardFilters
-- https://github.com/easylist
-- https://github.com/brave
-- https://github.com/hagezi
-- https://github.com/StevenBlack
-- https://github.com/DandelionSprout/adfilt
-```
+**Intent:** Port the two highest-value checks from abp-rule-checker into a small, native
+Bun/Node script rather than vendoring the whole web app (YAGNI — the CSS-to-blocking converter
+and domain-table generator are not needed here):
 
-**Intent:** Catalogue candidate upstream blocklist repositories and decide which lists
-to consume in the build pipeline.
+1. **Domain-only-diff / shadowed-rule detection** (`onlyDomainDiffers.js` concept): flag a
+   rule that is fully covered by a broader, already-present rule with the same body but a
+   wider (or absent) domain scope.
+2. **Whitelist/exception conflict detection** (`findWhitelistRules.js` concept): flag an
+   unconditional `@@` or blocking rule that permanently shadows a more specific, narrower
+   rule elsewhere in the same file set — the exact pattern fixed in T001
+   (`General.txt:41` shadowing `General.txt:42`).
 
 **Acceptance criteria:**
 
-- [ ] Inspect each repository for available list URLs and licenses.
-- [ ] Add selected source URLs to `lists/sources-urls.json` with descriptive names.
-- [ ] Run `uv run python -m Scripts.update_lists` to verify downloads succeed.
-- [ ] Update `docs/ext.md` to reflect integrated vs. rejected sources.
+- [ ] Add `Scripts/check-redundant-rules.mjs` implementing the two checks above, taking a
+      list of filter file paths as arguments and printing `file:line — reason — rule text`
+      for each finding.
+- [ ] Add `"lint:redundancy": "bun run Scripts/check-redundant-rules.mjs lists/adblock/*.txt lists/hostlist/*.txt"`
+      to `package.json` `scripts`. Do not add it to the main `lint` chain yet (semantic
+      redundancy checks are heuristic and can false-positive; keep it opt-in, same pattern as
+      any manual-dispatch lint step).
+- [ ] Add `.github/workflows/redundancy-check.yml`, modeled on the existing
+      `workflow_dispatch`-only trigger style in `.github/workflows/aglint.yml`, running
+      `bun run lint:redundancy` and posting findings via `core.warning` (non-blocking,
+      report-only — do not fail the job on findings).
+- [ ] Run the checker once against the current `lists/adblock/*.txt` as a smoke test and
+      confirm it surfaces the `General.txt:41`/`:42` pattern fixed in T001 (validates the
+      detector actually works before relying on it).
+- [ ] `bun run lint:js` passes on the new script (Biome/oxlint).
 
 **Implementation:**
 
-```json
-{
-  "sources": [
-    {
-{
-  "sources": [
-    { "filename": "shadowwhisperer-ads.txt", "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/Ads" }
-  ]
+```javascript
+// Scripts/check-redundant-rules.mjs
+import { readFileSync } from "node:fs";
+
+function parseDomainModifier(rule) {
+  const m = rule.match(/\$.*?domain=([^,]+)/);
+  return m ? m[1] : null;
+}
+
+function findShadowedRules(rules) {
+  // group by rule body with domain= stripped; flag narrower-domain rules
+  // that are unreachable because a broader/no-domain rule with the same
+  // body already appears earlier in the same file set.
+  const findings = [];
+  const seenBroad = new Map();
+  for (const { file, line, text } of rules) {
+    const body = text.replace(/\$.*?domain=[^,]+,?/, "$");
+    const domain = parseDomainModifier(text);
+    if (!domain && !seenBroad.has(body)) {
+      seenBroad.set(body, { file, line });
+    } else if (domain && seenBroad.has(body)) {
+      findings.push({ file, line, reason: "shadowed by broader rule", text, shadowedBy: seenBroad.get(body) });
+    }
+  }
+  return findings;
 }
 ```
 
 ---
 
-### T002 - Consolidate cross-file duplicate filter rules
+### T003 - Consolidate cross-file duplicate filter rules
 
 **File:** `docs/TODO.md:6`
 
@@ -173,14 +197,16 @@ uv run python -m Scripts.deduplicate --dry-run lists/adblock/*.txt
 
 ---
 
-### T003 - Migrate Python tooling to Bun/JS for CI portability
+### T004 - Migrate Python tooling to Bun/JS for CI portability
 
 **File:** `docs/TODO.md:7`
 
 **Severity:** high · **Category:** refactor · **Size:** XL
 
-**Intent:** Eliminate the Python runtime dependency from CI by rewriting tooling
-in JavaScript/TypeScript and executing it with Bun.
+**Intent:** Eliminate the Python runtime dependency from CI by rewriting tooling in
+JavaScript/TypeScript and executing it with Bun. `T002`'s new
+`Scripts/check-redundant-rules.mjs` is written directly in JS to avoid adding further
+Python debt that this migration would only need to redo.
 
 **Acceptance criteria:**
 
@@ -201,7 +227,7 @@ export function sanitizeFilename(name) {
 
 ---
 
-### T004 - Implement performance booster userscript
+### T005 - Implement performance booster userscript
 
 **File:** `userscripts/src/TODO.md:1`
 
