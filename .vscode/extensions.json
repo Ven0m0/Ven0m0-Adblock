@@ -1,10 +1,13 @@
 {
-    "recommendations": [
-        "adguard.adblock",
-        "davidanson.vscode-markdownlint",
-        "github.vscode-github-actions",
-        "exodiusstudios.comment-anchors",
-        "biomejs.biome",
-        "oxc.oxc-vscode"
-    ]
+  "recommendations": [
+    "adguard.adblock",
+    "davidanson.vscode-markdownlint",
+    "exodiusstudios.comment-anchors",
+    "biomejs.biome",
+    "oxc.oxc-vscode",
+    "detachhead.basedpyright",
+    "charliermarsh.ruff",
+    "the0807.uv-toolkit",
+    "hverlin.mise-vscode"
+  ]
 }
