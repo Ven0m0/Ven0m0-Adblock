@@ -197,3 +197,11 @@ youtube.com##ytd-video-description-infocards-section-renderer
 ||music.youtube.com^$csp=worker-src 'none'
 ||www.youtube.com^$csp=worker-src 'none'
 ~youtube-nocookie.com,~youtube.com##iframe ~ #topvbar > #rvid
+
+www.youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
+
+! Aug 24, 2026 https://www.youtube.com
+www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
+
+! Sep 8, 2026 https://www.youtube.com
+www.youtube.com##.ytp-paid-content-overlay-link
