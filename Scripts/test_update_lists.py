@@ -79,9 +79,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
         normalized = self.valid_content_body.replace("\r", "").rstrip("\n") + "\n"
         computed_hash = hashlib.sha256(normalized.encode("utf-8")).digest()
         self.checksum = base64.b64encode(computed_hash).decode().rstrip("=")
-        self.valid_full_content = (
-            f"! checksum: {self.checksum}\n{self.valid_content_body}"
-        )
+        self.valid_full_content = f"! checksum: {self.checksum}\n{self.valid_content_body}"
 
     async def test_validate_checksum_valid(self):
         result = await update_lists.validate_checksum(self.valid_full_content)
@@ -115,9 +113,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
             patch.object(Path, "exists", return_value=True),
             patch.object(Path, "unlink") as mock_unlink,
         ):
-            result = await update_lists.process_downloaded_file(
-                temp_path, "http://url", "final.txt", output_dir
-            )
+            result = await update_lists.process_downloaded_file(temp_path, "http://url", "final.txt", output_dir)
 
             # Verify result
             self.assertEqual(result, dest_path)
@@ -126,9 +122,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
             mock_validate.assert_called_once_with(self.valid_full_content, "final.txt")
 
             # Verify file was written
-            self.assertEqual(
-                mock_aiofiles.files[str(dest_path)], self.valid_full_content
-            )
+            self.assertEqual(mock_aiofiles.files[str(dest_path)], self.valid_full_content)
 
             # Verify NO unlink called (important for security regression)
             mock_unlink.assert_not_called()
@@ -145,9 +139,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
             patch.object(Path, "exists", return_value=True),
             patch.object(Path, "unlink") as mock_unlink,
         ):
-            result = await update_lists.process_downloaded_file(
-                temp_path, "http://url", "final.txt", Path("/tmp/out")
-            )
+            result = await update_lists.process_downloaded_file(temp_path, "http://url", "final.txt", Path("/tmp/out"))
 
         self.assertIsNone(result)
         # Should NOT unlink temp path (delegated to caller)
@@ -158,11 +150,8 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
     @patch("update_lists.process_downloaded_file")
     @patch("tempfile.NamedTemporaryFile")
     @patch("asyncio.to_thread")
-    async def test_fetch_list_cleanup_logic(
-        self, mock_to_thread, mock_tempfile, mock_process
-    ):
+    async def test_fetch_list_cleanup_logic(self, mock_to_thread, mock_tempfile, mock_process):
         """Verify fetch_list handles cleanup in finally block."""
-
         # Mock session response
         mock_resp = AsyncMock()
         mock_resp.raise_for_status = MagicMock()
@@ -186,9 +175,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
         mock_process.return_value = Path("/tmp/out/file.txt")
 
         # Run fetch_list
-        result = await update_lists.fetch_list(
-            mock_session, "http://url", "file.txt", Path("/tmp/out")
-        )
+        result = await update_lists.fetch_list(mock_session, "http://url", "file.txt", Path("/tmp/out"))
 
         # Verify process_downloaded_file called ONCE
         mock_process.assert_called_once()
@@ -202,16 +189,12 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
     @patch("update_lists.process_downloaded_file")
     @patch("tempfile.NamedTemporaryFile")
     @patch("asyncio.to_thread")
-    async def test_fetch_list_success(
-        self, mock_to_thread, mock_tempfile, mock_process
-    ):
+    async def test_fetch_list_success(self, mock_to_thread, mock_tempfile, mock_process):
         """Verify fetch_list successful download and process."""
         mock_resp = MagicMock()
         mock_resp.raise_for_status = MagicMock()
         mock_resp.content = MagicMock()
-        mock_resp.content.iter_chunked.return_value = AsyncIterator(
-            [b"chunk1", b"chunk2"]
-        )
+        mock_resp.content.iter_chunked.return_value = AsyncIterator([b"chunk1", b"chunk2"])
 
         session_ctx = MagicMock()
         session_ctx.__aenter__ = AsyncMock(return_value=mock_resp)
@@ -226,9 +209,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
 
         mock_process.return_value = Path("/tmp/out/file.txt")
 
-        result = await update_lists.fetch_list(
-            mock_session, "http://url", "file.txt", Path("/tmp/out")
-        )
+        result = await update_lists.fetch_list(mock_session, "http://url", "file.txt", Path("/tmp/out"))
 
         self.assertEqual(result, ("http://url", True))
         # self.assertEqual(mock_file_write.write.call_count, 2)
@@ -250,9 +231,7 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
         mock_session = MagicMock()
         mock_session.get.side_effect = TimeoutError()
 
-        result = await update_lists.fetch_list(
-            mock_session, "http://url", "file.txt", Path("/tmp/out")
-        )
+        result = await update_lists.fetch_list(mock_session, "http://url", "file.txt", Path("/tmp/out"))
 
         self.assertEqual(result, ("http://url", False))
         mock_logger_error.assert_called_once_with("✗ Timeout: http://url")
@@ -263,14 +242,10 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
         mock_session = MagicMock()
         mock_session.get.side_effect = update_lists.aiohttp.ClientError("HTTP failed")
 
-        result = await update_lists.fetch_list(
-            mock_session, "http://url", "file.txt", Path("/tmp/out")
-        )
+        result = await update_lists.fetch_list(mock_session, "http://url", "file.txt", Path("/tmp/out"))
 
         self.assertEqual(result, ("http://url", False))
-        mock_logger_error.assert_called_once_with(
-            "✗ HTTP error for http://url: HTTP failed"
-        )
+        mock_logger_error.assert_called_once_with("✗ HTTP error for http://url: HTTP failed")
 
     @patch("update_lists.logger.exception")
     async def test_fetch_list_unexpected_error(self, mock_logger_exception):
@@ -278,14 +253,10 @@ class TestUpdateLists(unittest.IsolatedAsyncioTestCase):
         mock_session = MagicMock()
         mock_session.get.side_effect = Exception("Boom")
 
-        result = await update_lists.fetch_list(
-            mock_session, "http://url", "file.txt", Path("/tmp/out")
-        )
+        result = await update_lists.fetch_list(mock_session, "http://url", "file.txt", Path("/tmp/out"))
 
         self.assertEqual(result, ("http://url", False))
-        mock_logger_exception.assert_called_once_with(
-            "✗ Unexpected error for http://url"
-        )
+        mock_logger_exception.assert_called_once_with("✗ Unexpected error for http://url")
 
     def test_count_rules(self):
         # Empty content
@@ -384,9 +355,7 @@ domain.com
 
             # Verify list1
             self.assertIn("https://example.com/list1.txt", sources)
-            self.assertEqual(
-                sources["https://example.com/list1.txt"]["filename"], "custom-name.txt"
-            )
+            self.assertEqual(sources["https://example.com/list1.txt"]["filename"], "custom-name.txt")
             self.assertTrue(sources["https://example.com/list1.txt"]["skip_checksum"])
 
             # Verify list3 (no filename provided - should use sanitize)

@@ -27,7 +27,7 @@ _root = Path(__file__).parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from Scripts.common import (
+from Scripts.common import (  # noqa: E402  (after sys.path bootstrap)
     dbg,
     die,
     err,
@@ -117,7 +117,8 @@ def build_adblock() -> None:
 
     header = (
         "[uBlock Origin]\n"
-        f"!  Title:  Ven0m0's Adblock List\n"
+        "! Title: Ven0m0's Adblock List\n"
+        "! Expires: 1 day\n"
         f"! Version: {ts_short()}\n"
         f"! Last Modified: {ts_read()}\n"
         f"! Homepage: https://github.com/{REPO}\n"
@@ -148,9 +149,7 @@ def build_hosts() -> None:
 
 
 def build_hostlist() -> None:
-    has_compiler = Path("node_modules/.bin/hostlist-compiler").exists() or has(
-        "hostlist-compiler"
-    )
+    has_compiler = Path("node_modules/.bin/hostlist-compiler").exists() or has("hostlist-compiler")
     if not has_compiler:
         warn("hostlist-compiler missing")
         return
@@ -204,15 +203,8 @@ def lint_filters() -> None:
     log("lint", "Setting up AGLint")
     if not Path("package.json").exists():
         subprocess.run(["npm", "init", "-y"], capture_output=True, check=False)
-    if (
-        subprocess.run(
-            ["npm", "list", "@adguard/aglint"], capture_output=True, check=False
-        ).returncode
-        != 0
-    ):
-        subprocess.run(
-            ["npm", "i", "-D", "@adguard/aglint"], capture_output=True, check=False
-        )
+    if subprocess.run(["npm", "list", "@adguard/aglint"], capture_output=True, check=False).returncode != 0:
+        subprocess.run(["npm", "i", "-D", "@adguard/aglint"], capture_output=True, check=False)
     if not Path(".aglintrc.yaml").exists():
         _run_js("@adguard/aglint", "init", capture_output=True, check=False)
 
@@ -319,9 +311,7 @@ def _process_js(f: Path) -> bool:
 
     SCRIPT_OUT.mkdir(parents=True, exist_ok=True)
     (SCRIPT_OUT / f"{base}.meta.js").write_text(meta_text + "\n", encoding="utf-8")
-    (SCRIPT_OUT / f"{base}.user.js").write_text(
-        meta_text + "\n" + js + "\n", encoding="utf-8"
-    )
+    (SCRIPT_OUT / f"{base}.user.js").write_text(meta_text + "\n" + js + "\n", encoding="utf-8")
     ok(f"{fn} -> {base}.user.js ({f.stat().st_size} -> {len(js)} bytes)")
     return True
 

@@ -10,9 +10,7 @@ import sys
 BASE_BRANCH = os.environ.get("BASE_BRANCH", "main")
 MAX_CYCLES = int(os.environ.get("MAX_CYCLES", "100"))
 BOT_NAME = os.environ.get("BOT_NAME", "github-actions[bot]")
-BOT_EMAIL = os.environ.get(
-    "BOT_EMAIL", "41898282+github-actions[bot]@users.noreply.github.com"
-)
+BOT_EMAIL = os.environ.get("BOT_EMAIL", "41898282+github-actions[bot]@users.noreply.github.com")
 CONFLICT_STRATEGY = os.environ.get("CONFLICT_STRATEGY", "ours")
 ALLOW_ADMIN_MERGE = os.environ.get("ALLOW_ADMIN_MERGE", "true").lower() == "true"
 
@@ -165,9 +163,7 @@ def main() -> None:
             is_cross: bool = pr.get("isCrossRepository", False)
             can_modify: bool = pr.get("maintainerCanModify", False)
 
-            print(
-                f"Evaluating PR #{number} ({title}) [draft={is_draft} state={merge_state}]"
-            )
+            print(f"Evaluating PR #{number} ({title}) [draft={is_draft} state={merge_state}]")
 
             if is_draft:
                 mark_ready(number)
@@ -175,23 +171,17 @@ def main() -> None:
                 continue
 
             if not head_ref or not head_owner or not head_repo:
-                blocked.append(
-                    f"PR #{number} is missing branch metadata required for auto-merge"
-                )
+                blocked.append(f"PR #{number} is missing branch metadata required for auto-merge")
                 continue
 
             if merge_state in ("DIRTY", "BEHIND"):
                 if is_cross and not can_modify:
-                    blocked.append(
-                        f"PR #{number} cannot be updated because maintainer edits are disabled"
-                    )
+                    blocked.append(f"PR #{number} cannot be updated because maintainer edits are disabled")
                     continue
                 if sync_branch(number, head_ref, head_owner, head_repo):
                     progress_made = True
                     continue
-                blocked.append(
-                    f"PR #{number} could not be updated against {BASE_BRANCH}"
-                )
+                blocked.append(f"PR #{number} could not be updated against {BASE_BRANCH}")
                 continue
 
             if merge_pr(number):
@@ -206,8 +196,7 @@ def main() -> None:
             )
             for pr in prs:
                 print(
-                    f"  #{pr['number']} {pr['title']}"
-                    f" [draft={pr['isDraft']} state={pr.get('mergeStateStatus')}]",
+                    f"  #{pr['number']} {pr['title']} [draft={pr['isDraft']} state={pr.get('mergeStateStatus')}]",
                     file=sys.stderr,
                 )
             if blocked:

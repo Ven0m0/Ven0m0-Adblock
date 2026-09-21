@@ -16,28 +16,25 @@
 ##div[aria-label="cookieconsent"]
 
 ! Remove common tracking params (dedupe, sort)
-! Block telemetry/analytics/metrics/diagnostics/crash/error-report
-! https://github.com/AdguardTeam/AdguardFilters/issues/204150
-! Adb track
-! Major social trackers (sorted, deduped)
-! Google & Firebase (sorted, deduped, key exceptions up top)
-! Google Custom Search fixes
-! Cloudflare challenge
-! GitHub and browser error noise
-! Extra recaptcha safety for site breakage
-! Allow doc/clients exceptions for YouTube etc
-!! Smartblock Embed Placeholders
-!--- Prevent AdFender detection ---
 $removeparam=utm_campaign
 $removeparam=utm_content
 $removeparam=utm_medium
 $removeparam=utm_source
 $removeparam=utm_term
+
+! Adb track
 ://yandex.*/images/_$xhr,method=post
+
+! Google & Firebase (sorted, deduped, key exceptions up top)
 @@||accounts.google.com^$domain=chromium.org|gstatic.com|googleusercontent.com|youtube.com
 @@||apis.google.com^
-@@||clients1.google.com^
 @@||consent.google.com^$subdocument
-||accounts.google.com^$3p,domain=~reddit.com|~twitter.com|~x.com|~youtube.com
+
+! Cloudflare challenge
 ||challenges.cloudflare.com^$3p
+
+! Allow doc/clients exceptions for YouTube etc
+@@||clients1.google.com^
 ||www.google.com^$3p,subdocument
+
+||accounts.google.com^$3p,domain=~reddit.com|~twitter.com|~x.com|~youtube.com

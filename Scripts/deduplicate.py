@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Deduplicate and optimize blocklist files
+"""Deduplicate and optimize blocklist files.
+
 - Removes duplicates within files and across files
 - Strips comments, empty lines, and trailing whitespace
 - Sorts entries for better compression
 - Validates domain syntax
 """
 
+import re
 import sys
 from collections import defaultdict
 from collections.abc import Iterable
@@ -14,7 +16,10 @@ from pathlib import Path
 
 from Scripts.common import is_valid_domain, write_lines
 
-HEADER_PREFIXES = ("! ", "#", "[", ";")
+# "!" covers every comment shape (including "!!!", "!---", "!/regex/" disabled rules);
+# "# " needs the space so "##"/"#@#"/"#?#" cosmetic rules are not mistaken for comments.
+COSMETIC_RE = re.compile(r"#[@$%?]*#")
+HEADER_PREFIXES = ("!", "# ", "[", ";")
 # AdGuard/uBO preprocessor directives: structural block markers, not comments.
 # They must keep their exact position and must never be deduplicated away -
 # nested "!#if"/"!#endif" pairs can repeat identical text per block.
@@ -22,7 +27,7 @@ DIRECTIVE_PREFIXES = ("!#if", "!#endif", "!#else", "!#include")
 
 
 def is_directive(line: str) -> bool:
-    """Check if line is a preprocessor directive (block boundary)"""
+    """Check if line is a preprocessor directive (block boundary)."""
     return line.startswith(DIRECTIVE_PREFIXES)
 
 
@@ -39,13 +44,19 @@ class Stats:
 
 
 def is_header(line: str) -> bool:
-    """Check if line is a header/metadata line"""
+    """Check if line is a header/metadata line."""
     return line.startswith(HEADER_PREFIXES) or not line
 
 
 def is_valid_rule(line: str) -> bool:
-    """Basic validation for filter rules"""
-    if not line or len(line) > 2048:
+    """Basic validation for filter rules."""
+    if not line:
+        return False
+    # Selectors and scriptlets legitimately exceed the network-rule length cap;
+    # treating them as comments used to hide them from this check entirely.
+    if COSMETIC_RE.search(line):
+        return True
+    if len(line) > 2048:
         return False
     if line.startswith(("||", "@@||")):
         # Extract domain part: remove || or @@||, stop at ^ or $ or options separator
@@ -62,22 +73,23 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
     or reordered. Dedup and alphabetical sort only apply within the run of
     plain rules between directives, since the same rule text can validly
     repeat under different conditional blocks.
+
+    A run of rules headed by a comment keeps its author order: the comment
+    usually describes specific rules in it, and sorting would separate them.
+    Blank lines between sections are kept as run boundaries.
     """
     stats = Stats()
     headers: list[str] = []
     rules: list[str] = []
-    segment: list[tuple[str, list[str]]] = []
+    segment: list[str] = []
     seen: set[str] = set()
     in_header = True
     current_comments: list[str] = []
+    headed = False
 
     def flush_segment() -> None:
-        segment.sort(key=lambda item: item[0])
-        for rule, comments in segment:
-            rules.extend(comments)
-            rules.append(rule)
+        rules.extend(segment if headed else sorted(segment))
         segment.clear()
-        seen.clear()
 
     for raw_line in lines:
         stats.original += 1
@@ -85,11 +97,18 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
         if not line:
             if in_header:
                 headers.append("")
+            else:
+                flush_segment()
+                rules.extend(current_comments)
+                current_comments = []
+                if rules and rules[-1]:
+                    rules.append("")
             continue
 
         if is_directive(line):
             in_header = False
             flush_segment()
+            seen.clear()
             rules.extend(current_comments)
             current_comments = []
             rules.append(line)
@@ -97,18 +116,26 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
             if in_header:
                 headers.append(line)
             else:
+                # A comment ends the sorted run, so a section heading stays
+                # above the rules it describes instead of drifting to the top.
+                flush_segment()
                 current_comments.append(line)
         else:
             in_header = False
             if line not in seen and is_valid_rule(line):
                 seen.add(line)
-                segment.append((line, current_comments))
+                if not segment:
+                    headed = bool(current_comments)
+                rules.extend(current_comments)
                 current_comments = []
+                segment.append(line)
             else:
                 current_comments = []
 
     flush_segment()
     rules.extend(current_comments)
+    while rules and not rules[-1]:
+        rules.pop()
 
     stats.headers = len(headers)
     stats.final = len(headers) + len(rules)
@@ -118,7 +145,7 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
 
 
 def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
-    """Deduplicate entries in a single file"""
+    """Deduplicate entries in a single file."""
     print(f"Processing: {filepath}")
 
     try:
@@ -144,7 +171,7 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
 def find_cross_file_duplicates(
     file_rules: dict[str, list[str]],
 ) -> dict[str, list[str]]:
-    """Find entries appearing in multiple files"""
+    """Find entries appearing in multiple files."""
     entry_locations = defaultdict(list)
 
     for filename, rules in file_rules.items():
@@ -159,10 +186,7 @@ def main() -> int:
     script_dir = Path(__file__).parent
     repo_dir = script_dir.parent
 
-    if len(sys.argv) > 1:
-        lists_dir = Path(sys.argv[1])
-    else:
-        lists_dir = repo_dir / "lists"
+    lists_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else repo_dir / "lists"
 
     if not lists_dir.exists():
         print(f"Error: Lists directory not found at {lists_dir}", file=sys.stderr)

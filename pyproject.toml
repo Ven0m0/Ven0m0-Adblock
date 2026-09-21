@@ -47,6 +47,32 @@ ignore = [
   "T201",  # print() in CLI scripts is intentional
   "BLE001",  # broad exception in CLI error handlers is acceptable
   "COM812",  # trailing comma conflicts with formatter
+  "CPY001",  # no copyright headers in this repo
+  "D100", "D101", "D102", "D103", "D104", "D105", "D107",  # docstrings optional for internal tooling
+  "G004",  # f-strings in log calls are intentional
+  "S603", "S607",  # subprocess calls use fixed argv from repo-controlled tooling
+  "S310",  # urllib fetches use hardcoded https list URLs
+  "FBT001", "FBT002", "FBT003",  # positional bool flags are fine for CLI helpers
+  "PLR2004",  # magic values are readable in small parsers
+  "C901", "PLR0911", "PLR0912", "PLR0915",  # CLI entrypoints are linear and long by nature
+  "TC003",  # runtime imports kept simple, no TYPE_CHECKING blocks
+  "TRY300",  # returning at the end of try reads better than an else block
+  "PLW2901",  # rebinding the loop variable while normalizing a line is intentional
+  "ANN003",  # **kwargs passthrough needs no annotation
+  "ASYNC230", "ASYNC240",  # one-shot setup/teardown file IO, not in a hot path
+  "TRY400",  # expected network failures log without a traceback; unexpected ones use logger.exception
+]
+
+[tool.ruff.lint.per-file-ignores]
+"Scripts/test_*.py" = [
+  "ANN",  # test signatures need no annotations
+  "S101",  # asserts are the point
+  "S108",  # temp paths in fixtures
+  "PT009",  # unittest.TestCase asserts are the established style
+  "PLC0415",  # local imports isolate fixtures
+  "ARG002",  # unused args in overridden test hooks
+  "ERA001",  # sample filter rules look like commented-out code
+  "EM101", "TRY003", "B904",  # terse raises in test helpers
 ]
 
 [tool.ruff.lint.isort]

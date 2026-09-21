@@ -208,6 +208,7 @@ jobs:
         with:
           commit_message: "ci: build and update filter lists"
           file_pattern: "Filters/*.txt lists/releases/*.txt"
+          add_options: "--force"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           skip_dirty_check: false

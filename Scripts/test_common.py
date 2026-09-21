@@ -15,15 +15,9 @@ from common import is_valid_domain, read_lines, sanitize_filename, write_lines
 
 class TestCommon(unittest.TestCase):
     def test_sanitize_filename_with_name(self):
-        self.assertEqual(
-            sanitize_filename("http://example.com", "My List"), "My-List.txt"
-        )
-        self.assertEqual(
-            sanitize_filename("http://example.com", "My List.txt"), "My-List.txt"
-        )
-        self.assertEqual(
-            sanitize_filename("http://example.com", "safe-name"), "safe-name.txt"
-        )
+        self.assertEqual(sanitize_filename("http://example.com", "My List"), "My-List.txt")
+        self.assertEqual(sanitize_filename("http://example.com", "My List.txt"), "My-List.txt")
+        self.assertEqual(sanitize_filename("http://example.com", "safe-name"), "safe-name.txt")
 
     def test_sanitize_filename_without_name(self):
         url = "https://example.com/list.txt"
@@ -44,13 +38,9 @@ class TestCommon(unittest.TestCase):
             sanitize_filename("http://example.com", 'a/b\\c:d*e?f"g<h>i|j'),
             "a-b-c-d-e-f-g-h-i-j.txt",
         )
-        self.assertEqual(
-            sanitize_filename("http://example.com", "My List.txt"), "My-List.txt"
-        )
+        self.assertEqual(sanitize_filename("http://example.com", "My List.txt"), "My-List.txt")
         self.assertEqual(sanitize_filename("http://example.com", "a/b.txt"), "a-b.txt")
-        self.assertEqual(
-            sanitize_filename("http://example.com", "c.txt.txt"), "c.txt.txt"
-        )
+        self.assertEqual(sanitize_filename("http://example.com", "c.txt.txt"), "c.txt.txt")
 
     def test_sanitize_filename_without_name_special_urls(self):
         # Missing scheme (no ://)
@@ -88,9 +78,7 @@ class TestCommon(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir_path = Path(temp_dir)
             target_file = temp_dir_path / "test.txt"
-            target_file.write_text(
-                "line1 \nline2\r\nline3", encoding="utf-8", newline=""
-            )
+            target_file.write_text("line1 \nline2\r\nline3", encoding="utf-8", newline="")
 
             lines = read_lines(target_file)
             self.assertEqual(lines, ["line1", "line2", "line3"])
@@ -133,9 +121,7 @@ class TestCommon(unittest.TestCase):
             # Test append
             result = write_lines(target_file, ["line5"], mode="a")
             self.assertTrue(result)
-            self.assertEqual(
-                target_file.read_text(encoding="utf-8"), "line3\nline4\nline5\n"
-            )
+            self.assertEqual(target_file.read_text(encoding="utf-8"), "line3\nline4\nline5\n")
 
     @patch("pathlib.Path.open")
     def test_write_lines_os_error_append(self, mock_open):

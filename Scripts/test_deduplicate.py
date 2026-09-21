@@ -50,6 +50,58 @@ class TestDeduplicate(unittest.TestCase):
         self.assertEqual(headers, expected_headers)
         self.assertEqual(rules, expected_rules)
 
+    def test_process_content_keeps_section_comments_above_their_rules(self):
+        # Regression: comments used to travel with the first rule of a run and
+        # get scattered by the sort, and "#"-prefixed cosmetic rules were
+        # mistaken for comments, clumping every heading at the top of the file.
+        lines = [
+            "! header",
+            "! Cosmetic",
+            "##.zed",
+            "##.alpha",
+            "! Tracking params",
+            "$removeparam=utm_source",
+            "$removeparam=utm_campaign",
+            "!!! Old section",
+            "||b.com^",
+            "||a.com^",
+        ]
+
+        headers, rules, _stats = process_content(lines)
+
+        self.assertEqual(headers, ["! header", "! Cosmetic"])
+        self.assertEqual(
+            rules,
+            [
+                "##.alpha",
+                "##.zed",
+                "! Tracking params",
+                "$removeparam=utm_source",
+                "$removeparam=utm_campaign",
+                "!!! Old section",
+                "||b.com^",
+                "||a.com^",
+            ],
+        )
+
+    def test_process_content_keeps_blank_lines_as_run_boundaries(self):
+        lines = [
+            "! header",
+            "",
+            "aaa.com",
+            "! Heading",
+            "zzz.com",
+            "",
+            "ccc.com",
+            "bbb.com",
+            "",
+        ]
+
+        _headers, rules, _stats = process_content(lines)
+
+        # Headed run keeps author order; the unheaded run after the blank is sorted.
+        self.assertEqual(rules, ["aaa.com", "! Heading", "zzz.com", "", "bbb.com", "ccc.com"])
+
     def test_process_content_preserves_directive_blocks(self):
         # Regression: !#if/!#endif must keep exact position and must never
         # be deduplicated, since nested blocks repeat identical directive
@@ -117,6 +169,8 @@ class TestDeduplicate(unittest.TestCase):
         self.assertTrue(is_header("# This is also a comment"))
         self.assertTrue(is_header("[Adblock Plus 2.0]"))
         self.assertTrue(is_header("; Semicolon comment"))
+        self.assertTrue(is_header("!!! Old Reddit"))
+        self.assertTrue(is_header("!/disabled-rule/$doc"))
 
         # Empty lines
         self.assertTrue(is_header(""))
@@ -126,6 +180,9 @@ class TestDeduplicate(unittest.TestCase):
         self.assertFalse(is_header("example.com##.ad"))
         self.assertFalse(is_header("example.com"))
         self.assertFalse(is_header("@@||example.com"))
+        self.assertFalse(is_header("##.ad"))
+        self.assertFalse(is_header("###banner"))
+        self.assertFalse(is_header("example.com#@#.ad"))
 
     def test_is_valid_rule(self):
         # Valid rules
@@ -143,6 +200,10 @@ class TestDeduplicate(unittest.TestCase):
         # Exactly 2048 chars should be valid
         max_line = "a" * 2048
         self.assertTrue(is_valid_rule(max_line))
+
+        # Cosmetic rules and scriptlets are exempt from the network-rule length cap
+        self.assertTrue(is_valid_rule("example.com##" + "a" * 3000))
+        self.assertTrue(is_valid_rule("#%#" + "a" * 3000))
 
         # Invalid domain patterns
         self.assertFalse(is_valid_rule("||invalid^"))

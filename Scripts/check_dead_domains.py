@@ -2,7 +2,8 @@
 import asyncio
 import re
 import sys
-import os
+from pathlib import Path
+
 import aiohttp
 
 DNS_QUERIES = [
@@ -12,16 +13,16 @@ DNS_QUERIES = [
 THROTTLE = 0.25
 
 PARKED_RE = [
-    re.compile(r'^traff-\d+\.hugedomains\.com\.?$'),
-    re.compile(r'^\d+\.parkingcrew\.net\.?$'),
-    re.compile(r'^ns\d\.centralnic\.net\.?(\s|$)'),
-    re.compile(r'^ns\d\.pananames\.com\.?(\s|$)'),
+    re.compile(r"^traff-\d+\.hugedomains\.com\.?$"),
+    re.compile(r"^\d+\.parkingcrew\.net\.?$"),
+    re.compile(r"^ns\d\.centralnic\.net\.?(\s|$)"),
+    re.compile(r"^ns\d\.pananames\.com\.?(\s|$)"),
 ]
 
-dns_cache = {}
+dns_cache: dict[str, bool] = {}
 
 
-async def validate_hostname(session, hn):
+async def validate_hostname(session: aiohttp.ClientSession, hn: str) -> dict[str, object] | None:
     await asyncio.sleep(THROTTLE)
     for url_tpl in DNS_QUERIES:
         url = url_tpl.format(hn=hn)
@@ -34,20 +35,25 @@ async def validate_hostname(session, hn):
                 data = await resp.json(content_type=None)
                 if data.get("Status") != 2:
                     return data
-        except Exception:
-            pass
+        except Exception:  # noqa: S112  (fall through to the next resolver)
+            continue
     return None
 
 
-def check_hostname(result):
+def check_hostname(result: object) -> str | None:
     if not isinstance(result, dict):
         return None
     status = result.get("Status")
-    if status == 1: return "format error"
-    if status == 2: return "dns server failure"
-    if status == 3: return "name error"
-    if status == 4: return "not implemented"
-    if status == 5: return "refused"
+    if status == 1:
+        return "format error"
+    if status == 2:
+        return "dns server failure"
+    if status == 3:
+        return "name error"
+    if status == 4:
+        return "not implemented"
+    if status == 5:
+        return "refused"
     answers = result.get("Answer") or []
     for entry in answers:
         data = entry.get("data", "")
@@ -57,7 +63,7 @@ def check_hostname(result):
     return None
 
 
-async def is_dead(session, hn):
+async def is_dead(session: aiohttp.ClientSession, hn: str) -> bool:
     if hn in dns_cache:
         return dns_cache[hn]
     result = await validate_hostname(session, hn)
@@ -68,27 +74,25 @@ async def is_dead(session, hn):
 
 # Cosmetic rules: domain-list##selector
 RULE_RE = re.compile(
-    r'^((?:~?[a-zA-Z0-9\-\*]+(?:\.[a-zA-Z0-9\-\*]+)*)(?:,(?:~?[a-zA-Z0-9\-\*]+(?:\.[a-zA-Z0-9\-\*]+)*))*)(##.+)$'
+    r"^((?:~?[a-zA-Z0-9\-\*]+(?:\.[a-zA-Z0-9\-\*]+)*)(?:,(?:~?[a-zA-Z0-9\-\*]+(?:\.[a-zA-Z0-9\-\*]+)*))*)(##.+)$"
 )
 
 # Network filters: domain= or from= pipe-separated list in options
-NET_OPT_RE = re.compile(r'(?<=[,$])(domain|from)=([^,\s\n]+)')
+NET_OPT_RE = re.compile(r"(?<=[,$])(domain|from)=([^,\s\n]+)")
 
 # Basic blocking rules: ||hostname^ or @@||hostname^
-HOSTNAME_RE = re.compile(r'^(@@)?\|\|([a-zA-Z0-9\-\.]+)\^')
+HOSTNAME_RE = re.compile(r"^(@@)?\|\|([a-zA-Z0-9\-\.]+)\^")
 
 
-def should_skip(hn):
-    if hn.endswith('.onion'):
+def should_skip(hn: str) -> bool:
+    if hn.endswith(".onion"):
         return True
-    if re.match(r'^\d+\.\d+\.\d+\.\d+$', hn):
+    if re.match(r"^\d+\.\d+\.\d+\.\d+$", hn):
         return True
-    if '*' in hn:
-        return True
-    return False
+    return "*" in hn
 
 
-async def check_pipe_domains(session, domains_str):
+async def check_pipe_domains(session: aiohttp.ClientSession, domains_str: str) -> tuple[list[str], list[str]]:
     domains = domains_str.split("|")
     checked = []
     for d in domains:
@@ -102,8 +106,8 @@ async def check_pipe_domains(session, domains_str):
     return domains, alive
 
 
-async def process(input_path):
-    with open(input_path, encoding="utf-8") as f:
+async def process(input_path: Path) -> list[str]:
+    with input_path.open(encoding="utf-8") as f:
         lines = f.readlines()
 
     out = []
@@ -113,7 +117,7 @@ async def process(input_path):
         for line in lines:
             raw = line.rstrip("\n")
 
-            if not raw or raw.startswith("!") or raw.startswith("["):
+            if not raw or raw.startswith(("!", "[")):
                 out.append(line)
                 continue
 
@@ -151,14 +155,14 @@ async def process(input_path):
                 if len(alive) == len(domains):
                     out.append(line)
                 elif alive:
-                    new_raw = raw[:m2.start(2)] + "|".join(alive) + raw[m2.end(2):]
+                    new_raw = raw[: m2.start(2)] + "|".join(alive) + raw[m2.end(2) :]
                     out.append(new_raw + "\n")
                 else:
                     first = domains[0]
                     if first not in backup_commented:
                         out.append("! All Dead Kept One Backup\n")
                         backup_commented.add(first)
-                    new_raw = raw[:m2.start(2)] + first + raw[m2.end(2):]
+                    new_raw = raw[: m2.start(2)] + first + raw[m2.end(2) :]
                     out.append(new_raw + "\n")
                 continue
 
@@ -182,18 +186,17 @@ async def process(input_path):
     return out
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: check_dead_domains.py <filter_file>")
         sys.exit(1)
 
-    inp = sys.argv[1]
-    base, ext = os.path.splitext(inp)
-    out_path = f"{base}_Dead Domain Cleaned{ext}"
+    inp = Path(sys.argv[1])
+    out_path = inp.with_name(f"{inp.stem}_Dead Domain Cleaned{inp.suffix}")
 
     result = asyncio.run(process(inp))
 
-    with open(out_path, "w", encoding="utf-8") as f:
+    with out_path.open("w", encoding="utf-8") as f:
         f.writelines(result)
 
     print(f"Done → {out_path}")

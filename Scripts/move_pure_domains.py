@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""
-Move pure domain entries from adblock lists to hostlist files.
-Pure domains are entries without AdGuard filter syntax (||, ##, $, @@, etc.)
+"""Move pure domain entries from adblock lists to hostlist files.
+
+Pure domains are entries without AdGuard filter syntax (||, ##, $, @@, etc.).
 """
 
 import re
@@ -13,12 +13,10 @@ from Scripts.common import is_valid_domain, read_lines, write_lines
 
 
 def is_pure_domain(line: str) -> bool:
-    """Check if a line is a pure domain without AdGuard syntax"""
+    """Check if a line is a pure domain without AdGuard syntax."""
     line = line.strip()
 
-    if not line or line.startswith(
-        ("!", "#", "[", ";", "|", "@", "$", "^", "*", "]", "~")
-    ):
+    if not line or line.startswith(("!", "#", "[", ";", "|", "@", "$", "^", "*", "]", "~")):
         return False
 
     return is_valid_domain(line)
@@ -30,25 +28,19 @@ SOCIAL_PATTERN = re.compile(r"social|facebook|twitter|instagram")
 
 
 def get_file_category(source_file: str) -> str | None:
-    """Get category based on source file name, if any"""
+    """Get category based on source file name, if any."""
     source_lower = source_file.lower()
     if "spotify" in source_lower:
         return "Spotify.txt"
-    elif (
-        "youtube" in source_lower
-        or "twitch" in source_lower
-        or "reddit" in source_lower
-        or "twitter" in source_lower
-    ):
+    if "youtube" in source_lower or "twitch" in source_lower or "reddit" in source_lower or "twitter" in source_lower:
         return "Social-Media.txt"
-    elif "game" in source_lower:
+    if "game" in source_lower:
         return "Games.txt"
     return None
 
 
 def categorize_domain(domain: str, source_file: str) -> str:
-    """Determine which hostlist category a domain belongs to"""
-
+    """Determine which hostlist category a domain belongs to."""
     file_category = get_file_category(source_file)
     if file_category:
         return file_category
@@ -56,22 +48,19 @@ def categorize_domain(domain: str, source_file: str) -> str:
     domain_lower = domain.lower()
     if ADS_PATTERN.search(domain_lower):
         return "Ads.txt"
-    elif SOCIAL_PATTERN.search(domain_lower):
+    if SOCIAL_PATTERN.search(domain_lower):
         return "Social-Media.txt"
-    else:
-        return "Other.txt"
+    return "Other.txt"
 
 
 def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
-    """
-    Scan adblock files, identify pure domains.
+    """Scan adblock files, identify pure domains.
+
     Returns:
         domain_moves: dict[target_hostlist_file][source_file] -> list[domains]
         file_updates: dict[filepath] -> list[str] (new content for source file)
     """
-    domain_moves: defaultdict[str, defaultdict[str, list[str]]] = defaultdict(
-        lambda: defaultdict(list)
-    )
+    domain_moves: defaultdict[str, defaultdict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
     file_updates = {}
 
     # sorted glob for consistent order
@@ -103,9 +92,7 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
                 domain_moves[file_category][adblock_file.name].extend(pure_domains)
             else:
                 for domain in pure_domains:
-                    domain_moves[categorize_domain(domain, adblock_file.name)][
-                        adblock_file.name
-                    ].append(domain)
+                    domain_moves[categorize_domain(domain, adblock_file.name)][adblock_file.name].append(domain)
 
     return domain_moves, file_updates
 
@@ -159,9 +146,8 @@ def _update_source_files(file_updates: dict) -> None:
         if write_lines(tmp_path, new_lines):
             tmp_path.replace(filepath)
             print(f"Updated {filepath.name}")
-        else:
-            if tmp_path.exists():
-                tmp_path.unlink()
+        elif tmp_path.exists():
+            tmp_path.unlink()
 
 
 def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:

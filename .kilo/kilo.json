@@ -1,7 +1,8 @@
 {
   "$schema": "https://app.kilo.ai/config.json",
   "instructions": [
-    ".kilo/rules/*.md", "./AGENTS.md",
+    ".kilo/rules/*.md",
+    "./AGENTS.md",
     "https://raw.githubusercontent.com/DietrichGebert/ponytail/main/PONYTAIL.md",
     "https://raw.githubusercontent.com/JuliusBrussee/caveman/main/CAVEMAN.md"
   ],
@@ -38,15 +39,7 @@
   ],
   "formatter": {
     "biome": {
-      "command": [
-        "npx",
-        "-y",
-        "@biomejs/biome",
-        "check",
-        "--write",
-        "--format-with-errors=true",
-        "$FILE"
-      ],
+      "command": ["npx", "-y", "@biomejs/biome", "check", "--write", "--format-with-errors=true", "$FILE"],
       "extensions": [".json", ".jsonc", ".js", ".ts"]
     },
     "ruff": {
@@ -55,14 +48,7 @@
     }
   },
   "watcher": {
-    "ignore": [
-      "node_modules/**",
-      "dist/**",
-      ".git/**",
-      ".venv/**",
-      "__pycache__/**",
-      ".ruff_cache/**"
-    ]
+    "ignore": ["node_modules/**", "dist/**", ".git/**", ".venv/**", "__pycache__/**", ".ruff_cache/**"]
   },
   "mcp": {
     "ref-tools": {
@@ -131,16 +117,7 @@
     },
     "vtsls": {
       "command": ["vtsls", "--stdio"],
-      "extensions": [
-        ".js",
-        ".jsx",
-        ".ts",
-        ".tsx",
-        ".mjs",
-        ".cjs",
-        ".mts",
-        ".cts"
-      ],
+      "extensions": [".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".mts", ".cts"],
       "initialization": {
         "preferences": { "importModuleSpecifierPreference": "relative" }
       }
@@ -151,17 +128,7 @@
     },
     "eslint": {
       "command": ["vscode-eslint-language-server", "--stdio"],
-      "extensions": [
-        ".js",
-        ".jsx",
-        ".mjs",
-        ".cjs",
-        ".ts",
-        ".tsx",
-        ".vue",
-        ".svelte",
-        ".astro"
-      ]
+      "extensions": [".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx", ".vue", ".svelte", ".astro"]
     },
     "yaml-ls": {
       "command": ["yaml-language-server", "--stdio"],

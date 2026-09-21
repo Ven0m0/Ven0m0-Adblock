@@ -34,7 +34,7 @@ hostlist
 external
 
 # Stray backup file, not a filter list
-my-ublock-backup_2026-07-31_22.19.20.txt
+my-ublock-backup_*.txt
 
 # CLAUDE.md is a symlink to AGENTS.md. It's not a filter list, but the real
 # reason it's ignored: git stash/checkout recreates the symlink, and a

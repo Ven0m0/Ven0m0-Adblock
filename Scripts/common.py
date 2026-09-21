@@ -1,6 +1,4 @@
-"""
-Common utilities and constants for Ven0m0-Adblock scripts.
-"""
+"""Common utilities and constants for Ven0m0-Adblock scripts."""
 
 import hashlib
 import os
@@ -15,9 +13,7 @@ from typing import Final
 # ============================================================================
 # ANSI COLORS
 # ============================================================================
-_color: bool = not os.environ.get("NO_COLOR") and (
-    sys.stdout.isatty() or bool(os.environ.get("FORCE_COLOR"))
-)
+_color: bool = not os.environ.get("NO_COLOR") and (sys.stdout.isatty() or bool(os.environ.get("FORCE_COLOR")))
 R: Final = "\x1b[31m" if _color else ""
 G: Final = "\x1b[32m" if _color else ""
 Y: Final = "\x1b[33m" if _color else ""
@@ -120,9 +116,7 @@ def sanitize_filename(url: str, name: str | None = None) -> str:
     # SHA-256 for stable naming only, not security.
     url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
     domain = re.search(r"://([^/]+)", url)
-    domain_part = (
-        domain.group(1).replace(".", "-").replace(":", "-") if domain else "list"
-    )
+    domain_part = domain.group(1).replace(".", "-").replace(":", "-") if domain else "list"
     return f"{domain_part}-{url_hash}.txt"
 
 
@@ -147,15 +141,18 @@ def write_lines(filepath: Path, lines: list[str], mode: str = "w") -> bool:
 
         # Atomic replace via temp file in same directory.
         fd, temp_path = tempfile.mkstemp(dir=filepath.parent, text=True)
+        tmp = Path(temp_path)
         try:
-            with open(fd, "w", encoding="utf-8", newline="\n") as f:
+            # open() here wraps the fd from mkstemp; Path.open cannot.
+            with open(fd, "w", encoding="utf-8", newline="\n") as f:  # noqa: PTH123
                 if lines:
                     f.write("\n".join(lines) + "\n")
-            os.replace(temp_path, filepath)
-            return True
+            tmp.replace(filepath)
         except Exception:
-            os.unlink(temp_path)
+            tmp.unlink()
             raise
+        else:
+            return True
     except (OSError, UnicodeError) as e:
         print(f"  Error writing {filepath}: {e}", file=sys.stderr)
         return False

@@ -124,64 +124,34 @@ another-pure.net
         # Should be categorized into Spotify.txt based on filename
         self.assertIn("Spotify.txt", domain_moves)
         if "Spotify.txt" in domain_moves:
-            self.assertIn(
-                "spotify-tracker.com", domain_moves["Spotify.txt"]["spotify_ads.txt"]
-            )
+            self.assertIn("spotify-tracker.com", domain_moves["Spotify.txt"]["spotify_ads.txt"])
 
 
 class TestCategorizeDomain(unittest.TestCase):
     def test_source_file_matching(self):
         # Match by source file name
-        self.assertEqual(
-            categorize_domain("example.com", "spotify_filters.txt"), "Spotify.txt"
-        )
-        self.assertEqual(
-            categorize_domain("example.com", "YouTube-Ads.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("example.com", "twitch_adblock.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("example.com", "reddit_promoted.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("example.com", "TWITTER.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("example.com", "game_servers.txt"), "Games.txt"
-        )
+        self.assertEqual(categorize_domain("example.com", "spotify_filters.txt"), "Spotify.txt")
+        self.assertEqual(categorize_domain("example.com", "YouTube-Ads.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("example.com", "twitch_adblock.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("example.com", "reddit_promoted.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("example.com", "TWITTER.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("example.com", "game_servers.txt"), "Games.txt")
 
     def test_domain_keyword_matching_ads(self):
         # Match by domain keywords (Ads)
         self.assertEqual(categorize_domain("ad.example.com", "unknown.txt"), "Ads.txt")
         self.assertEqual(categorize_domain("google-ads.com", "unknown.txt"), "Ads.txt")
-        self.assertEqual(
-            categorize_domain("analytics.google.com", "unknown.txt"), "Ads.txt"
-        )
-        self.assertEqual(
-            categorize_domain("tracking.example.net", "unknown.txt"), "Ads.txt"
-        )
-        self.assertEqual(
-            categorize_domain("telemetry.microsoft.com", "unknown.txt"), "Ads.txt"
-        )
-        self.assertEqual(
-            categorize_domain("metrics.apple.com", "unknown.txt"), "Ads.txt"
-        )
+        self.assertEqual(categorize_domain("analytics.google.com", "unknown.txt"), "Ads.txt")
+        self.assertEqual(categorize_domain("tracking.example.net", "unknown.txt"), "Ads.txt")
+        self.assertEqual(categorize_domain("telemetry.microsoft.com", "unknown.txt"), "Ads.txt")
+        self.assertEqual(categorize_domain("metrics.apple.com", "unknown.txt"), "Ads.txt")
 
     def test_domain_keyword_matching_social(self):
         # Match by domain keywords (Social Media)
-        self.assertEqual(
-            categorize_domain("social.network.com", "unknown.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("api.facebook.com", "unknown.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("cdn.twitter.com", "unknown.txt"), "Social-Media.txt"
-        )
-        self.assertEqual(
-            categorize_domain("instagram-images.net", "unknown.txt"), "Social-Media.txt"
-        )
+        self.assertEqual(categorize_domain("social.network.com", "unknown.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("api.facebook.com", "unknown.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("cdn.twitter.com", "unknown.txt"), "Social-Media.txt")
+        self.assertEqual(categorize_domain("instagram-images.net", "unknown.txt"), "Social-Media.txt")
 
     def test_fallback_category(self):
         # Match fallback
@@ -208,9 +178,7 @@ class TestApplyUpdates(unittest.TestCase):
             source_path = adblock_dir / source_file
             source_path.write_text("domain1.com\ndomain2.com\n||ad.com^\n")
 
-            domain_moves = {
-                "Other.txt": {"test_list.txt": ["domain1.com", "domain2.com"]}
-            }
+            domain_moves = {"Other.txt": {"test_list.txt": ["domain1.com", "domain2.com"]}}
             file_updates = {source_path: ["||ad.com^"]}
 
             total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
@@ -218,9 +186,7 @@ class TestApplyUpdates(unittest.TestCase):
             self.assertEqual(total_moved, 2)
 
             # Check target file content
-            self.assertEqual(
-                target_path.read_text(), "existing.com\ndomain1.com\ndomain2.com\n"
-            )
+            self.assertEqual(target_path.read_text(), "existing.com\ndomain1.com\ndomain2.com\n")
 
             # Check source file content
             self.assertEqual(source_path.read_text(), "||ad.com^\n")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""
-Automated Blocklist Updater for Ven0m0-Adblock
+"""Automated Blocklist Updater for Ven0m0-Adblock.
+
 Downloads and updates filter lists from remote URLs, validates checksums,
 and maintains source tracking metadata.
 """
@@ -8,6 +8,7 @@ and maintains source tracking metadata.
 import argparse
 import asyncio
 import base64
+import contextlib
 import hashlib
 import io
 import json
@@ -16,7 +17,7 @@ import re
 import subprocess
 import sys
 import tempfile
-from datetime import UTC
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Final
 
@@ -62,14 +63,8 @@ async def validate_checksum(content: str, name: str = "unknown") -> bool:
         logger.debug(f"No checksum in {name} (optional)")
         return True
     declared = match.group(1)
-    body = (content[: match.start()] + content[match.end() :]).rstrip("\r\n").replace(
-        "\r", ""
-    ) + "\n"
-    computed = (
-        base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest())
-        .decode()
-        .rstrip("=")
-    )
+    body = (content[: match.start()] + content[match.end() :]).rstrip("\r\n").replace("\r", "") + "\n"
+    computed = base64.b64encode(hashlib.sha256(body.encode("utf-8")).digest()).decode().rstrip("=")
     if declared == computed:
         logger.info(f"✓ Checksum valid: {name}")
         return True
@@ -85,9 +80,7 @@ async def validate_checksum(content: str, name: str = "unknown") -> bool:
 def count_rules(content: str) -> int:
     """Count active rules in the content."""
     return sum(
-        1
-        for line in io.StringIO(content)
-        if (stripped := line.strip()) and not stripped.startswith(HEADER_PREFIXES)
+        1 for line in io.StringIO(content) if (stripped := line.strip()) and not stripped.startswith(HEADER_PREFIXES)
     )
 
 
@@ -102,7 +95,7 @@ async def process_downloaded_file(
     dest_path = output_dir / Path(filename).name
 
     try:
-        async with aiofiles.open(temp_path, mode="r", encoding="utf-8") as f:
+        async with aiofiles.open(temp_path, encoding="utf-8") as f:
             content = await f.read()
 
         if not skip_checksum:
@@ -113,9 +106,7 @@ async def process_downloaded_file(
                 return None
 
         if len(content) < 100:
-            logger.error(
-                f"Downloaded file suspiciously small ({len(content)} bytes): {url}"
-            )
+            logger.error(f"Downloaded file suspiciously small ({len(content)} bytes): {url}")
             return None
 
         rule_count = count_rules(content)
@@ -170,17 +161,13 @@ async def fetch_list(
                         await f.write(chunk)
 
                 # Only call process once with the correct filename
-                result = await process_downloaded_file(
-                    tmp_path, url, filename, output_dir, skip_checksum
-                )
+                result = await process_downloaded_file(tmp_path, url, filename, output_dir, skip_checksum)
                 return (url, result is not None)
             finally:
                 # Ensure cleanup always
                 if tmp_path:
-                    try:
+                    with contextlib.suppress(FileNotFoundError):
                         await asyncio.to_thread(tmp_path.unlink)
-                    except FileNotFoundError:
-                        pass
 
     except TimeoutError:
         logger.error(f"✗ Timeout: {url}")
@@ -222,7 +209,7 @@ async def load_sources(config_path: Path) -> dict[str, dict]:
             await f.write(json.dumps(template, indent=2) + "\n")
         logger.info(f"Created template config: {config_path}")
 
-    async with aiofiles.open(config_path, mode="r", encoding="utf-8") as f:
+    async with aiofiles.open(config_path, encoding="utf-8") as f:
         content = await f.read()
     data = json.loads(content)
 
@@ -237,12 +224,8 @@ async def load_sources(config_path: Path) -> dict[str, dict]:
     }
 
 
-async def save_metadata(
-    sources: dict, results: dict[str, bool], output_dir: Path
-) -> None:
+async def save_metadata(sources: dict, results: dict[str, bool]) -> None:
     """Save download metadata for tracking."""
-    from datetime import datetime
-
     metadata = {
         "last_updated": datetime.now(UTC).isoformat(),
         "sources": {
@@ -271,9 +254,7 @@ async def save_metadata(
 
 async def main() -> int:
     """Main execution flow."""
-    parser = argparse.ArgumentParser(
-        description="Update Ven0m0-Adblock filter lists from remote sources"
-    )
+    parser = argparse.ArgumentParser(description="Update Ven0m0-Adblock filter lists from remote sources")
     parser.add_argument(
         "--config",
         type=Path,
@@ -318,8 +299,7 @@ async def main() -> int:
         sources = {
             url: cfg
             for url, cfg in sources.items()
-            if args.filter.lower() in url.lower()
-            or args.filter.lower() in cfg["filename"].lower()
+            if args.filter.lower() in url.lower() or args.filter.lower() in cfg["filename"].lower()
         }
         logger.info(f"Filtered to {len(sources)} sources matching '{args.filter}'")
 
@@ -332,15 +312,14 @@ async def main() -> int:
     connector = aiohttp.TCPConnector(limit=args.max_concurrent)
     async with aiohttp.ClientSession(connector=connector) as session:
         tasks = [
-            fetch_list(session, url, cfg["filename"], output_dir, cfg["skip_checksum"])
-            for url, cfg in sources.items()
+            fetch_list(session, url, cfg["filename"], output_dir, cfg["skip_checksum"]) for url, cfg in sources.items()
         ]
         results = await asyncio.gather(*tasks, return_exceptions=False)
 
     results_dict = dict(results)
     success_count = sum(1 for success in results_dict.values() if success)
 
-    await save_metadata(sources, results_dict, output_dir)
+    await save_metadata(sources, results_dict)
 
     logger.info(f"✓ Updated {success_count}/{len(sources)} lists successfully")
 
