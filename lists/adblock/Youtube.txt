@@ -207,14 +207,23 @@ youtube.com##a.ytp-suggestion-set
 youtube.com##body, ytd-app[scrolling]:style(overflow-x: hidden !important;)
 youtube.com##ytd-menu-service-item-renderer:has([d^="M480-80q0-83-31.5-156T363-363q-54-54-127-85.5T80-480q83"])
 ! pop-up ads
-youtube.com##ytd-video-description-infocards-section-renderer
+youtube.com##ytd-video-description-infocards-section-
+
 ! Credits: https://github.com/d3adconnection/update/blob/main/ublock.txt
 ! disable "workers"
 ||music.youtube.com^$csp=worker-src 'none'
 ||www.youtube.com^$csp=worker-src 'none'
 ~youtube-nocookie.com,~youtube.com##iframe ~ #topvbar > #rvid
 www.youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
+
 ! Aug 24, 2026 https://www.youtube.com
 www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
+
 ! Sep 8, 2026 https://www.youtube.com
 www.youtube.com##.ytp-paid-content-overlay-link
+www.youtube.com##yt-button-view-model.ytd-menu-renderer:nth-of-type(2)
+
+! Aug 24, 2026 https://www.youtube.com
+www.youtube.com###donation-shelf > .ytd-watch-flexy.style-scope
+
+music.youtube.com###right-content > .ytmusic-nav-bar.style-scope.cast-button > .ytmusic-cast-button.style-scope.cast-button > .ytmusic-cast-button.style-scope.chromecast-icon > .ytmusic-cast-button.style-scope.chromecast > .ytSpecIconShapeHost.yt-icon.style-scope.yt-icon-shape > div
