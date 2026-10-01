@@ -695,3 +695,8 @@ google.com##promo-throttler + div
 
 /^https?:\/\/172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])(\/|$)/
 github.com##.react-comments-container > div > div[class^="Flash__StyledFlash"]:has-text(Sign in to comment)
+
+! Oct 1, 2026 https://vanillatweaks.net
+vanillatweaks.net##.bloom-bg.panel-body
+||vanillatweaks.net/assets/images/patreon.png$image
+vanillatweaks.net##.patreon.btn-primary.btn
