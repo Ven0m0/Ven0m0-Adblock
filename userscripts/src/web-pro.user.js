@@ -3,10 +3,10 @@
 // @author       Ven0m0
 // @namespace    http://tampermonkey.net/
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
-// @version      6.0.0
+// @version      6.1.0
 // @description  Universal web optimizer: lazy load, URL cleaning, CPU/RAF tamer, network,
 //               privacy, perf features. Merges: Web Pro, Web Performance Optimizer,
-//               Speed up Google Captcha.
+//               Speed up Google Captcha, plus selected ideas from Greasy Fork performance scripts.
 // @match        *://*/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
 // @grant        GM_addStyle
@@ -86,6 +86,21 @@
       "cloudflare",
       "captcha"
     ],
+    EXTRA_TRACKER_HOSTS: [
+      "addthis.com",
+      "sharethis.com",
+      "optimizely.com",
+      "amplitude.com",
+      "newrelic.com",
+      "amazon-adsystem.com",
+      "scorecardresearch.com",
+      "quantserve.com",
+      "outbrain.com",
+      "taboola.com"
+    ],
+    PREFETCH_EXCL:
+      /\/(?:log(?:in|out|off)|sign(?:in|out|up)|register|auth|account|checkout|cart|download)|\.(?:zip|exe|pdf|apk|dmg|iso|7z|rar|msi|mp[34])(?:$|[?#])|[?&](?:logout|download|token|session|sid|key)=/i,
+    PREFETCH_MAX_QUERY: 80,
     IO_MARGIN: "300px",
     BATCH: 30,
     GPU_SEL: "video,canvas,[data-gpu-accelerate],.animation-container,.slider,.carousel"
@@ -143,6 +158,9 @@
     linkLimit: 10,
     linkDelay: 3000,
     hoverPrefetch: 1,
+    viewportPrefetch: 0,
+    asyncDecode: 1,
+    blockExtraTrackers: 0,
     blockPrefetchLinks: 1,
     cleanURL: 1,
     blockBeacons: 1,
@@ -187,6 +205,7 @@
   const saveCfg = () => localStorage.setItem(C.KEY, JSON.stringify(cfg));
 
   const state = {
+    prefetchCount: 0,
     cache: new Map(),
     cacheSize: 0,
     loaded: new WeakSet(),
@@ -228,6 +247,7 @@
     try {
       const h = new URL(url, location.origin).hostname;
       if ([...C.TRACKER_HOSTS].some((t) => h.endsWith(t))) return true;
+      if (cfg.blockExtraTrackers && C.EXTRA_TRACKER_HOSTS.some((t) => h === t || h.endsWith(`.${t}`))) return true;
       const lc = url.toLowerCase();
       return !C.ALLOW_KW.some((k) => lc.includes(k)) && C.SCRIPT_DENY.test(lc);
     } catch {
@@ -683,6 +703,7 @@
     document.querySelectorAll("img:not([data-wp])").forEach((i) => {
       if (i.getAttribute("loading") === "eager") return;
       if (!i.getAttribute("loading")) i.setAttribute("loading", "lazy");
+      if (cfg.asyncDecode && !i.getAttribute("decoding")) i.setAttribute("decoding", "async");
       if (i.dataset.src && !i.src) i.src = i.dataset.src;
       mark(i);
     });
@@ -781,7 +802,7 @@
     document.querySelectorAll("script[src]:not([data-wp-s])").forEach((s) => {
       const src = s.getAttribute("src") || "";
       const t = s.getAttribute("type") || "";
-      if (C.SCRIPT_DENY.test(src) || t === "application/ld+json") {
+      if (C.SCRIPT_DENY.test(src) || t === "application/ld+json" || (cfg.blockExtraTrackers && isTracker(src))) {
         const id = Math.random().toString(36).slice(2) + Date.now();
         state.deferredScripts.set(id, src);
         s.type = "text/wp-blocked";
@@ -889,24 +910,52 @@
     });
   }
 
-  // Hover prefetch
-  function initHoverPrefetch() {
-    if (!cfg.hoverPrefetch) return;
-    const EXCL = /\/log(?:in|out)|\/sign(?:in|out)|\/auth|\/account/;
-    const doPrefetch = (e) => {
-      const a = e.target.closest("a[href]");
-      if (!a || a.dataset.noPrefetch) return;
+  // Link prefetch: same-origin only, capped, skipped on data-saver / slow networks
+  function initLinkPrefetch() {
+    if ((!cfg.hoverPrefetch && !cfg.viewportPrefetch) || MODE >= 1) return;
+    const prefetch = (a) => {
+      if (state.prefetchCount >= cfg.linkLimit || a.dataset.noPrefetch) return;
       const { href } = a;
-      if (state.hoverPrefetched.has(href) || EXCL.test(href) || isTracker(href)) return;
+      if (state.hoverPrefetched.has(href)) return;
+      let u;
+      try {
+        u = new URL(href);
+      } catch {
+        return;
+      }
+      if (u.origin !== location.origin || !/^https?:$/.test(u.protocol)) return;
+      if (u.pathname === location.pathname && u.search === location.search) return;
+      if (u.search.length > C.PREFETCH_MAX_QUERY || C.PREFETCH_EXCL.test(u.pathname + u.search)) return;
       state.hoverPrefetched.add(href);
+      state.prefetchCount++;
       const link = document.createElement("link");
       link.rel = "prefetch";
       link.href = href;
       link.as = "document";
+      link.setAttribute("data-wp-hint", "1");
       document.head?.appendChild(link);
     };
-    document.addEventListener("mouseover", doPrefetch, { passive: true });
-    document.addEventListener("touchstart", doPrefetch, { passive: true });
+    if (cfg.hoverPrefetch) {
+      const onHover = (e) => {
+        const a = e.target.closest?.("a[href]");
+        if (a) prefetch(a);
+      };
+      document.addEventListener("mouseover", onHover, { passive: true });
+      document.addEventListener("touchstart", onHover, { passive: true });
+    }
+    if (cfg.viewportPrefetch && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => {
+        for (const e of es) {
+          if (!e.isIntersecting) continue;
+          io.unobserve(e.target);
+          prefetch(e.target);
+        }
+      });
+      // ponytail: observes links present after linkDelay only, add MutationObserver hook if SPA links matter
+      setTimeout(() => {
+        for (const a of document.querySelectorAll("a[href]")) io.observe(a);
+      }, cfg.linkDelay);
+    }
   }
 
   function blockPrefetchLinks() {
@@ -1058,7 +1107,7 @@
 
   const onReady = () => {
     pauseGIFs();
-    initHoverPrefetch();
+    initLinkPrefetch();
   };
   document.readyState === "loading"
     ? document.addEventListener("DOMContentLoaded", onReady, { once: true })
@@ -1096,7 +1145,10 @@
       defer: "Defer & block ad/tracking scripts",
       observe: "MutationObserver (dynamic content)",
       prefetch: "Link prefetch hints",
-      hoverPrefetch: "Hover prefetch (mouseover)",
+      hoverPrefetch: "Hover prefetch (same-origin, capped)",
+      viewportPrefetch: "Viewport prefetch (same-origin, capped)",
+      asyncDecode: "Async image decoding",
+      blockExtraTrackers: "Block extra tracker hosts (ad/analytics networks)",
       blockPrefetchLinks: "Block page-injected prefetch/preload",
       preconnect: "Preconnect to external origins",
       gpu: "GPU compositing hints (video/canvas)",
@@ -1127,7 +1179,7 @@
     modal.className = "wp-modal";
 
     const h2 = document.createElement("h2");
-    h2.textContent = "⚡ Web Pro v6";
+    h2.textContent = "⚡ Web Pro v6.1";
     modal.appendChild(h2);
 
     Object.entries(LABELS).forEach(([k, label]) => {
@@ -1186,5 +1238,5 @@
       : addToggle();
   }
 
-  log(`Web Pro v6.0 loaded (mode=${MODE})`);
+  log(`Web Pro v6.1 loaded (mode=${MODE})`);
 })();

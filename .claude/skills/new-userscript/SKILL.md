@@ -4,6 +4,7 @@ description: Scaffold a new userscript in userscripts/src/ with the correct head
 ---
 
 When the user asks to create a new userscript, collect (ask if not provided):
+
 - Script name (human-readable, e.g. "Reddit Cleaner")
 - Target URL pattern(s) — one or more `@match` values
 - What the script does (one sentence for `@description`)
@@ -36,6 +37,7 @@ Then create `userscripts/src/<kebab-name>.user.js` with this exact structure:
 ```
 
 Rules to follow:
+
 - `<script_slug>` = lowercase snake_case of the name, e.g. `reddit_cleaner`
 - Use `const`/`let`, never `var`
 - Use `===` not `==`; no `eval`
@@ -44,7 +46,8 @@ Rules to follow:
 - Use `@run-at document-start` for prototype patches; `document-end` for DOM-only work
 
 After writing the file, run:
-```
+
+```bash
 bun x biome check --write userscripts/src/<file>
 ```
 

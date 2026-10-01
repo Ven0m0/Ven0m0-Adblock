@@ -3,19 +3,24 @@ description: Summarize the recent run status of a GitHub Actions workflow in thi
 argument-hint: <workflow-name>
 ---
 
-Look up the recent run status of the workflow named `$ARGUMENTS` (match loosely against the filenames in `.github/workflows/`: `aglint.yml`, `automerge-open-prs.yml`, `build-filter-lists.yml`, `dead-domains-check.yml`, `dependabot-auto-merge.yml`, `lint-and-format.yml`, `maintain-lists.yml`, `pull_request.yml`, `update-lists.yml`, `userscripts.yml`).
+Look up the recent run status of the workflow named `$ARGUMENTS` (match loosely against the filenames in
+`.github/workflows/`: `aglint.yml`, `automerge-open-prs.yml`, `build-filter-lists.yml`, `dead-domains-check.yml`,
+`lint-and-format.yml`, `maintain-lists.yml`, `pull_request.yml`, `redundancy-check.yml`, `userscripts.yml`).
 
 Run:
-```
+
+```bash
 gh run list --workflow=<matched-file> --limit 5
 ```
 
 Then for the most recent run, if it failed:
-```
+
+```bash
 gh run view <run-id> --log-failed
 ```
 
 Report:
+
 1. The matched workflow file
 2. Status of the last 5 runs (success/failure, timestamp, trigger)
 3. If the latest failed, the specific failing step and error

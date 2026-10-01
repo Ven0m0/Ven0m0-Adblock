@@ -7,13 +7,9 @@ on:
     paths:
       - "lists/adblock/**/*.txt"
       - "hostlist-config.json"
-      - "configuration_popup_filter.json"
-      - "ragibkl-config.json"
       - "Scripts/build.py"
       - "mise.toml"
   workflow_dispatch:
-  #schedule:
-    #- cron: "0 7 * * *"
 
 permissions:
   contents: write
@@ -102,49 +98,7 @@ jobs:
           name: adguard-filters
           path: Filters/*.txt
           retention-days: 30
-  build-ragibkl:
-    name: Build Ragibkl Lists
-    runs-on: ubuntu-latest
-    needs: lint
-    continue-on-error: true
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.ref }}
-      - name: Setup mise
-        uses: jdx/mise-action@v5.0.1
-        with:
-          install: true
-          cache: true
-          experimental: true
-      - name: Clone adblock-list-compiler
-        run: git clone --depth=1 https://github.com/ragibkl/adblock-list-compiler.git compiler
-      - name: Install Python dependencies
-        run: |
-          cd compiler
-          if [[ -f requirements.txt ]]; then
-            mise exec -- python -m pip install -r requirements.txt
-          fi
-      - name: Compile lists
-        id: compile
-        run: |
-          mkdir -p Filters
-          mise exec -- python compiler/main.py \
-            --config ragibkl-config.json \
-            --output Filters/Ragibkl-Combined.txt
-          if [[ -s Filters/Ragibkl-Combined.txt ]]; then
-            printf 'has_changes=true\n' >> "$GITHUB_OUTPUT"
-          else
-            printf 'has_changes=false\n' >> "$GITHUB_OUTPUT"
-          fi
-      - name: Upload artifacts
-        if: steps.compile.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: ragibkl-filters
-          path: Filters/Ragibkl-Combined.txt
-          retention-days: 30
+
   build-custom:
     name: Build Custom Lists
     runs-on: ubuntu-latest
@@ -168,14 +122,14 @@ jobs:
           name: custom-filters
           path: lists/releases/*.txt
           retention-days: 30
+
   commit:
     name: Commit Changes
     runs-on: ubuntu-latest
-    needs: [build-adguard, build-ragibkl, build-custom]
+    needs: [build-adguard, build-custom]
     if: |
       always() &&
       (needs.build-adguard.result == 'success' ||
-       needs.build-ragibkl.result == 'success' ||
        needs.build-custom.result == 'success')
     steps:
       - name: Checkout repository
@@ -187,13 +141,6 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: adguard-filters
-          path: Filters/
-        continue-on-error: true
-      - name: Download Ragibkl artifacts
-        if: needs.build-ragibkl.result == 'success'
-        uses: actions/download-artifact@v8
-        with:
-          name: ragibkl-filters
           path: Filters/
         continue-on-error: true
       - name: Download custom artifacts
@@ -212,47 +159,3 @@ jobs:
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
           skip_dirty_check: false
-  convert:
-    name: Convert Lists
-    runs-on: ubuntu-latest
-    needs: commit
-    if: github.event_name == 'schedule'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.ref }}
-      - name: Setup mise
-        uses: jdx/mise-action@v5.0.1
-        with:
-          install: true
-          cache: true
-      - name: Run conversion
-        run: |
-          chmod +x convert.sh
-          mise exec -- bash convert.sh
-        env:
-          repository: ${{ github.repository }}
-      - name: Push to release branch
-        uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          branch: release
-          commit_message: "ci: update converted lists"
-          file_pattern: "release/*"
-          commit_user_name: "github-actions[bot]"
-          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
-          create_branch: true
-          push_options: "--force"
-  cleanup:
-    name: Cleanup
-    runs-on: ubuntu-latest
-    needs: [commit, convert]
-    if: always() && github.event_name == 'schedule'
-    steps:
-      - name: Delete old workflow runs
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 7
-          keep_minimum_runs: 3

@@ -8,6 +8,7 @@ You are a userscript code reviewer specialized in Tampermonkey/Violentmonkey use
 ## Review checklist
 
 ### Header (@metadata block)
+
 - Every `GM_*` / `GM.*` API called in the body has a matching `@grant` declaration
 - `@match` patterns are minimal and correct — no overbroad wildcards like `*://*/*`
 - `@run-at` is appropriate: `document-start` for prototype patches, `document-end` or `document-idle` for DOM work
@@ -15,18 +16,24 @@ You are a userscript code reviewer specialized in Tampermonkey/Violentmonkey use
 - `@author` is `Ven0m0`, `@homepageURL` points to the repo, `@license` is present
 
 ### Conflict detection
+
 Read all other scripts in `userscripts/src/` that share `@match` URLs and flag:
-- Two scripts both patching the same prototype method (`window.fetch`, `HTMLMediaElement.prototype.canPlayType`, `EventTarget.prototype.addEventListener`, `window.setTimeout`, etc.)
+
+- Two scripts both patching the same prototype method (`window.fetch`, `HTMLMediaElement.prototype.canPlayType`,
+  `EventTarget.prototype.addEventListener`, `window.setTimeout`, etc.)
 - Two scripts injecting CSS targeting the same selectors on the same site
 - Two scripts both installing a MutationObserver on `document.body` with overlapping subtrees
 
 ### Guard patterns
+
 - Script must have a duplicate-load guard: `if (window[GUARD]) return; window[GUARD] = 1`
 - Emergency disable check: `if (localStorage.getItem("disable_...") === "1") return`
 
 ### Code quality
+
 Run `bun x biome check <file>` and `bun x oxlint --quiet <file>` and report any errors.
 Also check manually:
+
 - No `var` — use `const`/`let`
 - No `eval`
 - `===` not `==`

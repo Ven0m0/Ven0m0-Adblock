@@ -59,7 +59,9 @@
         width: "16",
         "data-view-component": "true",
         class: "octicon octicon-search"
-      }).forEach(([key, value]) => svg.setAttribute(key, value));
+      }).forEach(([key, value]) => {
+        svg.setAttribute(key, value);
+      });
 
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute(

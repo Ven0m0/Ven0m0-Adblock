@@ -19,24 +19,11 @@ jobs:
   maintain:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout with submodules
+      - name: Checkout repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
-      - name: Update submodules
-        continue-on-error: true
-        run: |
-          git submodule update --init --recursive --remote
-          if git diff --submodule=diff --quiet; then
-            echo "submodules_updated=false" >> "$GITHUB_ENV"
-          else
-            echo "submodules_updated=true" >> "$GITHUB_ENV"
-            git add . gitmodules *
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "chore: update submodules" || true
-          fi
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -66,12 +53,12 @@ jobs:
         continue-on-error: true
         run: |
           bun i -g @adguard/hostlist-compiler
-          [[ -f hostlist-compiler-config.json ]] && hostlist-compiler -v -c hostlist-compiler-config.json -o blocklist
+          hostlist-compiler -v -c hostlist-config.json -o blocklist
       - name: Validate domains
         continue-on-error: true
         run: |
           invalid=0
-          for f in $(find . -type f -name '*.txt' ! -path '*/\.*' ! -name 'Lists-todo.txt'); do
+          for f in $(find . -type f -name '*.txt' ! -path '*/\.*'); do
             if grep -Ev '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\. )+[a-zA-Z]{2,}$|^$' "$f" &>/dev/null; then
               echo "Invalid entries in: $f"; ((invalid++))
             fi
@@ -116,7 +103,6 @@ jobs:
           - **Removed:** ${{ steps.changelog.outputs.dels }} entries
           - **Dead domains:** Removed via linter
           - **Duplicates:** Eliminated
-          - **Submodules:** Updated to latest
           ### Files
           - \`blocklist\` — Compiled master list" \
             blocklist || echo "Release exists or failed"

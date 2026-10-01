@@ -7,7 +7,7 @@ Reproduces `.github/workflows/dead-domains-check.yml` locally instead of waiting
 
 ## 1. Install the linter (if not already global)
 
-```
+```bash
 bun add -g @adguard/dead-domains-linter
 ```
 
@@ -15,27 +15,28 @@ bun add -g @adguard/dead-domains-linter
 
 For each changed file under `lists/adblock/` or `lists/hostlist/`:
 
-```
+```bash
 bunx dead-domains-linter --export dead-domains/<basename>.txt --input <file>
 ```
 
 ## 3. Review
 
-```
+```bash
 cat dead-domains/*.txt 2>/dev/null | sort -u
 ```
 
-Report each candidate dead domain to the user before removing anything — the linter flags low-traffic sites as false positives sometimes (per the workflow's own PR body caveat).
+Report each candidate dead domain to the user before removing anything — the linter flags low-traffic sites as false
+positives sometimes (per the workflow's own PR body caveat).
 
 ## 4. Apply removal (only after confirmation)
 
-```
+```bash
 bunx dead-domains-linter --auto --import dead-domains/<basename>.txt --input <file> --output <file>
 ```
 
 ## 5. Clean up
 
-```
+```text
 rm -rf dead-domains dead-domains.txt
 ```
 

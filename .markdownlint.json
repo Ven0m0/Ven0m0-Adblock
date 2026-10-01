@@ -1,18 +1,34 @@
 {
-  "ul-indent": { "indent": 2 },
+  "ul-indent": {
+    "indent": 2
+  },
   "line-length": {
-    "stern": true,
-    "line_length": 120
+    "line_length": 120,
+    "tables": false,
+    "code_blocks": false
   },
-  "no-multiple-blanks": { "maximum": 2 },
+  "no-multiple-blanks": {
+    "maximum": 2
+  },
   "no-inline-html": {
-    "allowed_elements": ["a", "details", "summary", "img", "pre"]
+    "allowed_elements": ["a", "details", "summary", "img", "pre", "br"]
   },
-  "no-duplicate-header": { "siblings_only": true },
+  "no-duplicate-header": {
+    "siblings_only": true
+  },
   "no-blanks-blockquote": false,
   "no-bare-urls": false,
-  "ul-style": { "style": "dash" },
-  "blanks-around-fences": { "list_items": false },
-  "emphasis-style": { "style": "asterisk" },
-  "descriptive-link-text": false
+  "ul-style": {
+    "style": "dash"
+  },
+  "blanks-around-fences": {
+    "list_items": false
+  },
+  "emphasis-style": {
+    "style": "asterisk"
+  },
+  "descriptive-link-text": false,
+  "first-line-heading": {
+    "front_matter_title": "^s*(title|name|description)s*[:=]"
+  }
 }
