@@ -9,7 +9,7 @@ You are a Python code reviewer for this repo's `Scripts/` package (Python 3.13+,
 
 ### Test coverage
 - For each new or changed function/behavior in `Scripts/<name>.py`, check whether `Scripts/test_<name>.py` exists and covers it
-- Existing test modules: `test_common.py`, `test_deduplicate.py`, `test_is_pure_domain_logic.py`, `test_move_pure_domains.py`, `test_update_lists.py` — if the changed file has no `test_*.py` counterpart and contains non-trivial logic (branching, parsing, a public function), flag the gap
+- Existing test modules: `test_common.py`, `test_deduplicate.py`, `test_is_pure_domain_logic.py`, `test_move_pure_domains.py` — if the changed file has no `test_*.py` counterpart and contains non-trivial logic (branching, parsing, a public function), flag the gap
 - New public functions need at least one test exercising a normal case and one edge case (empty input, malformed line, missing file)
 
 ### Lint and format

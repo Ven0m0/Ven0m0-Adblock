@@ -10,7 +10,6 @@
     "build:adblock": "uv run python -m Scripts.build adblock",
     "build:hosts": "uv run python -m Scripts.build hosts",
     "build:userscripts": "uv run python -m Scripts.build userscripts",
-    "update:lists": "uv run python -m Scripts.update_lists",
     "lint": "bun run lint:js && bun run lint:filters && bun run lint:md",
     "lint:js": "bun run lint:biome && bun run lint:oxlint",
     "lint:biome": "bun x biome lint .",

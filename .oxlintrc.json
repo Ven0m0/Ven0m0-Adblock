@@ -12,10 +12,6 @@
     "build/**",
     "Filters/**",
     "lists/releases/**",
-    "lists/mirror/**",
-    "userscripts/todo/**",
-    "userscripts/src/1_adguard-extra.user.js",
-    "userscripts/src/adguard-extra.user.js",
     "*.min.js",
     "*.bundle.js"
   ],

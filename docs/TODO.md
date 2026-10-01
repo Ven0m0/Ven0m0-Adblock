@@ -1,20 +1,25 @@
 # TODO
 
-## Pending
+Single backlog for the repo. Add new items here instead of creating more TODO or PLAN files.
 
-- [x] Finish hostlist-compiler configs (`hostlist-config.json`, `lists/conf.json`) — see [HostlistCompiler](https://github.com/AdguardTeam/HostlistCompiler) and [example config](https://github.com/AdguardTeam/AdGuardSDNSFilter/blob/master/configuration.json)
-- [ ] Review and consolidate cross-file duplicates in filter lists
-- [ ] Migrate remaining Python scripts to Bun/JS for CI portability
+## Open
 
-## Future Consideration
+- [ ] Browser-test `userscripts/src/web-pro.user.js` 6.1.0 in Tampermonkey or Violentmonkey: a login flow,
+      a checkout/cart page, and a media site. Toggle `viewportPrefetch`, `asyncDecode` and
+      `blockExtraTrackers`; confirm no console errors and no prefetch of excluded URLs.
+- [ ] Decide whether `lists/hostlist/windows-telemetry.txt` and `lists/hostlist/Spotify.txt` are hand-maintained
+      or upstream copies (no source header). Remove them if they are upstream copies.
+- [ ] `lists/adblock/exp.txt`, `lists/hostlist/Experimental.txt` and `lists/hostlist/Test.txt` are not part of any
+      build or combination list. Promote their rules into a real list or delete them.
 
-- StevenBlack/hosts automation scripts
-- AdGuardTeam/Scriptlets, FiltersCompiler
-- DandelionSprout/adfilt ClearURLs for uBo
+## Done
 
-## Resources
+- [x] Hostlist-compiler config (`hostlist-config.json`)
+- [x] Cross-file duplicate rules consolidated
+- [x] Redundant rule checker (`bun run lint:redundancy`)
+- [x] Reddit login fix (`accounts.google.com` third-party block now excludes `reddit.com`)
+- [x] Removed upstream list and userscript downloads; repo holds own content only
 
-- https://github.com/blocklistproject/Lists
-- https://github.com/AdguardTeam/HostlistCompiler
-- https://github.com/AdguardTeam/AGLint
-- https://github.com/AdguardTeam/DeadDomainsLinter
+## Decided against
+
+- Migrating the Python tooling in `Scripts/` to Bun/JS: it works and is tested; not worth the rewrite.

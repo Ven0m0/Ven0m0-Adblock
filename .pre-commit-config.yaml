@@ -8,9 +8,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^(lists/(releases|external)/|Filters/|userscripts/dist/)
+        exclude: ^(lists/releases/|Filters/|userscripts/dist/)
       - id: end-of-file-fixer
-        exclude: ^(lists/(releases|external)/|Filters/|userscripts/dist/)
+        exclude: ^(lists/releases/|Filters/|userscripts/dist/)
       - id: check-yaml
       - id: check-added-large-files
         args: [--maxkb=1024]

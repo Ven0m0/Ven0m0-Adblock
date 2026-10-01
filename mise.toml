@@ -12,10 +12,6 @@ bun = true
 [settings.pipx]
 uvx = true
 
-[settings.python]
-uv_venv_auto = true
-uv_venv_create_args = ["--system-site-packages", "--seed"]
-
 [settings.cargo]
 binstall = true
 
@@ -66,11 +62,6 @@ depends = ["install"]
 [tasks."build:all"]
 description = "Build everything"
 run = "uv run python -m Scripts.build all"
-depends = ["install"]
-
-[tasks."update:lists"]
-description = "Refresh external filter lists"
-run = "uv run python -m Scripts.update_lists"
 depends = ["install"]
 
 [tasks.lint]

@@ -1,5 +1,5 @@
 # NOTE: aglint 3.0.2's directory scanner tests ignore patterns against bare
-# basenames only (e.g. "external"), never full relative paths ("lists/external/").
+# basenames only (e.g. "releases"), never full relative paths ("lists/releases/").
 # Patterns with a "/" or a trailing "/" never match here - keep every directory
 # entry below as a bare name, no path prefix, no trailing slash.
 
@@ -30,11 +30,7 @@ __pycache__
 userscripts
 # Ignore hostlists that may use pure regex/domain formats not fully compatible with standard adblock linter
 hostlist
-# Ignore external sources (downloaded upstream lists, not ours to lint)
-external
 
-# Stray backup file, not a filter list
-my-ublock-backup_*.txt
 
 # CLAUDE.md is a symlink to AGENTS.md. It's not a filter list, but the real
 # reason it's ignored: git stash/checkout recreates the symlink, and a

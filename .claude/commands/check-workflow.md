@@ -3,7 +3,7 @@ description: Summarize the recent run status of a GitHub Actions workflow in thi
 argument-hint: <workflow-name>
 ---
 
-Look up the recent run status of the workflow named `$ARGUMENTS` (match loosely against the filenames in `.github/workflows/`: `aglint.yml`, `automerge-open-prs.yml`, `build-filter-lists.yml`, `dead-domains-check.yml`, `dependabot-auto-merge.yml`, `lint-and-format.yml`, `maintain-lists.yml`, `pull_request.yml`, `update-lists.yml`, `userscripts.yml`).
+Look up the recent run status of the workflow named `$ARGUMENTS` (match loosely against the filenames in `.github/workflows/`: `aglint.yml`, `automerge-open-prs.yml`, `build-filter-lists.yml`, `dead-domains-check.yml`, `lint-and-format.yml`, `maintain-lists.yml`, `pull_request.yml`, `redundancy-check.yml`, `userscripts.yml`).
 
 Run:
 ```

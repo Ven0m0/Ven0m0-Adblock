@@ -13,7 +13,3 @@
 !#include Spotify.txt
 !#include Twitter.txt
 !#include Youtube.txt
-!#include antiadblock.txt
-!#include fanboy_sounds_thirdparty.txt
-!#include lan-block.txt
-!#include resource-abuse.txt

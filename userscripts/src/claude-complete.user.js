@@ -186,7 +186,7 @@ IMPROVEMENTS OVER ORIGINALS:
               active.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
             } else if (!success && active.isContentEditable) {
               const selection = window.getSelection();
-              if (selection && selection.rangeCount) {
+              if (selection?.rangeCount) {
                 const range = selection.getRangeAt(0);
                 range.deleteContents();
 
