@@ -2,12 +2,11 @@
 // @name         YouTube Unified Optimizer
 // @author       Ven0m0
 // @namespace    http://tampermonkey.net/
-// @version      4.3.1
+// @version      4.3.2
 // @description  Lightweight YouTube optimizer: CPU/GPU/UI tweaks, quality lock, flags, engine tame
 // @match        https://youtube.com/*
 // @match        https://www.youtube.com/*
 // @match        https://m.youtube.com/*
-// @match        https://music.youtube.com/*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @grant        GM_getValue

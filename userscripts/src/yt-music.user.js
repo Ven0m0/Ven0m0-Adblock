@@ -1,10 +1,9 @@
 // ==UserScript==
 // @name         YouTube Music Complete
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
-// @description  Consolidated YouTube Music optimizer: Opus codec preference, auto audio-only mode, autopause prevention, performance fixes, lazy loading, UI enhancements
+// @version      1.0.2
+// @description  Consolidated YouTube Music optimizer: Opus codec preference, autopause prevention, performance fixes, lazy loading, UI enhancements
 // @author       Ven0m0
-// @namespace    http://tampermonkey.net/
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // @match        *://music.youtube.com/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
@@ -20,12 +19,10 @@
 CONSOLIDATED FEATURES:
 
 1. Opus Codec Preference - Blocks AAC to force Opus (more efficient)
-2. Auto Audio-Only Mode - Automatically switches to audio mode to save bandwidth
-3. AutoPause Prevention - Prevents "Still watching?" interruptions
-4. Performance Fixes - Animation disabling, smooth scrolling
-5. Lazy Loading - Optimized content loading
-6. New Releases Fixer - Fixes layout issues in New Releases section
-7. UI Enhancements - Minor cosmetic improvements
+2. AutoPause Prevention - Prevents "Still watching?" interruptions
+3. Performance Fixes - Animation disabling, smooth scrolling
+4. Lazy Loading - Optimized content loading
+5. UI Enhancements - Minor cosmetic improvements
 */
 
 (() => {
@@ -65,21 +62,17 @@ CONSOLIDATED FEATURES:
 
   const CONFIG = {
     opusCodec: GM_getValue("ytm_opus_codec", true),
-    autoAudioMode: GM_getValue("ytm_auto_audio", true),
     preventAutoPause: GM_getValue("ytm_prevent_autopause", true),
     performanceFixes: GM_getValue("ytm_performance", true),
     lazyLoading: GM_getValue("ytm_lazy_loading", true),
-    fixNewReleases: GM_getValue("ytm_fix_releases", true),
     uiEnhancements: GM_getValue("ytm_ui_enhance", true)
   };
 
   function saveConfig() {
     GM_setValue("ytm_opus_codec", CONFIG.opusCodec);
-    GM_setValue("ytm_auto_audio", CONFIG.autoAudioMode);
     GM_setValue("ytm_prevent_autopause", CONFIG.preventAutoPause);
     GM_setValue("ytm_performance", CONFIG.performanceFixes);
     GM_setValue("ytm_lazy_loading", CONFIG.lazyLoading);
-    GM_setValue("ytm_fix_releases", CONFIG.fixNewReleases);
     GM_setValue("ytm_ui_enhance", CONFIG.uiEnhancements);
   }
 
@@ -112,39 +105,7 @@ CONSOLIDATED FEATURES:
   }
 
   // ═══════════════════════════════════════════════════════════
-  // MODULE 2: AUTO AUDIO-ONLY MODE
-  // ═══════════════════════════════════════════════════════════
-
-  const AutoAudioModule = {
-    intervalId: null,
-
-    switchToAudio() {
-      try {
-        const toggle = document.querySelector('ytmusic-av-toggle[class="style-scope ytmusic-player-page"]');
-        if (toggle && toggle.getAttribute("playback-mode") === "OMV_PREFERRED") {
-          const button = document.querySelector(".song-button.style-scope.ytmusic-av-toggle");
-          if (button) button.click();
-        }
-      } catch {
-        // Silently fail if elements not found
-      }
-    },
-
-    start() {
-      this.switchToAudio();
-      this.intervalId = setInterval(() => this.switchToAudio(), 10000);
-    },
-
-    stop() {
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-        this.intervalId = null;
-      }
-    }
-  };
-
-  // ═══════════════════════════════════════════════════════════
-  // MODULE 3: AUTOPAUSE PREVENTION
+  // MODULE 2: AUTOPAUSE PREVENTION
   // ═══════════════════════════════════════════════════════════
 
   const AutoPauseModule = {
@@ -230,7 +191,7 @@ CONSOLIDATED FEATURES:
   };
 
   // ═══════════════════════════════════════════════════════════
-  // MODULE 4: PERFORMANCE FIXES
+  // MODULE 3: PERFORMANCE FIXES
   // ═══════════════════════════════════════════════════════════
 
   if (CONFIG.performanceFixes) {
@@ -256,7 +217,7 @@ CONSOLIDATED FEATURES:
   }
 
   // ═══════════════════════════════════════════════════════════
-  // MODULE 5: LAZY LOADING OPTIMIZATION
+  // MODULE 4: LAZY LOADING OPTIMIZATION
   // ═══════════════════════════════════════════════════════════
 
   const LazyLoadingModule = {
@@ -343,39 +304,7 @@ CONSOLIDATED FEATURES:
   };
 
   // ═══════════════════════════════════════════════════════════
-  // MODULE 6: NEW RELEASES FIXER
-  // ═══════════════════════════════════════════════════════════
-
-  if (CONFIG.fixNewReleases) {
-    GM_addStyle(`
-      /* Fix New Releases section layout */
-      ytmusic-carousel-shelf-renderer[system-id="new-releases"] {
-        display: block !important;
-        width: 100% !important;
-      }
-
-      ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        justify-content: flex-start !important;
-        gap: 16px !important;
-        scrollbar-width: none !important; /* Firefox */
-      }
-
-      ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel::-webkit-scrollbar {
-        display: none !important; /* Safari and Chrome */
-      }
-
-      ytmusic-carousel-shelf-renderer[system-id="new-releases"] .carousel-item {
-        flex: 0 0 auto !important;
-        margin: 0 !important;
-      }
-    `);
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // MODULE 7: UI ENHANCEMENTS
+  // MODULE 5: UI ENHANCEMENTS
   // ═══════════════════════════════════════════════════════════
 
   if (CONFIG.uiEnhancements) {
@@ -398,6 +327,7 @@ CONSOLIDATED FEATURES:
   // ═══════════════════════════════════════════════════════════
 
   function createSettingsPanel() {
+    if (document.getElementById("ytm-complete-settings")) return;
     const panel = document.createElement("div");
     panel.id = "ytm-complete-settings";
     Object.assign(panel.style, {
@@ -414,59 +344,53 @@ CONSOLIDATED FEATURES:
       boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
     });
 
-    panel.innerHTML = `
-      <h3 style="margin:0 0 10px 0;font-size:15px;">YouTube Music Complete</h3>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-opus" ${CONFIG.opusCodec ? "checked" : ""}>
-        Opus Codec Preference
-      </label>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-audio" ${CONFIG.autoAudioMode ? "checked" : ""}>
-        Auto Audio-Only Mode
-      </label>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-autopause" ${CONFIG.preventAutoPause ? "checked" : ""}>
-        Prevent AutoPause
-      </label>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-perf" ${CONFIG.performanceFixes ? "checked" : ""}>
-        Performance Fixes
-      </label>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-lazy" ${CONFIG.lazyLoading ? "checked" : ""}>
-        Lazy Loading
-      </label>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-releases" ${CONFIG.fixNewReleases ? "checked" : ""}>
-        Fix New Releases
-      </label>
-      <label style="display:block;margin:5px 0;">
-        <input type="checkbox" id="ytm-ui" ${CONFIG.uiEnhancements ? "checked" : ""}>
-        UI Enhancements
-      </label>
-      <div style="margin-top:10px;display:flex;gap:10px;">
-        <button id="ytm-save" style="flex:1;padding:6px;background:#1db954;color:#fff;border:none;border-radius:4px;cursor:pointer;">Save & Reload</button>
-        <button id="ytm-close" style="padding:6px 12px;background:#333;color:#fff;border:none;border-radius:4px;cursor:pointer;">Close</button>
-      </div>
-    `;
+    // Built with DOM APIs: innerHTML can be rejected by YouTube's Trusted Types policy
+    const el = (tag, props, css = "") => {
+      const node = document.createElement(tag);
+      Object.assign(node, props);
+      node.style.cssText = css;
+      return node;
+    };
+    const toggles = [
+      ["ytm-opus", "opusCodec", "Opus Codec Preference"],
+      ["ytm-autopause", "preventAutoPause", "Prevent AutoPause"],
+      ["ytm-perf", "performanceFixes", "Performance Fixes"],
+      ["ytm-lazy", "lazyLoading", "Lazy Loading"],
+      ["ytm-ui", "uiEnhancements", "UI Enhancements"]
+    ];
+
+    panel.appendChild(el("h3", { textContent: "YouTube Music Complete" }, "margin:0 0 10px 0;font-size:15px;"));
+    const boxes = toggles.map(([id, key, text]) => {
+      const label = el("label", {}, "display:block;margin:5px 0;");
+      const box = el("input", { type: "checkbox", id, checked: CONFIG[key] });
+      label.append(box, el("span", { textContent: ` ${text}` }));
+      panel.appendChild(label);
+      return [key, box];
+    });
+
+    const buttonCss = "color:#fff;border:none;border-radius:4px;cursor:pointer;";
+    const save = el(
+      "button",
+      { id: "ytm-save", textContent: "Save & Reload" },
+      `flex:1;padding:6px;background:#1db954;${buttonCss}`
+    );
+    const close = el(
+      "button",
+      { id: "ytm-close", textContent: "Close" },
+      `padding:6px 12px;background:#333;${buttonCss}`
+    );
+    const buttons = el("div", {}, "margin-top:10px;display:flex;gap:10px;");
+    buttons.append(save, close);
+    panel.appendChild(buttons);
 
     document.body.appendChild(panel);
 
-    document.getElementById("ytm-save").onclick = () => {
-      CONFIG.opusCodec = document.getElementById("ytm-opus").checked;
-      CONFIG.autoAudioMode = document.getElementById("ytm-audio").checked;
-      CONFIG.preventAutoPause = document.getElementById("ytm-autopause").checked;
-      CONFIG.performanceFixes = document.getElementById("ytm-perf").checked;
-      CONFIG.lazyLoading = document.getElementById("ytm-lazy").checked;
-      CONFIG.fixNewReleases = document.getElementById("ytm-releases").checked;
-      CONFIG.uiEnhancements = document.getElementById("ytm-ui").checked;
+    save.onclick = () => {
+      for (const [key, box] of boxes) CONFIG[key] = box.checked;
       saveConfig();
       window.location.reload();
     };
-
-    document.getElementById("ytm-close").onclick = () => {
-      panel.remove();
-    };
+    close.onclick = () => panel.remove();
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -478,25 +402,18 @@ CONSOLIDATED FEATURES:
 
   // Wait for page load to initialize DOM-dependent modules
   window.addEventListener("load", () => {
-    // Module 2: Auto Audio-Only Mode
-    if (CONFIG.autoAudioMode) {
-      AutoAudioModule.start();
-    }
-
-    // Module 3: AutoPause Prevention
+    // Module 2: AutoPause Prevention
     if (CONFIG.preventAutoPause) {
       AutoPauseModule.init();
     }
 
-    // Module 5: Lazy Loading
+    // Module 4: Lazy Loading
     LazyLoadingModule.init();
   });
 
   console.info(
-    "[YT Music Complete] Initialized (7 modules, Opus codec:",
+    "[YT Music Complete] Initialized (5 modules, Opus codec:",
     CONFIG.opusCodec,
-    ", Auto audio:",
-    CONFIG.autoAudioMode,
     ", Prevent autopause:",
     CONFIG.preventAutoPause,
     ")"

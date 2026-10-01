@@ -18,15 +18,15 @@ Updates are checked against the same URL, so new commits on `main` arrive automa
 
 | Script | Sites | Description | Install |
 | ------ | ----- | ----------- | ------- |
-| Web Pro | All sites | Lazy load, URL cleaning, CPU/RAF tamer, capped link prefetch, optional tracker blocking | [Install][web-pro] |
+| Web Pro | All sites | Lazy load, URL cleaning, CPU/RAF tamer, capped link prefetch | [Install][web-pro] |
 | Google Search Fixer | Google Search | Port of the google-search-fixer Firefox extension (Android-friendly) | [Install][google-search-fixer] |
 
 ### YouTube
 
 | Script | Sites | Description | Install |
 | ------ | ----- | ----------- | ------- |
-| YouTube Unified Optimizer | YouTube, YouTube Music | CPU/GPU/UI tweaks, quality lock, flags, engine tame | [Install][yt-pro] |
-| YouTube Music Complete | YouTube Music | Opus codec preference, audio-only mode, autopause prevention, UI tweaks | [Install][yt-music] |
+| YouTube Unified Optimizer | YouTube | CPU/GPU/UI tweaks, quality lock, flags, engine tame | [Install][yt-pro] |
+| YouTube Music Complete | YouTube Music | Opus codec preference, autopause prevention, UI tweaks | [Install][yt-music] |
 
 ### GitHub
 

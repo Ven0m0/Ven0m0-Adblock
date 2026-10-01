@@ -3,13 +3,12 @@
 // @author       Ven0m0
 // @namespace    http://tampermonkey.net/
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
-// @version      6.1.0
+// @version      6.2.0
 // @description  Universal web optimizer: lazy load, URL cleaning, CPU/RAF tamer, network,
 //               privacy, perf features. Merges: Web Pro, Web Performance Optimizer,
 //               Speed up Google Captcha, plus selected ideas from Greasy Fork performance scripts.
 // @match        *://*/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
-// @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
 // @run-at       document-start
@@ -18,12 +17,32 @@
 // ==/UserScript==
 (() => {
   const SITE_KEY = `webpro:disable:${location.hostname}`;
-  if (localStorage.getItem(SITE_KEY) === "1") return;
+  // localStorage access throws in sandboxed and opaque-origin frames
+  const store = (() => {
+    try {
+      return localStorage;
+    } catch {
+      return null;
+    }
+  })();
+  if (store?.getItem(SITE_KEY) === "1") {
+    if (window.top === window)
+      GM_registerMenuCommand("Web Pro ⚡ Enable on this site", () => {
+        store.removeItem(SITE_KEY);
+        location.reload();
+      });
+    return;
+  }
 
   const HKEY = "__webpro_v6__";
+  // Page globals must be patched on the page window: with @grant the script runs in a sandbox,
+  // where `window.setTimeout = ...` would only change the sandbox's own copy.
   const win = typeof unsafeWindow === "object" ? unsafeWindow : window;
+  // Firefox: functions handed to the page have to be exported from the sandbox
+  const expose = typeof exportFunction === "function" ? (fn) => exportFunction(fn, win) : (fn) => fn;
   if (win[HKEY]) return;
   win[HKEY] = true;
+  const VERSION = typeof GM_info === "object" ? GM_info.script.version : "dev";
 
   const isYouTube = /(?:^|\.)youtube\.com$|^youtu\.be$/.test(location.hostname);
   const conn = navigator.connection;
@@ -33,7 +52,7 @@
   // Config constants
   const C = {
     KEY: "ven0m0.webpro.v6",
-    CACHE: { MAX: 48 * 1024 * 1024, TTL: 300000, RX: /\.(css|woff2?|ttf|eot|js|json)$/i },
+    CACHE: { MAX: 48 * 1024 * 1024, TTL: 300000, RX: /\.(css|js|json)$/i },
     TIME: {
       IDLE: 1500,
       FALLBACK: 300,
@@ -42,27 +61,8 @@
       THR_CLEAN: 500,
       THR_RUN: 300,
       THR_MUT: 500,
-      THR_COOKIE: 1000,
       THR_MEM: 5000
     },
-    SCRIPT_DENY:
-      /ads?|analytics|tracking|doubleclick|googletag|gtag|google-analytics|adsbygoogle|consent|pixel|facebook|scorecardresearch|matomo|tealium|pardot|hubspot|hotjar|intercom|criteo|quantc|clarity|mixpanel|segment|fullstory|onesignal|beacon/i,
-    TRACKER_HOSTS: new Set([
-      "google-analytics.com",
-      "googletagmanager.com",
-      "doubleclick.net",
-      "googlesyndication.com",
-      "adservice.google.com",
-      "connect.facebook.net",
-      "clarity.ms",
-      "hotjar.com",
-      "sentry.io",
-      "mixpanel.com",
-      "segment.com",
-      "fullstory.com",
-      "onesignal.com"
-    ]),
-    TRACKER_SCRIPTS: ["google-analytics", "googletagmanager", "adsbygoogle", "doubleclick.net"],
     TRACKER_META: [
       "google-site-verification",
       "msvalidate.01",
@@ -73,30 +73,6 @@
       "trafficjunky-site-verification",
       "ero_verify",
       "linkbuxverifycode"
-    ],
-    ALLOW_KW: [
-      "jquery",
-      "bootstrap",
-      "core",
-      "essential",
-      "react",
-      "chunk",
-      "runtime",
-      "main",
-      "cloudflare",
-      "captcha"
-    ],
-    EXTRA_TRACKER_HOSTS: [
-      "addthis.com",
-      "sharethis.com",
-      "optimizely.com",
-      "amplitude.com",
-      "newrelic.com",
-      "amazon-adsystem.com",
-      "scorecardresearch.com",
-      "quantserve.com",
-      "outbrain.com",
-      "taboola.com"
     ],
     PREFETCH_EXCL:
       /\/(?:log(?:in|out|off)|sign(?:in|out|up)|register|auth|account|checkout|cart|download)|\.(?:zip|exe|pdf|apk|dmg|iso|7z|rar|msi|mp[34])(?:$|[?#])|[?&](?:logout|download|token|session|sid|key)=/i,
@@ -120,8 +96,6 @@
     "_ga",
     "pk_campaign",
     "scid",
-    "src",
-    "ref",
     "aff",
     "affiliate",
     "campaign",
@@ -143,35 +117,28 @@
     "rowan_msg_id"
   ];
   const HASH_RE = /^#(?:intcid|back-url|back_url|src)/;
-  const UE = ["click", "keydown", "touchstart", "pointerdown"];
+  const AMAZON_RE = /\.amazon\./i;
 
   const DEF = {
     log: 0,
     lazy: 1,
     iframes: 1,
     videos: 1,
-    defer: 1,
     observe: 1,
-    prefetch: 1,
     preconnect: 1,
-    linkPrefetch: 1,
     linkLimit: 10,
     linkDelay: 3000,
     hoverPrefetch: 1,
     viewportPrefetch: 0,
     asyncDecode: 1,
-    blockExtraTrackers: 0,
     blockPrefetchLinks: 1,
     cleanURL: 1,
-    blockBeacons: 1,
     fingerprintReduce: 0,
     gpu: 1,
     mem: 1,
-    preload: 1,
     cpuTamer: 1,
     rafTamer: 1,
     throttleBG: 1,
-    limitFPS: 0,
     minTimeout: C.TIME.MIN_TO,
     minInterval: C.TIME.MIN_IV,
     caching: 1,
@@ -179,39 +146,31 @@
     rightClick: 0,
     copy: 1,
     select: 1,
-    cookie: 1,
-    tabSave: 1,
-    xhrBlock: 1,
-    ytPrivacy: 1,
+    cookie: 0,
+    tabSave: 0,
     domCleanup: 1,
     captchaSpeed: 1,
     silenceConsole: 0,
-    darkMode: 0,
-    disableWebGL: 0,
-    pauseGIFs: 0,
     siteToggle: 1,
     showUI: 1
   };
-  if (MODE >= 1) DEF.blockPrefetchLinks = 1;
   if (MODE >= 2) DEF.fingerprintReduce = 1;
 
   const cfg = (() => {
     try {
-      return { ...DEF, ...JSON.parse(localStorage.getItem(C.KEY) || "") };
+      return { ...DEF, ...JSON.parse(store.getItem(C.KEY) || "") };
     } catch {
       return { ...DEF };
     }
   })();
-  const saveCfg = () => localStorage.setItem(C.KEY, JSON.stringify(cfg));
+  const saveCfg = () => store?.setItem(C.KEY, JSON.stringify(cfg));
 
   const state = {
     prefetchCount: 0,
     cache: new Map(),
     cacheSize: 0,
     loaded: new WeakSet(),
-    deferredScripts: new Map(),
     origins: new Set(),
-    interactionBound: 0,
     videoObserver: null,
     hoverPrefetched: new Set()
   };
@@ -232,78 +191,35 @@
   };
   const log = (...a) => cfg.log && console.debug("[WebPro]", ...a);
 
-  const pageHost = location.hostname;
-  const mainDomain = pageHost.split(".").slice(-2).join(".");
-  const isTrusted = (url) => {
-    if (!url) return false;
-    try {
-      return new URL(url, location.origin).hostname.endsWith(mainDomain);
-    } catch {
-      return false;
-    }
-  };
-  const isTracker = (url) => {
-    if (!url || isTrusted(url)) return false;
-    try {
-      const h = new URL(url, location.origin).hostname;
-      if ([...C.TRACKER_HOSTS].some((t) => h.endsWith(t))) return true;
-      if (cfg.blockExtraTrackers && C.EXTRA_TRACKER_HOSTS.some((t) => h === t || h.endsWith(`.${t}`))) return true;
-      const lc = url.toLowerCase();
-      return !C.ALLOW_KW.some((k) => lc.includes(k)) && C.SCRIPT_DENY.test(lc);
-    } catch {
-      return false;
-    }
-  };
-
   // Google Captcha speedup
   if (cfg.captchaSpeed && /\/recaptcha\/(api2|enterprise)\/bframe/.test(location.href)) {
-    const origST = setTimeout;
-    window.setTimeout = function (fn, dur, ...args) {
-      let d = dur;
-      if (d === 4000 || d === 50) d = 0;
-      return origST.call(this, fn, d, ...args);
-    };
-    document.head.appendChild(document.createElement("style")).textContent = "*{transition:none!important}";
+    const origST = win.setTimeout;
+    win.setTimeout = expose((fn, dur, ...args) => origST.call(win, fn, dur === 4000 || dur === 50 ? 0 : dur, ...args));
+    // document.head may not exist yet at document-start
+    (document.head || document.documentElement).appendChild(document.createElement("style")).textContent =
+      "*{transition:none!important}";
   }
 
   // Fingerprint reduction
   if (cfg.fingerprintReduce) {
-    const prop = (k, v) => Object.defineProperty(navigator, k, { get: () => v, configurable: true });
+    const prop = (k, v) => Object.defineProperty(win.navigator, k, { get: expose(() => v), configurable: true });
     prop("hardwareConcurrency", 2);
     prop("deviceMemory", 2);
     prop("plugins", []);
     prop("mimeTypes", []);
   }
 
-  // Beacon blocking
-  if (cfg.blockBeacons) {
-    const orig = navigator.sendBeacon?.bind(navigator);
-    if (orig) navigator.sendBeacon = (url, data) => (isTracker(url) ? false : orig(url, data));
-  }
-
-  // WebGL block
-  if (cfg.disableWebGL) {
-    try {
-      const orig = HTMLCanvasElement.prototype.getContext;
-      HTMLCanvasElement.prototype.getContext = function (type, ...a) {
-        return type === "webgl" || type === "webgl2" ? null : orig.call(this, type, ...a);
-      };
-    } catch (e) {
-      log("WebGL block error:", e);
-    }
-  }
-
   // CPU tamer / RAF tamer — skip on YouTube; yt-pro handles those domains
   if ((cfg.cpuTamer || cfg.rafTamer) && !isYouTube) {
     const AsyncFn = (async () => {}).constructor;
     const [nTO, nSI, nRAF, nCTO, nCI, nCAF] = [
-      setTimeout,
-      setInterval,
-      requestAnimationFrame,
-      clearTimeout,
-      clearInterval,
-      cancelAnimationFrame
-    ];
+      "setTimeout",
+      "setInterval",
+      "requestAnimationFrame",
+      "clearTimeout",
+      "clearInterval",
+      "cancelAnimationFrame"
+    ].map((k) => win[k].bind(win));
     const micro = queueMicrotask;
     let res = () => {},
       p;
@@ -324,20 +240,18 @@
 
     const toSet = new Set(),
       rafSet = new Set();
-    const awaitTO = async (id) => {
-      toSet.add(id);
+    // toSet holds live timer ids; clearTimeout/clearInterval remove them, so a callback
+    // cleared while waiting here does not run
+    const awaitTO = async () => {
       if (last !== p) micro(trig);
       await p;
       if (last !== p) micro(trig);
       await p;
-      toSet.delete(id);
-      return 1;
     };
     const awaitRAF = async (id, q) => {
       rafSet.add(id);
       await q;
-      rafSet.delete(id);
-      return 1;
+      return rafSet.delete(id);
     };
     const throwE = (e) =>
       micro(() => {
@@ -345,36 +259,38 @@
       });
 
     if (cfg.cpuTamer) {
-      window.setTimeout = (fn, d = 0, ...a) => {
+      win.setTimeout = expose((fn, d = 0, ...a) => {
         const h =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(res)
-                  .then((v) => v && fn(...x))
+                awaitTO()
+                  .then(() => toSet.delete(id) && fn(...x))
                   .catch(throwE)
             : fn;
-        const res = nTO(h, Math.max(d, cfg.minTimeout), ...a);
-        return res;
-      };
-      window.setInterval = (fn, d = 0, ...a) => {
+        const id = nTO(h, Math.max(d, cfg.minTimeout), ...a);
+        toSet.add(id);
+        return id;
+      });
+      win.setInterval = expose((fn, d = 0, ...a) => {
         const h =
           typeof fn === "function"
             ? (...x) =>
-                awaitTO(res)
-                  .then((v) => v && fn(...x))
+                awaitTO()
+                  .then(() => toSet.has(id) && fn(...x))
                   .catch(throwE)
             : fn;
-        const res = nSI(h, Math.max(d, cfg.minInterval), ...a);
-        return res;
-      };
-      window.clearTimeout = (id) => {
+        const id = nSI(h, Math.max(d, cfg.minInterval), ...a);
+        toSet.add(id);
+        return id;
+      });
+      win.clearTimeout = expose((id) => {
         toSet.delete(id);
         return nCTO(id);
-      };
-      window.clearInterval = (id) => {
+      });
+      win.clearInterval = expose((id) => {
         toSet.delete(id);
         return nCI(id);
-      };
+      });
     }
 
     if (cfg.rafTamer) {
@@ -391,22 +307,12 @@
       else if (typeof Animation === "function") {
         tl = document.documentElement?.animate?.(null)?.timeline || new T();
       } else tl = new T();
-      const frameMs = cfg.limitFPS ? 1000 / 30 : 0;
-      let lastFrame = 0;
 
-      window.requestAnimationFrame = (fn) => {
+      win.requestAnimationFrame = expose((fn) => {
         const q = p;
         const id = nRAF((ts) => {
-          if (frameMs) {
-            const now = Date.now();
-            if (now - lastFrame < frameMs) {
-              nCAF(rid);
-              return;
-            }
-            lastFrame = now;
-          }
           const s = tl.currentTime;
-          awaitRAF(rid, q)
+          awaitRAF(id, q)
             .then((v) => {
               if (v) {
                 fn(ts + (tl.currentTime - s));
@@ -416,67 +322,42 @@
         });
         if (last !== p) micro(trig);
         return id;
-      };
-      window.cancelAnimationFrame = (id) => {
+      });
+      win.cancelAnimationFrame = expose((id) => {
         rafSet.delete(id);
         return nCAF(id);
-      };
-    } else if (cfg.limitFPS) {
-      const nRAF2 = window.requestAnimationFrame.bind(window);
-      const frameMs = 1000 / 30;
-      let lastFrame = 0;
-      window.requestAnimationFrame = (cb) =>
-        nRAF2((ts) => {
-          const now = Date.now();
-          if (now - lastFrame >= frameMs) {
-            lastFrame = now;
-            cb(ts);
-          }
-        });
-    }
-  } else if (cfg.limitFPS) {
-    const nRAF = window.requestAnimationFrame.bind(window);
-    const frameMs = 1000 / 30;
-    let lastFrame = 0;
-    window.requestAnimationFrame = (cb) =>
-      nRAF((ts) => {
-        const now = Date.now();
-        if (now - lastFrame >= frameMs) {
-          lastFrame = now;
-          cb(ts);
-        }
       });
+    }
   }
 
-  // Background throttle
-  if (cfg.throttleBG) {
-    const nTO2 = window.setTimeout.bind(window),
-      nSI2 = window.setInterval.bind(window);
-    const active = { st: window.setTimeout, si: window.setInterval };
+  // Background throttle — skip on YouTube; yt-pro patches the same timers there
+  if (cfg.throttleBG && !isYouTube) {
+    const st = win.setTimeout,
+      si = win.setInterval;
+    const slowST = expose((fn, ms, ...a) => st.call(win, fn, Math.max(ms | 0, 2000), ...a));
+    const slowSI = expose((fn, ms, ...a) => si.call(win, fn, Math.max(ms | 0, 2000), ...a));
+    // Swap only our own functions, so a timer patch installed later by the page or another script survives
+    const swap = (k, from, to) => {
+      if (win[k] === from) win[k] = to;
+    };
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        window.setTimeout = (fn, ms, ...a) => nTO2(fn, Math.max(ms | 0, 2000), ...a);
-        window.setInterval = (fn, ms, ...a) => nSI2(fn, Math.max(ms | 0, 2000), ...a);
+        swap("setTimeout", st, slowST);
+        swap("setInterval", si, slowSI);
       } else {
-        window.setTimeout = active.st;
-        window.setInterval = active.si;
+        swap("setTimeout", slowST, st);
+        swap("setInterval", slowSI, si);
       }
     });
   }
 
   // Console silencing
   if (cfg.silenceConsole) {
-    const noop = () => {};
+    const noop = expose(() => {});
     ["log", "warn", "error", "debug", "info"].forEach((m) => {
-      console[m] = noop;
+      win.console[m] = noop;
     });
   }
-
-  // Dark mode
-  if (cfg.darkMode)
-    GM_addStyle(
-      "html,body{background:#121212!important;color:#e0e0e0!important}:not(pre)>code,pre{background:#212121!important;color:#e0e0e0!important}img,video,canvas{filter:invert(1) hue-rotate(180deg)}"
-    );
 
   // Tab save
   if (cfg.tabSave)
@@ -484,78 +365,64 @@
       document.documentElement.style.display = document.visibilityState === "hidden" ? "none" : "";
     });
 
-  // XHR interception
-  if (cfg.xhrBlock) {
-    const origOpen = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function (method, url, ...args) {
-      if (typeof url === "string" && isTracker(url)) {
-        log("XHR blocked:", url);
-        return;
-      }
-      return origOpen.call(this, method, url, ...args);
-    };
-  }
-
-  // Fetch override: caching + tracker blocking
+  // Fetch override: caching
   {
     const rx = (u) => cfg.caching && C.CACHE.RX.test(u);
     const cGet = (u) => {
       const e = state.cache.get(u);
       if (!e) return null;
-      if (Date.now() - e.ts < C.CACHE.TTL) {
-        state.cache.set(u, { data: e.data, ts: Date.now() });
-        return e.data;
-      }
+      // ts is not refreshed on a hit, so an entry expires TTL after it was fetched
+      if (Date.now() - e.ts < C.CACHE.TTL) return e;
       state.cache.delete(u);
       state.cacheSize -= e.data.length;
       return null;
     };
-    const cSet = (u, d) => {
-      if (state.cacheSize + d.length <= C.CACHE.MAX) {
-        state.cache.set(u, { data: d, ts: Date.now() });
-        state.cacheSize += d.length;
-      }
+    const cSet = (u, data, r) => {
+      // Concurrent misses for one URL both land here; replace instead of double-counting
+      const old = state.cache.get(u);
+      const size = state.cacheSize - (old ? old.data.length : 0) + data.length;
+      if (size > C.CACHE.MAX) return;
+      state.cache.set(u, { data, ts: Date.now(), status: r.status, statusText: r.statusText, headers: [...r.headers] });
+      state.cacheSize = size;
     };
-    const origFetch = window.fetch;
-    window.fetch = function (u, ...a) {
-      if (typeof u === "string") {
-        if (isTracker(u)) {
-          log("Fetch blocked:", u);
-          return new Promise(() => {});
-        }
-        if (rx(u)) {
-          const c = cGet(u);
-          if (c) return Promise.resolve(new Response(c));
-          return origFetch.call(this, u, ...a).then((r) => {
-            if (!r.ok) return r;
-            const s = Number.parseInt(r.headers.get("Content-Length") || "", 10);
-            if (!Number.isNaN(s) && s > 1048576) return r;
-            return r
-              .clone()
-              .text()
-              .then((t) => {
-                cSet(u, t);
-                return new Response(t, { status: r.status, statusText: r.statusText, headers: r.headers });
-              })
-              .catch((e) => {
-                log("Fetch clone error:", e);
-                return r;
-              });
-          });
-        }
+    const origFetch = win.fetch;
+    win.fetch = expose(function (u, ...a) {
+      // Cache key is the URL only, so cache plain GETs and nothing else
+      const method = a[0]?.method;
+      if (typeof u === "string" && rx(u) && (!method || method.toUpperCase() === "GET")) {
+        const c = cGet(u);
+        if (c) return Promise.resolve(new Response(c.data, c));
+        return origFetch.call(this, u, ...a).then((r) => {
+          if (!r.ok) return r;
+          const s = Number.parseInt(r.headers.get("Content-Length") || "", 10);
+          if (!Number.isNaN(s) && s > 1048576) return r;
+          return r
+            .clone()
+            .text()
+            .then((t) => {
+              cSet(u, t, r);
+              return new Response(t, { status: r.status, statusText: r.statusText, headers: r.headers });
+            })
+            .catch((e) => {
+              log("Fetch clone error:", e);
+              return r;
+            });
+        });
       }
       return origFetch.call(this, u, ...a);
-    };
+    });
   }
 
   // URL cleaning
   const stripTracking = (url) => {
     let c = 0;
-    if (url.href.includes("/ref=")) {
+    // `ref` and `src` are functional params on many sites; only Amazon uses them purely for tracking
+    const amazon = AMAZON_RE.test(url.hostname);
+    if (amazon && url.href.includes("/ref=")) {
       url.href = url.href.replace("/ref=", "?ref=");
       c = 1;
     }
-    for (const p of TRACK)
+    for (const p of amazon ? [...TRACK, "ref", "src"] : TRACK)
       if (url.searchParams.has(p)) {
         url.searchParams.delete(p);
         c = 1;
@@ -569,7 +436,7 @@
   };
 
   function canonicalAmazon(url) {
-    if (!/\.amazon\./i.test(url.hostname)) return 0;
+    if (!AMAZON_RE.test(url.hostname)) return 0;
     const p = url.pathname;
     const asin =
       p.match(/\/dp\/([A-Z0-9]{8,16})/i)?.[1] ||
@@ -589,13 +456,12 @@
   function cleanURL() {
     if (!cfg.cleanURL) return;
     try {
-      const url = new URL(location.href.replace("/ref=", "?ref="));
+      const url = new URL(location.href);
       if (canonicalAmazon(url)) return;
-      let c = stripTracking(url);
-      if (HASH_RE.test(url.hash)) {
-        c = 1;
-      }
-      if (c) history.replaceState(null, "", url.origin + url.pathname + url.search);
+      const c = stripTracking(url);
+      const dropHash = HASH_RE.test(url.hash);
+      if (c || dropHash)
+        history.replaceState(null, "", url.origin + url.pathname + url.search + (dropHash ? "" : url.hash));
     } catch (e) {
       log("URL clean error:", e);
     }
@@ -686,17 +552,6 @@
     if (window.gc) window.gc();
   }
 
-  function preloadRes() {
-    if (!cfg.preload) return;
-    document.querySelectorAll("img:not([data-wp-pre])").forEach((r) => {
-      if (r.src) {
-        const i = new Image();
-        i.src = r.src;
-      }
-      mark(r, "data-wp-pre");
-    });
-  }
-
   // Lazy loading
   function lazyImages() {
     if (!cfg.lazy) return;
@@ -715,7 +570,7 @@
       const s = i.getAttribute("src");
       if (!s || !/^https?:/i.test(s) || i.getAttribute("srcdoc") !== null) return;
       i.loading = "lazy";
-      i.fetchpriority = "low";
+      i.fetchPriority = "low";
       mark(i);
     });
   }
@@ -767,106 +622,6 @@
     });
   }
 
-  // GIF pause
-  function pauseGIFs() {
-    if (!cfg.pauseGIFs) return;
-    document.querySelectorAll("img[src$='.gif']").forEach((img) => {
-      const snap = () => {
-        if (!img.naturalWidth) return;
-        const c = document.createElement("canvas");
-        c.width = img.naturalWidth;
-        c.height = img.naturalHeight;
-        c.style.cssText = img.style.cssText;
-        c.className = img.className;
-        c.title = "Click to play GIF";
-        try {
-          c.getContext("2d").drawImage(img, 0, 0);
-        } catch (e) {
-          log("GIF snap error:", e);
-          return;
-        }
-        c.onclick = () => c.replaceWith(img);
-        img.replaceWith(c);
-      };
-      if (img.complete) {
-        snap();
-      } else {
-        img.addEventListener("load", snap, { once: true });
-      }
-    });
-  }
-
-  // Script defer + restore on interaction
-  function deferScripts() {
-    if (!cfg.defer) return;
-    document.querySelectorAll("script[src]:not([data-wp-s])").forEach((s) => {
-      const src = s.getAttribute("src") || "";
-      const t = s.getAttribute("type") || "";
-      if (C.SCRIPT_DENY.test(src) || t === "application/ld+json" || (cfg.blockExtraTrackers && isTracker(src))) {
-        const id = Math.random().toString(36).slice(2) + Date.now();
-        state.deferredScripts.set(id, src);
-        s.type = "text/wp-blocked";
-        s.setAttribute("data-wp-id", id);
-        s.removeAttribute("src");
-      }
-      mark(s, "data-wp-s");
-    });
-  }
-
-  function restoreScripts() {
-    document.querySelectorAll('script[type="text/wp-blocked"][data-wp-id]').forEach((s) => {
-      const id = s.getAttribute("data-wp-id");
-      const src = id && state.deferredScripts.get(id);
-      if (!src) return;
-      if (
-        src.startsWith("javascript:") ||
-        src.startsWith("data:") ||
-        src.startsWith("vbscript:") ||
-        src.startsWith("//") ||
-        /[<>"']/.test(src)
-      ) {
-        state.deferredScripts.delete(id);
-        return;
-      }
-      if (!src.startsWith("https://") && !src.startsWith("/")) {
-        state.deferredScripts.delete(id);
-        return;
-      }
-      if (src.startsWith("https://")) {
-        try {
-          if (new URL(src).protocol !== "https:") {
-            state.deferredScripts.delete(id);
-            return;
-          }
-        } catch {
-          state.deferredScripts.delete(id);
-          return;
-        }
-      }
-      state.deferredScripts.delete(id);
-      const n = document.createElement("script");
-      n.src = src;
-      n.async = 1;
-      n.setAttribute("data-restored", "1");
-      s.parentNode?.replaceChild(n, s);
-    });
-  }
-
-  function bindRestore() {
-    if (state.interactionBound) return;
-    const cb = () => {
-      idle(() => restoreScripts(), 500);
-      for (const e of UE) {
-        window.removeEventListener(e, cb, { passive: true });
-      }
-      state.interactionBound = 0;
-    };
-    for (const e of UE) {
-      window.addEventListener(e, cb, { passive: true, once: true });
-    }
-    state.interactionBound = 1;
-  }
-
   // Preconnect + origin hints
   function addHint(rel, href, as, cors) {
     if (!href || !/^\s*https?:/i.test(href)) return;
@@ -900,14 +655,6 @@
           log("Origin extract error:", e);
         }
       });
-  }
-
-  function preloadCritical() {
-    if (!cfg.preconnect) return;
-    document.querySelectorAll('link[rel="stylesheet"],link[rel="preload"],img[loading="eager"]').forEach((el) => {
-      if (el.href) addHint("preload", el.href, "style");
-      else if (el.src) addHint("preload", el.src, "image");
-    });
   }
 
   // Link prefetch: same-origin only, capped, skipped on data-saver / slow networks
@@ -960,20 +707,9 @@
 
   function blockPrefetchLinks() {
     if (!cfg.blockPrefetchLinks) return;
-    document
-      .querySelectorAll('link[rel="prefetch"]:not([data-wp-hint]),link[rel="preload"]:not([data-wp-hint])')
-      .forEach((l) => {
-        l.remove();
-      });
-  }
-
-  // YouTube privacy
-  function ytPrivacy() {
-    if (!cfg.ytPrivacy) return;
-    document.querySelectorAll("iframe[src]:not([data-wp-yt])").forEach((iframe) => {
-      if (iframe.src.includes("youtube.com/embed/"))
-        iframe.src = iframe.src.replace("youtube.com/embed/", "youtube-nocookie.com/embed/");
-      mark(iframe, "data-wp-yt");
+    // Preloads are left alone: pages use them for fonts and LCP images
+    document.querySelectorAll('link[rel="prefetch"]:not([data-wp-hint])').forEach((l) => {
+      l.remove();
     });
   }
 
@@ -985,12 +721,6 @@
       const prop = meta.getAttribute("property") || "";
       if (C.TRACKER_META.some((t) => name.includes(t)) || prop.startsWith("fb:")) {
         meta.remove();
-      }
-    });
-    document.querySelectorAll("script").forEach((s) => {
-      const src = s.getAttribute("src");
-      if (src && C.TRACKER_SCRIPTS.some((t) => src.includes(t))) {
-        s.remove();
       }
     });
     document.querySelectorAll("noscript").forEach((n) => {
@@ -1005,13 +735,13 @@
 
   // Amazon optimizations
   function initAmazon() {
-    if (!/\.amazon\./i.test(location.hostname)) return;
+    if (!AMAZON_RE.test(location.hostname)) return;
     if (/(checkout|signin|payment|addressselect|huc)/i.test(location.pathname)) return;
 
     const s = document.createElement("style");
     s.textContent =
       ".s-main-slot .s-result-item{content-visibility:auto;contain-intrinsic-size:1px 350px}img.s-image{transform:translateZ(0);will-change:opacity}#navFooter{content-visibility:auto;contain-intrinsic-size:1px 600px}";
-    document.head.appendChild(s);
+    (document.head || document.documentElement).appendChild(s);
 
     const HIGH = 4,
       DEBOUNCE = 240;
@@ -1066,21 +796,16 @@
     acceptCookies();
     forceGPU();
     optimizeMem();
-    preloadRes();
     lazyIframes();
     lazyImages();
     lazyVideos();
     optimizeVids();
-    deferScripts();
     extractOrigins();
-    preloadCritical();
     blockPrefetchLinks();
-    ytPrivacy();
     domCleanup();
   }, C.TIME.THR_RUN);
 
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", run) : setTimeout(run, 100);
-  if (cfg.defer) bindRestore();
 
   if (cfg.observe) {
     const mut = throttle(() => {
@@ -1089,10 +814,8 @@
       lazyImages();
       lazyVideos();
       optimizeVids();
-      deferScripts();
       extractOrigins();
       blockPrefetchLinks();
-      ytPrivacy();
     }, C.TIME.THR_MUT);
     new MutationObserver(() => mut()).observe(document.documentElement, { childList: true, subtree: true });
   }
@@ -1105,13 +828,9 @@
       }, C.TIME.THR_MEM)
     );
 
-  const onReady = () => {
-    pauseGIFs();
-    initLinkPrefetch();
-  };
   document.readyState === "loading"
-    ? document.addEventListener("DOMContentLoaded", onReady, { once: true })
-    : onReady();
+    ? document.addEventListener("DOMContentLoaded", initLinkPrefetch, { once: true })
+    : initLinkPrefetch();
   initAmazon();
 
   // Settings UI
@@ -1142,36 +861,25 @@
       lazy: "Lazy-load images",
       iframes: "Lazy-load iframes",
       videos: "Lazy-load videos",
-      defer: "Defer & block ad/tracking scripts",
       observe: "MutationObserver (dynamic content)",
-      prefetch: "Link prefetch hints",
       hoverPrefetch: "Hover prefetch (same-origin, capped)",
       viewportPrefetch: "Viewport prefetch (same-origin, capped)",
       asyncDecode: "Async image decoding",
-      blockExtraTrackers: "Block extra tracker hosts (ad/analytics networks)",
-      blockPrefetchLinks: "Block page-injected prefetch/preload",
+      blockPrefetchLinks: "Block page-injected prefetch",
       preconnect: "Preconnect to external origins",
       gpu: "GPU compositing hints (video/canvas)",
       mem: "Memory cleanup on tab hide",
-      preload: "Preload resource hints",
       cpuTamer: "CPU tamer (async setTimeout/setInterval)",
       rafTamer: "RAF tamer (async rAF)",
       throttleBG: "Throttle background timers (≥2s)",
-      limitFPS: "Cap frame rate at 30fps",
       cleanURL: "Strip tracking params from URLs",
-      blockBeacons: "Block sendBeacon to trackers",
       fingerprintReduce: "Fingerprint reduction",
-      xhrBlock: "Block tracker XHR requests",
-      ytPrivacy: "YouTube privacy (no-cookie embeds)",
-      domCleanup: "Remove tracker meta/scripts/noscript",
+      domCleanup: "Remove tracker meta/noscript",
       captchaSpeed: "Speed up Google reCAPTCHA",
       bypass: "Bypass copy/select restrictions",
       cookie: "Auto-accept cookie banners",
       tabSave: "Hide DOM when tab is hidden",
       silenceConsole: "Silence console output",
-      darkMode: "Force dark mode",
-      disableWebGL: "Disable WebGL",
-      pauseGIFs: "Freeze GIF animations",
       siteToggle: "Show per-site disable button"
     };
 
@@ -1179,7 +887,7 @@
     modal.className = "wp-modal";
 
     const h2 = document.createElement("h2");
-    h2.textContent = "⚡ Web Pro v6.1";
+    h2.textContent = `⚡ Web Pro v${VERSION}`;
     modal.appendChild(h2);
 
     Object.entries(LABELS).forEach(([k, label]) => {
@@ -1217,8 +925,8 @@
     document.body.appendChild(panel);
   }
 
-  // Per-site toggle
-  if (cfg.siteToggle) {
+  // Per-site toggle (top frame only; re-enable through the userscript menu)
+  if (cfg.siteToggle && window.top === window) {
     const addToggle = () => {
       if (document.getElementById("wp-toggle")) return;
       const btn = document.createElement("button");
@@ -1228,7 +936,7 @@
       btn.style.cssText =
         "position:fixed;bottom:10px;right:10px;z-index:99999;font-size:11px;padding:5px 9px;background:#222;color:#fff;border:none;border-radius:4px;cursor:pointer;touch-action:manipulation;opacity:.8";
       btn.onclick = () => {
-        localStorage.setItem(SITE_KEY, "1");
+        store?.setItem(SITE_KEY, "1");
         location.reload();
       };
       document.body?.appendChild(btn);
@@ -1238,5 +946,5 @@
       : addToggle();
   }
 
-  log(`Web Pro v6.1 loaded (mode=${MODE})`);
+  log(`Web Pro v${VERSION} loaded (mode=${MODE})`);
 })();

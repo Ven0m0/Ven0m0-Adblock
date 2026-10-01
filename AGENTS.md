@@ -20,6 +20,7 @@ add scripts or workflows that download them into the repo. Recommend upstream li
 | `lists/adblock/` | Hand-maintained adblock filter rules; `Combination*.txt` bundle the others via `!#include` |
 | `lists/hostlist/` | Hand-maintained DNS hostlist rules |
 | `userscripts/src/` | Userscript source files |
+| `userscripts/tests/` | Userscript unit tests (`bun test`); load the real source into a stubbed browser sandbox |
 | `Scripts/` | Python build and maintenance tooling (plus `check-redundant-rules.mjs`) |
 | `.github/workflows/` | CI workflow definitions |
 | `docs/` | User docs (`userscripts.md`, `filter-rules.md`) and the backlog (`TODO.md`) |
@@ -46,7 +47,7 @@ Edit source files; the pipeline regenerates these automatically.
 5. Match the style of the file being edited.
 6. Preserve comments and metadata blocks unless the task requires changing them.
 7. When adding filter rules, verify no duplicate exists first.
-8. Userscript work: edit `userscripts/src/`; list new scripts in `docs/userscripts.md`.
+8. Userscript work: edit `userscripts/src/`; list new scripts in `docs/userscripts.md`; run `bun run test:unit`.
 9. Build or CI changes: check `Scripts/build.py` and the relevant workflow file together.
 10. When updating agent instructions: edit `AGENTS.md`; `CLAUDE.md` updates automatically.
 
@@ -57,7 +58,7 @@ Edit source files; the pipeline regenerates these automatically.
 | `.github/workflows/build-filter-lists.yml` | Push to `main` touching `lists/adblock/` or `Scripts/build.py` | Lints sources, compiles filter outputs, auto-commits |
 | `.github/workflows/maintain-lists.yml` | Manual dispatch | Deduplicates, removes dead domains, creates a dated GitHub release (tag format: vYYYY.MM.DD-HHMM) with a `blocklist` compiled from `hostlist-config.json` |
 | `.github/workflows/userscripts.yml` | Push touching `userscripts/src/` | Builds and publishes userscript dist outputs |
-| `.github/workflows/pull_request.yml` | Push and PR | JS lint and format check |
+| `.github/workflows/pull_request.yml` | Push and PR | JS lint, format check, and userscript unit tests |
 | `.github/workflows/dead-domains-check.yml` | Weekly / dispatch | Finds dead domains in filter lists and opens a PR removing them |
 | `.github/workflows/automerge-open-prs.yml` | Hourly / push / dispatch | Merges open PRs via `Scripts/automerge_open_prs.py` |
 | `.github/workflows/lint-and-format.yml` | Manual dispatch | Runs JS and markdown linters and auto-fixes |
@@ -84,6 +85,9 @@ bun run lint:md        # markdownlint
 bun run format         # write
 bun run format:check   # check only
 
+# Userscript unit tests
+bun run test:unit
+
 # Build
 bun run build              # all outputs
 bun run build:adblock      # adblock filter list
@@ -99,7 +103,7 @@ uv run pytest Scripts
 yamllint .             # requires: pip install yamllint
 ```
 
-`bun run test` = lint + format check. `bun run validate` = test + build.
+`bun run test` = lint + format check + unit tests. `bun run validate` = test + build.
 
 ## Style conventions
 

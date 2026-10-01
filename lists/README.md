@@ -144,3 +144,15 @@ Toggle on [advanced settings](https://github.com/gorhill/uBlock/wiki/Advanced-us
 | `autoUpdateDelayAfterLaunch`    | `10`                | update out-of-date filter lists `x` seconds after browser startup                                    |
 | `filterAuthorMode`              | `true`              | enable [Dynamic Filtering](https://github.com/gorhill/uBlock/wiki/Dynamic-filtering:-quick-guide)    |
 | `updateAssetBypassBrowserCache` | `true`              | bypass cache when manually fetching a filter list more than once an hour                             |
+
+### Trusted list prefix
+
+```text
+trustedListPrefixes ublock- https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/
+```
+
+> [!IMPORTANT]
+> `trustedListPrefixes` is required for Ven0m0's lists. Without it, uBlock Origin rejects every `trusted-*` scriptlet
+> (most of the YouTube rules) with `Filter requires trusted source`. Keep the default `ublock-` prefix, separate
+> prefixes with a space, then purge the list cache and update. Only add prefixes for lists you trust: trusted
+> filters can rewrite page scripts and network responses.

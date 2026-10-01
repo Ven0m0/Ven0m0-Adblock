@@ -27,3 +27,5 @@ jobs:
         run: bun run lint:js
       - name: Run formatting checks
         run: bun run format:check
+      - name: Run userscript unit tests
+        run: bun run test:unit

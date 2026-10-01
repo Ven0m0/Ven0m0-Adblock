@@ -8,7 +8,6 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_addStyle
-// @grant        GM_registerMenuCommand
 // @license      MIT
 // @run-at       document-start
 // @downloadURL  https://update.greasyfork.org/scripts/[ID]/Claude%20Complete%20Enhancement.user.js
