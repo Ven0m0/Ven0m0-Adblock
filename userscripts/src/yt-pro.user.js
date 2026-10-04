@@ -2,7 +2,7 @@
 // @name         YouTube Unified Optimizer
 // @author       Ven0m0
 // @namespace    http://tampermonkey.net/
-// @version      4.3.2
+// @version      4.3.4
 // @description  Lightweight YouTube optimizer: CPU/GPU/UI tweaks, quality lock, flags, engine tame
 // @match        https://youtube.com/*
 // @match        https://www.youtube.com/*
@@ -15,6 +15,7 @@
 // @license      GPL-3.0
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // ==/UserScript==
+
 (() => {
   const GUARD = "__yt_unified_optimizer__";
   if (window[GUARD]) return;
@@ -23,13 +24,6 @@
     RAF_BASE: 1e9,
     RAF_BATCH: 8,
     PREFETCH_TO: 3e4,
-    TIMER_CHECK: 10,
-    TIMER_REPATCH: 800,
-    TIMER_NAV_DEB: 500,
-    IDLE_CHECK: 2e3,
-    IDLE_THROTTLE: 120,
-    IDLE_MIN_ACTIVE: 150,
-    LAZY_THUMB_MARGIN: "1000px",
     SCROLL_DB: 60,
     WHEEL_DB: 60,
     RESIZE_DB: 120,
@@ -44,16 +38,10 @@
     cpu: {
       eventThrottle: 1,
       rafDecimation: 1,
-      timerPatch: 1,
-      idleBoost: 1,
-      idleDelayNormal: 8e3,
-      idleDelayShorts: 15e3,
       rafFpsVisible: 20,
-      rafFpsHidden: 3,
-      minDelayIdle: 200,
-      minDelayBase: 75
+      rafFpsHidden: 3
     },
-    gpu: { blockAV1: 1, disableAmbient: 1, lazyThumbs: 1 },
+    gpu: { blockAV1: 1, disableAmbient: 1 },
     ui: { hideSpinner: 1, hideShorts: 0, disableAnimations: 1, contentVisibility: 1, instantNav: 1 },
     quality: {
       enabled: 1,
@@ -96,7 +84,6 @@
   };
   const RES = ["highres", "hd2880", "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny"];
   const H = [4320, 2880, 2160, 1440, 1080, 720, 480, 360, 240, 144];
-  const IDLE_ATTR = "data-yt-idle";
   const log = (...a) => CFG.debug && console.log("[YT Unified]", ...a);
   const isShorts = () => location.pathname.startsWith("/shorts");
   const throttle = (fn, ms) => {
@@ -253,102 +240,6 @@
     );
     log("RAF decimation ok");
   }
-  if (CFG.cpu.timerPatch) {
-    (async () => {
-      const nat = {
-        setTimeout: window.setTimeout.bind(window),
-        clearTimeout: window.clearTimeout.bind(window),
-        setInterval: window.setInterval.bind(window),
-        clearInterval: window.clearInterval.bind(window)
-      };
-      if (!document.documentElement)
-        await new Promise((r) => {
-          document.addEventListener("DOMContentLoaded", r, { once: true });
-        });
-      let timers = nat;
-      if (document.visibilityState === "visible") {
-        const f = document.createElement("iframe");
-        f.style.display = "none";
-        f.sandbox = "allow-same-origin allow-scripts";
-        f.srcdoc = "<!doctype html><title>t</title>";
-        document.documentElement.appendChild(f);
-        await new Promise((r) => {
-          const ck = () => (f.contentWindow?.setTimeout ? r() : setTimeout(ck, K.TIMER_CHECK));
-          ck();
-        });
-        f.remove();
-        timers = {
-          setTimeout: f.contentWindow.setTimeout.bind(f.contentWindow),
-          clearTimeout: f.contentWindow.clearTimeout.bind(f.contentWindow),
-          setInterval: f.contentWindow.setInterval.bind(f.contentWindow),
-          clearInterval: f.contentWindow.clearInterval.bind(f.contentWindow)
-        };
-      }
-      const wrapTO =
-        (impl) =>
-        (fn, d = 0, ...a) => {
-          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setTimeout for security.");
-          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setTimeout(fn, d, ...a);
-          return impl(() => fn(...a), d);
-        };
-      const wrapIV =
-        (impl) =>
-        (fn, d = 0, ...a) => {
-          if (typeof fn !== "function") throw new TypeError("Only functions are allowed in setInterval for security.");
-          if (isShorts() || d < CFG.cpu.minDelayBase) return nat.setInterval(fn, d, ...a);
-          return impl(() => fn(...a), d);
-        };
-      window.setTimeout = wrapTO(timers.setTimeout);
-      window.clearTimeout = timers.clearTimeout;
-      window.setInterval = wrapIV(timers.setInterval);
-      window.clearInterval = timers.clearInterval;
-      if (CFG.cpu.idleBoost) {
-        let last = performance.now();
-        let throttleTimers = 1;
-        let minDelay = CFG.cpu.minDelayBase;
-        const actEv = ["mousemove", "mousedown", "keydown", "wheel", "touchstart", "pointerdown", "focusin"];
-        const thAct = throttle(() => {
-          last = performance.now();
-          if (document.documentElement.hasAttribute(IDLE_ATTR)) {
-            document.documentElement.removeAttribute(IDLE_ATTR);
-            throttleTimers = 1;
-            minDelay = CFG.cpu.minDelayBase;
-            log("Idle OFF");
-          }
-        }, K.IDLE_THROTTLE);
-        for (const ev of actEv) {
-          window.addEventListener(ev, thAct, { capture: true, passive: true });
-        }
-        setInterval(() => {
-          if (document.visibilityState !== "visible") return;
-          const now = performance.now();
-          const idle = isShorts() ? CFG.cpu.idleDelayShorts : CFG.cpu.idleDelayNormal;
-          if (now - last >= idle && !document.documentElement.hasAttribute(IDLE_ATTR)) {
-            document.documentElement.setAttribute(IDLE_ATTR, "1");
-            const hv = document.querySelector("video.video-stream")?.paused === false;
-            throttleTimers = !(hv || isShorts());
-            minDelay = hv || isShorts() ? K.IDLE_MIN_ACTIVE : CFG.cpu.minDelayIdle;
-            log("Idle ON");
-          }
-        }, K.IDLE_CHECK);
-        window.__YT_TIMER_STATE__ = {
-          get throttleTimers() {
-            return throttleTimers;
-          },
-          get minDelay() {
-            return minDelay;
-          }
-        };
-      }
-      const reapply = debounce(() => {
-        window.setTimeout = wrapTO(timers.setTimeout);
-        window.setInterval = wrapIV(timers.setInterval);
-        window.clearTimeout = timers.clearTimeout;
-        window.clearInterval = timers.clearInterval;
-      }, K.TIMER_REPATCH);
-      window.addEventListener("yt-navigate-finish", reapply);
-    })();
-  }
   (() => {
     let css = "";
     if (CFG.ui.disableAnimations)
@@ -386,55 +277,6 @@
     };
     document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", dis) : setTimeout(dis, 400);
     window.addEventListener("yt-navigate-finish", throttle(dis, 1000));
-  }
-  if (CFG.gpu.lazyThumbs) {
-    const obs = new IntersectionObserver(
-      (es) => {
-        requestAnimationFrame(() => {
-          es.forEach((e) => {
-            if (e.isIntersecting) {
-              if (e.target.style.display === "none") e.target.style.display = "";
-              obs.unobserve(e.target);
-            }
-          });
-        });
-      },
-      { rootMargin: K.LAZY_THUMB_MARGIN }
-    );
-    const sel =
-      "ytd-rich-item-renderer:not([data-lazy-opt]),ytd-compact-video-renderer:not([data-lazy-opt]),ytd-thumbnail:not([data-lazy-opt])";
-    const processNode = (e) => {
-      e.dataset.lazyOpt = "1";
-      e.style.display = "none";
-      obs.observe(e);
-    };
-    const lazy = () => document.querySelectorAll(sel).forEach(processNode);
-    let moTimeout;
-    const mo = new MutationObserver((mutations) => {
-      let hasAdded = false;
-      for (let i = 0; i < mutations.length; i++) {
-        const added = mutations[i].addedNodes;
-        for (let j = 0; j < added.length; j++) {
-          if (added[j].nodeType === 1) {
-            hasAdded = true;
-            break;
-          }
-        }
-        if (hasAdded) break;
-      }
-
-      if (hasAdded) {
-        if (moTimeout) clearTimeout(moTimeout);
-        moTimeout = setTimeout(() => {
-          const els = document.querySelectorAll(sel);
-          for (let i = 0; i < els.length; i++) {
-            processNode(els[i]);
-          }
-        }, 100);
-      }
-    });
-    mo.observe(document.body || document.documentElement, { childList: true, subtree: true });
-    document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", lazy) : setTimeout(lazy, 120);
   }
   if (CFG.ui.instantNav) {
     const hov = throttle((e) => {
@@ -602,12 +444,5 @@
       log("Settings error:", e);
     }
   })();
-  (() => {
-    const win = window;
-    if (typeof win?.navigator?.locks?.request === "function") {
-      win.navigator.locks.query = () => Promise.resolve({});
-      win.navigator.locks.request = () => new (async () => {})().constructor();
-    }
-  })();
-  log("YouTube Unified Optimizer v4.3.1 loaded");
+  log("YouTube Unified Optimizer v4.3.4 loaded");
 })();

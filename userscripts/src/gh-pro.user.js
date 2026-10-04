@@ -13,6 +13,7 @@
 // @license      MIT
 // @run-at       document-idle
 // ==/UserScript==
+
 (() => {
   // prettier-ignore
   const CFG = {

@@ -23,8 +23,6 @@
 // @match        *://chat.aicnn.xyz/*
 // @match        *://plus.aivvm.com/*
 // @match        *://chat.kelaode.ai/*
-// @include      *://*claude*/*
-// @include      http://192.168.*.*:*/*
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue

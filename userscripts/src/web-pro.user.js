@@ -4,17 +4,15 @@
 // @namespace    http://tampermonkey.net/
 // @homepageURL  https://github.com/Ven0m0/Ven0m0-Adblock
 // @version      6.2.0
-// @description  Universal web optimizer: lazy load, URL cleaning, CPU/RAF tamer, network,
-//               privacy, perf features. Merges: Web Pro, Web Performance Optimizer,
-//               Speed up Google Captcha, plus selected ideas from Greasy Fork performance scripts.
+// @description  Universal web optimizer: lazy load, URL cleaning, CPU/RAF tamer, network, privacy, perf features. Merges: Web Pro, Web Performance Optimizer, Speed up Google Captcha, plus selected ideas from Greasy Fork performance scripts.
 // @match        *://*/*
 // @exclude      /^https?://\S+\.(txt|png|jpg|jpeg|gif|xml|svg|manifest|log|ini)[^\/]*$/
 // @grant        GM_registerMenuCommand
 // @grant        unsafeWindow
 // @run-at       document-start
-// @allFrames    true
 // @license      MIT
 // ==/UserScript==
+
 (() => {
   const SITE_KEY = `webpro:disable:${location.hostname}`;
   // localStorage access throws in sandboxed and opaque-origin frames

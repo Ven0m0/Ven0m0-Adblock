@@ -11,6 +11,7 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
+
 (() => {
   // prettier-ignore
   const CFG = {

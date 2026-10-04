@@ -27,6 +27,9 @@ jobs:
           - name: Oxlint
             command: mise exec -- bun run lint:oxlint
             paths: "**/*.{js,mjs,cjs}"
+          - name: ESLint
+            command: mise exec -- bun run lint:eslint
+            paths: "userscripts/"
           - name: AGLint
             command: mise exec -- bun run lint:aglint
             paths: "lists/adblock/**/*.txt"

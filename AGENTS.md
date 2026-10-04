@@ -24,7 +24,7 @@ add scripts or workflows that download them into the repo. Recommend upstream li
 | `Scripts/` | Python build and maintenance tooling (plus `check-redundant-rules.mjs`) |
 | `.github/workflows/` | CI workflow definitions |
 | `docs/` | User docs (`userscripts.md`, `filter-rules.md`) and the backlog (`TODO.md`) |
-| Root configs | `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `.oxlintrc.json`, `biome.json` |
+| Root configs | `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `.oxlintrc.json`, `eslint.config.js`, `biome.json` |
 
 ## CI-generated paths — owned by pipeline
 
@@ -77,7 +77,7 @@ mise install && bun install && uv sync
 bun run lint
 
 # Lint subsets
-bun run lint:js        # biome + oxlint
+bun run lint:js        # biome + oxlint + eslint (userscripts, incl. metadata headers)
 bun run lint:filters   # AGLint
 bun run lint:md        # markdownlint
 
