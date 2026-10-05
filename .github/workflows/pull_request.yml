@@ -16,7 +16,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup mise
-        uses: jdx/mise-action@v5.0.1
+        uses: jdx/mise-action@v5.1.1
         with:
           install: true
           cache: true

@@ -31,7 +31,7 @@ jobs:
           bun-version: latest
 
       - name: Setup mise
-        uses: jdx/mise-action@v5.0.1
+        uses: jdx/mise-action@v5.1.1
         with:
           install: true
           cache: true
