@@ -69,6 +69,8 @@ ignore = [
   "S101",  # asserts are the point
   "S108",  # temp paths in fixtures
   "PT009",  # unittest.TestCase asserts are the established style
+  "PT027",  # unittest.TestCase assertRaises is the established style
+  "SLF001",  # tests exercise private helpers directly
   "PLC0415",  # local imports isolate fixtures
   "ARG002",  # unused args in overridden test hooks
   "ERA001",  # sample filter rules look like commented-out code

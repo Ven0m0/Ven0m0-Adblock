@@ -5,12 +5,15 @@ Tasks:
   adblock       Build adblock filter list
   hosts         Build hosts file
   hostlist      Compile hostlist configs
+  catalog       Write lists/releases/metadata.json for the built lists
   lint          Lint filter lists with AGLint
   userscripts   Lint, minify and build userscripts
   all           Run all tasks (default)
 """
 
 import argparse
+import hashlib
+import json
 import os
 import re
 import subprocess
@@ -47,13 +50,41 @@ _DOMAIN_RE = re.compile(
     re.IGNORECASE,
 )
 
+# A rebuild that keeps less than this share of the committed rules is treated as broken.
+MIN_KEEP_RATIO = 0.5
+
+
+def _count_rules(text: str) -> int:
+    """Count rule lines, skipping blanks, `!` comments, `[...]` headers and `# ` comments.
+
+    A bare `#` prefix is not skipped: cosmetic rules start with `##`, `#@#` or `#?#`.
+    """
+    return sum(1 for line in text.splitlines() if (s := line.strip()) and not s.startswith(("!", "[", "# ")))
+
+
+def _check_shrink(out: Path, new_count: int) -> None:
+    """Abort before overwriting `out` with an empty or heavily shrunk build.
+
+    Keeps the last committed list intact when a source or compiler failure empties the output.
+    """
+    if new_count == 0:
+        die(f"{out.name}: new build has 0 rules, keeping existing file")
+    if out.exists() and not os.environ.get("BUILD_ALLOW_SHRINK"):
+        old_count = _count_rules(out.read_text(encoding="utf-8"))
+        if old_count and new_count < old_count * MIN_KEEP_RATIO:
+            die(
+                f"{out.name}: rules dropped {old_count} -> {new_count} "
+                f"(under {MIN_KEEP_RATIO:.0%}); set BUILD_ALLOW_SHRINK=1 to override"
+            )
+
+
+def _write_release(out: Path, header: str, rules: list[str]) -> None:
+    _check_shrink(out, len(rules))
+    out.write_text(header + "\n".join(sorted(rules)) + "\n", encoding="utf-8")
+
 
 def _js_runner() -> list[str] | None:
-    if has("bun"):
-        return ["bun", "x"]
-    if has("npx"):
-        return ["npx", "-y"]
-    return None
+    return ["bun", "x"] if has("bun") else None
 
 
 def _run_js(*args: str, **kwargs) -> subprocess.CompletedProcess:
@@ -100,7 +131,7 @@ def build_adblock() -> None:
         f"! Homepage: https://github.com/{REPO}\n"
         f"! Syntax: uBlock Origin\n"
     )
-    out.write_text(header + "\n".join(sorted(rules)) + "\n", encoding="utf-8")
+    _write_release(out, header, list(rules))
     ok(f"{out} ({len(rules)} rules)")
 
 
@@ -120,7 +151,7 @@ def build_hosts() -> None:
             entries.add(f"0.0.0.0 {m.group(0).lower()}")
 
     header = f"# Hostlist by {REPO}\n# Updated: {ts_read()}\n"
-    out.write_text(header + "\n".join(sorted(entries)) + "\n", encoding="utf-8")
+    _write_release(out, header, list(entries))
     ok(f"{out} ({len(entries)} entries)")
 
 
@@ -134,34 +165,69 @@ def build_hostlist() -> None:
     FILTER_OUT.mkdir(parents=True, exist_ok=True)
 
     if Path("hostlist-config.json").exists():
-        r = _run_js(
-            "hostlist-compiler",
-            "-c",
-            "hostlist-config.json",
-            "-o",
-            str(FILTER_OUT / "hostlist.txt"),
-            "--verbose",
-            check=False,
+        out = FILTER_OUT / "hostlist.txt"
+        tmp = out.with_name(out.name + ".tmp")
+        try:
+            r = _run_js(
+                "hostlist-compiler",
+                "-c",
+                "hostlist-config.json",
+                "-o",
+                str(tmp),
+                "--verbose",
+                check=False,
+            )
+            if r.returncode != 0 or not tmp.exists():
+                warn("Hostlist compilation failed")
+                return
+            _check_shrink(out, _count_rules(tmp.read_text(encoding="utf-8")))
+            tmp.replace(out)
+        finally:
+            tmp.unlink(missing_ok=True)
+
+
+def write_catalog() -> None:
+    """Index the built lists so consumers can detect changes and verify downloads."""
+    log("catalog", "Writing list catalog")
+    lists = []
+    for f in sorted(FILTER_OUT.glob("*.txt")):
+        data = f.read_bytes()
+        text = data.decode("utf-8")
+        title = version = None
+        for line in text.splitlines():
+            if line.startswith("! Title:"):
+                title = line.removeprefix("! Title:").strip()
+            elif line.startswith("! Version:"):
+                version = line.removeprefix("! Version:").strip()
+        lists.append(
+            {
+                "file": f.name,
+                "title": title,
+                "url": f"https://raw.githubusercontent.com/{REPO}/main/{FILTER_OUT.as_posix()}/{f.name}",
+                "rules": _count_rules(text),
+                "bytes": len(data),
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "version": version,
+            }
         )
-        if r.returncode != 0:
-            warn("Hostlist compilation failed")
+    if not lists:
+        die(f"No built lists found in {FILTER_OUT}")
+    out = FILTER_OUT / "metadata.json"
+    out.write_text(json.dumps({"generated": ts_read(), "lists": lists}, indent=2) + "\n", encoding="utf-8")
+    ok(f"{out} ({len(lists)} lists)")
 
 
 def lint_filters() -> None:
     runner = _js_runner()
     if runner is None:
-        warn("No JS runtime available, skipping lint")
+        warn("bun not found, skipping lint")
         return
 
-    log("lint", "Setting up AGLint")
-    if not Path("package.json").exists():
-        subprocess.run(["npm", "init", "-y"], capture_output=True, check=False)
-    if subprocess.run(["npm", "list", "@adguard/aglint"], capture_output=True, check=False).returncode != 0:
-        subprocess.run(["npm", "i", "-D", "@adguard/aglint"], capture_output=True, check=False)
-    if not Path(".aglintrc.yaml").exists():
-        _run_js("@adguard/aglint", "init", capture_output=True, check=False)
+    log("lint", "Installing dependencies and running lint")
+    if not Path("node_modules").exists():
+        subprocess.run(["bun", "install"], capture_output=True, check=False)
 
-    if subprocess.run(["npm", "run", "lint"], check=False).returncode != 0:
+    if subprocess.run(["bun", "run", "lint"], check=False).returncode != 0:
         warn("Lint found issues")
 
 
@@ -239,7 +305,7 @@ def _process_js(f: Path) -> bool:
 
 def build_userscripts() -> None:
     if _js_runner() is None:
-        warn("No JS runtime (bun/npx) found, skipping userscripts")
+        warn("bun not found, skipping userscripts")
         return
 
     SCRIPT_SRC.mkdir(parents=True, exist_ok=True)
@@ -284,6 +350,7 @@ def _task_all() -> None:
     build_adblock()
     build_hosts()
     build_hostlist()
+    write_catalog()
     build_userscripts()
 
 
@@ -291,6 +358,7 @@ _TASKS: dict[str, Callable[[], None]] = {
     "adblock": build_adblock,
     "hosts": build_hosts,
     "hostlist": build_hostlist,
+    "catalog": write_catalog,
     "lint": lint_filters,
     "userscripts": build_userscripts,
     "all": _task_all,
@@ -306,7 +374,8 @@ def main() -> None:
             "  adblock       Build adblock filter list\n"
             "  hosts         Build hosts file\n"
             "  hostlist      Compile hostlist configs\n"
-            "  lint          Lint filter lists with AGLint\n"
+            "  catalog       Write lists/releases/metadata.json\n"
+            "  lint         Lint filter lists with AGLint\n"
             "  userscripts   Lint, minify and build userscripts\n"
             "  all           Run all tasks (default)\n"
         ),

@@ -29,3 +29,11 @@ jobs:
         run: bun run format:check
       - name: Run userscript unit tests
         run: bun run test:unit
+      - name: Install Python dependencies
+        run: mise exec -- uv sync --frozen
+      - name: Run Python lint
+        run: mise exec -- uv run ruff check --no-fix .
+      - name: Run Python format check
+        run: mise exec -- uv run ruff format --check .
+      - name: Run Python tests
+        run: mise exec -- uv run pytest Scripts

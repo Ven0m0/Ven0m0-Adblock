@@ -40,7 +40,7 @@ jobs:
       - name: Install Dependencies
         run: |
           bun install
-          npm install -g fop-cli
+          bun add -g fop-cli
           bun add -g @adguard/dead-domains-linter
 
       - name: Find Filter Files

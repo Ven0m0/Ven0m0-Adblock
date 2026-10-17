@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ven0m0 Rule Search</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fff;
+    --fg: #1b1f24;
+    --muted: #59636e;
+    --border: #d1d9e0;
+    --code-bg: #f3f5f7;
+    --link: #0969da;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117;
+      --fg: #e6edf3;
+      --muted: #9198a1;
+      --border: #30363d;
+      --code-bg: #161b22;
+      --link: #58a6ff;
+    }
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.5 system-ui, sans-serif;
+    margin: 0 auto;
+    max-width: 60rem;
+    padding: 1.5rem 1rem;
+  }
+  h1 { font-size: 1.4rem; margin: 0 0 1rem; }
+  input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: var(--fg);
+    font: inherit;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+  }
+  #status { color: var(--muted); margin: 0.75rem 0; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { border-top: 1px solid var(--border); padding: 0.5rem 0; }
+  code {
+    background: var(--code-bg);
+    border-radius: 4px;
+    display: block;
+    overflow-x: auto;
+    padding: 0.25rem 0.5rem;
+    white-space: pre;
+  }
+  a { color: var(--link); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<h1>Ven0m0 rule search</h1>
+<input id="q" type="search" placeholder="Search rules, e.g. youtube.com" autocomplete="off" autofocus disabled>
+<p id="status" role="status">Loading rules...</p>
+<ul id="results"></ul>
+<script>
+"use strict";
+
+const REPO = "Ven0m0/Ven0m0-Adblock";
+const MIN_CHARS = 2;
+const MAX_RESULTS = 200;
+const DEBOUNCE_MS = 150;
+
+const input = document.getElementById("q");
+const status = document.getElementById("status");
+const results = document.getElementById("results");
+const rules = [];
+
+// Results are built with textContent only: list rules are untrusted text and must never reach innerHTML.
+function render(query) {
+  results.replaceChildren();
+  if (query.length < MIN_CHARS) {
+    status.textContent = `${rules.length} rules loaded. Type at least ${MIN_CHARS} characters.`;
+    return;
+  }
+  const needle = query.toLowerCase();
+  const hits = [];
+  let total = 0;
+  for (const rule of rules) {
+    if (rule.lower.includes(needle)) {
+      total += 1;
+      if (hits.length < MAX_RESULTS) hits.push(rule);
+    }
+  }
+  for (const rule of hits) {
+    const li = document.createElement("li");
+    const code = document.createElement("code");
+    code.textContent = rule.text;
+    const link = document.createElement("a");
+    link.href = `https://github.com/${REPO}/blob/main/${rule.path}#L${rule.line}`;
+    link.textContent = `${rule.path}:${rule.line}`;
+    li.append(code, link);
+    results.append(li);
+  }
+  status.textContent = total > hits.length ? `${total} matches, showing first ${hits.length}.` : `${total} matches.`;
+}
+
+async function load() {
+  const files = await (await fetch("files.json")).json();
+  const texts = await Promise.all(
+    files.map(async (path) => {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+      return [path, await res.text()];
+    }),
+  );
+  for (const [path, text] of texts) {
+    text.split(/\r?\n/).forEach((line, i) => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("!")) {
+        rules.push({ path, line: i + 1, text: trimmed, lower: trimmed.toLowerCase() });
+      }
+    });
+  }
+  input.disabled = false;
+  input.focus();
+  render(input.value.trim());
+}
+
+let timer;
+input.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => render(input.value.trim()), DEBOUNCE_MS);
+});
+
+load().catch((e) => {
+  status.textContent = `Failed to load rules: ${e.message}`;
+});
+</script>
+</body>
+</html>

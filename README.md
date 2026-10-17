@@ -24,6 +24,12 @@ Individual lists, if you only want part of it:
 
 Recommended third-party lists to pair with these, with one-click subscribe links: [lists/README.md](lists/README.md).
 
+Search every rule in these lists: [ven0m0.github.io/Ven0m0-Adblock](https://ven0m0.github.io/Ven0m0-Adblock/).
+
+The built lists in `lists/releases/` are indexed in
+[`metadata.json`](https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/releases/metadata.json)
+(rule count, size, SHA-256 and version per file).
+
 ## Userscripts
 
 One-click Tampermonkey / Violentmonkey install links: [docs/userscripts.md](docs/userscripts.md).
@@ -36,6 +42,7 @@ One-click Tampermonkey / Violentmonkey install links: [docs/userscripts.md](docs
 | `lists/hostlist/` | DNS hostlist rules |
 | `userscripts/src/` | Userscript sources |
 | `Scripts/` | Build and maintenance tooling (Python, plus one Bun script) |
+| `site/` | Static rule search page, deployed to GitHub Pages |
 | `docs/` | Userscript install page, filter notes, backlog (`TODO.md`) |
 | `.github/workflows/` | CI: lint, build, dead-domain cleanup, releases |
 

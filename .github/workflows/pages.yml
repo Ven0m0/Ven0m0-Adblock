@@ -1,0 +1,54 @@
+name: Rule Search Page
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "lists/adblock/**"
+      - "lists/hostlist/**"
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp site/index.html _site/
+          cp -r --parents lists/adblock lists/hostlist _site/
+          find lists/adblock lists/hostlist -name '*.txt' | sort | jq -R . | jq -s . > _site/files.json
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

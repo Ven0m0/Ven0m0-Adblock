@@ -22,6 +22,7 @@ add scripts or workflows that download them into the repo. Recommend upstream li
 | `userscripts/src/` | Userscript source files |
 | `userscripts/tests/` | Userscript unit tests (`bun test`); load the real source into a stubbed browser sandbox |
 | `Scripts/` | Python build and maintenance tooling (plus `check-redundant-rules.mjs`) |
+| `site/` | Static rule search page (`index.html`), deployed by `pages.yml` |
 | `.github/workflows/` | CI workflow definitions |
 | `docs/` | User docs (`userscripts.md`, `filter-rules.md`) and the backlog (`TODO.md`) |
 | Root configs | `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `.oxlintrc.json`, `eslint.config.js`, `biome.json` |
@@ -33,7 +34,7 @@ Edit source files; the pipeline regenerates these automatically.
 
 | Path | Written by |
 | --- | --- |
-| `lists/releases/` | `Scripts/build.py` via `.github/workflows/build-filter-lists.yml` |
+| `lists/releases/` (incl. `metadata.json`) | `Scripts/build.py` via `.github/workflows/build-filter-lists.yml`; the build aborts if a list is empty or loses over 50% of its rules (override: `BUILD_ALLOW_SHRINK=1`) |
 | `Filters/` | AdGuard hostlist-compiler via `.github/workflows/build-filter-lists.yml` |
 | `userscripts/dist/` | `Scripts/build.py` via `.github/workflows/userscripts.yml` |
 | `dist/` | `.github/workflows/userscripts.yml` artifact step |
@@ -58,7 +59,8 @@ Edit source files; the pipeline regenerates these automatically.
 | `.github/workflows/build-filter-lists.yml` | Push to `main` touching `lists/adblock/` or `Scripts/build.py` | Lints sources, compiles filter outputs, auto-commits |
 | `.github/workflows/maintain-lists.yml` | Manual dispatch | Deduplicates, removes dead domains, creates a dated GitHub release (tag format: vYYYY.MM.DD-HHMM) with a `blocklist` compiled from `hostlist-config.json` |
 | `.github/workflows/userscripts.yml` | Push touching `userscripts/src/` | Builds and publishes userscript dist outputs |
-| `.github/workflows/pull_request.yml` | Push and PR | JS lint, format check, and userscript unit tests |
+| `.github/workflows/pull_request.yml` | Push and PR | JS lint, format check, userscript unit tests, and Python ruff + pytest |
+| `.github/workflows/pages.yml` | Push to `main` touching `lists/`, `site/` | Deploys the rule search page to GitHub Pages |
 | `.github/workflows/dead-domains-check.yml` | Weekly / dispatch | Finds dead domains in filter lists and opens a PR removing them |
 | `.github/workflows/automerge-open-prs.yml` | Hourly / push / dispatch | Merges open PRs via `Scripts/automerge_open_prs.py` |
 | `.github/workflows/lint-and-format.yml` | Manual dispatch | Runs JS and markdown linters and auto-fixes |

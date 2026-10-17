@@ -115,12 +115,14 @@ jobs:
           cache: true
           experimental: true
       - name: Run build script
-        run: mise exec -- uv run python -m Scripts.build adblock hosts hostlist
+        run: mise exec -- uv run python -m Scripts.build adblock hosts hostlist catalog
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: custom-filters
-          path: lists/releases/*.txt
+          path: |
+            lists/releases/*.txt
+            lists/releases/metadata.json
           retention-days: 30
 
   commit:
@@ -154,7 +156,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "ci: build and update filter lists"
-          file_pattern: "Filters/*.txt lists/releases/*.txt"
+          file_pattern: "Filters/*.txt lists/releases/*.txt lists/releases/metadata.json"
           add_options: "--force"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
