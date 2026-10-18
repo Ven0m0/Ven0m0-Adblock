@@ -698,5 +698,4 @@ github.com##.react-comments-container > div > div[class^="Flash__StyledFlash"]:h
 
 ! Oct 1, 2026 https://vanillatweaks.net
 vanillatweaks.net##.bloom-bg.panel-body
-||vanillatweaks.net/assets/images/patreon.png$image
 vanillatweaks.net##.patreon.btn-primary.btn

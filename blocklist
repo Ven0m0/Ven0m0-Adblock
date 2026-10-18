@@ -1,0 +1,20 @@
+!
+! Title: Ven0m0's Combined Hostlist
+! Description: Curated ad-blocking and privacy-focused filter list
+! Version: 1.0.1
+! Homepage: https://github.com/Ven0m0/Ven0m0-Adblock
+! License: https://github.com/Ven0m0/Ven0m0-Adblock/blob/main/LICENSE
+! Last modified: 2026-10-18T13:59:03.202Z
+!
+! Compiled by @adguard/hostlist-compiler v2.1.1
+!
+||re.trigs-sockets.com^
+||rss.solty.biz^
+||rcm.shinobi.jp^
+||rssfetcher.blogsys.jp^
+||blogroll.matome-alpha.com^
+||3site-rss.s3-ap-northeast-1.amazonaws.com^
+||blogroll.livedoor.net^
+||consent.google.com^
+/^https?:\/\/172\.255\.6\.(\d{1,2}|2.*|1[0-689].*|17[0-689])(\/|$)/
+.teads-inread
