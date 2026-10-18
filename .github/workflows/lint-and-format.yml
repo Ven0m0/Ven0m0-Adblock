@@ -3,8 +3,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
   cancel-in-progress: true
@@ -17,6 +16,9 @@ jobs:
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -42,8 +44,9 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          persist-credentials: false
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -66,6 +69,9 @@ jobs:
   format:
     name: Auto-Format & Fix
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
     needs: lint
     if: |
       github.event_name != 'pull_request' &&
@@ -77,7 +83,7 @@ jobs:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -101,13 +107,17 @@ jobs:
   yamllint:
     name: Lint YAML
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          persist-credentials: false
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -117,13 +127,17 @@ jobs:
   shellcheck:
     name: Lint Shell Scripts
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          persist-credentials: false
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -136,15 +150,22 @@ jobs:
   summary:
     name: Lint Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
     needs: [lint, format, yamllint, shellcheck]
     if: always()
     steps:
       - name: Check results
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          FORMAT_RESULT: ${{ needs.format.result }}
+          YAMLLINT_RESULT: ${{ needs.yamllint.result }}
+          SHELLCHECK_RESULT: ${{ needs.shellcheck.result }}
         run: |
-          if [[ ${{ needs.lint.result }} == failure ]] || \
-             [[ ${{ needs.format.result }} == failure ]] || \
-             [[ ${{ needs.yamllint.result }} == failure ]] || \
-             [[ ${{ needs.shellcheck.result }} == failure ]]; then
+          if [[ $LINT_RESULT == failure ]] || \
+             [[ $FORMAT_RESULT == failure ]] || \
+             [[ $YAMLLINT_RESULT == failure ]] || \
+             [[ $SHELLCHECK_RESULT == failure ]]; then
             printf '::warning::Some linters found issues. Review logs.\n'; exit 1
           else
             printf '::notice::All linting checks passed!\n'

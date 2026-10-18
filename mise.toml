@@ -18,9 +18,9 @@ binstall = true
 [tools]
 python = "latest"
 # node = "latest"
-# bun = "latest"
+bun = "latest"
 # prek = "latest"
-# uv = "latest"
+uv = "latest"
 # ruff = "latest"
 
 [env]

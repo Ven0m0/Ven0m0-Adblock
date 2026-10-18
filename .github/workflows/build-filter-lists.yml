@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,11 +22,14 @@ jobs:
   lint:
     name: Lint Sources
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -50,14 +53,18 @@ jobs:
   build-adguard:
     name: Build AdGuard Lists
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
     needs: lint
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
+          persist-credentials: false
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -102,14 +109,18 @@ jobs:
   build-custom:
     name: Build Custom Lists
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     needs: lint
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           ref: ${{ github.ref }}
+          persist-credentials: false
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -128,6 +139,9 @@ jobs:
   commit:
     name: Commit Changes
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
     needs: [build-adguard, build-custom]
     if: |
       always() &&

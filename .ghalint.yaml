@@ -1,0 +1,44 @@
+# SHA pinning is intentionally not used; actions float on their latest major tag.
+excludes:
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/cache
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/checkout
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/deploy-pages
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/download-artifact
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/github-script
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/upload-artifact
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: actions/upload-pages-artifact
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: jdx/mise-action
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: oven-sh/setup-bun
+  - policy_name: action_ref_should_be_full_length_commit_sha
+    action_name: stefanzweifel/git-auto-commit-action
+  # These jobs push commits or branches with the checkout token.
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/automerge-open-prs.yml
+    job_name: merge-open-prs
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/build-filter-lists.yml
+    job_name: lint
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/build-filter-lists.yml
+    job_name: commit
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/dead-domains-check.yml
+    job_name: dead-domains-check
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/lint-and-format.yml
+    job_name: format
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/maintain-lists.yml
+    job_name: maintain
+  - policy_name: checkout_persist_credentials_should_be_false
+    workflow_file_path: .github/workflows/userscripts.yml
+    job_name: deploy

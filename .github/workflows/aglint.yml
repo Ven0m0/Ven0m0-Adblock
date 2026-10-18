@@ -19,9 +19,12 @@ jobs:
   lint:
     name: Run AGLint
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Check out to repository
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:

@@ -21,6 +21,7 @@ jobs:
   merge-open-prs:
     name: Merge Open Pull Requests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       # Prefer PAT when branch protection or cross-repository branch updates exceed GITHUB_TOKEN.
       GH_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}

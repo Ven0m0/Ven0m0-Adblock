@@ -21,6 +21,7 @@ jobs:
   dead-domains-check:
     name: Run Dead Domains
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Check Out Repository
         uses: actions/checkout@v7
@@ -31,7 +32,7 @@ jobs:
           bun-version: latest
 
       - name: Setup mise
-        uses: jdx/mise-action@v5.2.0
+        uses: jdx/mise-action@v5
         with:
           install: true
           cache: true
@@ -48,8 +49,10 @@ jobs:
         run: |
           adblock_files=$(find lists/adblock -type f -name "*.txt" 2>/dev/null | tr '\n' ' ')
           hostlist_files=$(find lists/hostlist -type f -name "*.txt" 2>/dev/null | tr '\n' ' ')
-          echo "adblock_files=$adblock_files" >> $GITHUB_OUTPUT
-          echo "hostlist_files=$hostlist_files" >> $GITHUB_OUTPUT
+          {
+            echo "adblock_files=$adblock_files"
+            echo "hostlist_files=$hostlist_files"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Export Dead Domains
         env:
@@ -132,7 +135,7 @@ jobs:
           branch_name="feature/dead-domains"
           git checkout -b $branch_name
 
-          echo "branch_name=$branch_name" >> $GITHUB_OUTPUT
+          echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
 
       - name: Remove Dead Domains
         if: steps.read-dead-domains.outputs.has_dead_domains == 'true'

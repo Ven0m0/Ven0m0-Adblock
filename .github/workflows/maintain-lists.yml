@@ -18,6 +18,7 @@ env:
 jobs:
   maintain:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -47,7 +48,7 @@ jobs:
             tmp=$(mktemp)
             sed -E '/^@@|^#|^[[:space:]]*$/d; s/^0\. 0\.0\.0[[:space:]]+//; s/^[[:space:]]+//; s/[[:space:]]+$//' "$f" | \
               awk 'NF && ! seen[$0]++' | sort -u > "$tmp"
-            [[ -s "$tmp" ]] && mv "$tmp" "$f" || rm -f "$tmp"
+            if [[ -s "$tmp" ]]; then mv "$tmp" "$f"; else rm -f "$tmp"; fi
           done; echo "✓ Hostlists deduplicated"
       - name: Build blocklist
         continue-on-error: true
@@ -58,11 +59,11 @@ jobs:
         continue-on-error: true
         run: |
           invalid=0
-          for f in $(find . -type f -name '*.txt' ! -path '*/\.*'); do
+          while IFS= read -r -d '' f; do
             if grep -Ev '^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\. )+[a-zA-Z]{2,}$|^$' "$f" &>/dev/null; then
               echo "Invalid entries in: $f"; ((invalid++))
             fi
-          done; [[ $invalid -eq 0 ]] && echo "✓ All domains valid"
+          done < <(find . -type f -name '*.txt' ! -path '*/\.*' -print0); [[ $invalid -eq 0 ]] && echo "✓ All domains valid"
       - name: Generate changelog
         id: changelog
         continue-on-error: true
@@ -75,8 +76,11 @@ jobs:
             files=$(git diff --cached --numstat | wc -l)
             adds=$(git diff --cached --numstat | awk '{sum+=$1} END {print sum+0}')
             dels=$(git diff --cached --numstat | awk '{sum+=$2} END {print sum+0}')
-            echo "files=$files" >> "$GITHUB_OUTPUT"
-            echo "adds=$adds" >> "$GITHUB_OUTPUT"; echo "dels=$dels" >> "$GITHUB_OUTPUT"
+            {
+              echo "files=$files"
+              echo "adds=$adds"
+              echo "dels=$dels"
+            } >> "$GITHUB_OUTPUT"
           fi
       - name: Commit & push
         if: steps.changelog.outputs.changed == 'true'
@@ -109,12 +113,19 @@ jobs:
       - name: Summary
         if: always()
         continue-on-error: true
+        env:
+          CHANGED: ${{ steps.changelog.outputs.changed }}
+          FILES: ${{ steps.changelog.outputs.files }}
+          ADDS: ${{ steps.changelog.outputs.adds }}
+          DELS: ${{ steps.changelog.outputs.dels }}
         run: |
-          echo "## 🎯 Maintenance Report" >> "$GITHUB_STEP_SUMMARY"
-          if [[ "${{ steps.changelog.outputs.changed }}" == "true" ]]; then
-            echo "✅ **Updated** ${{ steps.changelog.outputs.files }} files" >> "$GITHUB_STEP_SUMMARY"
-            echo "- Added: ${{ steps.changelog.outputs.adds }}" >> "$GITHUB_STEP_SUMMARY"
-            echo "- Removed: ${{ steps.changelog.outputs.dels }}" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "ℹ️ No changes required" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          {
+            echo "## 🎯 Maintenance Report"
+            if [[ "$CHANGED" == "true" ]]; then
+              echo "✅ **Updated** $FILES files"
+              echo "- Added: $ADDS"
+              echo "- Removed: $DELS"
+            else
+              echo "ℹ️ No changes required"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
