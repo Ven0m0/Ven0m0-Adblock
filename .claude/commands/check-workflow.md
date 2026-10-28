@@ -1,4 +1,5 @@
 ---
+
 description: Summarize the recent run status of a GitHub Actions workflow in this repo
 argument-hint: <workflow-name>
 ---

@@ -1,5 +1,3 @@
-import hashlib
-import io
 import sys
 import tempfile
 import unittest
@@ -10,61 +8,10 @@ from unittest.mock import patch
 if str(Path(__file__).parent) not in sys.path:
     sys.path.append(str(Path(__file__).parent))
 
-from common import is_valid_domain, read_lines, sanitize_filename, write_lines
+from common import is_valid_domain, read_lines, write_lines
 
 
 class TestCommon(unittest.TestCase):
-    def test_sanitize_filename_with_name(self):
-        self.assertEqual(sanitize_filename("http://example.com", "My List"), "My-List.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "My List.txt"), "My-List.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "safe-name"), "safe-name.txt")
-
-    def test_sanitize_filename_without_name(self):
-        url = "https://example.com/list.txt"
-        filename = sanitize_filename(url)
-        # Check structure: domain-hash.txt
-        self.assertTrue(filename.startswith("example-com-"))
-        self.assertTrue(filename.endswith(".txt"))
-
-        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
-        self.assertIn(expected_hash, filename)
-
-    def test_sanitize_filename_with_name_special_chars(self):
-        self.assertEqual(
-            sanitize_filename("http://example.com", "My!@#$%^&*()_+=List"),
-            "My----------_--List.txt",
-        )
-        self.assertEqual(
-            sanitize_filename("http://example.com", 'a/b\\c:d*e?f"g<h>i|j'),
-            "a-b-c-d-e-f-g-h-i-j.txt",
-        )
-        self.assertEqual(sanitize_filename("http://example.com", "My List.txt"), "My-List.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "a/b.txt"), "a-b.txt")
-        self.assertEqual(sanitize_filename("http://example.com", "c.txt.txt"), "c.txt.txt")
-
-    def test_sanitize_filename_without_name_special_urls(self):
-        # Missing scheme (no ://)
-        url = "example.com/list.txt"
-        filename = sanitize_filename(url)
-        self.assertTrue(filename.startswith("list-"))
-        self.assertTrue(filename.endswith(".txt"))
-        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
-        self.assertEqual(filename, f"list-{expected_hash}.txt")
-
-        # Empty string
-        url = ""
-        filename = sanitize_filename(url)
-        self.assertTrue(filename.startswith("list-"))
-        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
-        self.assertEqual(filename, f"list-{expected_hash}.txt")
-
-        # URL with port
-        url = "http://example.com:8080/list.txt"
-        filename = sanitize_filename(url)
-        self.assertTrue(filename.startswith("example-com-8080-"))
-        expected_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
-        self.assertEqual(filename, f"example-com-8080-{expected_hash}.txt")
-
     def test_is_valid_domain(self):
         self.assertTrue(is_valid_domain("example.com"))
         self.assertTrue(is_valid_domain("sub.example.com"))
@@ -83,67 +30,50 @@ class TestCommon(unittest.TestCase):
             lines = read_lines(target_file)
             self.assertEqual(lines, ["line1", "line2", "line3"])
 
-    @patch("pathlib.Path.open")
-    def test_read_lines_unicode_error(self, mock_open):
-        mock_open.side_effect = UnicodeError("mock unicode error")
-        with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
-            lines = read_lines(Path("dummy.txt"))
-            self.assertIsNone(lines)
-            self.assertIn("Error reading dummy.txt", mock_stderr.getvalue())
-            self.assertIn("mock unicode error", mock_stderr.getvalue())
-
-    def test_read_lines_file_not_found(self):
+    def test_read_lines_raises_on_unicode_error(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_dir_path = Path(temp_dir)
-            non_existent = temp_dir_path / "missing.txt"
+            bad = Path(temp_dir) / "bad.txt"
+            bad.write_bytes(b"\xff\xfe\x00bad")
+            with self.assertRaises(UnicodeError):
+                read_lines(bad)
 
-            with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
-                lines = read_lines(non_existent)
-                self.assertIsNone(lines)
-                self.assertIn(f"Error reading {non_existent}", mock_stderr.getvalue())
+    def test_read_lines_raises_when_missing(self):
+        with tempfile.TemporaryDirectory() as temp_dir, self.assertRaises(FileNotFoundError):
+            read_lines(Path(temp_dir) / "missing.txt")
 
     def test_write_lines_atomic(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            temp_dir_path = Path(temp_dir)
-            target_file = temp_dir_path / "target.txt"
+            target_file = Path(temp_dir) / "target.txt"
 
-            # Test write
-            result = write_lines(target_file, ["line1", "line2"])
-            self.assertTrue(result)
-            self.assertTrue(target_file.exists())
+            write_lines(target_file, ["line1", "line2"])
             self.assertEqual(target_file.read_text(encoding="utf-8"), "line1\nline2\n")
 
-            # Test atomic overwrite
-            result = write_lines(target_file, ["line3", "line4"])
-            self.assertTrue(result)
+            write_lines(target_file, ["line3", "line4"])
             self.assertEqual(target_file.read_text(encoding="utf-8"), "line3\nline4\n")
 
-            # Test append
-            result = write_lines(target_file, ["line5"], mode="a")
-            self.assertTrue(result)
+            write_lines(target_file, ["line5"], append=True)
             self.assertEqual(target_file.read_text(encoding="utf-8"), "line3\nline4\nline5\n")
 
-    @patch("pathlib.Path.open")
-    def test_write_lines_os_error_append(self, mock_open):
-        from common import write_lines
+    def test_write_lines_failure_keeps_target_and_leaves_no_temp(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target_file = Path(temp_dir) / "target.txt"
+            target_file.write_text("keep\n", encoding="utf-8")
+            with patch.object(Path, "replace", side_effect=OSError("mock replace error")), self.assertRaises(OSError):
+                write_lines(target_file, ["new"])
+            self.assertEqual(target_file.read_text(encoding="utf-8"), "keep\n")
+            self.assertEqual([p.name for p in Path(temp_dir).iterdir()], ["target.txt"])
 
+    @patch("pathlib.Path.open")
+    def test_write_lines_append_raises(self, mock_open):
         mock_open.side_effect = OSError("mock os error append")
-        with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
-            result = write_lines(Path("dummy.txt"), ["line1"], mode="a")
-            self.assertFalse(result)
-            self.assertIn("Error writing dummy.txt", mock_stderr.getvalue())
-            self.assertIn("mock os error append", mock_stderr.getvalue())
+        with self.assertRaises(OSError):
+            write_lines(Path("dummy.txt"), ["line1"], append=True)
 
     @patch("tempfile.mkstemp")
-    def test_write_lines_os_error_atomic(self, mock_mkstemp):
-        from common import write_lines
-
+    def test_write_lines_atomic_raises(self, mock_mkstemp):
         mock_mkstemp.side_effect = OSError("mock os error atomic")
-        with patch("sys.stderr", new_callable=io.StringIO) as mock_stderr:
-            result = write_lines(Path("dummy.txt"), ["line1"], mode="w")
-            self.assertFalse(result)
-            self.assertIn("Error writing dummy.txt", mock_stderr.getvalue())
-            self.assertIn("mock os error atomic", mock_stderr.getvalue())
+        with self.assertRaises(OSError):
+            write_lines(Path("dummy.txt"), ["line1"])
 
 
 if __name__ == "__main__":

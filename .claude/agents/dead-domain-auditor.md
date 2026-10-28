@@ -1,4 +1,5 @@
 ---
+
 name: dead-domain-auditor
 description: Checks whether domains in lists/adblock/ or lists/hostlist/ are still live, mirroring dead-domains-check.yml. Use before a PR to catch dead domains locally, or on request for a full-repo liveness sweep. Complements filter-reviewer, which checks syntax and duplicates but not domain liveness.
 ---

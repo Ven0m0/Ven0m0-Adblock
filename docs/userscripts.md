@@ -16,32 +16,32 @@ Updates are checked against the same URL, so new commits on `main` arrive automa
 
 ### Web
 
-| Script | Sites | Description | Install |
-| ------ | ----- | ----------- | ------- |
-| Web Pro | All sites | Lazy load, URL cleaning, CPU/RAF tamer, capped link prefetch | [Install][web-pro] |
+| Script              | Sites         | Description                                                          | Install                        |
+| ------------------- | ------------- | -------------------------------------------------------------------- | ------------------------------ |
+| Web Pro             | All sites     | Lazy load, URL cleaning, CPU/RAF tamer, capped link prefetch         | [Install][web-pro]             |
 | Google Search Fixer | Google Search | Port of the google-search-fixer Firefox extension (Android-friendly) | [Install][google-search-fixer] |
 
 ### YouTube
 
-| Script | Sites | Description | Install |
-| ------ | ----- | ----------- | ------- |
-| YouTube Unified Optimizer | YouTube | CPU/GPU/UI tweaks, quality lock, flags, engine tame | [Install][yt-pro] |
-| YouTube Music Complete | YouTube Music | Opus codec preference, autopause prevention, UI tweaks | [Install][yt-music] |
+| Script                    | Sites         | Description                                            | Install             |
+| ------------------------- | ------------- | ------------------------------------------------------ | ------------------- |
+| YouTube Unified Optimizer | YouTube       | CPU/GPU/UI tweaks, quality lock, flags, engine tame    | [Install][yt-pro]   |
+| YouTube Music Complete    | YouTube Music | Opus codec preference, autopause prevention, UI tweaks | [Install][yt-music] |
 
 ### GitHub
 
-| Script | Sites | Description | Install |
-| ------ | ----- | ----------- | ------- |
-| GitHub Enhanced: Size & Editor (Lean) | GitHub | Shows file/folder sizes and sets editor defaults | [Install][gh-pro] |
-| GitHub Complete Enhancer | GitHub | Useful Forks button, auto device authorization, image preview with zoom | [Install][gh-enhancer] |
+| Script                                | Sites  | Description                                                             | Install                |
+| ------------------------------------- | ------ | ----------------------------------------------------------------------- | ---------------------- |
+| GitHub Enhanced: Size & Editor (Lean) | GitHub | Shows file/folder sizes and sets editor defaults                        | [Install][gh-pro]      |
+| GitHub Complete Enhancer              | GitHub | Useful Forks button, auto device authorization, image preview with zoom | [Install][gh-enhancer] |
 
 ### AI chat
 
-| Script | Sites | Description | Install |
-| ------ | ----- | ----------- | ------- |
-| ChatGPT/Gemini/Claude Optimizer (Lean) | ChatGPT, Gemini, Claude | Width, cleanup, auto-continue/regenerate with minimal overhead | [Install][llm-pro] |
-| AI Chat Universal Enhancer | ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Grok | Width, Enter key behavior, code block improvements | [Install][llm-enhancer] |
-| Claude Complete Enhancement | Claude | Theme, token monitor, code block collapser, usage monitor, conversation fork | [Install][claude-complete] |
+| Script                                 | Sites                                               | Description                                                                  | Install                    |
+| -------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------- |
+| ChatGPT/Gemini/Claude Optimizer (Lean) | ChatGPT, Gemini, Claude                             | Width, cleanup, auto-continue/regenerate with minimal overhead               | [Install][llm-pro]         |
+| AI Chat Universal Enhancer             | ChatGPT, Claude, Gemini, DeepSeek, Perplexity, Grok | Width, Enter key behavior, code block improvements                           | [Install][llm-enhancer]    |
+| Claude Complete Enhancement            | Claude                                              | Theme, token monitor, code block collapser, usage monitor, conversation fork | [Install][claude-complete] |
 
 Overlapping scripts (for example `LLM-pro` and `llm-enhancer` on the same site) can conflict.
 Enable one per site.

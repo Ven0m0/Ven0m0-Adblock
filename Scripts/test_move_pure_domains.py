@@ -11,55 +11,9 @@ if spec is None or spec.loader is None:
     raise ImportError("Could not load module")
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
-is_pure_domain = module.is_pure_domain
 scan_adblock_files = module.scan_adblock_files
 categorize_domain = module.categorize_domain
 apply_updates = module.apply_updates
-
-
-class TestIsPureDomain(unittest.TestCase):
-    def test_pure_domains(self):
-        valid_domains = [
-            "www.example.com",
-            "sub.example.com",
-            "test.co.uk",
-            "very.long.domain.name.with.many.parts.org",
-            "example.com",
-            "a-b.com",
-            "123.com",
-        ]
-        for domain in valid_domains:
-            with self.subTest(domain=domain):
-                self.assertTrue(is_pure_domain(domain), f"Should be True: {domain}")
-
-    def test_adguard_syntax(self):
-        invalid_lines = [
-            "||example.com^",
-            "@@||example.com",
-            "example.com$script",
-            "##.ad-class",
-            "example.com##.ad",
-            "! Comment",
-            "[Adblock Plus 2.0]",
-            "|http://example.com",
-            "example.com#@#.ad",
-            "/pattern/",
-            "http://example.com",  # URL, not pure domain
-            "https://example.com",  # URL
-        ]
-        for line in invalid_lines:
-            with self.subTest(line=line):
-                self.assertFalse(is_pure_domain(line), f"Should be False: {line}")
-
-    def test_edge_cases(self):
-        self.assertFalse(is_pure_domain(""))
-        self.assertFalse(is_pure_domain("   "))
-        # Regex expects start with [a-z0-9]
-        self.assertFalse(is_pure_domain("-start-dash.com"))
-
-        # Regex expects end with .[a-z]{2,}
-        self.assertFalse(is_pure_domain("example.c"))  # 1 char TLD
-        self.assertFalse(is_pure_domain("example.123"))  # numeric TLD
 
 
 class TestScanAdblockFiles(unittest.TestCase):
@@ -228,7 +182,7 @@ class TestApplyUpdates(unittest.TestCase):
             file_updates = {source_path: ["||ad.com^"]}
 
             original_write_lines = module.write_lines
-            module.write_lines = Mock(return_value=False)
+            module.write_lines = Mock(side_effect=OSError("disk full"))
             try:
                 total_moved = apply_updates(hostlist_dir, domain_moves, file_updates)
                 self.assertEqual(total_moved, 0)

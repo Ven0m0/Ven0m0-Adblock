@@ -1,4 +1,5 @@
 ---
+
 name: add-filter-rule
 description: Add a new adblock or hostlist rule with duplicate check, correct file placement, and AGLint validation. Use when adding a domain, cosmetic rule, or exception to lists/adblock/ or lists/hostlist/.
 ---

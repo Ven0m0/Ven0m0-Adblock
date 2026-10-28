@@ -8,81 +8,81 @@ rules:
   no-excluded-rules:
     - error
     - regexp-patterns:
-      # https://github.com/hagezi/dns-blocklists/issues/7276
-      - datadog.pool.ntp.org\^$
-      # https://github.com/AdguardTeam/AdguardFilters/issues/212409
-      - \|\|pro-1w-dataaggregator.onelouder.com\^$
-      - ^\|\|api-iam\.intercom\.io\/messenger\/web\/ping$
-      - ^\|\|udc.yahoo.com\^$
-      - ^\|\|bilibili.com\^\$removeparam=mid$
-      - ^\|\|collector\.appconsent\.io\^$
-      - ^##a?\[href[^*]="(https?:\/\/)?lin\.ee\/?"\]\s$
-      - ^\|\|g\.alicdn\.com\/alilog\/mlog\/aplus_v2\.js
-      - ^\|\|pub.pixels.ai\^$
-      - ^\|\|(cdn\.)?livechatinc\.com/tracking\.js(?:$|\$domain=~[^\s]*$)
-      - ^\|\|links.duckduckgo.com\/d\.js\?q=$
-      - ^\|\|sstats\.adobe\.com\^$
-      - ^\|\|global\.ketchcdn\.com\^$
-      - ^\|\|config-api.internet.apps.samsung.com\^$
-      - etsy.com##.wt-animated--slide-from-bottom$
-      - \$cookie=datadome$
-      - \|\|(www\.)?youtube\.com\^\$removeparam=si$
-      - ^\$removeparam=si,domain=(www\.)?youtube\.com
-      - \|\|oogiri-ads-bucket\.s3\.ap-northeast-3\.amazonaws.com\^$
-      - oogiri-chaya.com##\.ads_insert$
-      - \|\|prodregistryv2\.org\^$
-      - \|\|event\.notifier\.rakuten\.co\.jp\^$
-      - \|\|ashiato\.travel\.rakuten\.co\.jp\^$
-      - \|\|insights.alibaba.com\^$
-      - \|\|roblox.com\^\$cookie=RBXEventTrackerV2
-      - dropbox\.com##div\.dig-Banner\[role="alert"\]$
-      - dropbox\.com##\.dig-Banner$
-      - \|\|hotapi\*\.tiktokv\.\w{2,3}\^$
-      - ^\|\|stat\.g2\.plvideo.ru\^
-      - ^\|\|amazon\.\*\$removeparam=(psc|ref|ref_|ie)$
-      - ^\|\|amazon\.\*\/message-us\$removeparam=origRef$
-      - ^\|\|amazon\.\*\$removeparam=smid$
-      - \|\|sdk-v2\.conscent\.in\^(\$third-party)?$
-      - \|\|c-api-bit.shopeemobile.com\^
-      - \|\|tapi.pureapk.com\^
-      - \|\|market\.yandex\.[a-z]*\$removeparam=do-waremd5
-      - \|\|applicationinsights\.io\^
-      - \|\|events.data.microsoft.com\^
-      - \|\|bilibili.com\^\$removeparam=from$
-      - ^ameblo\.jp##div:has\(
-      - ameblo\.jp##div(\[class.=.+\])?:empty
-      - \|\|telemetry\.api\.playstation\.com
-      - \|\|mobile\.pipe\.aria\.microsoft.com
-      - \|\|log\.suumo\.jp
-      - ^##\.(ad-area|sidebar-ad|Ad-Container|cookie-modal)$
-      - ^###cookie-modal$
-      - ^ameblo\.jp##\.pickCreative_root$
-      - ^(\/sd)?_ads_updater-$
-      - ^\|\|b\.karte\.io
-      - ^\|\|static\.karte\.io
-      - ^tuma(douga)?\.jp##\.index_banner_space$
-      - static-assets\.bamgrid\.com\/analytics
-      - staff-start\.com\/js\/track\/
-      - minkou.jp\/js\/tracking\.js
-      - amazon.com\/1\/batch\/1\/O[EP]\/
-      - youtube\.com\^\$removeparam=si$
-      - syndication\.twitter\.com\^
-      - fiverr\.com\^\$removeparam=ref$
-      # Blocking pixapi.net causes issues
-      - ^pixapi\.net\^
-      # https://github.com/AdguardTeam/AdguardFilters/issues/221086
-      # May break whole mobile page
-      - ^u\.gg##\.media-query_MOBILE_SMALL__MOBILE_LARGE$
-      # https://github.com/AdguardTeam/AdguardFilters/issues/221018
-      # Breaks Bandlab boost function
-      - ^\|\|ad\.bandlab\.io\^$
-      # Breks shareing and access control in Google Docs
-      - ^google\.\*##div\[aria-label="Share"\]$
-      # Breaks websites that use Intercom chat widget
-      - ^\|\|api-iam\.intercom\.io/messenger/web/ping$
-      # Breaks adding Yahoo account in email clients
-      - ^\|\|udc\.yahoo\.com\^$
-      # https://github.com/AdguardTeam/AdguardFilters/issues/188783#issuecomment-2359649738
-      - ^\|\|bilibili\.com\^\$removeparam=mid$
-      # Breaks appconsent.io cookie consents
-      - ^\|\|collector\.appconsent\.io\^$
+        # https://github.com/hagezi/dns-blocklists/issues/7276
+        - datadog.pool.ntp.org\^$
+        # https://github.com/AdguardTeam/AdguardFilters/issues/212409
+        - \|\|pro-1w-dataaggregator.onelouder.com\^$
+        - ^\|\|api-iam\.intercom\.io\/messenger\/web\/ping$
+        - ^\|\|udc.yahoo.com\^$
+        - ^\|\|bilibili.com\^\$removeparam=mid$
+        - ^\|\|collector\.appconsent\.io\^$
+        - ^##a?\[href[^*]="(https?:\/\/)?lin\.ee\/?"\]\s$
+        - ^\|\|g\.alicdn\.com\/alilog\/mlog\/aplus_v2\.js
+        - ^\|\|pub.pixels.ai\^$
+        - ^\|\|(cdn\.)?livechatinc\.com/tracking\.js(?:$|\$domain=~[^\s]*$)
+        - ^\|\|links.duckduckgo.com\/d\.js\?q=$
+        - ^\|\|sstats\.adobe\.com\^$
+        - ^\|\|global\.ketchcdn\.com\^$
+        - ^\|\|config-api.internet.apps.samsung.com\^$
+        - etsy.com##.wt-animated--slide-from-bottom$
+        - \$cookie=datadome$
+        - \|\|(www\.)?youtube\.com\^\$removeparam=si$
+        - ^\$removeparam=si,domain=(www\.)?youtube\.com
+        - \|\|oogiri-ads-bucket\.s3\.ap-northeast-3\.amazonaws.com\^$
+        - oogiri-chaya.com##\.ads_insert$
+        - \|\|prodregistryv2\.org\^$
+        - \|\|event\.notifier\.rakuten\.co\.jp\^$
+        - \|\|ashiato\.travel\.rakuten\.co\.jp\^$
+        - \|\|insights.alibaba.com\^$
+        - \|\|roblox.com\^\$cookie=RBXEventTrackerV2
+        - dropbox\.com##div\.dig-Banner\[role="alert"\]$
+        - dropbox\.com##\.dig-Banner$
+        - \|\|hotapi\*\.tiktokv\.\w{2,3}\^$
+        - ^\|\|stat\.g2\.plvideo.ru\^
+        - ^\|\|amazon\.\*\$removeparam=(psc|ref|ref_|ie)$
+        - ^\|\|amazon\.\*\/message-us\$removeparam=origRef$
+        - ^\|\|amazon\.\*\$removeparam=smid$
+        - \|\|sdk-v2\.conscent\.in\^(\$third-party)?$
+        - \|\|c-api-bit.shopeemobile.com\^
+        - \|\|tapi.pureapk.com\^
+        - \|\|market\.yandex\.[a-z]*\$removeparam=do-waremd5
+        - \|\|applicationinsights\.io\^
+        - \|\|events.data.microsoft.com\^
+        - \|\|bilibili.com\^\$removeparam=from$
+        - ^ameblo\.jp##div:has\(
+        - ameblo\.jp##div(\[class.=.+\])?:empty
+        - \|\|telemetry\.api\.playstation\.com
+        - \|\|mobile\.pipe\.aria\.microsoft.com
+        - \|\|log\.suumo\.jp
+        - ^##\.(ad-area|sidebar-ad|Ad-Container|cookie-modal)$
+        - ^###cookie-modal$
+        - ^ameblo\.jp##\.pickCreative_root$
+        - ^(\/sd)?_ads_updater-$
+        - ^\|\|b\.karte\.io
+        - ^\|\|static\.karte\.io
+        - ^tuma(douga)?\.jp##\.index_banner_space$
+        - static-assets\.bamgrid\.com\/analytics
+        - staff-start\.com\/js\/track\/
+        - minkou.jp\/js\/tracking\.js
+        - amazon.com\/1\/batch\/1\/O[EP]\/
+        - youtube\.com\^\$removeparam=si$
+        - syndication\.twitter\.com\^
+        - fiverr\.com\^\$removeparam=ref$
+        # Blocking pixapi.net causes issues
+        - ^pixapi\.net\^
+        # https://github.com/AdguardTeam/AdguardFilters/issues/221086
+        # May break whole mobile page
+        - ^u\.gg##\.media-query_MOBILE_SMALL__MOBILE_LARGE$
+        # https://github.com/AdguardTeam/AdguardFilters/issues/221018
+        # Breaks Bandlab boost function
+        - ^\|\|ad\.bandlab\.io\^$
+        # Breks shareing and access control in Google Docs
+        - ^google\.\*##div\[aria-label="Share"\]$
+        # Breaks websites that use Intercom chat widget
+        - ^\|\|api-iam\.intercom\.io/messenger/web/ping$
+        # Breaks adding Yahoo account in email clients
+        - ^\|\|udc\.yahoo\.com\^$
+        # https://github.com/AdguardTeam/AdguardFilters/issues/188783#issuecomment-2359649738
+        - ^\|\|bilibili\.com\^\$removeparam=mid$
+        # Breaks appconsent.io cookie consents
+        - ^\|\|collector\.appconsent\.io\^$

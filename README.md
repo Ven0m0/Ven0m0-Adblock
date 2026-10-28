@@ -11,12 +11,12 @@ Built for uBlock Origin and AdGuard.
 
 Pick **one** combined list. Each one bundles the individual lists below via `!#include`.
 
-| List | Includes | Subscribe |
-| ---- | -------- | --------- |
-| [Desktop][combo-desktop] | General, Other, Reddit, Search Engines, YouTube, Twitch | [subscribe][sub-combo-desktop] |
-| [Full][combo-full] | General, Other, Reddit, Search Engines, Spotify, Twitter, YouTube | [subscribe][sub-combo-full] |
-| [Minimal][combo-minimal] | General, Other, Reddit, Search Engines, Twitter, YouTube | [subscribe][sub-combo-minimal] |
-| [Mobile][combo-mobile] | General, Other, Reddit, Search Engines | [subscribe][sub-combo-mobile] |
+| List                     | Includes                                                          | Subscribe                      |
+| ------------------------ | ----------------------------------------------------------------- | ------------------------------ |
+| [Desktop][combo-desktop] | General, Other, Reddit, Search Engines, YouTube, Twitch           | [subscribe][sub-combo-desktop] |
+| [Full][combo-full]       | General, Other, Reddit, Search Engines, Spotify, Twitter, YouTube | [subscribe][sub-combo-full]    |
+| [Minimal][combo-minimal] | General, Other, Reddit, Search Engines, Twitter, YouTube          | [subscribe][sub-combo-minimal] |
+| [Mobile][combo-mobile]   | General, Other, Reddit, Search Engines                            | [subscribe][sub-combo-mobile]  |
 
 Individual lists, if you only want part of it:
 [General][general] · [Other][other] · [Reddit][reddit] · [Search Engines][search] · [Spotify][spotify] ·
@@ -36,15 +36,15 @@ One-click Tampermonkey / Violentmonkey install links: [docs/userscripts.md](docs
 
 ## Repository layout
 
-| Path | Content |
-| ---- | ------- |
-| `lists/adblock/` | Filter rules (source of the lists above) |
-| `lists/hostlist/` | DNS hostlist rules |
-| `userscripts/src/` | Userscript sources |
-| `Scripts/` | Build and maintenance tooling (Python, plus one Bun script) |
-| `site/` | Static rule search page, deployed to GitHub Pages |
-| `docs/` | Userscript install page, filter notes, backlog (`TODO.md`) |
-| `.github/workflows/` | CI: lint, build, dead-domain cleanup, releases |
+| Path                 | Content                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `lists/adblock/`     | Filter rules (source of the lists above)                    |
+| `lists/hostlist/`    | DNS hostlist rules                                          |
+| `userscripts/src/`   | Userscript sources                                          |
+| `Scripts/`           | Build and maintenance tooling (Python, plus one Bun script) |
+| `site/`              | Static rule search page, deployed to GitHub Pages           |
+| `docs/`              | Userscript install page, filter notes, backlog (`TODO.md`)  |
+| `.github/workflows/` | CI: lint, build, dead-domain cleanup, releases              |
 
 Contributor and agent instructions: [AGENTS.md](AGENTS.md).
 

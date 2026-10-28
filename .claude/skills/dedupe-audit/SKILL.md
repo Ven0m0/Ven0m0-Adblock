@@ -1,4 +1,5 @@
 ---
+
 name: dedupe-audit
 description: Run the deduplication scripts across filter and hostlist files and review the diff before committing. Use for a periodic full-repo dedup pass, mirroring what maintain-lists.yml does automatically.
 ---
@@ -41,5 +42,5 @@ PYTHONPATH=. python3 Scripts/deduplicate.py lists/adblock
 git diff --stat lists/
 ```
 
-Walk through the diff — flag anything that looks like an unintended removal (a rule that only *looked* like a duplicate,
+Walk through the diff — flag anything that looks like an unintended removal (a rule that only _looked_ like a duplicate,
 e.g. same domain with a different `$` modifier) rather than staging blindly.

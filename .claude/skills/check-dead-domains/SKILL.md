@@ -1,4 +1,5 @@
 ---
+
 name: check-dead-domains
 description: Locally check filter and hostlist domains for dead/unreachable entries before pushing, mirroring dead-domains-check.yml. Use before a PR touching lists/adblock/ or lists/hostlist/ to catch dead domains ahead of CI.
 ---

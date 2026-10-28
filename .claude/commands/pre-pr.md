@@ -1,6 +1,6 @@
 ---
-description: Run full validation (lint + format check + build) and report pass/fail before opening a PR
----
+
+## description: Run full validation (lint + format check + build) and report pass/fail before opening a PR
 
 Run `bun run validate` (equivalent to `bun run test && bun run build`, i.e. `lint:js` + `lint:filters` + `lint:md` +
 `format:check` + all build tasks).

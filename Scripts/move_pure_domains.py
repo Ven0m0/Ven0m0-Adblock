@@ -10,17 +10,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from Scripts.common import is_valid_domain, read_lines, write_lines
-
-
-def is_pure_domain(line: str) -> bool:
-    """Check if a line is a pure domain without AdGuard syntax."""
-    line = line.strip()
-
-    if not line or line.startswith(("!", "#", "[", ";", "|", "@", "$", "^", "*", "]", "~")):
-        return False
-
-    return is_valid_domain(line)
-
+from Scripts.rules import Kind, classify
 
 # Compiled regex patterns for domain categorization
 ADS_PATTERN = re.compile(r"ad|ads|analytics|tracking|telemetry|metric")
@@ -72,7 +62,7 @@ def scan_adblock_files(adblock_dir: Path) -> tuple[dict, dict]:
         try:
             content = adblock_file.read_text(encoding="utf-8")
             for line in content.splitlines():
-                if is_pure_domain(line):
+                if classify(line) is Kind.DOMAIN:
                     pure_domains.append(line.strip())
                 else:
                     filter_rules.append(line)
@@ -116,19 +106,19 @@ def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
             continue
 
         existing_domains = set()
-        if target_path.exists():
-            lines = read_lines(target_path)
-            if lines is None:
-                continue
-            for line in lines:
-                stripped = line.strip()
+        try:
+            if target_path.exists():
                 # Only track pure domains, not regex patterns
-                if stripped and is_valid_domain(stripped):
-                    existing_domains.add(stripped)
+                existing_domains = {s for line in read_lines(target_path) if is_valid_domain(s := line.strip())}
 
-        new_domains = list(set(all_domains) - existing_domains)
+            new_domains = sorted(set(all_domains) - existing_domains)
+            if new_domains:
+                write_lines(target_path, new_domains, append=True)
+        except (OSError, UnicodeError) as e:
+            print(f"  Error updating {target_path}: {e}", file=sys.stderr)
+            continue
 
-        if new_domains and write_lines(target_path, sorted(new_domains), mode="a"):
+        if new_domains:
             total_moved += len(new_domains)
             print(f"Appended {len(new_domains)} domains to {target_file}")
 
@@ -142,12 +132,12 @@ def _update_source_files(file_updates: dict) -> None:
     print("=" * 60 + "\n")
 
     for filepath, new_lines in file_updates.items():
-        tmp_path = filepath.with_name(filepath.name + ".tmp")
-        if write_lines(tmp_path, new_lines):
-            tmp_path.replace(filepath)
+        try:
+            write_lines(filepath, new_lines)
+        except (OSError, UnicodeError) as e:
+            print(f"  Error writing {filepath}: {e}", file=sys.stderr)
+        else:
             print(f"Updated {filepath.name}")
-        elif tmp_path.exists():
-            tmp_path.unlink()
 
 
 def apply_updates(hostlist_dir: Path, domain_moves: dict, file_updates: dict) -> int:

@@ -1,4 +1,5 @@
 ---
+
 description: Scaffold a new userscript using the new-userscript skill
 argument-hint: <script name>
 ---

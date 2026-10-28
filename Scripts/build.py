@@ -12,10 +12,7 @@ Tasks:
 """
 
 import argparse
-import hashlib
-import json
 import os
-import re
 import subprocess
 import sys
 from collections.abc import Callable
@@ -26,7 +23,8 @@ _root = Path(__file__).parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from Scripts.common import (  # noqa: E402  (after sys.path bootstrap)
+from Scripts import release, userscript  # noqa: E402  (after sys.path bootstrap)
+from Scripts.common import (  # noqa: E402
     die,
     err,
     has,
@@ -37,50 +35,13 @@ from Scripts.common import (  # noqa: E402  (after sys.path bootstrap)
     ts_short,
     warn,
 )
+from Scripts.rules import blocked_host, is_rule  # noqa: E402
 
 REPO = os.environ.get("GITHUB_REPOSITORY", "Ven0m0/Ven0m0-Adblock")
 FILTER_SRC = Path("lists/adblock")
 FILTER_OUT = Path("lists/releases")
 SCRIPT_SRC = Path("userscripts/src")
 SCRIPT_OUT = Path("userscripts/dist")
-
-_FILTER_RE = re.compile(r"^\s*!|\[Adblock|^\s*$")
-_DOMAIN_RE = re.compile(
-    r"[a-z0-9][-a-z0-9]{0,61}(?:\.[a-z0-9][-a-z0-9]{0,61})+\.[a-z]{2,}",
-    re.IGNORECASE,
-)
-
-# A rebuild that keeps less than this share of the committed rules is treated as broken.
-MIN_KEEP_RATIO = 0.5
-
-
-def _count_rules(text: str) -> int:
-    """Count rule lines, skipping blanks, `!` comments, `[...]` headers and `# ` comments.
-
-    A bare `#` prefix is not skipped: cosmetic rules start with `##`, `#@#` or `#?#`.
-    """
-    return sum(1 for line in text.splitlines() if (s := line.strip()) and not s.startswith(("!", "[", "# ")))
-
-
-def _check_shrink(out: Path, new_count: int) -> None:
-    """Abort before overwriting `out` with an empty or heavily shrunk build.
-
-    Keeps the last committed list intact when a source or compiler failure empties the output.
-    """
-    if new_count == 0:
-        die(f"{out.name}: new build has 0 rules, keeping existing file")
-    if out.exists() and not os.environ.get("BUILD_ALLOW_SHRINK"):
-        old_count = _count_rules(out.read_text(encoding="utf-8"))
-        if old_count and new_count < old_count * MIN_KEEP_RATIO:
-            die(
-                f"{out.name}: rules dropped {old_count} -> {new_count} "
-                f"(under {MIN_KEEP_RATIO:.0%}); set BUILD_ALLOW_SHRINK=1 to override"
-            )
-
-
-def _write_release(out: Path, header: str, rules: list[str]) -> None:
-    _check_shrink(out, len(rules))
-    out.write_text(header + "\n".join(sorted(rules)) + "\n", encoding="utf-8")
 
 
 def _js_runner() -> list[str] | None:
@@ -118,9 +79,7 @@ def build_adblock() -> None:
 
     rules: set[str] = set()
     for f in files:
-        for line in f.read_text(encoding="utf-8").splitlines():
-            if not _FILTER_RE.search(line):
-                rules.add(line)
+        rules.update(line for line in f.read_text(encoding="utf-8").splitlines() if is_rule(line))
 
     header = (
         "[uBlock Origin]\n"
@@ -131,8 +90,8 @@ def build_adblock() -> None:
         f"! Homepage: https://github.com/{REPO}\n"
         f"! Syntax: uBlock Origin\n"
     )
-    _write_release(out, header, list(rules))
-    ok(f"{out} ({len(rules)} rules)")
+    count = release.publish(out, [*header.splitlines(), *sorted(rules)])
+    ok(f"{out} ({count} rules)")
 
 
 def build_hosts() -> None:
@@ -144,15 +103,13 @@ def build_hosts() -> None:
     if not src.exists():
         die(f"No host source file found: {src}")
 
-    entries: set[str] = set()
-    for line in src.read_text(encoding="utf-8").splitlines():
-        m = _DOMAIN_RE.search(line)
-        if m:
-            entries.add(f"0.0.0.0 {m.group(0).lower()}")
+    entries = {
+        f"0.0.0.0 {host}" for line in src.read_text(encoding="utf-8").splitlines() if (host := blocked_host(line))
+    }
 
     header = f"# Hostlist by {REPO}\n# Updated: {ts_read()}\n"
-    _write_release(out, header, list(entries))
-    ok(f"{out} ({len(entries)} entries)")
+    count = release.publish(out, [*header.splitlines(), *sorted(entries)])
+    ok(f"{out} ({count} entries)")
 
 
 def build_hostlist() -> None:
@@ -180,41 +137,13 @@ def build_hostlist() -> None:
             if r.returncode != 0 or not tmp.exists():
                 warn("Hostlist compilation failed")
                 return
-            _check_shrink(out, _count_rules(tmp.read_text(encoding="utf-8")))
-            tmp.replace(out)
+            release.publish(out, tmp.read_text(encoding="utf-8").splitlines())
         finally:
             tmp.unlink(missing_ok=True)
 
 
 def write_catalog() -> None:
-    """Index the built lists so consumers can detect changes and verify downloads."""
-    log("catalog", "Writing list catalog")
-    lists = []
-    for f in sorted(FILTER_OUT.glob("*.txt")):
-        data = f.read_bytes()
-        text = data.decode("utf-8")
-        title = version = None
-        for line in text.splitlines():
-            if line.startswith("! Title:"):
-                title = line.removeprefix("! Title:").strip()
-            elif line.startswith("! Version:"):
-                version = line.removeprefix("! Version:").strip()
-        lists.append(
-            {
-                "file": f.name,
-                "title": title,
-                "url": f"https://raw.githubusercontent.com/{REPO}/main/{FILTER_OUT.as_posix()}/{f.name}",
-                "rules": _count_rules(text),
-                "bytes": len(data),
-                "sha256": hashlib.sha256(data).hexdigest(),
-                "version": version,
-            }
-        )
-    if not lists:
-        die(f"No built lists found in {FILTER_OUT}")
-    out = FILTER_OUT / "metadata.json"
-    out.write_text(json.dumps({"generated": ts_read(), "lists": lists}, indent=2) + "\n", encoding="utf-8")
-    ok(f"{out} ({len(lists)} lists)")
+    release.write_catalog(FILTER_OUT, REPO)
 
 
 def lint_filters() -> None:
@@ -231,51 +160,7 @@ def lint_filters() -> None:
         warn("Lint found issues")
 
 
-def _process_js(f: Path) -> bool:
-    fn = f.name
-    base = fn[: -len(".user.js")] if fn.endswith(".user.js") else f.stem
-
-    text = f.read_text(encoding="utf-8")
-    meta_lines: list[str] = []
-    code_lines: list[str] = []
-    in_meta = False
-    after_meta = False
-
-    for line in text.splitlines():
-        if line.strip() == "// ==UserScript==":
-            in_meta = True
-            meta_lines.append(line)
-        elif line.strip() == "// ==/UserScript==":
-            in_meta = False
-            after_meta = True
-        elif in_meta:
-            meta_lines.append(line)
-        elif after_meta:
-            code_lines.append(line)
-
-    if not meta_lines or not code_lines:
-        err(f"{fn} (missing metadata or code block)")
-        return False
-
-    filtered_meta: list[str] = []
-    for line in meta_lines:
-        if re.match(r"^// @(name|description):", line) and ": en" not in line:
-            continue
-        line = re.sub(
-            r"^(// @downloadURL).*",
-            rf"\1 https://raw.githubusercontent.com/{REPO}/main/{SCRIPT_OUT.as_posix()}/{base}.user.js",
-            line,
-        )
-        line = re.sub(
-            r"^(// @updateURL).*",
-            rf"\1 https://raw.githubusercontent.com/{REPO}/main/{SCRIPT_OUT.as_posix()}/{base}.meta.js",
-            line,
-        )
-        filtered_meta.append(line)
-
-    meta_text = "\n".join(filtered_meta)
-    code_text = "\n".join(code_lines)
-
+def _minify(code: str) -> str:
     result = _run_js(
         "esbuild",
         "--minify",
@@ -283,23 +168,31 @@ def _process_js(f: Path) -> bool:
         "--format=iife",
         "--platform=browser",
         "--log-level=error",
-        input=code_text.encode(),
+        input=code.encode(),
         capture_output=True,
         check=False,
     )
     if result.returncode != 0:
-        err(f"{fn} (esbuild failed)")
-        return False
+        msg = "esbuild failed"
+        raise ValueError(msg)
+    return result.stdout.decode().strip()
 
-    js = result.stdout.decode().strip()
-    if len(js) < 50:
-        err(f"{fn} ({len(js)} bytes, suspiciously small)")
+
+def _process_js(f: Path) -> bool:
+    fn = f.name
+    base = fn[: -len(".user.js")] if fn.endswith(".user.js") else f.stem
+    try:
+        packaged = userscript.package(
+            f.read_text(encoding="utf-8"), base, repo=REPO, dist=SCRIPT_OUT.as_posix(), minify=_minify
+        )
+    except ValueError as e:
+        err(f"{fn} ({e})")
         return False
 
     SCRIPT_OUT.mkdir(parents=True, exist_ok=True)
-    (SCRIPT_OUT / f"{base}.meta.js").write_text(meta_text + "\n", encoding="utf-8")
-    (SCRIPT_OUT / f"{base}.user.js").write_text(meta_text + "\n" + js + "\n", encoding="utf-8")
-    ok(f"{fn} -> {base}.user.js ({f.stat().st_size} -> {len(js)} bytes)")
+    (SCRIPT_OUT / f"{base}.meta.js").write_text(packaged.meta, encoding="utf-8")
+    (SCRIPT_OUT / f"{base}.user.js").write_text(packaged.script, encoding="utf-8")
+    ok(f"{fn} -> {base}.user.js ({f.stat().st_size} -> {len(packaged.script)} bytes)")
     return True
 
 

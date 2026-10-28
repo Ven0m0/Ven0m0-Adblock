@@ -1,0 +1,18 @@
+{
+  "blank": ["", "   "],
+  "comment": ["! comment", "!!! Old Reddit", "!/disabled-rule/$doc", "# hosts comment", "; semicolon"],
+  "header": ["[Adblock Plus 2.0]", "[uBlock Origin]"],
+  "directive": ["!#if adguard", "!#endif", "!#else", "!#include other.txt"],
+  "cosmetic": [
+    "##.ad",
+    "###banner",
+    "example.com##.ad",
+    "example.com#@#.ad",
+    "a.com#?#div",
+    "a.com#$#body { x: y }",
+    "#%#//scriptlet"
+  ],
+  "exception": ["@@||example.com^", "@@||example.com^$document"],
+  "network": ["||example.com^", "||example.com^$3p", "|http://example.com", "/pattern/", "http://example.com"],
+  "domain": ["example.com", "sub.example.com", "valid-domain.co.uk", "abc.123.net", "a-b.com", "123.com"]
+}

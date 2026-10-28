@@ -7,28 +7,14 @@
 - Validates domain syntax
 """
 
-import re
 import sys
 from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
-from Scripts.common import is_valid_domain, write_lines
-
-# "!" covers every comment shape (including "!!!", "!---", "!/regex/" disabled rules);
-# "# " needs the space so "##"/"#@#"/"#?#" cosmetic rules are not mistaken for comments.
-COSMETIC_RE = re.compile(r"#[@$%?]*#")
-HEADER_PREFIXES = ("!", "# ", "[", ";")
-# AdGuard/uBO preprocessor directives: structural block markers, not comments.
-# They must keep their exact position and must never be deduplicated away -
-# nested "!#if"/"!#endif" pairs can repeat identical text per block.
-DIRECTIVE_PREFIXES = ("!#if", "!#endif", "!#else", "!#include")
-
-
-def is_directive(line: str) -> bool:
-    """Check if line is a preprocessor directive (block boundary)."""
-    return line.startswith(DIRECTIVE_PREFIXES)
+from Scripts.common import read_lines, write_lines
+from Scripts.rules import Kind, classify, is_rule, is_valid
 
 
 @dataclass(slots=True)
@@ -41,28 +27,6 @@ class Stats:
     @property
     def compression_ratio(self) -> float:
         return (1 - self.final / self.original) * 100 if self.original > 0 else 0.0
-
-
-def is_header(line: str) -> bool:
-    """Check if line is a header/metadata line."""
-    return line.startswith(HEADER_PREFIXES) or not line
-
-
-def is_valid_rule(line: str) -> bool:
-    """Basic validation for filter rules."""
-    if not line:
-        return False
-    # Selectors and scriptlets legitimately exceed the network-rule length cap;
-    # treating them as comments used to hide them from this check entirely.
-    if COSMETIC_RE.search(line):
-        return True
-    if len(line) > 2048:
-        return False
-    if line.startswith(("||", "@@||")):
-        # Extract domain part: remove || or @@||, stop at ^ or $ or options separator
-        domain = line.split("^", maxsplit=1)[0].lstrip("|@")
-        return is_valid_domain(domain)
-    return True
 
 
 def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
@@ -105,14 +69,15 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
                     rules.append("")
             continue
 
-        if is_directive(line):
+        kind = classify(line)
+        if kind is Kind.DIRECTIVE:
             in_header = False
             flush_segment()
             seen.clear()
             rules.extend(current_comments)
             current_comments = []
             rules.append(line)
-        elif is_header(line):
+        elif kind in (Kind.COMMENT, Kind.HEADER):
             if in_header:
                 headers.append(line)
             else:
@@ -122,7 +87,7 @@ def process_content(lines: Iterable[str]) -> tuple[list[str], list[str], Stats]:
                 current_comments.append(line)
         else:
             in_header = False
-            if line not in seen and is_valid_rule(line):
+            if line not in seen and is_valid(line):
                 seen.add(line)
                 if not segment:
                     headed = bool(current_comments)
@@ -149,23 +114,17 @@ def deduplicate_file(filepath: Path) -> tuple[Stats, list[str]]:
     print(f"Processing: {filepath}")
 
     try:
-        with filepath.open("r", encoding="utf-8") as f:
-            lines_gen = (line.strip() for line in f)
-            headers, rules, stats = process_content(lines_gen)
-    except OSError as e:
-        print(f"  Error reading {filepath}: {e}", file=sys.stderr)
+        headers, rules, stats = process_content(read_lines(filepath))
+        write_lines(filepath, headers + rules)
+    except (OSError, UnicodeError) as e:
+        print(f"  Error processing {filepath}: {e}", file=sys.stderr)
         return Stats(), []
 
-    final_content = headers + rules
-
-    if write_lines(filepath, final_content):
-        print(
-            f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)"
-        )
-        # Return only actual rules (not comments/directives) for cross-file duplicate detection
-        return stats, [r for r in rules if not is_header(r) and not is_directive(r)]
-
-    return Stats(), []
+    print(
+        f"  {stats.original} → {stats.final} lines ({stats.removed} removed, {stats.compression_ratio:.1f}% reduction)"
+    )
+    # Return only actual rules (not comments/directives) for cross-file duplicate detection
+    return stats, [r for r in rules if is_rule(r)]
 
 
 def find_cross_file_duplicates(

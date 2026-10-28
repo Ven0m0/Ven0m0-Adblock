@@ -1,6 +1,5 @@
 """Common utilities and constants for Ven0m0-Adblock scripts."""
 
-import hashlib
 import os
 import re
 import shutil
@@ -42,11 +41,6 @@ def warn(msg: str) -> None:
     print(f"{Y}⚠{N} {msg}", file=sys.stderr, flush=True)
 
 
-def dbg(msg: str) -> None:
-    if os.environ.get("DEBUG") == "1":
-        print(f"{C}[dbg]{N} {msg}", file=sys.stderr, flush=True)
-
-
 def die(msg: str, code: int = 1) -> None:
     err(msg)
     sys.exit(code)
@@ -82,77 +76,34 @@ DOMAIN_PATTERN: Final[re.Pattern] = re.compile(
     re.IGNORECASE,
 )
 
-ADGUARD_INDICATORS: Final[list[str]] = [
-    "||",
-    "##",
-    "#@#",
-    "#?#",
-    "@@",
-    "$",
-    "^",
-    "*",
-    "!",
-    "[",
-    "]",
-    "##.",
-    "###",
-    "##:",
-    "~",
-    "|",
-]
-
 
 def is_valid_domain(domain: str) -> bool:
     """Check if a string is a valid domain name."""
     return bool(DOMAIN_PATTERN.match(domain))
 
 
-def sanitize_filename(url: str, name: str | None = None) -> str:
-    """Generate safe filename from URL or provided name."""
-    if name:
-        safe = re.sub(r"[^\w\-.]", "-", name)
-        return f"{safe}.txt" if not safe.endswith(".txt") else safe
-
-    # SHA-256 for stable naming only, not security.
-    url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()[:12]
-    domain = re.search(r"://([^/]+)", url)
-    domain_part = domain.group(1).replace(".", "-").replace(":", "-") if domain else "list"
-    return f"{domain_part}-{url_hash}.txt"
+def read_lines(filepath: Path) -> list[str]:
+    """Read right-stripped lines. Raises OSError or UnicodeError."""
+    with filepath.open("r", encoding="utf-8") as f:
+        return [line.rstrip() for line in f]
 
 
-def read_lines(filepath: Path) -> list[str] | None:
-    """Read lines from file. Returns None on error."""
+def write_lines(filepath: Path, lines: list[str], *, append: bool = False) -> None:
+    """Write lines, replacing the file atomically unless appending. Raises OSError or UnicodeError."""
+    text = "\n".join(lines) + "\n" if lines else ""
+    if append:
+        with filepath.open("a", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+        return
+
+    # Temp file in the same directory so the replace stays on one filesystem.
+    fd, temp_path = tempfile.mkstemp(dir=filepath.parent, text=True)
+    tmp = Path(temp_path)
     try:
-        with filepath.open("r", encoding="utf-8") as f:
-            return [line.rstrip() for line in f]
-    except (OSError, UnicodeError) as e:
-        print(f"  Error reading {filepath}: {e}", file=sys.stderr)
-        return None
-
-
-def write_lines(filepath: Path, lines: list[str], mode: str = "w") -> bool:
-    """Write lines to file. Returns True on success."""
-    try:
-        if mode == "a":
-            with filepath.open(mode, encoding="utf-8", newline="\n") as f:
-                if lines:
-                    f.write("\n".join(lines) + "\n")
-            return True
-
-        # Atomic replace via temp file in same directory.
-        fd, temp_path = tempfile.mkstemp(dir=filepath.parent, text=True)
-        tmp = Path(temp_path)
-        try:
-            # open() here wraps the fd from mkstemp; Path.open cannot.
-            with open(fd, "w", encoding="utf-8", newline="\n") as f:  # noqa: PTH123
-                if lines:
-                    f.write("\n".join(lines) + "\n")
-            tmp.replace(filepath)
-        except Exception:
-            tmp.unlink()
-            raise
-        else:
-            return True
-    except (OSError, UnicodeError) as e:
-        print(f"  Error writing {filepath}: {e}", file=sys.stderr)
-        return False
+        # open() here wraps the fd from mkstemp; Path.open cannot.
+        with open(fd, "w", encoding="utf-8", newline="\n") as f:  # noqa: PTH123
+            f.write(text)
+        tmp.replace(filepath)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise

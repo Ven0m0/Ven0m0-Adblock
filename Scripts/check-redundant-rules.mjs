@@ -5,12 +5,19 @@
 // General.txt where an unconditional block shadowed a narrower exception).
 import { globSync, readFileSync } from "node:fs";
 
+// Mirrors Scripts/rules.py: only exception and network rules can shadow one another.
+// Scripts/rule_kinds.json holds the shared vectors that keep the two grammars in step.
+export function isNetworkRule(line) {
+  const text = line.trim();
+  return Boolean(text) && !/^(!|# |;|\[)/.test(text) && !/#[@$%?]*#/.test(text);
+}
+
 function parseRules(file) {
   const lines = readFileSync(file, "utf8").split("\n");
   const rules = [];
   lines.forEach((raw, i) => {
     const text = raw.trim();
-    if (!text || text.startsWith("!") || text.startsWith("[") || /#[@$%]?#/.test(text)) return;
+    if (!isNetworkRule(text)) return;
     rules.push({ file, line: i + 1, text });
   });
   return rules;
@@ -60,22 +67,24 @@ function selfTest() {
   console.log("self-test passed");
 }
 
-if (process.argv[2] === "--test") {
-  selfTest();
-  process.exit(0);
-}
+if (import.meta.main) {
+  if (process.argv[2] === "--test") {
+    selfTest();
+    process.exit(0);
+  }
 
-const patterns = process.argv.slice(2);
-if (patterns.length === 0) {
-  console.error("Usage: check-redundant-rules.mjs <file-or-glob>... | --test");
-  process.exit(1);
-}
+  const patterns = process.argv.slice(2);
+  if (patterns.length === 0) {
+    console.error("Usage: check-redundant-rules.mjs <file-or-glob>... | --test");
+    process.exit(1);
+  }
 
-const files = [...new Set(patterns.flatMap((p) => (p.includes("*") ? globSync(p) : [p])))];
-const findings = findShadowedRules(files.flatMap(parseRules));
+  const files = [...new Set(patterns.flatMap((p) => (p.includes("*") ? globSync(p) : [p])))];
+  const findings = findShadowedRules(files.flatMap(parseRules));
 
-if (findings.length === 0) {
-  console.log("No redundant/shadowed rules found.");
-} else {
-  for (const f of findings) console.log(`${f.file}:${f.line} — ${f.reason} — ${f.text}`);
+  if (findings.length === 0) {
+    console.log("No redundant/shadowed rules found.");
+  } else {
+    for (const f of findings) console.log(`${f.file}:${f.line} — ${f.reason} — ${f.text}`);
+  }
 }

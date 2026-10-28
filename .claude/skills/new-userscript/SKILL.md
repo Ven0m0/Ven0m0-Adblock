@@ -1,4 +1,5 @@
 ---
+
 name: new-userscript
 description: Scaffold a new userscript in userscripts/src/ with the correct header, guard pattern, and project conventions for this repo.
 ---

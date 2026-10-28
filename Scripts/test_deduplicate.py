@@ -8,8 +8,6 @@ from unittest.mock import patch
 # Add current directory to path to allow importing deduplicate
 from Scripts.deduplicate import (
     find_cross_file_duplicates,
-    is_header,
-    is_valid_rule,
     main,
     process_content,
 )
@@ -162,53 +160,6 @@ class TestDeduplicate(unittest.TestCase):
                 "!#endif",
             ],
         )
-
-    def test_is_header(self):
-        # Valid headers with prefixes
-        self.assertTrue(is_header("! This is a comment"))
-        self.assertTrue(is_header("# This is also a comment"))
-        self.assertTrue(is_header("[Adblock Plus 2.0]"))
-        self.assertTrue(is_header("; Semicolon comment"))
-        self.assertTrue(is_header("!!! Old Reddit"))
-        self.assertTrue(is_header("!/disabled-rule/$doc"))
-
-        # Empty lines
-        self.assertTrue(is_header(""))
-
-        # Non-headers
-        self.assertFalse(is_header("||example.com^"))
-        self.assertFalse(is_header("example.com##.ad"))
-        self.assertFalse(is_header("example.com"))
-        self.assertFalse(is_header("@@||example.com"))
-        self.assertFalse(is_header("##.ad"))
-        self.assertFalse(is_header("###banner"))
-        self.assertFalse(is_header("example.com#@#.ad"))
-
-    def test_is_valid_rule(self):
-        # Valid rules
-        self.assertTrue(is_valid_rule("example.com"))
-        self.assertTrue(is_valid_rule("||example.com^"))
-        self.assertTrue(is_valid_rule("@@||example.com"))
-        self.assertTrue(is_valid_rule("example.com$domain=example.com"))
-        self.assertTrue(is_valid_rule("||example.com^$important"))
-
-        # Empty or too long
-        self.assertFalse(is_valid_rule(""))
-        long_line = "a" * 2049
-        self.assertFalse(is_valid_rule(long_line))
-
-        # Exactly 2048 chars should be valid
-        max_line = "a" * 2048
-        self.assertTrue(is_valid_rule(max_line))
-
-        # Cosmetic rules and scriptlets are exempt from the network-rule length cap
-        self.assertTrue(is_valid_rule("example.com##" + "a" * 3000))
-        self.assertTrue(is_valid_rule("#%#" + "a" * 3000))
-
-        # Invalid domain patterns
-        self.assertFalse(is_valid_rule("||invalid^"))
-        self.assertFalse(is_valid_rule("||-start.com^"))
-        self.assertFalse(is_valid_rule("||end-.com^"))
 
     def test_find_cross_file_duplicates(self):
         file_rules = {

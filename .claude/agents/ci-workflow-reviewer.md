@@ -1,4 +1,5 @@
 ---
+
 name: ci-workflow-reviewer
 description: Reviews changes to Scripts/build.py or other build/maintenance scripts against the GitHub Actions workflow files that invoke them. Use when editing Scripts/ files that CI depends on, or the workflow files themselves.
 ---
@@ -15,8 +16,7 @@ Map the changed script to the workflow(s) that call it:
 - `Scripts/build.py` → `.github/workflows/build-filter-lists.yml`, `.github/workflows/userscripts.yml`
 - `Scripts/check-redundant-rules.mjs` → `.github/workflows/redundancy-check.yml`
 - `Scripts/deduplicate.py` → `.github/workflows/maintain-lists.yml`
-- `Scripts/move_pure_domains.py`, `Scripts/check_dead_domains.py`, `Scripts/hosts_creator.py` → no workflow (run
-  manually)
+- `Scripts/move_pure_domains.py` → no workflow (run manually)
 - `Scripts/automerge_open_prs.py` → `.github/workflows/automerge-open-prs.yml`
 
 ### Contract checks

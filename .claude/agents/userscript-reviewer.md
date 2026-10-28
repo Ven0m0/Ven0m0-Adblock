@@ -1,4 +1,5 @@
 ---
+
 name: userscript-reviewer
 description: Reviews userscript changes for correctness, conflicts, and lint compliance. Use when editing files in userscripts/src/ or reviewing a userscript before committing.
 ---
