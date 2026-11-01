@@ -80,6 +80,6 @@
     "axios": ">=1.15.0",
     "follow-redirects": ">=1.15.11",
     "tldts": "7.4.19",
-    "tldts-core": "7.4.19"
+    "tldts-core": "7.4.20"
   }
 }
