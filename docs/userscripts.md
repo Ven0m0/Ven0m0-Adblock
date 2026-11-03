@@ -27,6 +27,9 @@ Updates are checked against the same URL, so new commits on `main` arrive automa
 | ------------------------- | ------------- | ------------------------------------------------------ | ------------------- |
 | YouTube Unified Optimizer | YouTube       | CPU/GPU/UI tweaks, quality lock, flags, engine tame    | [Install][yt-pro]   |
 | YouTube Music Complete    | YouTube Music | Opus codec preference, autopause prevention, UI tweaks | [Install][yt-music] |
+| YouTube Codec Preference  | YouTube       | Blocks AV1, prefers VP9, falls back to H.264           | [Install][yt-codec] |
+
+YouTube Unified Optimizer no longer blocks AV1 itself; install YouTube Codec Preference for that.
 
 ### GitHub
 
@@ -57,6 +60,7 @@ Enable one per site.
 [google-search-fixer]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/google-search-fixer.user.js
 [yt-pro]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/yt-pro.user.js
 [yt-music]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/yt-music.user.js
+[yt-codec]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/yt-codec.user.js
 [gh-pro]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/gh-pro.user.js
 [gh-enhancer]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/gh-enhancer.user.js
 [llm-pro]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/LLM-pro.user.js

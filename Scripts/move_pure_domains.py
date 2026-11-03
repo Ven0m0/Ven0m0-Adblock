@@ -9,7 +9,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from Scripts.common import is_valid_domain, read_lines, write_lines
+from Scripts.common import read_lines, write_lines
 from Scripts.rules import Kind, classify
 
 # Compiled regex patterns for domain categorization
@@ -109,7 +109,7 @@ def _update_hostlists(hostlist_dir: Path, domain_moves: dict) -> int:
         try:
             if target_path.exists():
                 # Only track pure domains, not regex patterns
-                existing_domains = {s for line in read_lines(target_path) if is_valid_domain(s := line.strip())}
+                existing_domains = {line.strip() for line in read_lines(target_path) if classify(line) is Kind.DOMAIN}
 
             new_domains = sorted(set(all_domains) - existing_domains)
             if new_domains:

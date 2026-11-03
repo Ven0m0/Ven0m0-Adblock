@@ -2,7 +2,7 @@
 // @name         YouTube Unified Optimizer
 // @author       Ven0m0
 // @namespace    http://tampermonkey.net/
-// @version      4.3.4
+// @version      4.4.0
 // @description  Lightweight YouTube optimizer: CPU/GPU/UI tweaks, quality lock, flags, engine tame
 // @match        https://youtube.com/*
 // @match        https://www.youtube.com/*
@@ -41,7 +41,7 @@
       rafFpsVisible: 20,
       rafFpsHidden: 3
     },
-    gpu: { blockAV1: 1, disableAmbient: 1 },
+    gpu: { disableAmbient: 1 },
     ui: { hideSpinner: 1, hideShorts: 0, disableAnimations: 1, contentVisibility: 1, instantNav: 1 },
     quality: {
       enabled: 1,
@@ -145,19 +145,7 @@
     if (Document?.prototype?.requestStorageAccessFor)
       Document.prototype.requestStorageAccessFor = () => Promise.reject();
   })();
-  if (CFG.gpu.blockAV1) {
-    const cp = HTMLMediaElement.prototype.canPlayType;
-    HTMLMediaElement.prototype.canPlayType = function (t) {
-      if (t && /av01/i.test(t)) return "";
-      return cp.call(this, t);
-    };
-    if (navigator.mediaCapabilities?.decodingInfo) {
-      const od = navigator.mediaCapabilities.decodingInfo.bind(navigator.mediaCapabilities);
-      navigator.mediaCapabilities.decodingInfo = async (c) =>
-        /av01/i.test(c?.video?.contentType || "") ? { supported: 0, powerEfficient: 0, smooth: 0 } : od(c);
-    }
-    log("AV1 blocked");
-  }
+  // Codec policy (AV1 block, VP9 preference) lives in yt-codec.user.js.
   if (CFG.cpu.eventThrottle) {
     const oa = EventTarget.prototype.addEventListener;
     const or = EventTarget.prototype.removeEventListener;

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Auto-merge open pull requests targeting the base branch."""
+"""Auto-merge open pull requests targeting the base branch.
+
+Run from the repo root as `python -m Scripts.automerge_open_prs` so it can share `Scripts.common`.
+"""
 
 import json
 import os
-import shutil
 import subprocess
 import sys
+
+from Scripts.common import die, has
 
 BASE_BRANCH = os.environ.get("BASE_BRANCH", "main")
 MAX_CYCLES = int(os.environ.get("MAX_CYCLES", "100"))
@@ -16,25 +20,22 @@ ALLOW_ADMIN_MERGE = os.environ.get("ALLOW_ADMIN_MERGE", "true").lower() == "true
 
 
 def _require(cmd: str) -> None:
-    if not shutil.which(cmd):
-        print(f"{cmd} is required", file=sys.stderr)
-        sys.exit(1)
+    if not has(cmd):
+        die(f"{cmd} is required")
 
 
 def _run(*args: str, **kwargs) -> subprocess.CompletedProcess:
     return subprocess.run(list(args), check=True, **kwargs)
 
 
+def _succeeds(*args: str) -> bool:
+    """Run a command whose failure is an answer, not an error."""
+    return subprocess.run(list(args), check=False).returncode == 0
+
+
 def refresh_main() -> None:
     _run("git", "fetch", "origin", BASE_BRANCH, "--prune")
-    has_branch = (
-        subprocess.run(
-            ["git", "show-ref", "--verify", "--quiet", f"refs/heads/{BASE_BRANCH}"],
-            check=False,
-        ).returncode
-        == 0
-    )
-    if has_branch:
+    if _succeeds("git", "show-ref", "--verify", "--quiet", f"refs/heads/{BASE_BRANCH}"):
         _run("git", "checkout", BASE_BRANCH)
     else:
         _run("git", "checkout", "-B", BASE_BRANCH, f"origin/{BASE_BRANCH}")
@@ -76,22 +77,8 @@ def sync_branch(number: int, head_ref: str, head_owner: str, head_repo: str) -> 
     print(f"Updating PR #{number} branch with {BASE_BRANCH}")
     refresh_main()
     _run("gh", "pr", "checkout", str(number))
-    merged = (
-        subprocess.run(
-            [
-                "git",
-                "merge",
-                "--no-edit",
-                "-X",
-                CONFLICT_STRATEGY,
-                f"origin/{BASE_BRANCH}",
-            ],
-            check=False,
-        ).returncode
-        == 0
-    )
-    if not merged:
-        subprocess.run(["git", "merge", "--abort"], check=False)
+    if not _succeeds("git", "merge", "--no-edit", "-X", CONFLICT_STRATEGY, f"origin/{BASE_BRANCH}"):
+        _succeeds("git", "merge", "--abort")
         return False
     _run(
         "git",
@@ -104,39 +91,16 @@ def sync_branch(number: int, head_ref: str, head_owner: str, head_repo: str) -> 
 
 def merge_pr(number: int) -> bool:
     print(f"Merging PR #{number}")
-    if (
-        subprocess.run(
-            ["gh", "pr", "merge", str(number), "--squash", "--delete-branch"],
-            check=False,
-        ).returncode
-        == 0
-    ):
+    if _succeeds("gh", "pr", "merge", str(number), "--squash", "--delete-branch"):
         return True
-    if ALLOW_ADMIN_MERGE:
-        return (
-            subprocess.run(
-                [
-                    "gh",
-                    "pr",
-                    "merge",
-                    str(number),
-                    "--admin",
-                    "--squash",
-                    "--delete-branch",
-                ],
-                check=False,
-            ).returncode
-            == 0
-        )
-    return False
+    return ALLOW_ADMIN_MERGE and _succeeds("gh", "pr", "merge", str(number), "--admin", "--squash", "--delete-branch")
 
 
 def main() -> None:
     _require("gh")
     _require("git")
     if not os.environ.get("GH_TOKEN"):
-        print("GH_TOKEN is required", file=sys.stderr)
-        sys.exit(1)
+        die("GH_TOKEN is required")
 
     _run("git", "config", "user.name", BOT_NAME)
     _run("git", "config", "user.email", BOT_EMAIL)

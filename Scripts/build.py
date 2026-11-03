@@ -31,6 +31,7 @@ from Scripts.common import (  # noqa: E402
     log,
     ncpu,
     ok,
+    read_lines,
     ts_read,
     ts_short,
     warn,
@@ -48,11 +49,21 @@ def _js_runner() -> list[str] | None:
     return ["bun", "x"] if has("bun") else None
 
 
+TOOL_MISSING = 127  # shell convention for "command not found"
+
+
 def _run_js(*args: str, **kwargs) -> subprocess.CompletedProcess:
+    """Run a JS tool, via bun when present. A missing tool is a failed run, not an exception.
+
+    Callers then handle "not installed" and "exited non-zero" through the same returncode check.
+    """
     runner = _js_runner()
     cmd = [*runner, *args] if runner else list(args)
     check = kwargs.pop("check", False)
-    return subprocess.run(cmd, check=check, **kwargs)
+    try:
+        return subprocess.run(cmd, check=check, **kwargs)
+    except FileNotFoundError:
+        return subprocess.CompletedProcess(cmd, TOOL_MISSING, b"", f"{cmd[0]} not found".encode())
 
 
 def build_adblock() -> None:
@@ -79,7 +90,7 @@ def build_adblock() -> None:
 
     rules: set[str] = set()
     for f in files:
-        rules.update(line for line in f.read_text(encoding="utf-8").splitlines() if is_rule(line))
+        rules.update(line for line in read_lines(f) if is_rule(line))
 
     header = (
         "[uBlock Origin]\n"
@@ -103,9 +114,7 @@ def build_hosts() -> None:
     if not src.exists():
         die(f"No host source file found: {src}")
 
-    entries = {
-        f"0.0.0.0 {host}" for line in src.read_text(encoding="utf-8").splitlines() if (host := blocked_host(line))
-    }
+    entries = {f"0.0.0.0 {host}" for line in read_lines(src) if (host := blocked_host(line))}
 
     header = f"# Hostlist by {REPO}\n# Updated: {ts_read()}\n"
     count = release.publish(out, [*header.splitlines(), *sorted(entries)])
@@ -137,13 +146,9 @@ def build_hostlist() -> None:
             if r.returncode != 0 or not tmp.exists():
                 warn("Hostlist compilation failed")
                 return
-            release.publish(out, tmp.read_text(encoding="utf-8").splitlines())
+            release.publish(out, read_lines(tmp))
         finally:
             tmp.unlink(missing_ok=True)
-
-
-def write_catalog() -> None:
-    release.write_catalog(FILTER_OUT, REPO)
 
 
 def lint_filters() -> None:
@@ -173,7 +178,8 @@ def _minify(code: str) -> str:
         check=False,
     )
     if result.returncode != 0:
-        msg = "esbuild failed"
+        detail = (result.stderr or b"").decode(errors="replace").strip()
+        msg = f"esbuild failed: {detail}" if detail else "esbuild failed"
         raise ValueError(msg)
     return result.stdout.decode().strip()
 
@@ -243,15 +249,19 @@ def _task_all() -> None:
     build_adblock()
     build_hosts()
     build_hostlist()
-    write_catalog()
+    build_catalog()
     build_userscripts()
+
+
+def build_catalog() -> None:
+    release.write_catalog(FILTER_OUT, REPO)
 
 
 _TASKS: dict[str, Callable[[], None]] = {
     "adblock": build_adblock,
     "hosts": build_hosts,
     "hostlist": build_hostlist,
-    "catalog": write_catalog,
+    "catalog": build_catalog,
     "lint": lint_filters,
     "userscripts": build_userscripts,
     "all": _task_all,

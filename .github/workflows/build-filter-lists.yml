@@ -7,7 +7,9 @@ on:
     paths:
       - "lists/adblock/**/*.txt"
       - "hostlist-config.json"
-      - "Scripts/build.py"
+      # Build imports rules/common/release, so any tooling edit must rebuild; tests do not affect outputs.
+      - "Scripts/*.py"
+      - "!Scripts/test_*.py"
       - "mise.toml"
   workflow_dispatch:
 

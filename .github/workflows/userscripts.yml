@@ -6,7 +6,9 @@ on:
     paths:
       - "userscripts/src/**/*.js"
       - "userscripts/src/**/*.user.js"
-      - "Scripts/build.py"
+      # Build imports userscript/common, so any tooling edit must rebuild; tests do not affect outputs.
+      - "Scripts/*.py"
+      - "!Scripts/test_*.py"
       - "mise.toml"
   pull_request:
     paths:
