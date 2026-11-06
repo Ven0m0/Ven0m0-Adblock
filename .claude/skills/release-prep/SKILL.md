@@ -1,6 +1,6 @@
 ---
-
 name: release-prep
+disable-model-invocation: true
 description: Validate the repo and summarize changes before manually dispatching maintain-lists.yml (releases are otherwise fully automated). Use before triggering a manual release or checking whether one is due.
 ---
 
