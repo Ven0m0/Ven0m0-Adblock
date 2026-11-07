@@ -51,7 +51,6 @@ gossip-eu-classic-lb-1736877676.eu-west-1.elb.amazonaws.com
 gossip.easyanticheat.net
 hydra-eu-lb-618151913.eu-west-1.elb.amazonaws.com
 hydra.easyanticheat.net
-hydra.easyanticheat.netgamesec-hydra-eu-lb-prod-220534806.eu-west-1.elb.amazonaws.com
 ipv6check-udp.steamserver.net
 js-agent.newrelic.com
 merchantpool1.epicgames.com

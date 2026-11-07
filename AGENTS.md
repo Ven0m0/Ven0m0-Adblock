@@ -11,7 +11,7 @@ Filter syntax: AdGuard and uBlock Origin rule formats.
 
 **Own content only.** Do not commit upstream filter lists, hostlists, or third-party userscripts, and do not
 add scripts or workflows that download them into the repo. Recommend upstream lists by link instead
-(`lists/README.md` for filter lists, `docs/userscripts.md` for userscripts).
+(`lists/README.md` for filter lists, `docs/userscripts.md` for userscripts); subscribe links for own lists go in `docs/filterlists.md`.
 
 ## Source files — edit these
 
@@ -24,7 +24,7 @@ add scripts or workflows that download them into the repo. Recommend upstream li
 | `Scripts/`           | Python build and maintenance tooling (plus `check-redundant-rules.mjs`)                                            |
 | `site/`              | Static rule search page (`index.html`), deployed by `pages.yml`                                                    |
 | `.github/workflows/` | CI workflow definitions                                                                                            |
-| `docs/`              | User docs (`userscripts.md`, `filter-rules.md`) and the backlog (`TODO.md`)                                        |
+| `docs/`              | User docs (`userscripts.md`, `filterlists.md`)                                                                     |
 | Root configs         | `package.json`, `mise.toml`, `pyproject.toml`, `.aglintrc.yml`, `.oxlintrc.json`, `eslint.config.js`, `biome.json` |
 
 ## CI-generated paths — owned by pipeline

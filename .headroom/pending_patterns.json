@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "patterns": [
+    {
+      "category": "error_recovery",
+      "content": "Command `rtk rg -n \"hostlist\" .aglintrc.yml package.json Scripts/*.py .github/workflows/dead-domains-check.yml .github/workflows/pages.yml README.md lists/README.md | rtk proxy grep -v \"^Scripts/test_\"` fails (runtime_error). Use `rtk proxy sed -n '138,160p;236,300p' \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"` instead.",
+      "importance": 0.7,
+      "count": 1,
+      "entity_refs": [],
+      "metadata": {
+        "error_category": "runtime_error",
+        "tool": "Bash",
+        "failed_cmd": "rtk rg -n \"hostlist\" .aglintrc.yml package.json Scripts/*.py .github/workflows/dead-domains-check.yml .github/workflows/pages.yml README.md lists/README.md | rtk proxy grep -v \"^Scripts/test_\"",
+        "success_cmd": "rtk proxy sed -n '138,160p;236,300p' \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"",
+        "first_seen_at": "2026-11-07T13:10:44.183478+00:00",
+        "last_seen_at": "2026-11-07T13:10:44.183478+00:00"
+      },
+      "content_hash": "5c620f6117a94992",
+      "save_token": null
+    },
+    {
+      "category": "error_recovery",
+      "content": "Command `rtk rg -n \"hostlist\" .aglintrc.yml package.json Scripts/*.py .github/workflows/dead-domains-check.yml .github/workflows/pages.yml README.md lists/README.md | rtk proxy grep -v \"^Scripts/test_\"` fails (runtime_error). Use `rtk proxy grep -n -A30 \"private fun parseLines\" \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"; rtk proxy grep -n -B3 -A12 \"fun i` instead.",
+      "importance": 0.7,
+      "count": 1,
+      "entity_refs": [],
+      "metadata": {
+        "error_category": "runtime_error",
+        "tool": "Bash",
+        "failed_cmd": "rtk rg -n \"hostlist\" .aglintrc.yml package.json Scripts/*.py .github/workflows/dead-domains-check.yml .github/workflows/pages.yml README.md lists/README.md | rtk proxy grep -v \"^Scripts/test_\"",
+        "success_cmd": "rtk proxy grep -n -A30 \"private fun parseLines\" \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"; rtk proxy grep -n -B3 -A12 \"fun i",
+        "first_seen_at": "2026-11-07T13:10:44.194503+00:00",
+        "last_seen_at": "2026-11-07T13:10:44.194503+00:00"
+      },
+      "content_hash": "3ac1d23c60e0d819",
+      "save_token": null
+    },
+    {
+      "category": "error_recovery",
+      "content": "Command `rtk proxy sed -n '44,55p' .github/workflows/maintain-lists.yml; rtk rg -n -i \"admob|applovin|unityads|appsflyer|adjust|branch\\.io|mintegral|pangle|ironsrc|vungle|chartboost|inmobi|crashlytics|app-meas` fails (runtime_error). Use `rtk proxy sed -n '138,160p;236,300p' \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"` instead.",
+      "importance": 0.7,
+      "count": 1,
+      "entity_refs": [],
+      "metadata": {
+        "error_category": "runtime_error",
+        "tool": "Bash",
+        "failed_cmd": "rtk proxy sed -n '44,55p' .github/workflows/maintain-lists.yml; rtk rg -n -i \"admob|applovin|unityads|appsflyer|adjust|branch\\.io|mintegral|pangle|ironsrc|vungle|chartboost|inmobi|crashlytics|app-meas",
+        "success_cmd": "rtk proxy sed -n '138,160p;236,300p' \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"",
+        "first_seen_at": "2026-11-07T13:11:23.852239+00:00",
+        "last_seen_at": "2026-11-07T13:11:23.852239+00:00"
+      },
+      "content_hash": "5315ccd6aedbc501",
+      "save_token": null
+    },
+    {
+      "category": "error_recovery",
+      "content": "Command `rtk proxy sed -n '44,55p' .github/workflows/maintain-lists.yml; rtk rg -n -i \"admob|applovin|unityads|appsflyer|adjust|branch\\.io|mintegral|pangle|ironsrc|vungle|chartboost|inmobi|crashlytics|app-meas` fails (runtime_error). Use `rtk proxy grep -n -A30 \"private fun parseLines\" \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"; rtk proxy grep -n -B3 -A12 \"fun i` instead.",
+      "importance": 0.7,
+      "count": 2,
+      "entity_refs": [],
+      "metadata": {
+        "error_category": "runtime_error",
+        "tool": "Bash",
+        "failed_cmd": "rtk proxy sed -n '44,55p' .github/workflows/maintain-lists.yml; rtk rg -n -i \"admob|applovin|unityads|appsflyer|adjust|branch\\.io|mintegral|pangle|ironsrc|vungle|chartboost|inmobi|crashlytics|app-meas",
+        "success_cmd": "rtk proxy grep -n -A30 \"private fun parseLines\" \"C:/Users/Ven0m0/AppData/Local/Temp/claude/d148114307b19656/92e82b5a-7752-4025-abf7-b402d416dabb/scratchpad/hosts.kt\"; rtk proxy grep -n -B3 -A12 \"fun i",
+        "first_seen_at": "2026-11-07T13:11:23.869541+00:00",
+        "last_seen_at": "2026-11-07T13:12:05.924686+00:00"
+      },
+      "content_hash": "9109279ee458c2ad",
+      "save_token": null
+    },
+    {
+      "category": "error_recovery",
+      "content": "Command `cd \"C:/Users/Ven0m0/AppData/Local/Temp/claude/7903725d0ef5fbf1/dfb05456-c206-4351-8114-63d9a93254d9/scratchpad\" && python - <<'EOF'\nimport re\np=\"tomd.py\"\ns=open(p).read()\ns=s[:s.index(\"out = [\")]+'''w` fails (syntax_error). Use `cd /c/Users/Ven0m0/project/Ven0m0-Adblock; python - <<'EOF'\nimport socket\nfor l in open(\"lists/hostlist/Android.txt\"):\n    l=l.strip()\n    if l.startswith(\"!\"): continue\n    try: socket.getaddrinfo(l,` instead.",
+      "importance": 0.7,
+      "count": 1,
+      "entity_refs": [],
+      "metadata": {
+        "error_category": "syntax_error",
+        "tool": "Bash",
+        "failed_cmd": "cd \"C:/Users/Ven0m0/AppData/Local/Temp/claude/7903725d0ef5fbf1/dfb05456-c206-4351-8114-63d9a93254d9/scratchpad\" && python - <<'EOF'\nimport re\np=\"tomd.py\"\ns=open(p).read()\ns=s[:s.index(\"out = [\")]+'''w",
+        "success_cmd": "cd /c/Users/Ven0m0/project/Ven0m0-Adblock; python - <<'EOF'\nimport socket\nfor l in open(\"lists/hostlist/Android.txt\"):\n    l=l.strip()\n    if l.startswith(\"!\"): continue\n    try: socket.getaddrinfo(l,",
+        "first_seen_at": "2026-11-07T13:14:50.391945+00:00",
+        "last_seen_at": "2026-11-07T13:14:50.391945+00:00"
+      },
+      "content_hash": "82d66e2dfeb6e4bd",
+      "save_token": null
+    }
+  ]
+}

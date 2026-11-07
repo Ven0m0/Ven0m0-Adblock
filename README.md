@@ -9,18 +9,7 @@ Built for uBlock Origin and AdGuard.
 
 ## Filter lists
 
-Pick **one** combined list. Each one bundles the individual lists below via `!#include`.
-
-| List                     | Includes                                                          | Subscribe                      |
-| ------------------------ | ----------------------------------------------------------------- | ------------------------------ |
-| [Desktop][combo-desktop] | General, Other, Reddit, Search Engines, YouTube, Twitch           | [subscribe][sub-combo-desktop] |
-| [Full][combo-full]       | General, Other, Reddit, Search Engines, Spotify, Twitter, YouTube | [subscribe][sub-combo-full]    |
-| [Minimal][combo-minimal] | General, Other, Reddit, Search Engines, Twitter, YouTube          | [subscribe][sub-combo-minimal] |
-| [Mobile][combo-mobile]   | General, Other, Reddit, Search Engines                            | [subscribe][sub-combo-mobile]  |
-
-Individual lists, if you only want part of it:
-[General][general] · [Other][other] · [Reddit][reddit] · [Search Engines][search] · [Spotify][spotify] ·
-[Twitch][twitch] · [Twitter][twitter] · [YouTube][youtube]
+One-click subscribe links for the combined and individual lists, plus the Android apps hostlist: [docs/filterlists.md](docs/filterlists.md).
 
 Recommended third-party lists to pair with these, with one-click subscribe links: [lists/README.md](lists/README.md).
 
@@ -43,7 +32,7 @@ One-click Tampermonkey / Violentmonkey install links: [docs/userscripts.md](docs
 | `userscripts/src/`   | Userscript sources                                          |
 | `Scripts/`           | Build and maintenance tooling (Python, plus one Bun script) |
 | `site/`              | Static rule search page, deployed to GitHub Pages           |
-| `docs/`              | Userscript install page, filter notes, backlog (`TODO.md`)  |
+| `docs/`              | Install pages for filter lists and userscripts              |
 | `.github/workflows/` | CI: lint, build, dead-domain cleanup, releases              |
 
 Contributor and agent instructions: [AGENTS.md](AGENTS.md).
@@ -70,20 +59,3 @@ bun run build    # filter list, hosts file, userscripts
 ## License
 
 [MIT](LICENSE)
-
-[combo-desktop]: lists/adblock/Combination-desktop.txt
-[combo-full]: lists/adblock/Combination.txt
-[combo-minimal]: lists/adblock/Combination-Minimal.txt
-[combo-mobile]: lists/adblock/Combination-mobile.txt
-[sub-combo-desktop]: https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/Combination-desktop.txt&title=Ven0m0%20Desktop
-[sub-combo-full]: https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/Combination.txt&title=Ven0m0%20Full
-[sub-combo-minimal]: https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/Combination-Minimal.txt&title=Ven0m0%20Minimal
-[sub-combo-mobile]: https://subscribe.adblockplus.org/?location=https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/lists/adblock/Combination-mobile.txt&title=Ven0m0%20Mobile
-[general]: lists/adblock/General.txt
-[other]: lists/adblock/Other.txt
-[reddit]: lists/adblock/Reddit.txt
-[search]: lists/adblock/Search-Engines.txt
-[spotify]: lists/adblock/Spotify.txt
-[twitch]: lists/adblock/Twitch.txt
-[twitter]: lists/adblock/Twitter.txt
-[youtube]: lists/adblock/Youtube.txt

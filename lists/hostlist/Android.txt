@@ -1,0 +1,56 @@
+! Description: Ad, tracker, analytics and crash telemetry SDK domains for Android apps
+! Format: one plain domain per line, subdomains included when wildcard blocking is on
+! Title: Ven0m0 Android apps hostlist
+! Usage: Morphe with the Adobo patch Block ads, trackers, and analytics, Hosts file option
+! aglint-disable
+adjust.com
+adjust.io
+admob.com
+adservice.google.com
+amplitude.com
+an.facebook.com
+app-analytics-services.com
+app-measurement.com
+applovin.com
+applvn.com
+appmetrica.yandex.net
+appsflyer.com
+appsflyersdk.com
+bidmachine.io
+branch.io
+bugsnag.com
+chartboost.com
+crashlytics.com
+doubleclick.net
+firebaselogging-pa.googleapis.com
+flurry.com
+fyber.com
+googleadservices.com
+googlesyndication.com
+inmobi.com
+inmobicdn.net
+inner-active.mobi
+instabug.com
+ironsrc.com
+ironsrc.mobi
+kochava.com
+liftoff.io
+mintegral.com
+mintegral.net
+mixpanel.com
+mobile-collector.newrelic.com
+moloco.com
+pangle.io
+pangleglobal.com
+rayjump.com
+segment.io
+sentry.io
+singular.net
+smaato.net
+startappservice.com
+supersonicads.com
+tapjoy.com
+tapjoyads.com
+unityads.unity3d.com
+vungle.com
+yandexadexchange.net

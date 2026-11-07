@@ -25,14 +25,14 @@ wheels = [
 
 [[package]]
 name = "deadcode"
-version = "2.4.1"
+version = "2.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tomli" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c8/ab/1122e6d6392f7860718f16e931b1976d5e579433486a84b09333811e3a6b/deadcode-2.4.1.tar.gz", hash = "sha256:1ba1e22425cf53c4b3f5ddd46e62a86d98479b47f2ac3430ae60910ac8cb318d", size = 37734, upload-time = "2024-08-09T18:12:58.58Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/aa/ad/14d370eff372d92eb39df04bf161ec38441e2249b93d840c71abc6e3bf38/deadcode-2.5.0.tar.gz", hash = "sha256:30661ed8792d2239ca94568e879c157f28d2c52c0fd58a4fea1f91fe0200517c", size = 38251, upload-time = "2026-11-07T11:48:07.997Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/cc/9c27bb3a1224a66740b25d8153cd41051240103fa9aaee119688362c32b6/deadcode-2.4.1-py3-none-any.whl", hash = "sha256:a16b28b601a82d5dc7ebfcab464a6f65e22a99d5684ec4c7907bdb75f8f64050", size = 44621, upload-time = "2024-08-09T18:12:56.433Z" },
+    { url = "https://files.pythonhosted.org/packages/be/c4/9cf94e7e2c128c3ab42ff5a0ba4368a325ef7ce0b23816833401c27731c2/deadcode-2.5.0-py3-none-any.whl", hash = "sha256:cf01a8b5517ab9de4e8e7e25b2cc59474288736bf2670ecb5b21704cbc7fcc02", size = 45115, upload-time = "2026-11-07T11:48:06.533Z" },
 ]
 
 [[package]]

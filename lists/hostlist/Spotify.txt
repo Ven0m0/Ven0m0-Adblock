@@ -350,7 +350,6 @@ admob.sg
 admob.tk
 admob.tw
 adnxs.com
-adnxs.comadplexmedia.adk2x.com
 ads-akp.spotify.com
 ads-fa.spotify.ads.pubmatic.com
 ads-fa.spotify.com
@@ -1029,7 +1028,6 @@ q.admob.com
 qat.comscore.com
 quantcast584928381.s.moatpixel.com
 quicksilver.scdn.co
-r.254a.comjs.moatads.com
 r.admob.com
 r.scdn.co
 r2.vip.sc9.admob.com
@@ -1063,7 +1061,6 @@ sb.voicefive.com
 sc1.admob.com
 sc9.admob.com
 scannables.scdn.co
-scdnco.spotify.map.fastly.net3f.audio-ak.cdn.spotify.com
 sdkm.w.inmobi.com
 search.spotxchange.com
 secure-gg.imrworldwide.com
@@ -1201,7 +1198,6 @@ wap.admob.com
 waps.admob.com
 wave.spotify.com
 weblb-wg.dual-gslb.spotify.com
-weblb-wg.gslb.spotify.
 weblb-wg.gslb.spotify.com
 webplayersupport.spotify.com
 welcome-images.scdn.co

@@ -107,7 +107,6 @@ smp-device-content.apple.com
 snippets.cdn.mozilla.net
 snippets.mozilla.com
 ssl.google-analytics.com
-ssl.google−analytics.com
 static.gc.apple.com
 stats.gc-apple.com
 supportmetrics-uat.apple.com

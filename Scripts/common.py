@@ -17,7 +17,6 @@ R: Final = "\x1b[31m" if _color else ""
 G: Final = "\x1b[32m" if _color else ""
 Y: Final = "\x1b[33m" if _color else ""
 B: Final = "\x1b[34m" if _color else ""
-C: Final = "\x1b[36m" if _color else ""
 N: Final = "\x1b[0m" if _color else ""
 
 # ============================================================================
