@@ -27,6 +27,15 @@ for f in lists/hostlist/*.txt; do
 done
 ```
 
+## 2b. Deduplicate hostlists across files
+
+Drops an entry from a file when an earlier file already has it (order: `Ads.txt`, `Other.txt`, then alphabetical).
+Files stay separate, nothing is merged. `Android.txt` is exempt because Morphe uses it standalone.
+
+```text
+PYTHONPATH=. python3 Scripts/dedupe_hostlists.py lists/hostlist
+```
+
 ## 3. Cross-check `lists/adblock/`
 
 `Scripts/deduplicate.py` targets `lists/sources`; run the same duplicate check against the hand-maintained

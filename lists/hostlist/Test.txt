@@ -10,7 +10,6 @@ gllto.glpals.com
 gllto1.glpals.com
 gllto2.glpals.com
 glpals.com
-hits.dwyl.io
 laobi.icu
 location.services.mozilla.org
 locprod1-elb-eu-west-1.prod.mozaws.net

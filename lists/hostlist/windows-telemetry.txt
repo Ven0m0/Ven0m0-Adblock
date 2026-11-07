@@ -8,8 +8,6 @@ a.rad.msn.com
 ac3.msn.com
 activity-consumer.trafficmanager.net
 activity.windows.com
-adnexus.net
-adnxs.com
 ads.msn.com
 ads1.msads.net
 ads1.msn.com
@@ -81,7 +79,6 @@ bn4sch101123202.wns.windows.com
 bn4sch102110124.wns.windows.com
 browser.events.data.msn.com
 browser.pipe.aria.microsoft.com
-bs.serving-sys.com
 c-msn-com-nsatc.trafficmanager.net
 c.atdmt.com
 c.msn.com
@@ -192,7 +189,6 @@ ceuswatcab01.blob.core.windows.net
 ceuswatcab02.blob.core.windows.net
 co4.telecommand.telemetry.microsoft.com
 compatexchange1.trafficmanager.net
-config.edge.skype.com
 corp.sts.microsoft.com
 corpext.msitadfs.glbdns2.microsoft.com
 cs1.wpc.v0cdn.net
@@ -318,7 +314,6 @@ lb1.www.ms.akadns.net
 legacywatson.trafficmanager.net
 live.rads.msn.com
 location-inference-westus.cloudapp.net
-m.adnxs.com
 maps.windows.com
 mobile.pipe.aria.microsoft.com
 modern.watson.data.microsoft.com
@@ -331,7 +326,6 @@ nexus.officeapps.live.com
 nexusrules.officeapps.live.com
 ns1.gammacdn.net
 ntp.msn.com
-nw-umwatson.events.data.microsoft.com
 oca.microsoft.com
 oca.telemetry.microsoft.com
 oca.telemetry.microsoft.us
@@ -359,7 +353,6 @@ presence.teams.live.com
 preview.msn.com
 query.prod.cms.rt.microsoft.com
 rad.live.com
-rad.msn.com
 redir.metaservices.microsoft.com
 reports.wes.df.telemetry.microsoft.com
 ris-prod.trafficmanager.net
@@ -367,7 +360,6 @@ ris.api.iris.microsoft.com
 romeccs.microsoft.com
 schemas.microsoft.akadns.net
 scorecardresearch.com
-secure.adnxs.com
 secure.flashtalking.com
 self-events-data.trafficmanager.net
 self.events.data.microsoft.com

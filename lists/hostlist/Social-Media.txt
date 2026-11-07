@@ -69,7 +69,6 @@ c.aaxads.com
 crashlogs.whatsapp.net
 customerevents.dradis.netflix.com
 customerevents.geo.netflix.com
-customerevents.netflix.com
 dit.whatsapp.net
 dualstack.ichnaea-web-323206729.eu-west-1.elb.amazonaws.com
 edge-mqtt.facebook.com
@@ -88,9 +87,7 @@ gtq6.sct.sc-prod.net
 hits.dwyl.io
 ichnaea-ios-aws-control.prod.ftl.netflix.com
 ichnaea-web.geo.netflix.com
-ichnaea-web.netflix.com
 ichnaea.geo.netflix.com
-ichnaea.netflix.com
 instagram.c10r.facebook.com
 ipstatp.com
 l3.aaxads.com

@@ -73,6 +73,10 @@ ignore = [
   "EM101", "TRY003", "B904",  # terse raises in test helpers
 ]
 
+"Scripts/dedupe_hostlists.py" = [
+  "E402",  # sys.path bootstrap must run before the Scripts.common import
+]
+
 [tool.ruff.lint.isort]
 known-first-party = ["scripts"]
 

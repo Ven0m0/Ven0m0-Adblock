@@ -50,6 +50,10 @@ jobs:
               awk 'NF && ! seen[$0]++' | sort -u > "$tmp"
             if [[ -s "$tmp" ]]; then mv "$tmp" "$f"; else rm -f "$tmp"; fi
           done; echo "✓ Hostlists deduplicated"
+      - name: Deduplicate hostlists across files
+        continue-on-error: true
+        run: |
+          PYTHONPATH=. python3 Scripts/dedupe_hostlists.py lists/hostlist
       - name: Build blocklist
         continue-on-error: true
         run: |

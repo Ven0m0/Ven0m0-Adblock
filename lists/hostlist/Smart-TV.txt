@@ -11,7 +11,6 @@
 2mdn.net
 7345023508.fxm9485766783.com
 7345023508.fxmconnect.com
-^.*stats?.*\.
 ^api\..*\.hismarttv\.com$
 acr0.samsungcloudsolution.com
 ad.71i.de
@@ -38,7 +37,6 @@ b02.black.ndmdhs.com
 bdcore-apr-lb.bda.ndmdhs.com
 black.ndmdhs.com
 bpu.samsungelectronics.com
-bravia.dl.playstation.net
 call.me.sel.sony.com
 cdn.smartclip.net
 cdns-content.dzcdn.net

@@ -11,7 +11,8 @@ Filter syntax: AdGuard and uBlock Origin rule formats.
 
 **Own content only.** Do not commit upstream filter lists, hostlists, or third-party userscripts, and do not
 add scripts or workflows that download them into the repo. Recommend upstream lists by link instead
-(`lists/README.md` for filter lists, `docs/userscripts.md` for userscripts); subscribe links for own lists go in `docs/filterlists.md`.
+(`docs/filterlists.md` for filter lists, `docs/userscripts.md` for userscripts); subscribe links for own lists also go
+in `docs/filterlists.md`.
 
 ## Source files — edit these
 

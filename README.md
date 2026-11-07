@@ -11,7 +11,8 @@ Built for uBlock Origin and AdGuard.
 
 One-click subscribe links for the combined and individual lists, plus the Android apps hostlist: [docs/filterlists.md](docs/filterlists.md).
 
-Recommended third-party lists to pair with these, with one-click subscribe links: [lists/README.md](lists/README.md).
+Recommended third-party lists to pair with these, with one-click subscribe links:
+[docs/filterlists.md](docs/filterlists.md#recommended-third-party-lists).
 
 Search every rule in these lists: [ven0m0.github.io/Ven0m0-Adblock](https://ven0m0.github.io/Ven0m0-Adblock/).
 
@@ -54,7 +55,7 @@ bun run build    # filter list, hosts file, userscripts
 ## Credit
 
 - [DandelionSprout/adfilt](https://github.com/DandelionSprout/adfilt)
-- [yokoffing/filterlists](https://github.com/yokoffing/filterlists) (basis of `lists/README.md`)
+- [yokoffing/filterlists](https://github.com/yokoffing/filterlists) (basis of the recommended third-party lists in `docs/filterlists.md`)
 
 ## License
 

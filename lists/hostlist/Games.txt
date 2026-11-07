@@ -33,7 +33,6 @@ images.nvidiagrid.net
 ipv6check-http.steamcontent.com
 ipv6check-http.steamserver.net
 ipv6check-udp.steamcontent.com
-ipv6check-udp.steamserver.net
 lightstep.kaizen.nvidia.com
 loc.actual.battle.net
 login.nvgs.nvidia.cn
