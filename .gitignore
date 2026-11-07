@@ -49,3 +49,4 @@ dead-domains.txt
 dead-domains/
 .omc/
 .codegraph/
+.headroom/
