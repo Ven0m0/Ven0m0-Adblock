@@ -34,3 +34,13 @@ x.com##.r-14wv3jr.r-g2wdr4.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.css-
 ! Relevant People
 x.com##.r-1udh08x.r-1ifxtd0.r-rs99b7.r-1phboty.r-1867qdf.r-1kqtdi0.r-kemksi.css-175oi2r
 x.com##.r-12vffkv.r-1p0dtai.r-1xcajam.r-1d2f490.r-zchlnj.r-aqfbo4.css-175oi2r > div.r-12vffkv.css-175oi2r > .r-12vffkv.css-175oi2r
+
+! Age verification prompt (https://x.com/Lunarion21/status/2119118013739733232)
+x.com##+js(set, __INITIAL_STATE__.featureSwitch.defaultConfig.rweb_age_assurance_flow_enabled.value, false)
+x.com##+js(set, __INITIAL_STATE__.featureSwitch.user.config.rweb_age_assurance_flow_enabled.value, false)
+! Fallback if the rules above stop working: strip the prompt from timeline XHR responses
+!#if cap_html_filtering
+x.com##+js(trusted-replace-xhr-response, /AgeVerificationPrompt/g, , url:/UserOriginalsTimeline|UserRepliesTimeline|UserRepostsTimeline|UserVideoTimeline|UserPhotoTimeline|UserHighlightsTweets|TweetDetail|TweetResultByRestId|UserTweets|HomeTimeline|HomeLatestTimeline|SearchTimeline|UserMedia|Bookmarks|Likes/)
+!#else
+/UserOriginalsTimeline|UserRepliesTimeline|UserRepostsTimeline|UserVideoTimeline|UserPhotoTimeline|UserHighlightsTweets|TweetDetail|TweetResultByRestId|UserTweets|HomeTimeline|HomeLatestTimeline|SearchTimeline|UserMedia|Bookmarks|Likes/$xhr,1p,domain=x.com,replace=/AgeVerificationPrompt//g
+!#endif
