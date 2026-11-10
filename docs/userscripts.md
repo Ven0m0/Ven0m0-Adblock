@@ -31,6 +31,12 @@ Updates are checked against the same URL, so new commits on `main` arrive automa
 
 YouTube Unified Optimizer no longer blocks AV1 itself; install YouTube Codec Preference for that.
 
+### Twitch
+
+| Script        | Sites  | Description                    | Install           |
+| ------------- | ------ | ------------------------------ | ----------------- |
+| Twitch Script | Twitch | Make Twitch usable (by nohuto) | [Install][twitch] |
+
 ### GitHub
 
 | Script                                | Sites  | Description                                                             | Install                |
@@ -61,6 +67,7 @@ Enable one per site.
 [yt-pro]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/yt-pro.user.js
 [yt-music]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/yt-music.user.js
 [yt-codec]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/yt-codec.user.js
+[twitch]: https://raw.githubusercontent.com/nohuto/userscripts/main/twitch.js
 [gh-pro]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/gh-pro.user.js
 [gh-enhancer]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/gh-enhancer.user.js
 [llm-pro]: https://raw.githubusercontent.com/Ven0m0/Ven0m0-Adblock/main/userscripts/src/LLM-pro.user.js
