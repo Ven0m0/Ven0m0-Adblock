@@ -25,11 +25,11 @@ wheels = [
 
 [[package]]
 name = "deadcode"
-version = "2.6.0"
+version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3a/b9/5915da8ad5f49ff0ee3ccc42c66bec5847d83b722a8ab7870ff63bb62d2e/deadcode-2.6.0.tar.gz", hash = "sha256:0d227c7e92f5688b6a8b6d8847a00048d70808b2690a208441bf4112c5aa5dd7", size = 47774, upload-time = "2026-11-08T17:02:56.117Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/43/6f/8c0315e6165be092630e37b8b7e138bc2b8077cc1d895d9f6dec01dc2b23/deadcode-2.6.1.tar.gz", hash = "sha256:9a6c81fb2615b74d74af0b5808754c7ed88fb7b47a4cef80d0b95e7f0649e69d", size = 57108, upload-time = "2026-11-11T07:12:35.473Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/14/0458be2fbba3ad7d0203bfd93f16a1e5f367bb444199902a0bdca0968570/deadcode-2.6.0-py3-none-any.whl", hash = "sha256:88e318d79f18a82526623434680a402c99f52319026955b001479961792dc9cf", size = 59959, upload-time = "2026-11-08T17:02:54.8Z" },
+    { url = "https://files.pythonhosted.org/packages/94/a0/15bd27b3aee520e88492f3131cb3644c7f773e690aa6a30419243efaffb9/deadcode-2.6.1-py3-none-any.whl", hash = "sha256:daec68cfb4e0aecf57aaa151e53871dca510fe51539724753bfd08287b5e9e7a", size = 61851, upload-time = "2026-11-11T07:12:33.497Z" },
 ]
 
 [[package]]
