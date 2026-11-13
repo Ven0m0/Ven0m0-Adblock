@@ -32,7 +32,7 @@
 
     "@adguard/agtree": ["@adguard/agtree@3.3.1", "", { "dependencies": { "@adguard/css-tokenizer": "^1.2.0", "camelcase-keys": "^7.0.2", "clone-deep": "^4.0.1", "is-ip": "3.1.0", "json5": "^2.2.3", "sprintf-js": "^1.1.3", "tldts": "^5.7.112", "xregexp": "^5.1.1", "zod": "3.24.4" } }, "sha512-WfJH2IbvtGi3CThD48Ok1C/NNtELxDfs24G/CACUT92/hPxXc7uvVxxxwou0sr4jNJa1Z5Eh5tmfvjBOFAsKmQ=="],
 
-    "@adguard/css-tokenizer": ["@adguard/css-tokenizer@1.2.0", "", {}, "sha512-cUj5j/AU5z/T4//5M6KnIJBpykAY4QbDsoiQ2DaWX/r2XkepMkTb8DhIbUHJD/QLGEyLeQLpi+nlxAgf4NTRRQ=="],
+    "@adguard/css-tokenizer": ["@adguard/css-tokenizer@1.3.0", "", {}, "sha512-0i5TNN4P34KbJGtPg5+ul9JNnw+MuOwd2oCjqFaQydaxzNpTr8dbMIS4fVTZNcvMgb6/GN/y/7/wmWRdcjo/7A=="],
 
     "@adguard/dead-domains-linter": ["@adguard/dead-domains-linter@1.0.38", "", { "dependencies": { "@adguard/agtree": "^1.1.7", "consola": "3.2.3", "glob": "^10.3.10", "node-fetch": "^2.7.0", "tldts": "^6.1.4", "yargs": "^17.7.2" }, "bin": { "dead-domains-linter": "src/cli.js" } }, "sha512-tbmTZZBqFipHCMRBr6/vXbk/WYhwNpvj+lvjFyB4DEeNbkx47x6wkuE5nTdKmM/xjZzp35u3HFtXWIf+XhV1Pg=="],
 
