@@ -79,7 +79,7 @@
   "overrides": {
     "axios": ">=1.15.0",
     "follow-redirects": ">=1.15.11",
-    "tldts": "7.5.1",
-    "tldts-core": "7.5.1"
+    "tldts": "7.5.2",
+    "tldts-core": "7.5.2"
   }
 }
