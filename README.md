@@ -2,7 +2,6 @@
 
 ![Commit activity](https://img.shields.io/github/last-commit/Ven0m0/Ven0m0-Adblock?logo=github)
 [![Formatted with Biome](https://img.shields.io/badge/Formatted_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev/)
-[![Maintainability](https://qlty.sh/gh/Ven0m0/projects/Ven0m0-Adblock/maintainability.svg)](https://qlty.sh/gh/Ven0m0/projects/Ven0m0-Adblock)
 
 Hand-maintained filter rules, DNS hostlists and userscripts for blocking ads and making the web more pleasant.
 Built for uBlock Origin and AdGuard.
