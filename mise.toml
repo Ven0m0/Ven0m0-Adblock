@@ -4,7 +4,6 @@ color = false
 yes = true
 auto_install = true
 quiet = true
-go_skip_checksum = true
 
 [settings.npm]
 bun = true
