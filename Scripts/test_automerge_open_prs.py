@@ -45,6 +45,24 @@ class TestMergePr(unittest.TestCase):
         ran.assert_called_once()
 
 
+class TestSyncBranch(unittest.TestCase):
+    def _merge_cmd(self, strategy):
+        with (
+            patch.object(am, "CONFLICT_STRATEGY", strategy),
+            patch.object(am, "refresh_main"),
+            patch.object(am, "_run"),
+            patch.object(am, "_succeeds", return_value=True) as ran,
+        ):
+            self.assertTrue(am.sync_branch(1, "b", "o", "r"))
+        return ran.call_args.args
+
+    def test_default_merge_has_no_conflict_strategy(self):
+        self.assertNotIn("-X", self._merge_cmd(""))
+
+    def test_explicit_strategy_is_passed(self):
+        self.assertIn("ours", self._merge_cmd("ours"))
+
+
 class TestMainDecisions(unittest.TestCase):
     def _run(self, prs_by_cycle, *, merge=True, sync=True):
         env = {"GH_TOKEN": "t"}
@@ -92,6 +110,12 @@ class TestMainDecisions(unittest.TestCase):
     def test_unmergeable_pr_exits_nonzero(self):
         code, *_ = self._run([[_pr(1)]], merge=False)
         self.assertEqual(code, 1)
+
+    def test_pr_with_unpassed_checks_is_not_merged(self):
+        for state in ("UNSTABLE", "BLOCKED", "UNKNOWN"):
+            code, _, merged, _ = self._run([[_pr(1, mergeStateStatus=state)]])
+            self.assertEqual(code, 1, state)
+            merged.assert_not_called()
 
     def test_missing_token_is_fatal(self):
         with (

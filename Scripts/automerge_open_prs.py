@@ -15,8 +15,11 @@ BASE_BRANCH = os.environ.get("BASE_BRANCH", "main")
 MAX_CYCLES = int(os.environ.get("MAX_CYCLES", "100"))
 BOT_NAME = os.environ.get("BOT_NAME", "github-actions[bot]")
 BOT_EMAIL = os.environ.get("BOT_EMAIL", "41898282+github-actions[bot]@users.noreply.github.com")
-CONFLICT_STRATEGY = os.environ.get("CONFLICT_STRATEGY", "ours")
-ALLOW_ADMIN_MERGE = os.environ.get("ALLOW_ADMIN_MERGE", "true").lower() == "true"
+# Empty = plain merge that aborts on conflict. Set "ours"/"theirs" only to knowingly resolve conflicts by discarding one side.
+CONFLICT_STRATEGY = os.environ.get("CONFLICT_STRATEGY", "")
+ALLOW_ADMIN_MERGE = os.environ.get("ALLOW_ADMIN_MERGE", "false").lower() == "true"
+# mergeStateStatus values where required checks passed; anything else (UNSTABLE, BLOCKED, UNKNOWN) is not merged.
+MERGEABLE_STATES = ("CLEAN", "HAS_HOOKS")
 
 
 def _require(cmd: str) -> None:
@@ -77,7 +80,8 @@ def sync_branch(number: int, head_ref: str, head_owner: str, head_repo: str) -> 
     print(f"Updating PR #{number} branch with {BASE_BRANCH}")
     refresh_main()
     _run("gh", "pr", "checkout", str(number))
-    if not _succeeds("git", "merge", "--no-edit", "-X", CONFLICT_STRATEGY, f"origin/{BASE_BRANCH}"):
+    strategy = ["-X", CONFLICT_STRATEGY] if CONFLICT_STRATEGY else []
+    if not _succeeds("git", "merge", "--no-edit", *strategy, f"origin/{BASE_BRANCH}"):
         _succeeds("git", "merge", "--abort")
         return False
     _run(
@@ -146,6 +150,10 @@ def main() -> None:
                     progress_made = True
                     continue
                 blocked.append(f"PR #{number} could not be updated against {BASE_BRANCH}")
+                continue
+
+            if merge_state not in MERGEABLE_STATES:
+                blocked.append(f"PR #{number} is {merge_state}, not merging until checks pass")
                 continue
 
             if merge_pr(number):

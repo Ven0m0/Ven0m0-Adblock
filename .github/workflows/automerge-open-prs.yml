@@ -26,9 +26,6 @@ jobs:
       # Prefer PAT when branch protection or cross-repository branch updates exceed GITHUB_TOKEN.
       GH_TOKEN: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
       BASE_BRANCH: main
-      # These aggressive defaults intentionally match the issue requirement to merge every open PR.
-      CONFLICT_STRATEGY: ours
-      ALLOW_ADMIN_MERGE: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
