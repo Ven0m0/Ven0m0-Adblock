@@ -1,0 +1,62 @@
+name: Rule diff comment
+
+on:
+  pull_request:
+    paths:
+      - "lists/adblock/**"
+      - "lists/hostlist/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: rule-diff-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  comment:
+    # Fork PRs get a read-only token, so skip them instead of failing.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Count added and removed rules per file
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## Rule changes"
+            echo
+            echo "| File | Added | Removed |"
+            echo "|------|------:|--------:|"
+          } > comment.md
+          while IFS= read -r f; do
+            # Rules only: skip blank lines and ! / # comments, and the +++ / --- diff headers.
+            # grep -c exits 1 on zero matches, so count with wc -l
+            # shellcheck disable=SC2126
+            added=$(git diff -U0 "$BASE_SHA...$HEAD_SHA" -- "$f" | grep -E '^\+[^+]' | grep -vE '^\+\s*([!#]|$)' | wc -l || true)
+            # shellcheck disable=SC2126
+            removed=$(git diff -U0 "$BASE_SHA...$HEAD_SHA" -- "$f" | grep -E '^-[^-]' | grep -vE '^-\s*([!#]|$)' | wc -l || true)
+            echo "| \`$f\` | $added | $removed |" >> comment.md
+          done < <(git diff --name-only "$BASE_SHA...$HEAD_SHA" -- lists/adblock lists/hostlist)
+          echo >> comment.md
+          echo "<!-- rule-diff-comment -->" >> comment.md
+      - name: Post or update the comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --jq '[.[] | select(.body | contains("<!-- rule-diff-comment -->"))][0].id // empty')
+          if [[ -n "$existing" ]]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$existing" -F body=@comment.md
+          else
+            gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file comment.md
+          fi
