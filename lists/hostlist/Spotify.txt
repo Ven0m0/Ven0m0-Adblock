@@ -398,7 +398,6 @@ api.comscore.com
 api.intercom.io
 api.safedk.com
 api.zwizzarmyknife.com
-app.adjust.com
 apx.moatads.com
 ar.voicefive.com
 arantxa.ash.spotify.com
@@ -643,6 +642,7 @@ dd.audio-ak.cdn.spotify.com
 dd.video-ak.cdn.spotify.com
 de.audio-ak.cdn.spotify.com
 de.video-ak.cdn.spotify.com
+dealer.spotify.com
 deborah.ash.spotify.com
 deborah.ash1.spotify.com
 demo-builder.spotify.com
@@ -664,7 +664,6 @@ df.video-ak.cdn.spotify.com
 digitalassetlinks.googleapis.com
 docs.spotify.com
 doubleclick.com
-doubleclick.net
 download.spotify.com
 download.spotify.map.fastly.net
 ds.serving-sys.com
@@ -942,7 +941,6 @@ o.admob.com
 o.scdn.co
 o1.em.spotify.com
 o11.em.spotify.com
-ogads-pa.googleapis.com
 oktascimserver.spotify.com
 omaze.com
 opensource.spotify.com
@@ -1151,7 +1149,6 @@ webplayersupport.spotify.com
 welcome-images.scdn.co
 wendy.admob.com
 wg.spotify.com
-widget.intercom.io
 wildcard.moatads.com.edgekey.net
 wl.spotify.com
 wl.support.spotify.com

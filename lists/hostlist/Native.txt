@@ -8,9 +8,13 @@ activity-stream-icons.services.mozilla.com
 ads-static.brave.com
 advertising.apple.com
 advp.apple.com
+af.opera.com
+air-quality-api.open-meteo.com
 amp-test.com                                   # ? On msn.com
 analytics.itunes.apple.com
+api.intelsa.intel.com
 api.msn.com                                    #Tiles - Win 10 / 11
+appclassify.nothingtech.link
 appexbingfinance.trafficmanager.net            #Tiles - Win 10 / 11
 appexbingweather.trafficmanager.net            #Tiles - Win 10 / 11
 appexeusprodweather.blob.core.windows.net      #Tiles - Win 10 / 11
@@ -18,33 +22,62 @@ appexfinanceappupdate.blob.core.windows.net    #Tiles - Win 10 / 11
 appexnewsappupdate.blob.core.windows.net       #Tiles - Win 10 / 11
 appexsports.trafficmanager.net                 #Tiles - Win 10 / 11
 appexwusprodweather.blob.core.windows.net      #Tiles - Win 10 / 11
+appleid.cdn-apple.com
+arc.trafficmanager.net
+arcore.googleapis.com
+asset.nothing.tech
+assistant.google.com
+asussupport.asus.com
+atm-settingsfe-prod-geo2.trafficmanager.net
 beta.vodafone.de
 bingwallpaper.microsoft.com                    #Bing - Download wallpaper
 blob.weather.microsoft.com                     #Tiles - Win 10 / 11
+blocklists.settings.services.mozilla.com
 brave-core-ext.s3.brave.com
 browserdefaults.microsoft.com                  #App     Edge
 bubblewitch3mobile.king.com # Win 10 Start Tiles
 candycrush.king.com
 candycrushsoda.king.com
+cashback-api-production.operacdn.com
+cashback.opera.com
+cast.google.com
 ccs.play.king.com
+cdn.darkreader.app
 ceipmsn.com                                    #SeaPort (Search Enhancement Broker process)
+chat-pa.clients6.google.com
+chatbot.rc3.qa.ring.com
+chromesyncentities-pa.googleapis.com
+chromesyncpasswords-pa.googleapis.com
+classify-client.services.mozilla.com
 client.prod.repmap.microsoft.com               # Captcha ?
 cloudtile.photos.microsoft.com                 #Tiles - Win 10 / 11
+connectivity-check.ubuntu.com
 cortana.ai                                     #App   Cortana
 counter.apple.com
 crash-reports.mozilla.com
+crashlyticsreports-pa.googleapis.com
 cstat.apple.com
 d3ozddcpb3il9a.cloudfront.net
 d6wjo2hisqfy2.cloudfront.net
 daisy.ubuntu.com
+dc-api.nothingtech.link
+detectportal.firefox.com
 devstats.apple.com
 donate.mozilla.org
 edmarketing.apple.com
+ekop.intel.com
+embeddedassistant.googleapis.com
+experience.amd.com
+favicons.proxy.brave.com
+feedback-pa.clients6.google.com
 feedback.apple.com
 feedback.push.apple.com
 fevoke-windowsservices-tas.msedge.net          #App    Candy Crush Saga (Updates)
 finance-services.msn.com                       #Tiles - Win 10 / 11
 finance.services.appex.bing.com                #Tiles - Win 10 / 11
+firebaselogging-pa.googleapis.com
+firebaseremoteconfigrealtime.googleapis.com
+firefox-android-home-recommendations.getpocket.com
 firefox.settings.services.mozilla.com
 foodanddrink.services.appex.bing.com           #Tiles - Win 10 / 11
 foodanddrink.tile.appex.bing.com               #Tiles - Win 10 / 11
@@ -53,11 +86,16 @@ gameclipscontent-d2006.media.xboxlive.com      #Xbox
 gameclipscontent-t2006.xboxlive.com            #Xbox
 geoplaces.apple.com
 getpocket.cdn.mozilla.net
+getpocket.com
 gs-loc.apple.com
+h20572.www2.hp.com
+homecloudcastsdk-pa.googleapis.com
 iad-apple.com
 iad.apple.com
 iadcontent.apple.com
 iadmoo.apple.com
+ias.intel.com
+iasbroker.intel.com
 ie11welcome.microsoft.com                      #Internet Explorer
 ie9cvlist.ie.microsoft.com                     #Toolbar - Uninstall
 iecvlist.microsoft.com                         #Toolbar - Uninstall
@@ -66,6 +104,8 @@ img-prod.pocket.prod.cloudops.mozgcp.net
 imgstats.apple.com
 insiderhub.microsoft.com                       #Tiles - Win 10 / 11
 insiderservice.microsoft.com                   #Tiles - Win 10 / 11
+instantmessaging-pa-us.googleapis.com
+instantmessaging-pa.googleapis.com
 internalcheck.apple.com
 iosdiags.apple.com
 iphonediags.apple.com
@@ -73,27 +113,48 @@ iphonediagsit2.apple.com
 iphonediagsuat-bscan.apple.com
 iphonediagsuat2.apple.com
 iphonesubmissions.apple.com
+ipv4.connman.net
+iso-stats.cachyos.org
+lamssettings-pa.googleapis.com
 launch.apple.com
 lfghub-anonymous.xboxlive.com                  #Xbox
 livetile.hulu.com                              #Tiles - Win 10 / 11
 livetileedge.dsx.mp.microsoft.com              #Tiles - Win 10 / 11
 livetiles.health.appex.bing.com                #Tiles - Win 10 / 11
 location.services.mozilla.com
+locprod1-elb-eu-west-1.prod.mozaws.net
 maps.windows.com                               #Bing Maps
 marketing.apple.com
 mgslivetiles.cloudapp.net                      #Tiles - Win 10 / 11
+monitor.mozilla.org
+n-deventry-smb.tplinkcloud.com
+n-devs-smb.tplinkcloud.com
 netperform-lz.vodafone.com
 news-events.apple.com
+news-skip.nothingtech.link
+news.nothingtech.link
 normandy-cloudfront.cdn.mozilla.net
+nothingx.nothingtech.link
+nothingx.nothingtech.link.fritz.box
 notificationinbox.xboxlive.com                 #Xbox
 o.xbox.com                                     # ? Tracking (Blank)
+openh264.org
+passwordsleakcheck-pa.googleapis.com
+peoplestack-pa.googleapis.com
 phone.sports.tile.appex.bing.com               #Tiles - Win 10 / 11
+phonedeviceverification-pa.googleapis.com
+ping.archlinux.org
+prod.detectportal.prod.cloudops.mozgcp.net
 profile.gc.apple.com
 push.services.mozilla.com
+qsurvey.mozilla.com
 qwapi.apple.com
 r20swj13mr.microsoft.com                       #Internet Explorer - After Updating
 radarsubmissions.apple.com
+relay.mozilla.org
 sa.apple.com
+safebrowsing.googleapis.com
+samsungknox.com
 screenshots.firefox.com
 screenshotscdn.firefox.com
 search.msn.com                                 #MSN - Search
@@ -101,15 +162,21 @@ search.msn.de                                  #MSN - Search
 searchads.apple.com
 securemetrics.apple.com.cn
 securemetrics.experience.apple
+secureprotocolengine-test.intel.com
 service.weather.microsoft.com                  #Tiles - Win 10 / 11
+shavar.prod.mozaws.net
+shavar.services.mozilla.com
 smoot.apple.com
 smp-device-content.apple.com
 snippets.cdn.mozilla.net
 snippets.mozilla.com
+start.ubuntu.com
 static.gc.apple.com
 stats.gc-apple.com
 supportmetrics-uat.apple.com
 survey.support.services.microsoft.com          #Survey - Popup Window
+telemetry.mozilla.org
+thunderbird-settings.thunderbird.net
 tile-service.weather.microsoft.com             #Tiles - Win 10 / 11
 tiles-cloudfront.cdn.mozilla.net
 tiles.r53-2.services.mozilla.com
@@ -126,6 +193,7 @@ weather.microsoft.com                          #Tiles - Win 10 / 11
 weather.services.appex.bing.com                #Tiles - Win 10 / 11
 weather.tile.appex.bing.com                    #Tiles - Win 10 / 11
 westus.tts.speech.microsoft.com                #Text To Speech API
+whatsnew.libreoffice.org
 windows.msn.com                                #MSN - Taskbar - News and Interests
 windowssearch.com                              #Bing
 xboxab.com                                     #Games -  Game Bar Overlay
